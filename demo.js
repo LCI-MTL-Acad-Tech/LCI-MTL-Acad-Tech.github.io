@@ -1,7 +1,7 @@
 var permissions = 0;
-const threshold = 5; 
-const fps = 10; 
-var stopped = false;
+const threshold = 4; // how many chunks at a time are processed
+const sampleRate = 3000;
+const fps = 30; 
 
 var canvas = document.getElementById('canvas'); // visible
 var prev =  document.getElementById('canvas'); // invisible, for memory
@@ -9,28 +9,23 @@ var auxIn = document.createElement('canvas'); // invisible, for input
 var auxOut = document.createElement('canvas'); // invisible, for output
 
 // adapted from https://stackoverflow.com/questions/74101155/chrome-warning-willreadfrequently-attribute-set-to-true
-var ctx = canvas.getContext('2d', { willReadFrequently : true });
+var ctx = canvas.getContext('2d', { willReadFrequently : true }); // actual output
 var pc = canvas.getContext('2d', { willReadFrequently : true });
 var ic = auxIn.getContext('2d', { willReadFrequently : true });
 var oc = auxOut.getContext('2d', { willReadFrequently : true });
 var first = true;
+var running = false;
 
-var r = null; // placeholder for the recorder
+var cam = null; // placeholder for the webcam recorder
 
 function whine(e) {
   console.log("It is not working", e.message);
 }
 
-function thanks() {
-   console.log('Stopping');
-   if (!Object.is(r, null)) {
-    r.stop();
-   } 
-   stopped = true;
-   alert('Thank you! Please reload the page if you want to try again.');
-}
+let camChunks = []; // this is where the media stream incoming data goes
+let resultChunks = [];
 
-let chunks = []; // this is where the media stream incoming data goes
+let pos = 0; // this is how far we have processed them
 
 const mimeType = 'video/webm;codecs=vp8,opus'; // https://dev.to/ethand91/mediarecorder-api-tutorial-54n8
 const options = { audioBitsPerSecond: 128000, mimeType, videoBitsPerSecond: 2500000 };
@@ -41,30 +36,102 @@ if (!MediaRecorder.isTypeSupported(mimeType)) {
   console.log('The requested mime type is supported');
 }
 
-function color(value) {
-  return Math.min(Math.max(value, 0), 255);
+const produce = ({ data }) => {
+  if (data.size > 0) {
+      resultChunks.push(data);
+      console.log('Data added to output buffer'); 
+  } else {
+    console.log('No output data available');
+  }
+};
+
+
+function react(s) {
+   // record a short video from the webcam   
+   cam = new MediaRecorder(s, options);
+   cam.ondataavailable = receive;
+   running = true;
+   cam.start(1000);
 }
 
+function attempt() {
+  if (permissions == 2) {
+    console.log('Accessing media');
+    navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(react).catch(whine);
+  } else {
+    console.log("Checking further permissions");
+  }
+}
+
+
+let dark = 25;
+let bright = 230;
+function color(value) {
+  let result = Math.min(Math.max(value, 0), 255);
+  if (result < dark || result > bright) {
+    result = Math.floor(Math.random() * 255);
+  }
+  return result;
+}
+
+// audio analysis code based on https://mdn.github.io/voice-change-o-matic/
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const distortion = audioCtx.createWaveShaper();
+const biquadFilter = audioCtx.createBiquadFilter();
+const gainNode = audioCtx.createGain();
+const convolver = audioCtx.createConvolver();
+const analyser = audioCtx.createAnalyser();
+analyser.minDecibels = -90;
+analyser.maxDecibels = -10;
+analyser.smoothingTimeConstant = 0.85;
+analyser.connect(audioCtx.destination);
+distortion.connect(biquadFilter);
+biquadFilter.connect(gainNode);
+convolver.connect(gainNode);
+
+// audio analysis setup ends
+ 
 async function process() {
-      var blob = new Blob(chunks, { 'type': 'video/webm' });
-      chunks = []; // clear
-      console.log('Processing the buffer');
-      let url = URL.createObjectURL(blob);
-      let video = document.createElement('video');
-      let seekResolve; // adapted from https://stackoverflow.com/questions/32699721/javascript-extract-video-frames-reliably
-      video.addEventListener("seeked", async function () {
+  var blob = new Blob(camChunks, { 'type': 'video/webm' });
+  console.log('Processing a buffer of length', camChunks.length);
+  let url = URL.createObjectURL(blob);
+  let video = document.createElement('video');
+  
+  let seekResolve = false; // adapted from https://stackoverflow.com/questions/32699721/javascript-extract-video-frames-reliably
+  video.addEventListener("seeked", async function () {
         if (seekResolve) seekResolve();
-      });
-      video.src = url;
-      while ( // weird hack
-        (video.duration === Infinity || isNaN(video.duration)) &&
-        video.readyState < 2
-        ) {
-        await new Promise((r) => setTimeout(r, 1000));
-        video.currentTime = 10000000 * Math.random();
-      }
-      let duration = video.duration;
-      let [w, h] = [video.videoWidth, video.videoHeight];
+  }); 
+  video.src = url;
+  while ((video.duration === Infinity || isNaN(video.duration)) && video.readyState < 2) { // weird hack but absolutely necessary
+    await new Promise((r) => setTimeout(r, 200));
+    video.currentTime = 100000 * Math.random();
+    console.log('Weird hack loop');
+  } 
+
+  let duration = video.duration;
+  console.log('Constructed a video with duration', duration);
+  let [w, h] = [video.videoWidth, video.videoHeight];
+
+      // audio extraction from video based on https://stackoverflow.com/questions/49140159/extracting-audio-from-a-video-file
+      var offlineAudioContext = new OfflineAudioContext(2, sampleRate * duration, sampleRate);
+      var soundSource = offlineAudioContext.createBufferSource();
+      var reader = new FileReader();
+      reader.readAsArrayBuffer(blob); 
+      reader.onload = function () {
+        var videoFileAsBuffer = reader.result; 
+        offlineAudioContext.decodeAudioData(videoFileAsBuffer).then(function (decodedAudioData) {
+          myBuffer = decodedAudioData;
+          soundSource.buffer = myBuffer;
+          soundSource.connect(offlineAudioContext.destination);
+          soundSource.start();
+        });
+      };
+      analyser.fftSize = 2048;
+      const bufferLength = analyser.fftSize;
+      const audio = new Uint8Array(bufferLength);
+      analyser.getByteTimeDomainData(audio);
+      console.log(audio.length);
 
       auxIn.width = w;
       auxIn.height = h;
@@ -79,7 +146,14 @@ async function process() {
       let interval = 1 / fps;
       let currentTime = 0;
       console.log('Iterating over the video frames');
-      while (currentTime < duration && !stopped) {
+
+  const animationStream = canvas.captureStream(fps); 
+  let animationRecorder = new MediaRecorder(animationStream, options);
+  animationRecorder.ondataavailable = produce;
+  animationRecorder.start(1000);
+
+
+      while (currentTime < duration) {
         video.currentTime = currentTime;
         await new Promise((r) => (seekResolve = r));
         ic.drawImage(video, 0, 0, w, h);
@@ -107,10 +181,10 @@ async function process() {
             var rv = op[i];
             var gv = op[i + 1];
             var bv = op[i + 2];
-            // red for debug
-            op[i] = 255; // color(rv + rn - ro);
-  	    op[i + 1] = 0; // color(gv + gn - go);
-            op[i + 2] = 0; // color(bv + bn - bo);
+            // accumulate
+            op[i] = color(bv + bn - bo);
+  	    op[i + 1] = color(gv + gn - go);
+            op[i + 2] = color(bv + bn - bo);
           }
 	  output.data = op; // update the output data
           ctx.putImageData(output, 0, 0); // refresh the visible canvas
@@ -122,35 +196,44 @@ async function process() {
       }
 };
 
+async function store() {
+   console.log('Making a video for download');
+   // adapted from https://developer.mozilla.org/en-US/docs/Web/API/MediaStream_Recording_API/Recording_a_media_element
+   return; // this call is happening too soon, need to fix it
+   let outputBlob = new Blob(resultChunks, { type: "video/mp4" });
+   let result = document.getElementById("result");
+   result.src = URL.createObjectURL(outputBlob);
+   result.width = canvas.width;
+   result.height = canvas.height;
+   let db = document.getElementById("db");
+   db.href = result.src;
+   db.download = "Creation.mp4";
+}
+
 const receive = ({ data }) => {
+  if (!running) {
+     console.log('Discarding late input data');
+     return;
+  }
   if (data.size > 0) {
-    chunks.push(data);
-    if (chunks.length > threshold) {
-	process();
+    if (camChunks.length < threshold) {
+      camChunks.push(data);
+      if (camChunks.length >= threshold) {
+          console.log('Stopping the webcam recording');
+          running = false;
+	  cam.stop();
+	  console.log('Processing the input');
+  	  process().then(store())
+      } else {
+        console.log('Data added to input buffer'); 
+      }
     } else {
-      console.log('Data added to buffer'); 
-    }
+      console.log('Discarding excess input data');
+    } 
   } else {
-    console.log('No data available');
+    console.log('No input data available');
   }
 };
-
-
-function react(s) {
-   console.log('Recording');
-   rec = new MediaRecorder(s, options);
-   rec.ondataavailable = receive;
-   rec.start(1000);
-}
-
-function attempt() {
-  if (permissions == 2) {
-    console.log('Accessing media');
-    navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(react).catch(whine);
-  } else {
-    console.log("Checking further permissions");
-  }
-}
 
 document.addEventListener('DOMContentLoaded', function(){
 
