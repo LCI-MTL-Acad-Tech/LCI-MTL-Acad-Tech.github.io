@@ -29,6 +29,18 @@ let pos = 0; // this is how far we have processed them
 const mimeType = 'video/webm;codecs=vp8,opus'; // https://dev.to/ethand91/mediarecorder-api-tutorial-54n8
 const options = { audioBitsPerSecond: 128000, mimeType, videoBitsPerSecond: 2500000 };
 
+// these values will affect the colors (quietness will give a constant 128 it seems)
+let mean = 128;
+let std = 0;
+
+// based on https://stackoverflow.com/questions/7343890/standard-deviation-javascript
+function setAudioStats(data) { 
+   const n = data.length;
+   mean = data.reduce((a, b) => a + b) / n;
+   std = Math.sqrt(data.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
+   console.log('Got', n, 'elements of audio data with mean', mean, 'and stddev', std); 
+}
+
 if (!MediaRecorder.isTypeSupported(mimeType)) {
   alert('vp8/opus mime type is not supported');
 } else {
@@ -43,7 +55,6 @@ const produce = ({ data }) => {
     console.log('No output data available');
   }
 };
-
 
 function react(s) {
    // record a short video from the webcam   
@@ -63,15 +74,31 @@ function attempt() {
   }
 }
 
+// tweaking how color() works alters the generation of the visual
+let dark = 5;
+let bright = 250;
+function color(channel, accumulated, currInput, prevInput) {
+  let temperature = mean + std * Math.random() - 128;
+  let change = (currInput - prevInput); 
+  let result = accumulated + temperature;
 
-let dark = 25;
-let bright = 230;
-function color(value) {
-  let result = Math.min(Math.max(value, 0), 255);
-  if (result < dark || result > bright) {
-    result = Math.floor(Math.random() * 255);
-  }
-  return result;
+  switch(channel) { 
+    case 0: // red 
+     result = 255 - result / 2;
+ break;
+  case 1: // green
+     result = 128 + result / 2;
+break;
+  case 2: // blue
+     result = result / 2;
+break;
+default: // not a color channel
+   result = 0;  
+}
+
+  result += Math.random() * (255 - change);
+
+  return Math.min(Math.max(Math.floor(result), 0), 255);
 }
 
 function nudge(input, keep = 0.9, scale = 50) {
@@ -85,21 +112,14 @@ function nudge(input, keep = 0.9, scale = 50) {
 // audio analysis code based on https://mdn.github.io/voice-change-o-matic/
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-const distortion = audioCtx.createWaveShaper();
-const biquadFilter = audioCtx.createBiquadFilter();
-const gainNode = audioCtx.createGain();
-const convolver = audioCtx.createConvolver();
 const analyser = audioCtx.createAnalyser();
 analyser.minDecibels = -90;
 analyser.maxDecibels = -10;
 analyser.smoothingTimeConstant = 0.85;
 analyser.connect(audioCtx.destination);
-distortion.connect(biquadFilter);
-biquadFilter.connect(gainNode);
-convolver.connect(gainNode);
 
 // audio analysis setup ends
- 
+
 async function process() {
   var blob = new Blob(camChunks, { 'type': 'video/webm' });
   console.log('Processing a buffer of length', camChunks.length);
@@ -118,6 +138,7 @@ async function process() {
   } 
 
   let duration = video.duration;
+
   console.log('Constructed a video with duration', duration);
   let [w, h] = [video.videoWidth, video.videoHeight];
 
@@ -139,8 +160,9 @@ async function process() {
       const bufferLength = analyser.fftSize;
       const audio = new Uint8Array(bufferLength);
       analyser.getByteTimeDomainData(audio);
-      console.log(audio.length);
-
+      let al = audio.length;
+      console.log('Audio length is', al);
+	
       auxIn.width = w;
       auxIn.height = h;
       auxOut.width = w;
@@ -152,6 +174,7 @@ async function process() {
       console.log('Working on a', w, 'by', h, 'canvas');
 
       let interval = 1 / fps;
+      let segment = (al / fps) / duration;
       let currentTime = 0;
       console.log('Iterating over the video frames');
 
@@ -164,20 +187,23 @@ async function process() {
   var init = pc.getImageData(0, 0, w, h); // the "prev" of the first is a randomized one
   var id = init.data; 
   console.log('Setting up a random starting point');
-  for (var i = 0; i < id.length; i += 1) { // rgba?
+  for (var i = 0; i < id.length; i += 1) { // channels all treated the same way
        if (i == 0) {
-            id[i] = color(0); // random value 
+          id[i] = color(i % 4, 0, 0, 0); // random value 
        } else {
-            id[i] = color(nudge(id[i-1]));
+          id[i] = color(i % 4, 0, nudge(id[i-1]), 0);
        }
    }
    init.data = id; // update the output data
 
-
+    let counter = 0;
       while (currentTime < duration) {
         video.currentTime = currentTime;
+        document.getElementById("msg").innerHTML = '<p>At ' + currentTime.toFixed(1) + ' of a total of ' + duration.toFixed(2) + ' seconds</p>';
         await new Promise((r) => (seekResolve = r));
         ic.drawImage(video, 0, 0, w, h);
+        setAudioStats(audio.slice(counter * segment, (counter + 1) * segment));
+        counter++;
         currentTime += interval;
 
 	// pixel access based on https://html5doctor.com/video-canvas-magic/
@@ -202,9 +228,9 @@ async function process() {
             var gv = op[i + 1];
             var bv = op[i + 2];
             // accumulate
-            op[i] = color(rv + rn - ro);
-  	    op[i + 1] = color(gv + gn - go);
-            op[i + 2] = color(bv + bn - bo);
+            op[i] = color(0, rv, rn, ro);
+  	    op[i + 1] = color(1, gv, gn, go);
+            op[i + 2] = color(2, bv, bn, bo);
           }
 	  output.data = op; // update the output data
           ctx.putImageData(output, 0, 0); // refresh the visible canvas
@@ -232,8 +258,8 @@ const receive = ({ data }) => {
   if (data.size > 0) {
     let k = camChunks.length;
     if (k < threshold) {
-      document.getElementById("msg").innerHTML = '<p>' + k + '/' + threshold + '</p>';
       camChunks.push(data);
+      document.getElementById("msg").innerHTML = '<p>' + (k + 1) + '/' + threshold + '</p>';
       if (k + 1 == threshold) {
           console.log('Stopping the webcam recording');
           running = false;
