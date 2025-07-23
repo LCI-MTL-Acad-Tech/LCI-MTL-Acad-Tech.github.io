@@ -3,17 +3,16 @@ const threshold = 4; // how many chunks at a time are processed
 const sampleRate = 3000;
 const fps = 30; 
 
-var canvas = document.getElementById('canvas'); // visible
-var prev =  document.getElementById('canvas'); // invisible, for memory
+var canvas = document.createElement('canvas'); // invisible, for target
+var prev = document.createElement('canvas'); // invisible, for memory
 var auxIn = document.createElement('canvas'); // invisible, for input
 var auxOut = document.createElement('canvas'); // invisible, for output
 
 // adapted from https://stackoverflow.com/questions/74101155/chrome-warning-willreadfrequently-attribute-set-to-true
 var ctx = canvas.getContext('2d', { willReadFrequently : true }); // actual output
-var pc = canvas.getContext('2d', { willReadFrequently : true });
+var pc = prev.getContext('2d', { willReadFrequently : true });
 var ic = auxIn.getContext('2d', { willReadFrequently : true });
 var oc = auxOut.getContext('2d', { willReadFrequently : true });
-var first = true;
 var running = false;
 
 var cam = null; // placeholder for the webcam recorder
@@ -51,6 +50,7 @@ function react(s) {
    cam = new MediaRecorder(s, options);
    cam.ondataavailable = receive;
    running = true;
+   document.getElementById("msg").innerHTML = '<p>Listening and watching...</p>';
    cam.start(1000);
 }
 
@@ -72,6 +72,14 @@ function color(value) {
     result = Math.floor(Math.random() * 255);
   }
   return result;
+}
+
+function nudge(input, keep = 0.9, scale = 50) {
+    if (Math.random() < keep) {
+	return input;
+    } else {
+        return Math.floor(input + scale * Math.random());
+   } 
 }
 
 // audio analysis code based on https://mdn.github.io/voice-change-o-matic/
@@ -152,6 +160,19 @@ async function process() {
   animationRecorder.ondataavailable = produce;
   animationRecorder.start(1000);
 
+  // place colors on the canvas to begin modifying
+  var init = pc.getImageData(0, 0, w, h); // the "prev" of the first is a randomized one
+  var id = init.data; 
+  console.log('Setting up a random starting point');
+  for (var i = 0; i < id.length; i += 1) { // rgba?
+       if (i == 0) {
+            id[i] = color(0); // random value 
+       } else {
+            id[i] = color(nudge(id[i-1]));
+       }
+   }
+   init.data = id; // update the output data
+
 
       while (currentTime < duration) {
         video.currentTime = currentTime;
@@ -162,10 +183,9 @@ async function process() {
 	// pixel access based on https://html5doctor.com/video-canvas-magic/
         var input = ic.getImageData(0, 0, w, h); 
         var ip = input.data;
-        if (!first) {
   	  var output = oc.getImageData(0, 0, w, h);
 	  var op = output.data; 
-	  var old = oc.getImageData(0, 0, w, h);
+	  var old = pc.getImageData(0, 0, w, h);
 	  var od = old.data; 
 	  console.log('Subsequent frame with data length of', ip.length);
           for (var i = 0; i < ip.length; i += 4) { // rgba?
@@ -182,25 +202,18 @@ async function process() {
             var gv = op[i + 1];
             var bv = op[i + 2];
             // accumulate
-            op[i] = color(bv + bn - bo);
+            op[i] = color(rv + rn - ro);
   	    op[i + 1] = color(gv + gn - go);
             op[i + 2] = color(bv + bn - bo);
           }
 	  output.data = op; // update the output data
           ctx.putImageData(output, 0, 0); // refresh the visible canvas
-        } else {
-	  first = false; // start calculating differences
-	  console.log('First frame will be read into storage');
-        }
+
         oc.putImageData(input, 0, 0); // save this input frame to compare with on the next round
       }
-};
-
-async function store() {
    console.log('Making a video for download');
    // adapted from https://developer.mozilla.org/en-US/docs/Web/API/MediaStream_Recording_API/Recording_a_media_element
-   return; // this call is happening too soon, need to fix it
-   let outputBlob = new Blob(resultChunks, { type: "video/mp4" });
+    let outputBlob = new Blob(resultChunks, { type: "video/mp4" });
    let result = document.getElementById("result");
    result.src = URL.createObjectURL(outputBlob);
    result.width = canvas.width;
@@ -208,6 +221,7 @@ async function store() {
    let db = document.getElementById("db");
    db.href = result.src;
    db.download = "Creation.mp4";
+   document.getElementById("msg").innerHTML = '<p>Play the video.</p>';
 }
 
 const receive = ({ data }) => {
@@ -216,14 +230,17 @@ const receive = ({ data }) => {
      return;
   }
   if (data.size > 0) {
-    if (camChunks.length < threshold) {
+    let k = camChunks.length;
+    if (k < threshold) {
+      document.getElementById("msg").innerHTML = '<p>' + k + '/' + threshold + '</p>';
       camChunks.push(data);
-      if (camChunks.length >= threshold) {
+      if (k + 1 == threshold) {
           console.log('Stopping the webcam recording');
           running = false;
 	  cam.stop();
 	  console.log('Processing the input');
-  	  process().then(store())
+          document.getElementById("msg").innerHTML = '<p>Preparing the video.</p>';
+  	  process();
       } else {
         console.log('Data added to input buffer'); 
       }
