@@ -1,7 +1,7 @@
 var permissions = 0;
 const threshold = 4; // how many chunks at a time are processed
 const sampleRate = 3000;
-const fps = 30; 
+const fps = 10; // increase for a longer processing
 
 var canvas = document.createElement('canvas'); // invisible, for target
 var prev = document.createElement('canvas'); // invisible, for memory
@@ -30,15 +30,16 @@ const mimeType = 'video/webm;codecs=vp8,opus'; // https://dev.to/ethand91/mediar
 const options = { audioBitsPerSecond: 128000, mimeType, videoBitsPerSecond: 2500000 };
 
 // these values will affect the colors (quietness will give a constant 128 it seems)
-let mean = 128;
+let sqrtmean = 128;
 let std = 0;
 
 // based on https://stackoverflow.com/questions/7343890/standard-deviation-javascript
 function setAudioStats(data) { 
    const n = data.length;
-   mean = data.reduce((a, b) => a + b) / n;
+   let mean = data.reduce((a, b) => a + b) / n;
+   sqrtmean = Math.sqrt(mean);
    std = Math.sqrt(data.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
-   console.log('Got', n, 'elements of audio data with mean', mean, 'and stddev', std); 
+   console.log('Got', n, 'elements of audio data with sqrt of mean', sqrtmean, 'and stddev', std); 
 }
 
 if (!MediaRecorder.isTypeSupported(mimeType)) {
@@ -74,32 +75,6 @@ function attempt() {
   }
 }
 
-// tweaking how color() works alters the generation of the visual
-let dark = 5;
-let bright = 250;
-function color(channel, accumulated, currInput, prevInput) {
-  let temperature = mean + std * Math.random() - 128;
-  let change = (currInput - prevInput); 
-  let result = accumulated + temperature;
-
-  switch(channel) { 
-    case 0: // red 
-     result = 255 - result / 2;
- break;
-  case 1: // green
-     result = 128 + result / 2;
-break;
-  case 2: // blue
-     result = result / 2;
-break;
-default: // not a color channel
-   result = 0;  
-}
-
-  result += Math.random() * (255 - change);
-
-  return Math.min(Math.max(Math.floor(result), 0), 255);
-}
 
 function nudge(input, keep = 0.9, scale = 50) {
     if (Math.random() < keep) {
@@ -120,6 +95,45 @@ analyser.connect(audioCtx.destination);
 
 // audio analysis setup ends
 
+
+// pixel manipulation auxiliary routines
+
+function getPixel(row, column, width, height, data) {
+  // four channels, row by row, width by height 
+  let pos = row * width * 4 + column * 4;
+  return data.slice(pos, pos + 4); // RGBA
+}
+
+function setPixel(row, column, width, height, data, value) {  
+   let start = row * width * 4 + column * 4;
+   for (let i = 0; i < 4; i++) {
+     data[start + i] = value[i];
+   } 
+}
+
+// tweaking this alters the visuals
+function makePixel(one, two, three) { 
+  const ri = [ one[0], two[0], three[0] ];
+  const gi = [ one[1], two[1], three[1] ];
+  const bi = [ one[2], two[2], three[2] ];
+
+   let rd = ri[Math.floor(Math.random() * ri.length)];
+   let gd = gi[Math.floor(Math.random() * gi.length)];
+   let bd = bi[Math.floor(Math.random() * bi.length)];
+
+   let r = Math.min(Math.max(rd, 0), 255);
+   let g = Math.min(Math.max(gd, 0), 255);
+   let b = Math.min(Math.max(bd, 0), 255);
+   return [ Math.floor(r), Math.floor(g), Math.floor(b), 255 ]; // alpha -> opaque
+}
+
+function offset(row, col, w, h, rd, cd) {
+     let r = row + rd;
+     let c = col + cd;
+     return [Math.min(Math.max(r, 0), h), Math.min(Math.max(c, 0), w)]
+}
+
+// the core of it all is here
 async function process() {
   var blob = new Blob(camChunks, { 'type': 'video/webm' });
   console.log('Processing a buffer of length', camChunks.length);
@@ -188,53 +202,44 @@ async function process() {
   var id = init.data; 
   console.log('Setting up a random starting point');
   for (var i = 0; i < id.length; i += 1) { // channels all treated the same way
-       if (i == 0) {
-          id[i] = color(i % 4, 0, 0, 0); // random value 
-       } else {
-          id[i] = color(i % 4, 0, nudge(id[i-1]), 0);
-       }
-   }
-   init.data = id; // update the output data
+      id[i] = 127; // starting gray
+  }
+  id.data = id; // update the output data
 
     let counter = 0;
       while (currentTime < duration) {
         video.currentTime = currentTime;
-        document.getElementById("msg").innerHTML = '<p>At ' + currentTime.toFixed(1) + ' of a total of ' + duration.toFixed(2) + ' seconds</p>';
+        document.getElementById("msg").innerHTML = '<p>Post-processing at ' + currentTime.toFixed(1) + ' of a total of ' + duration.toFixed(2) + ' seconds</p>';
         await new Promise((r) => (seekResolve = r));
-        ic.drawImage(video, 0, 0, w, h);
+        ic.drawImage(video, 0, 0, w, h); // get the video onto the current input frame
         setAudioStats(audio.slice(counter * segment, (counter + 1) * segment));
         counter++;
         currentTime += interval;
 
 	// pixel access based on https://html5doctor.com/video-canvas-magic/
-        var input = ic.getImageData(0, 0, w, h); 
-        var ip = input.data;
-  	  var output = oc.getImageData(0, 0, w, h);
-	  var op = output.data; 
-	  var old = pc.getImageData(0, 0, w, h);
-	  var od = old.data; 
+        var input = ic.getImageData(0, 0, w, h); // retrieve the input image data
+        var ip = input.data; // pixel access for current input frame
+  	  var output = oc.getImageData(0, 0, w, h); // retrieve the current output frame
+	  var op = output.data; // pixel access for current output frame
+	  var old = pc.getImageData(0, 0, w, h); // retrieve the previous input frame
+	  var od = old.data; // pixel access for previous input frame
 	  console.log('Subsequent frame with data length of', ip.length);
-          for (var i = 0; i < ip.length; i += 4) { // rgba?
-	    // read the pixels of the incoming video frame
-            var rn = ip[i];
-            var gn = ip[i + 1];
-            var bn = ip[i + 2];
-	    // read the pixels of the previous frame
-            var ro = od[i];
-            var go = od[i + 1];
-            var bo = od[i + 2];
-	    // update the output	
-            var rv = op[i];
-            var gv = op[i + 1];
-            var bv = op[i + 2];
-            // accumulate
-            op[i] = color(0, rv, rn, ro);
-  	    op[i + 1] = color(1, gv, gn, go);
-            op[i + 2] = color(2, bv, bn, bo);
+          // iterate over the pixels
+          for (var row = 0; row < h; row ++) {
+            for (var col = 0; col < w; col++) { 
+		let ci = getPixel(row, col, w, h, ip); // current input frame pixel
+                // offsets for previous input frame
+                let pif = offset(row, col, w, h, std, sqrtmean);
+		let pi = getPixel(pif[0], pif[1], w, h, od); // previous input pixel with an offset
+		// offsets for previous output frame
+                let pof = offset(row, col, w, h, sqrtmean, std);
+		let po = getPixel(pof[0], pof[1], w, h, op); // previous output frame with an offset
+ 		// accumulate the result into the current output pixels
+                setPixel(row, col, w, h, op, makePixel(ci, pi, po));
+            }
           }
-	  output.data = op; // update the output data
-          ctx.putImageData(output, 0, 0); // refresh the visible canvas
-
+	  output.data = op; // update the output pixels
+          ctx.putImageData(output, 0, 0); // refresh the visible canvas with the updated output
         oc.putImageData(input, 0, 0); // save this input frame to compare with on the next round
       }
    console.log('Making a video for download');
@@ -259,7 +264,7 @@ const receive = ({ data }) => {
     let k = camChunks.length;
     if (k < threshold) {
       camChunks.push(data);
-      document.getElementById("msg").innerHTML = '<p>' + (k + 1) + '/' + threshold + '</p>';
+      document.getElementById("msg").innerHTML = '<p>Recording snippet ' + (k + 1) + '/' + threshold + '</p>';
       if (k + 1 == threshold) {
           console.log('Stopping the webcam recording');
           running = false;
