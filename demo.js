@@ -19,7 +19,7 @@ var coCtx = currOutput.getContext('2d', { willReadFrequently : true });
 var running = false;
 
 var cam = null; // placeholder for the webcam recorder
-var audio = null; // placeholder for the extracted audio analysis
+var audio = []; // placeholder for the extracted audio analysis
 
 function sorry(e) {
     console.log("No can do", e.message);
@@ -71,13 +71,36 @@ const produce = ({ data }) => {
     }
 };
 
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const analyser = audioCtx.createAnalyser();	    
+var audioData = null;
+
 function react(s) {
     document.getElementById("msg").innerHTML = '<p>Listening and watching...</p>';
+    
+    // audio capture based on https://mdn.github.io/voice-change-o-matic/scripts/app.js
+    analyser.minDecibels = -90;
+    analyser.maxDecibels = -10;
+    analyser.smoothingTimeConstant = 0.85;
+    
+    let mic = audioCtx.createMediaStreamSource(s);
+    const gainNode = audioCtx.createGain();
+    mic.connect(gainNode);     
+    analyser.connect(audioCtx.destination);     
+    
+    analyser.fftSize = 32;
+    const l = analyser.frequencyBinCount;
+    audioData = new Uint8Array(l);    
+    
+    console.log('Mic on');
+    
     // record a short video from the webcam   
     cam = new MediaRecorder(s, options);
     cam.ondataavailable = receive;
-    running = true;
+    console.log('Camera on');
     cam.start(500);
+    
+    running = true;
 }
 
 function attempt() {
@@ -162,33 +185,6 @@ async function process() {
     let duration = video.duration;
     console.log('Constructed a video with duration', duration);
 
-    // audio extraction from video based on
-    // https://stackoverflow.com/questions/49140159/extracting-audio-from-a-video-file
-    console.log('Extracting audio');
-    var actx = new OfflineAudioContext(2, sampleRate * duration, sampleRate);
-    var source  = actx.createBufferSource();
-    var reader = new FileReader();
-    reader.readAsArrayBuffer(blob);
-    ready = false;
-    let audio = null;
-    reader.onload = function () {
-        var videoFileAsBuffer = reader.result; 
-        actx.decodeAudioData(videoFileAsBuffer).then(function (data) {
-	    analyser = actx.createAnalyser();	    
-	    audio = new Uint8Array(analyser.fftSize);
-	    analyser.getByteTimeDomainData(audio);
-	    source.connect(analyser);
-	    console.log('Audio buffer ready', audio);
-	    ready = true;
-	})
-    };
-
-    while(!ready) {
-	await new Promise((r) => setTimeout(r, 200));
-	if (debug) {
-	    console.log('Waiting for audio extraction');
-	}
-    } 
 
     let [w, h] = [video.videoWidth, video.videoHeight];
     console.log('Incoming video resolution is', w, 'by', h);
@@ -281,18 +277,28 @@ async function process() {
     document.getElementById("msg").innerHTML = '<p>Play the video.</p>';
 }
 
+let bars = [];
+
 const receive = ({ data }) => {
     if (!running) {
-	console.log('Discarding late input data');
+	console.log('Discarding late video data');
 	return;
     }
+    
     if (data.size > 0) {
+
+	// analyse audio every time there is new video data to process
+	let stuff = analyser.getByteFrequencyData(audioData);
+	bars.push(audioData);
+	console.log('Audio chunks', bars.length);
+	
+	console.log('Incoming video data');
 	let k = camChunks.length;
 	if (k < threshold) {
 	    camChunks.push(data);
 	    document.getElementById("msg").innerHTML = '<p>Recording snippet ' + (k + 1) + '/' + threshold + '</p>';
 	    if (k + 1 == threshold) {
-		console.log('Stopping the webcam recording');
+		console.log('Stopping the recording');
 		running = false;
 		cam.stop();
 		console.log('Processing the input');
@@ -310,6 +316,7 @@ const receive = ({ data }) => {
 	console.log('No input data available');
     }
 };
+
 
 document.addEventListener('DOMContentLoaded', function(){
     
