@@ -26,6 +26,11 @@ var running = false;
 
 var cam = null; // placeholder for the webcam recorder
 
+function sorry(e) {
+    console.log("No can do", e.message);
+    alert("Unfortunately your browser did not grant permission to access your camera and microphone.");
+}
+
 function whine(e) {
     console.log("It is not working", e.message);
 }
@@ -99,7 +104,7 @@ function attempt() {
 	    };
 	}
 	
-	navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(react).catch(whine);
+	navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(react).catch(sorry);
     } else {
 	console.log("Checking further permissions");
     }
