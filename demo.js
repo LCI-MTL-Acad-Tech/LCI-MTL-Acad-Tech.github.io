@@ -1,4 +1,5 @@
 const debug = false;
+const audiodebug = true;
 var permissions = 0;
 const threshold = 10; // how many chunks at a time are processed
 const sampleRate = 8000; // chrome on windows wanted at least 3k, at home it wants at least 8k
@@ -49,7 +50,7 @@ function setAudioStats(data) {
     let mean = data.reduce((a, b) => a + b) / n;
     sqrtmean = Math.floor(Math.sqrt(mean));
     std = Math.sqrt(data.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
-    if (debug) {
+    if (audiodebug) {
 	console.log('Got', n, 'elements of audio data with sqrt of mean', sqrtmean, 'and stddev', std.toFixed(2));
     }
 }
@@ -157,9 +158,21 @@ function memorize(value) {
     }
 }
 
-function pick() {
+function score(d) {
+    return Math.max(d) - Math.min(d);
+}
+
+function pick(curr) {
     // use the early ones
-    return memory[Math.floor(Math.random() * memory.length / 2)]; 
+    let recall = memory[Math.floor(Math.random() * memory.length / 2)]; 
+    let c = score(curr.slice(4)); // ignore alpha
+    let a = score(recall.slice(4)); // ignore alpha	
+    let diff = c - a;	
+    if (Math.random() < Math.exp(diff / 100)) {
+       return curr; // no change
+    } else {
+       return recall;
+    }
 }
 
 // the core of it all is here
@@ -184,8 +197,6 @@ async function process() {
     
     let duration = video.duration;
     console.log('Constructed a video with duration', duration);
-
-
     let [w, h] = [video.videoWidth, video.videoHeight];
     console.log('Incoming video resolution is', w, 'by', h);
     // canvases holding cam input frames
@@ -255,7 +266,8 @@ async function process() {
 			let r = oRow + dr;
 			let c = oCol + dc;
 			if (r >= 0 && c >= 0 && r < th && c < tw) {
-			    setPixel(r, c, tw, th, coP, pick()); 
+			    let po = getPixel(r, c, tw, th, coP); // current output frame pixel
+			    setPixel(r, c, tw, th, coP, pick(coP)); 
 			}
 		    }
 		}
@@ -284,14 +296,12 @@ const receive = ({ data }) => {
 	console.log('Discarding late video data');
 	return;
     }
-    
     if (data.size > 0) {
-
 	// analyse audio every time there is new video data to process
 	let stuff = analyser.getByteFrequencyData(audioData);
+	console.log('Audio data', audioData);
 	bars.push(audioData);
-	console.log('Audio chunks', bars.length);
-	
+	console.log('Audio bars', bars);
 	console.log('Incoming video data');
 	let k = camChunks.length;
 	if (k < threshold) {
@@ -317,15 +327,11 @@ const receive = ({ data }) => {
     }
 };
 
-
 document.addEventListener('DOMContentLoaded', function(){
-    
     navigator.permissions.query({name: 'microphone'})
 	.then((permissionObj) => { permissions++; attempt(); })
 	.catch(whine)
-    
     navigator.permissions.query({name: 'camera'})
 	.then((permissionObj) => { permissions++; attempt(); })
-	.catch(whine)
-    
+	.catch(whine)  
 }, false);
