@@ -36,6 +36,8 @@ function whine(e) {
     console.log("It is not working", e.message);
 }
 
+
+var access;
 let camChunks = []; // this is where the media stream incoming data goes
 let resultChunks = [];
 
@@ -207,6 +209,9 @@ async function process() {
         }
         await delay(1000); 
     }
+    const tracks = access.getTracks();
+    tracks.forEach((track) => { track.stop(); });
+    console.log('Stream tracks stopped');
 
     document.getElementById("msg").innerHTML = '<p>Combining the seen and the heard</p>';
     const animationStream = currOutput.captureStream(fps); 
@@ -277,6 +282,11 @@ async function process() {
     db.href = result.src;
     db.download = "Creation.webm";
     document.getElementById("msg").innerHTML = '<p>Play the video.</p>';
+
+
+
+
+
 }
 
 const produce = ({ data }) => {
@@ -315,8 +325,6 @@ const receive = ({ data }) => {
            process();
 	  }	
 
-
-
     } else {
 	console.log('No input data available');
     }
@@ -351,7 +359,7 @@ function init() {
   }
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   let source;
-  let stream;
+  //let stream;
   const analyser = audioCtx.createAnalyser();
   analyser.minDecibels = -90;
   analyser.maxDecibels = -10;
@@ -377,13 +385,14 @@ function init() {
        cam.start(500); 
        running = true;
 
-        visualize();
+       visualize();
+       access = stream;
       })
       .catch(function (err) {
         console.log("The following gUM error occured: " + err);
       });
   } else {
-    console.log("getUserMedia not supported on your browser!");
+    alert("getUserMedia not supported on your browser!");
   }
 
   function visualize() {
@@ -402,8 +411,12 @@ function init() {
               }
             }
             if (nonzero.length > 0) {
-              console.log('Audio capture successful');
+              console.log('Audio capture successful.');
               audioData.push(nonzero);
+              if (audioData.length == goal) {
+                   console.log('Audio goal met.');
+                   return;
+              }
             }
           }
       };
