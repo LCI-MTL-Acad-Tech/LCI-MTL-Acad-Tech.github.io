@@ -7,8 +7,8 @@ const threshold = 5; // how many chunks at a time are processed
 const fps = 7; // increase for a longer processing
 var fbc = 0; // frequency bin count
 
-const tw = 1920;
-const th = 1080;
+const tw = 800; // 1920;
+const th = 600; // 1080;
 const result = document.getElementById("result");
 result.width = tw;
 result.height = th;
@@ -36,7 +36,6 @@ function whine(e) {
     console.log("It is not working", e.message);
 }
 
-
 var access;
 let camChunks = []; // this is where the media stream incoming data goes
 let resultChunks = [];
@@ -46,7 +45,6 @@ let pos = 0; // this is how far we have processed them
 // firefox at home is unhappy with all codecs I tried
 const mimeType = 'video/webm'; // https://dev.to/ethand91/mediarecorder-api-tutorial-54n8
 const options = { audioBitsPerSecond: 128000, mimeType, videoBitsPerSecond: 2500000 };
-
 
 // from https://stackoverflow.com/questions/14226803/wait-5-seconds-before-executing-next-line
 const delay = ms => new Promise(res => setTimeout(res, ms));
@@ -73,7 +71,7 @@ function setPixel(row, column, width, height, data, value) {
 }
 
 function randint(base, mult) {
-   return Math.floor(base + Math.random() * mult);
+    return Math.floor(base + Math.random() * mult);
 }
 
 let memory = [];
@@ -88,13 +86,13 @@ while (memory.length < 50) {
 }
 
 function nudge(rgba) {
-   let d1 = randint(-10, 20);
-   let d2 = randint(-10, 20);
-   let r = rgba[0];
-   let g = rgba[1];
-   let b = rgba[2];
-   let a = rgba[3];
-   return [(r - d1) % 256, (g + d1 - d2) % 256, (b + d2) % 256, 255];
+    let d1 = randint(-10, 20);
+    let d2 = randint(-10, 20);
+    let r = rgba[0];
+    let g = rgba[1];
+    let b = rgba[2];
+    let a = rgba[3];
+    return [(r - d1) % 256, (g + d1 - d2) % 256, (b + d2) % 256, 255];
 }
 
 function memorize(value) {
@@ -122,12 +120,12 @@ function roulette(time, total, max) {
     var acc = 0;
     for (let i = 0; i < k ; i++) {
         for (let j = 0; j < reps; j++) {
-          acc += audio[i];
-          if (acc > pos) {
-             chosen = reps * i + j; // roulette selection
-             break;
-          }
-       }
+            acc += audio[i];
+            if (acc > pos) {
+		chosen = reps * i + j; // roulette selection
+		break;
+            }
+	}
     }
     return chosen % m; // modulo to make sure it fits 
 }
@@ -141,9 +139,9 @@ function pick(curr, time, total) {
     let a = score(rgbA);
     let diff = a - c + 20; // nudge in favor of alteration	
     if (time < memory.length || Math.random() < Math.exp(diff / 100)) {
-       return recall; 
+	return recall; 
     } else {
-       return curr; // no change
+	return curr; // no change
     }
 }
 
@@ -191,7 +189,7 @@ async function process() {
 	console.log('Scaling margins', marginW, marginH);
 	console.log('Working on a', w, 'by', h, 'input for a', tw, 'by', th, 'output');
     }
-
+    
     let interval = 1 / fps;
     let currentTime = 0;
     if (videodebug) {
@@ -200,12 +198,12 @@ async function process() {
     listening = true;
     goal = Math.ceil(duration * fps);
     console.log('Capturing', goal, 'audio analyses');
-
+    
     document.getElementById("msg").innerHTML = '<p>Capturing audio data (make some noise for this phase to finish)</p>';
-
+    
     while (audioData.length < goal) {
         if (audiodebug) {
-          console.log('Waiting for further audio', audioData.length, 'of', goal);
+            console.log('Waiting for further audio', audioData.length, 'of', goal);
         }
         await delay(1000); 
     }
@@ -218,17 +216,17 @@ async function process() {
     let animationRecorder = new MediaRecorder(animationStream, options);
     animationRecorder.ondataavailable = produce;
     animationRecorder.start(1000);
-
+    
     let counter = 0;
     while (currentTime < duration) {
         let sum = 0;
         for (let i = 0; i < audioData[counter].length; i++) {
            sum += audioData[counter][i];
         }
-
+	
         console.log('Audio sum is', sum, 'and the landscape is', audioData[counter]);
         console.log('Pixel memory buffer lenght at the start of the step is', memory.length);
-
+	
         video.currentTime = currentTime;
         document.getElementById("msg").innerHTML = '<p>Post-processing at ' + currentTime.toFixed(1) + ' of a total of ' + duration.toFixed(2) + ' seconds</p>';
         await new Promise((r) => (seekResolve = r));
@@ -236,16 +234,16 @@ async function process() {
         currentTime += interval;
 
 	// pixel access based on https://html5doctor.com/video-canvas-magic/
-
+	
         var ciD = ciCtx.getImageData(0, 0, w, h); // retrieve the input image data
         var ciP = ciD.data; // pixel access for current input frame
 	var coD = coCtx.getImageData(0, 0, tw, th); // retrieve the output image data
 	var coP = coD.data; // pixel access for current output frame
-
+	
 	if (debug) {
 	    console.log('Subsequent frame with data length of', ciP.length);
 	}
-
+	
         // iterate over the pixels
         for (var col = 0; col < w; col++) {  // each input column
             for (var row = 0; row < h; row ++) { // each input row
@@ -282,11 +280,6 @@ async function process() {
     db.href = result.src;
     db.download = "Creation.webm";
     document.getElementById("msg").innerHTML = '<p>Play the video.</p>';
-
-
-
-
-
 }
 
 const produce = ({ data }) => {
@@ -318,12 +311,12 @@ const receive = ({ data }) => {
 	} else {
 	    console.log('Discarding excess video input data');
 	} 
-
+	
 	if (camChunks.length == threshold) {
-	   running = false;
-           cam.stop(); // stop the camaudio
-           process();
-	  }	
+	    running = false;
+            cam.stop(); // stop the camaudio
+            process();
+	}	
 
     } else {
 	console.log('No input data available');
@@ -332,131 +325,130 @@ const receive = ({ data }) => {
 
 // audio capture based on https://mdn.github.io/voice-change-o-matic/scripts/app.js
 function init() {
-
-  document.getElementById("start").disabled = true;
-  document.getElementById("start").innerHTML = 'Reload the page if you want to start over';
-
-
-  if (navigator.mediaDevices === undefined) {
-    navigator.mediaDevices = {};
-  }
-  if (navigator.mediaDevices.getUserMedia === undefined) {
-    navigator.mediaDevices.getUserMedia = function (constraints) {
-      // First get ahold of the legacy getUserMedia, if present
-      const getUserMedia =
-        navigator.webkitGetUserMedia ||
-        navigator.mozGetUserMedia ||
-        navigator.msGetUserMedia;
-      if (!getUserMedia) {
-        return Promise.reject(
-          new Error("getUserMedia is not implemented in this browser")
-        );
-      }
-      return new Promise(function (resolve, reject) {
-        getUserMedia.call(navigator, constraints, resolve, reject);
-      });
-    };
-  }
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  let source;
-  //let stream;
-  const analyser = audioCtx.createAnalyser();
-  analyser.minDecibels = -90;
-  analyser.maxDecibels = -10;
-  analyser.smoothingTimeConstant = 0.85;
-  const gainNode = audioCtx.createGain();
-  const echoDelay = createEchoDelayEffect(audioCtx);
-
-  if (navigator.mediaDevices.getUserMedia) {
-    console.log("getUserMedia supported.");
-    const constraints = { audio: true, video: true };
-    navigator.mediaDevices
-      .getUserMedia(constraints)
-      .then(function (stream) {
-        source = audioCtx.createMediaStreamSource(stream);
-        source.connect(gainNode);
-        echoDelay.placeBetween(gainNode, analyser); // nothing works if I take out the echoDelay
-        analyser.connect(audioCtx.destination);
-
-       // record a short video from the webcam   
-       cam = new MediaRecorder(stream, options);
-       cam.ondataavailable = receive;
-       console.log('Camera recorder is now on.');
-       cam.start(500); 
-       running = true;
-
-       visualize();
-       access = stream;
-      })
-      .catch(function (err) {
-        console.log("The following gUM error occured: " + err);
-      });
-  } else {
-    alert("getUserMedia not supported on your browser!");
-  }
-
-  function visualize() {
-      analyser.fftSize = 256;
-      fbc = analyser.frequencyBinCount;
-      const data = new Uint8Array(fbc);
-      const repeat = function () {
-          let nonzero = []; 
-          requestAnimationFrame(repeat); // make this happen periodically
-          if (listening && audioData.length < goal) {
-            analyser.getByteFrequencyData(data);
-           for (let i = 0; i < fbc; i++) {
-              let v = data[i];
-              if (v > 0) {
-                nonzero.push(v); // keep the non-zeros only
-              }
+    
+    document.getElementById("start").disabled = true;
+    document.getElementById("start").innerHTML = 'Reload the page if you want to start over';
+    
+    if (navigator.mediaDevices === undefined) {
+	navigator.mediaDevices = {};
+    }
+    if (navigator.mediaDevices.getUserMedia === undefined) {
+	navigator.mediaDevices.getUserMedia = function (constraints) {
+	    // First get ahold of the legacy getUserMedia, if present
+	    const getUserMedia =
+		  navigator.webkitGetUserMedia ||
+		  navigator.mozGetUserMedia ||
+		  navigator.msGetUserMedia;
+	    if (!getUserMedia) {
+		return Promise.reject(
+		    new Error("getUserMedia is not implemented in this browser")
+		);
+	    }
+	    return new Promise(function (resolve, reject) {
+		getUserMedia.call(navigator, constraints, resolve, reject);
+	    });
+	};
+    }
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let source;
+    //let stream;
+    const analyser = audioCtx.createAnalyser();
+    analyser.minDecibels = -90;
+    analyser.maxDecibels = -10;
+    analyser.smoothingTimeConstant = 0.85;
+    const gainNode = audioCtx.createGain();
+    const echoDelay = createEchoDelayEffect(audioCtx);
+    
+    if (navigator.mediaDevices.getUserMedia) {
+	console.log("getUserMedia supported.");
+	const constraints = { audio: true, video: true };
+	navigator.mediaDevices
+	    .getUserMedia(constraints)
+	    .then(function (stream) {
+		source = audioCtx.createMediaStreamSource(stream);
+		source.connect(gainNode);
+		echoDelay.placeBetween(gainNode, analyser); // nothing works if I take out the echoDelay
+		analyser.connect(audioCtx.destination);
+		
+		// record a short video from the webcam   
+		cam = new MediaRecorder(stream, options);
+		cam.ondataavailable = receive;
+		console.log('Camera recorder is now on.');
+		cam.start(500); 
+		running = true;
+		
+		visualize();
+		access = stream;
+	    })
+	    .catch(function (err) {
+		console.log("The following gUM error occured: " + err);
+	    });
+    } else {
+	alert("getUserMedia not supported on your browser!");
+    }
+    
+    function visualize() {
+	analyser.fftSize = 256;
+	fbc = analyser.frequencyBinCount;
+	const data = new Uint8Array(fbc);
+	const repeat = function () {
+            let nonzero = []; 
+            requestAnimationFrame(repeat); // make this happen periodically
+            if (listening && audioData.length < goal) {
+		analyser.getByteFrequencyData(data);
+		for (let i = 0; i < fbc; i++) {
+		    let v = data[i];
+		    if (v > 0) {
+			nonzero.push(v); // keep the non-zeros only
+		    }
+		}
+		if (nonzero.length > 0) {
+		    console.log('Audio capture successful.');
+		    audioData.push(nonzero);
+		    if (audioData.length == goal) {
+			console.log('Audio goal met.');
+			return;
+		    }
+		}
             }
-            if (nonzero.length > 0) {
-              console.log('Audio capture successful.');
-              audioData.push(nonzero);
-              if (audioData.length == goal) {
-                   console.log('Audio goal met.');
-                   return;
-              }
-            }
-          }
-      };
-      repeat();
-  }
-
-  function createEchoDelayEffect(audioContext) {
-    const delay = audioContext.createDelay(1);
-    const dryNode = audioContext.createGain();
-    const wetNode = audioContext.createGain();
-    const mixer = audioContext.createGain();
-    const filter = audioContext.createBiquadFilter();
-
-    delay.delayTime.value = 0.75;
-    dryNode.gain.value = 1;
-    wetNode.gain.value = 0;
-    filter.frequency.value = 1100;
-    filter.type = "highpass";
-
-    return {
-      apply: function () {
-        wetNode.gain.setValueAtTime(0.75, audioContext.currentTime);
-      },
-      discard: function () {
-        wetNode.gain.setValueAtTime(0, audioContext.currentTime);
-      },
-      isApplied: function () {
-        return wetNode.gain.value > 0;
-      },
-      placeBetween: function (inputNode, outputNode) {
-        inputNode.connect(delay);
-        delay.connect(wetNode);
-        wetNode.connect(filter);
-        filter.connect(delay);
-
-        inputNode.connect(dryNode);
-        dryNode.connect(mixer);
-        wetNode.connect(mixer);
-        mixer.connect(outputNode);
-      },
-    };
-  }
+	};
+	repeat();
+    }
+    
+    function createEchoDelayEffect(audioContext) {
+	const delay = audioContext.createDelay(1);
+	const dryNode = audioContext.createGain();
+	const wetNode = audioContext.createGain();
+	const mixer = audioContext.createGain();
+	const filter = audioContext.createBiquadFilter();
+	
+	delay.delayTime.value = 0.75;
+	dryNode.gain.value = 1;
+	wetNode.gain.value = 0;
+	filter.frequency.value = 1100;
+	filter.type = "highpass";
+	
+	return {
+	    apply: function () {
+		wetNode.gain.setValueAtTime(0.75, audioContext.currentTime);
+	    },
+	    discard: function () {
+		wetNode.gain.setValueAtTime(0, audioContext.currentTime);
+	    },
+	    isApplied: function () {
+		return wetNode.gain.value > 0;
+	    },
+	    placeBetween: function (inputNode, outputNode) {
+		inputNode.connect(delay);
+		delay.connect(wetNode);
+		wetNode.connect(filter);
+		filter.connect(delay);
+		
+		inputNode.connect(dryNode);
+		dryNode.connect(mixer);
+		wetNode.connect(mixer);
+		mixer.connect(outputNode);
+	    },
+	};
+    }
 }
