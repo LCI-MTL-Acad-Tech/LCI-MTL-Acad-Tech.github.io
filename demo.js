@@ -195,18 +195,30 @@ async function process() {
     if (videodebug) {
       console.log('Iterating over the video frames');  
     }  
+
     listening = true;
     goal = Math.ceil(duration * fps);
     console.log('Capturing', goal, 'audio analyses');
     
     document.getElementById("msg").innerHTML = '<p>Capturing audio data (make some noise for this phase to finish)</p>';
-    
+
+    let patience = 5;
     while (audioData.length < goal) {
         if (audiodebug) {
             console.log('Waiting for further audio', audioData.length, 'of', goal);
         }
-        await delay(1000); 
+        await delay(1000);
+	patience--;
+	if (patience == 0) {
+	    console.log('Audio is silent, using randomized data instead.');
+	    break;
+	}
     }
+
+    while (audioData.length < goal) {
+	audioData.push( [ randint(5, 10) ] );
+    }
+        
     const tracks = access.getTracks();
     tracks.forEach((track) => { track.stop(); });
     console.log('Stream tracks stopped');
@@ -223,9 +235,11 @@ async function process() {
         for (let i = 0; i < audioData[counter].length; i++) {
            sum += audioData[counter][i];
         }
-	
-        console.log('Audio sum is', sum, 'and the landscape is', audioData[counter]);
-        console.log('Pixel memory buffer lenght at the start of the step is', memory.length);
+
+	if (audiodebug) {
+            console.log('Audio sum is', sum, 'and the landscape is', audioData[counter]);
+            console.log('Pixel memory buffer lenght at the start of the step is', memory.length);
+	}
 	
         video.currentTime = currentTime;
         document.getElementById("msg").innerHTML = '<p>Post-processing at ' + currentTime.toFixed(1) + ' of a total of ' + duration.toFixed(2) + ' seconds</p>';
