@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Explore — Collège LaSalle</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <a id="logoLink" href="https://collegelasalle.lcieducation.com/fr" target="_blank" rel="noopener" style="line-height:1;display:flex;text-decoration:none;">
+      <span class="lci-logo" style="font-size:34px;">&#xE207;</span>
+    </a>
+  </div>
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="setLang('fr')">FR</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('es')">ES</button>
+  </div>
+</header>
+
+<div class="page">
+
+<!-- WELCOME -->
+<section id="screen-welcome" class="screen active">
+  <div class="ws ws1"></div><div class="ws ws2"></div><div class="ws ws3"></div>
+  <div class="welcome-inner">
+    <div class="welcome-logo"><span class="lci-logo" style="font-size:56px;">&#xE207;</span></div>
+    <div class="welcome-eyebrow" id="w-eyebrow">Tech et design</div>
+    <h1 class="welcome-title" id="w-title">Trouve ton programme</h1>
+    <p class="welcome-sub" id="w-sub">Réponds à quelques questions et découvre les programmes du Collège LaSalle qui correspondent le mieux à ton profil.</p>
+    <button class="btn-start" onclick="startProfile()">
+      <span id="w-cta">Commencer</span><span class="arr">→</span>
+    </button>
+  </div>
+</section>
+
+<!-- PROFILE -->
+<section id="screen-profile" class="screen form-screen">
+  <div class="form-wrap">
+    <div class="pdots" id="pDots"></div>
+    <div class="step-label" id="pLbl"></div>
+    <h2 class="screen-q" id="pQ"></h2>
+    <div class="opt-list" id="pOpts"></div>
+    <div class="warn-box" id="pWarn"></div>
+    <div class="nav-row">
+      <button class="btn-back" id="pBack" onclick="profileBack()">← Retour</button>
+      <button class="btn-next" id="pNext" onclick="profileNext()">Suivant →</button>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section id="screen-quiz" class="screen">
+  <div class="quiz-wrap">
+    <div class="qpbar"><div class="qpfill" id="qFill"></div></div>
+    <div class="quiz-eyebrow" id="qEye">Tes préférences</div>
+    <div class="quiz-q" id="qQ"></div>
+    <div class="choice-pair" id="qPair"></div>
+    <div class="choice-actions">
+      <button class="btn-both" id="qBoth" onclick="pickBoth()">
+        <span id="qBothLbl">Les deux</span>
+      </button>
+      <button class="btn-neither" id="qNeither" onclick="pickNeither()">Aucune de ces options</button>
+    </div>
+    <div class="conf-wrap">
+      <div class="conf-hdr"><span id="qConfLbl">Confiance du résultat</span><span id="qConfPct">0%</span></div>
+      <div class="conf-track"><div class="conf-fill" id="qConfFill"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section id="screen-results" class="screen">
+  <div class="results-wrap">
+    <div class="results-top">
+      <div class="results-hdg">
+        <h2 id="rTitle">Tes programmes</h2>
+        <p id="rSub">Ces programmes correspondent le mieux à ton profil.</p>
+      </div>
+    </div>
+
+    <!-- Inline refine panel -->
+    <div class="refine-panel" id="refinePanel" style="display:none;">
+      <div class="refine-panel-inner">
+        <div class="refine-q" id="refinePanelQ"></div>
+        <div class="choice-pair" id="refinePanelPair"></div>
+        <div class="choice-actions">
+          <button class="btn-both" id="refineBoth" onclick="refinePickBoth()"><span id="refineBothLbl">Les deux</span></button>
+          <button class="btn-neither" id="refineNeither" onclick="refinePickNeither()"><span id="refineNeitherLbl">Aucune de ces options</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Keep refining button -->
+    <button class="btn-kg" id="btnKG" onclick="keepGoing()">
+      <span id="kgLbl">Continuer à affiner →</span>
+    </button>
+
+    <div id="rCards"></div>
+    <div class="global-warn" id="gWarn"></div>
+    <div class="results-footer">
+      <button class="btn-reset" id="rReset" onclick="resetAll()">↺ Recommencer</button>
+      <button class="btn-share" id="rShare" onclick="triggerShare()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        <span id="rShareLbl">Partager</span>
+      </button>
+      <button class="btn-export" id="rExport" onclick="exportResults()">Télécharger mes résultats</button>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- SHARE MENU -->
+<div class="share-backdrop" id="shareBackdrop" onclick="closeShare()"></div>
+<div class="share-menu" id="shareMenu">
+  <div class="share-menu-header">
+    <span class="share-menu-title" id="shareMenuTitle">Partager mes résultats</span>
+    <button class="share-menu-close" onclick="closeShare()">×</button>
+  </div>
+  <div class="share-options">
+    <button class="share-opt" onclick="shareEmail()">
+      <span class="share-opt-icon">✉️</span>
+      <span id="shareEmailLbl">Envoyer par courriel</span>
+    </button>
+    <button class="share-opt" onclick="copyShareText()">
+      <span class="share-opt-icon">📋</span>
+      <span id="shareCopyLbl">Copier le texte</span>
+    </button>
+  </div>
+  <div class="share-copied" id="shareCopied">✓ Copié !</div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
