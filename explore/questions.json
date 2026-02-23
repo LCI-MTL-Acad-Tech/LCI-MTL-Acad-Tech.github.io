@@ -1,0 +1,491 @@
+[
+  {
+    "id": "creativity-visual-vs-interactive",
+    "q": {
+      "fr": "Par rapport à la créativité…",
+      "en": "When it comes to creativity…",
+      "es": "En cuanto a la creatividad…"
+    },
+    "a": {
+      "fr": "Je préfère créer des choses visuelles que les gens peuvent voir et toucher",
+      "en": "I prefer creating visual things people can see and touch",
+      "es": "Prefiero crear cosas visuales que la gente pueda ver y tocar"
+    },
+    "b": {
+      "fr": "Je préfère créer des expériences interactives que les gens peuvent vivre",
+      "en": "I prefer creating interactive experiences people can live through",
+      "es": "Prefiero crear experiencias interactivas que la gente pueda vivir"
+    },
+    "scores": {
+      "a": {
+        "design-graphique": 3,
+        "design-interieur-dec": 3,
+        "design-interieur-aec": 3,
+        "montage-video": 2,
+        "uiux-dec": 1
+      },
+      "b": {
+        "uiux-dec": 3,
+        "jeux-dec": 2,
+        "design-jeux": 3
+      }
+    }
+  },
+  {
+    "id": "spaces-physical-vs-digital",
+    "q": {
+      "fr": "Les espaces physiques et les environnements…",
+      "en": "Physical spaces and environments…",
+      "es": "Los espacios físicos y entornos…"
+    },
+    "a": {
+      "fr": "M'inspirent — j'aime concevoir des espaces où les gens se sentent bien",
+      "en": "Inspire me — I love designing spaces where people feel good",
+      "es": "Me inspiran — me encanta diseñar espacios donde la gente se sienta bien"
+    },
+    "b": {
+      "fr": "Me semblent moins attrayants que les mondes numériques et virtuels",
+      "en": "Feel less appealing to me than digital and virtual worlds",
+      "es": "Me atraen menos que los mundos digitales y virtuales"
+    },
+    "scores": {
+      "a": {
+        "design-interieur-dec": 3,
+        "design-interieur-aec": 3,
+        "uiux-dec": 2
+      },
+      "b": {
+        "uiux-dec": 2,
+        "jeux-dec": 2,
+        "design-jeux": 2,
+        "prog-dec": 1,
+        "ia-ml": 1
+      }
+    }
+  },
+  {
+    "id": "colors-shapes-vs-logic",
+    "q": {
+      "fr": "Les couleurs, les formes et la composition…",
+      "en": "Colors, shapes and composition…",
+      "es": "Los colores, formas y composición…"
+    },
+    "a": {
+      "fr": "Sont au cœur de ce qui m'attire dans un projet créatif",
+      "en": "Are at the heart of what draws me to a creative project",
+      "es": "Están en el corazón de lo que me atrae en un proyecto creativo"
+    },
+    "b": {
+      "fr": "M'intéressent moins que la logique et l'architecture des systèmes",
+      "en": "Interest me less than the logic and architecture of systems",
+      "es": "Me interesan menos que la lógica y arquitectura de sistemas"
+    },
+    "scores": {
+      "a": {
+        "design-graphique": 3,
+        "design-interieur-dec": 2,
+        "design-interieur-aec": 2,
+        "uiux-dec": 2
+      },
+      "b": {
+        "reseaux-dec": 3,
+        "cisco": 3,
+        "prog-dec": 2,
+        "ia-ml": 2,
+        "bi": 1
+      }
+    }
+  },
+  {
+    "id": "video-audio-storytelling-vs-technical",
+    "q": {
+      "fr": "La vidéo et le son…",
+      "en": "Video and sound…",
+      "es": "El video y el sonido…"
+    },
+    "a": {
+      "fr": "Sont des outils puissants pour raconter des histoires et émouvoir",
+      "en": "Are powerful tools for storytelling and moving people",
+      "es": "Son herramientas poderosas para contar historias y emocionar"
+    },
+    "b": {
+      "fr": "M'intéressent surtout comme composantes techniques de systèmes interactifs",
+      "en": "Interest me mainly as technical components of interactive systems",
+      "es": "Me interesan principalmente como componentes técnicas de sistemas interactivos"
+    },
+    "scores": {
+      "a": {
+        "montage-video": 3,
+        "jeux-dec": 2,
+        "design-jeux": 2,
+        "uiux-dec": 1
+      },
+      "b": {
+        "jeux-dec": 2,
+        "uiux-dec": 2,
+        "prog-dec": 2
+      }
+    }
+  },
+  {
+    "id": "problem-solving-configure-vs-invent",
+    "q": {
+      "fr": "Résoudre des problèmes pour moi, c'est avant tout…",
+      "en": "For me, problem-solving is mainly about…",
+      "es": "Para mí, resolver problemas consiste principalmente en…"
+    },
+    "a": {
+      "fr": "Configurer, réarranger et optimiser des systèmes existants",
+      "en": "Configuring, rearranging and optimizing existing systems",
+      "es": "Configurar, reorganizar y optimizar sistemas existentes"
+    },
+    "b": {
+      "fr": "Imaginer de nouveaux produits et processus qui n'existent pas encore",
+      "en": "Imagining new products and processes that do not yet exist",
+      "es": "Imaginar nuevos productos y procesos que aún no existen"
+    },
+    "scores": {
+      "a": {
+        "reseaux-dec": 3,
+        "cisco": 3,
+        "bi": 1
+      },
+      "b": {
+        "prog-dec": 3,
+        "programmeur-analyste": 3,
+        "uiux-dec": 2,
+        "design-jeux": 2,
+        "ia-ml": 2
+      }
+    }
+  },
+  {
+    "id": "storytelling-vs-efficiency",
+    "q": {
+      "fr": "La narration et divertir les autres…",
+      "en": "Storytelling and entertaining others…",
+      "es": "La narración y entretener a otros…"
+    },
+    "a": {
+      "fr": "Sont au centre de ce que je veux faire professionnellement",
+      "en": "Are at the center of what I want to do professionally",
+      "es": "Están en el centro de lo que quiero hacer profesionalmente"
+    },
+    "b": {
+      "fr": "M'intéressent moins que l'efficacité et l'automatisation",
+      "en": "Interest me less than efficiency and automation",
+      "es": "Me interesan menos que la eficiencia y la automatización"
+    },
+    "scores": {
+      "a": {
+        "montage-video": 3,
+        "jeux-dec": 2,
+        "design-jeux": 3
+      },
+      "b": {
+        "prog-dec": 2,
+        "programmeur-analyste": 2,
+        "reseaux-dec": 2,
+        "cisco": 2,
+        "bi": 2,
+        "ia-ml": 1
+      }
+    }
+  },
+  {
+    "id": "abstraction-data-vs-concrete",
+    "q": {
+      "fr": "L'abstraction et les modèles conceptuels…",
+      "en": "Abstraction and conceptual models…",
+      "es": "La abstracción y los modelos conceptuales…"
+    },
+    "a": {
+      "fr": "Me fascinent — j'aime trouver des patterns cachés dans des données complexes",
+      "en": "Fascinate me — I love finding hidden patterns in complex data",
+      "es": "Me fascinan — me encanta encontrar patrones ocultos en datos complejos"
+    },
+    "b": {
+      "fr": "M'intéressent moins que le concret et la réalisation visible",
+      "en": "Interest me less than concrete, visible results",
+      "es": "Me interesan menos que los resultados concretos y visibles"
+    },
+    "scores": {
+      "a": {
+        "ia-ml": 3,
+        "bi": 3,
+        "prog-dec": 2,
+        "programmeur-analyste": 2
+      },
+      "b": {
+        "design-graphique": 2,
+        "design-interieur-dec": 2,
+        "design-interieur-aec": 2,
+        "montage-video": 1
+      }
+    }
+  },
+  {
+    "id": "people-close-vs-technical-depth",
+    "q": {
+      "fr": "Travailler en étroite collaboration avec des gens…",
+      "en": "Working closely with people…",
+      "es": "Trabajar estrechamente con personas…"
+    },
+    "a": {
+      "fr": "Est essentiel pour moi — j'aime co-créer et aider directement",
+      "en": "Is essential for me — I love co-creating and helping directly",
+      "es": "Es esencial para mí — me encanta co-crear y ayudar directamente"
+    },
+    "b": {
+      "fr": "Est moins important que la profondeur technique et analytique",
+      "en": "Is less important than technical and analytical depth",
+      "es": "Es menos importante que la profundidad técnica y analítica"
+    },
+    "scores": {
+      "a": {
+        "uiux-dec": 2,
+        "design-graphique": 2,
+        "design-interieur-dec": 2,
+        "design-interieur-aec": 2,
+        "montage-video": 1
+      },
+      "b": {
+        "ia-ml": 2,
+        "prog-dec": 2,
+        "reseaux-dec": 2,
+        "cisco": 2,
+        "bi": 1
+      }
+    }
+  },
+  {
+    "id": "people-needs-vs-intellectual",
+    "q": {
+      "fr": "Créer des solutions qui répondent aux besoins des gens…",
+      "en": "Creating solutions that meet people's needs…",
+      "es": "Crear soluciones que respondan a las necesidades de las personas…"
+    },
+    "a": {
+      "fr": "Est ma principale motivation — je veux voir l'impact humain de mon travail",
+      "en": "Is my main motivation — I want to see the human impact of my work",
+      "es": "Es mi principal motivación — quiero ver el impacto humano de mi trabajo"
+    },
+    "b": {
+      "fr": "Est important, mais je suis surtout motivé·e par les défis intellectuels",
+      "en": "Is important, but I am mainly driven by intellectual challenges",
+      "es": "Es importante, pero me motivan principalmente los desafíos intelectuales"
+    },
+    "scores": {
+      "a": {
+        "uiux-dec": 3,
+        "design-interieur-dec": 3,
+        "design-interieur-aec": 3,
+        "design-graphique": 2
+      },
+      "b": {
+        "ia-ml": 3,
+        "prog-dec": 2,
+        "bi": 2,
+        "reseaux-dec": 1
+      }
+    }
+  },
+  {
+    "id": "automate-vs-create-analyze",
+    "q": {
+      "fr": "Automatiser et simplifier des tâches répétitives…",
+      "en": "Automating and simplifying repetitive tasks…",
+      "es": "Automatizar y simplificar tareas repetitivas…"
+    },
+    "a": {
+      "fr": "M'enthousiasme — je veux libérer les gens de ce qui est fastidieux",
+      "en": "Excites me — I want to free people from tedious work",
+      "es": "Me entusiasma — quiero liberar a la gente del trabajo tedioso"
+    },
+    "b": {
+      "fr": "M'intéresse moins que la conception créative ou l'analyse de données",
+      "en": "Interests me less than creative design or data analysis",
+      "es": "Me interesa menos que el diseño creativo o el análisis de datos"
+    },
+    "scores": {
+      "a": {
+        "prog-dec": 3,
+        "programmeur-analyste": 3,
+        "ia-ml": 2,
+        "reseaux-dec": 1
+      },
+      "b": {
+        "design-graphique": 2,
+        "design-interieur-dec": 2,
+        "design-interieur-aec": 2,
+        "bi": 2,
+        "montage-video": 1
+      }
+    }
+  },
+  {
+    "id": "data-insights-vs-visual-interactive",
+    "q": {
+      "fr": "Extraire des insights à partir de données…",
+      "en": "Extracting insights from data…",
+      "es": "Extraer conclusiones de los datos…"
+    },
+    "a": {
+      "fr": "Est fascinant — les données sont une mine d'or pour prendre de meilleures décisions",
+      "en": "Is fascinating — data is a goldmine for better decisions",
+      "es": "Es fascinante — los datos son una mina de oro para mejores decisiones"
+    },
+    "b": {
+      "fr": "Est moins attrayant que créer des choses visuelles ou interactives",
+      "en": "Is less appealing than creating visual or interactive things",
+      "es": "Es menos atractivo que crear cosas visuales o interactivas"
+    },
+    "scores": {
+      "a": {
+        "bi": 3,
+        "ia-ml": 3,
+        "prog-dec": 1
+      },
+      "b": {
+        "design-graphique": 2,
+        "uiux-dec": 2,
+        "jeux-dec": 2,
+        "design-jeux": 2,
+        "montage-video": 1
+      }
+    }
+  },
+  {
+    "id": "psychology-vs-how-tech-works",
+    "q": {
+      "fr": "La psychologie et le comportement humain…",
+      "en": "Psychology and human behaviour…",
+      "es": "La psicología y el comportamiento humano…"
+    },
+    "a": {
+      "fr": "M'intéressent beaucoup — je veux comprendre pourquoi les gens agissent comme ils le font",
+      "en": "Interest me a lot — I want to understand why people act the way they do",
+      "es": "Me interesan mucho — quiero entender por qué la gente actúa como lo hace"
+    },
+    "b": {
+      "fr": "M'intéressent moins que comprendre comment la technologie fonctionne",
+      "en": "Interest me less than understanding how technology works",
+      "es": "Me interesan menos que entender cómo funciona la tecnología"
+    },
+    "scores": {
+      "a": {
+        "uiux-dec": 3,
+        "design-interieur-dec": 2,
+        "design-interieur-aec": 2,
+        "design-graphique": 1
+      },
+      "b": {
+        "prog-dec": 2,
+        "programmeur-analyste": 2,
+        "reseaux-dec": 2,
+        "cisco": 2,
+        "ia-ml": 2
+      }
+    }
+  },
+  {
+    "id": "understand-tech-deeply-vs-creative-human",
+    "q": {
+      "fr": "Savoir comment la technologie fonctionne en profondeur…",
+      "en": "Understanding deeply how technology works…",
+      "es": "Entender en profundidad cómo funciona la tecnología…"
+    },
+    "a": {
+      "fr": "Est une passion — j'aime démonter et reconstruire des systèmes",
+      "en": "Is a passion — I love taking systems apart and rebuilding them",
+      "es": "Es una pasión — me encanta desmontar y reconstruir sistemas"
+    },
+    "b": {
+      "fr": "Est un moyen, pas une fin — ce qui m'importe c'est le résultat créatif ou humain",
+      "en": "Is a means, not an end — what matters to me is the creative or human result",
+      "es": "Es un medio, no un fin — lo que me importa es el resultado creativo o humano"
+    },
+    "scores": {
+      "a": {
+        "prog-dec": 3,
+        "programmeur-analyste": 3,
+        "reseaux-dec": 3,
+        "cisco": 3,
+        "ia-ml": 2
+      },
+      "b": {
+        "design-graphique": 2,
+        "design-interieur-dec": 2,
+        "design-interieur-aec": 2,
+        "uiux-dec": 1,
+        "montage-video": 1
+      }
+    }
+  },
+  {
+    "id": "create-new-tech-vs-use-for-art",
+    "q": {
+      "fr": "Créer de la nouvelle technologie (IA, outils, logiciels)…",
+      "en": "Creating new technology (AI, tools, software)…",
+      "es": "Crear nueva tecnología (IA, herramientas, software)…"
+    },
+    "a": {
+      "fr": "Est ce que je veux faire — je veux construire ce que d'autres utiliseront",
+      "en": "Is what I want to do — I want to build what others will use",
+      "es": "Es lo que quiero hacer — quiero construir lo que otros usarán"
+    },
+    "b": {
+      "fr": "Est moins attrayant que d'utiliser la technologie au service d'une création artistique ou humaine",
+      "en": "Is less appealing than using technology in service of artistic or human creation",
+      "es": "Es menos atractivo que usar la tecnología al servicio de la creación artística o humana"
+    },
+    "scores": {
+      "a": {
+        "ia-ml": 3,
+        "prog-dec": 3,
+        "programmeur-analyste": 3,
+        "reseaux-dec": 1
+      },
+      "b": {
+        "design-graphique": 2,
+        "montage-video": 2,
+        "design-interieur-dec": 2,
+        "design-interieur-aec": 2,
+        "uiux-dec": 1,
+        "design-jeux": 1
+      }
+    }
+  },
+  {
+    "id": "immersive-ar-vs-real-world-systems",
+    "q": {
+      "fr": "Les expériences immersives et la réalité augmentée…",
+      "en": "Immersive experiences and augmented reality…",
+      "es": "Las experiencias inmersivas y la realidad aumentada…"
+    },
+    "a": {
+      "fr": "Me fascinent — je veux concevoir des mondes et des interfaces que l'on peut habiter",
+      "en": "Fascinate me — I want to design worlds and interfaces people can inhabit",
+      "es": "Me fascinan — quiero diseñar mundos e interfaces que se puedan habitar"
+    },
+    "b": {
+      "fr": "M'intéressent moins que les systèmes qui font tourner le monde réel",
+      "en": "Interest me less than the systems that keep the real world running",
+      "es": "Me interesan menos que los sistemas que hacen funcionar el mundo real"
+    },
+    "scores": {
+      "a": {
+        "uiux-dec": 3,
+        "jeux-dec": 2,
+        "design-jeux": 2,
+        "prog-dec": 1
+      },
+      "b": {
+        "reseaux-dec": 3,
+        "cisco": 3,
+        "bi": 1,
+        "prog-dec": 1
+      }
+    }
+  }
+]

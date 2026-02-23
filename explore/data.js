@@ -13,7 +13,7 @@ const T = {
     kg:'Continuer à affiner →',reset:'↺ Recommencer',export:'Télécharger mes résultats',
     share:'Partager', shareMenu:'Partager mes résultats',
     shareEmail:'Envoyer par courriel', shareCopy:'Copier le texte',
-    shareCopied:'✓ Copié !', shareSubject:'Mes programmes — Collège LaSalle',
+    shareCopied:'✓ Copié !', shareSubject:'Mes programmes — Collège LaSalle', noMoreQ:'Tu as déjà répondu à toutes les questions.',
     school:'École',code:'Code',detail_what:'Ce que tu feras',detail_where:'Où tu travailleras',
     detail_titles:'Titres de postes',detail_future:'Le métier en 2025 et après',
     warnInt:"Programme de moins de 2 ans — les étudiant·e·s internationaux·ales doivent vérifier les conditions de leur permis d'études (CAQ) avec le Collège.",
@@ -30,7 +30,7 @@ const T = {
     kg:'Keep refining →',reset:'↺ Start over',export:'Download my results',
     share:'Share', shareMenu:'Share my results',
     shareEmail:'Send by email', shareCopy:'Copy text',
-    shareCopied:'✓ Copied!', shareSubject:'My top programs — Collège LaSalle',
+    shareCopied:'✓ Copied!', shareSubject:'My top programs — Collège LaSalle', noMoreQ:'You have already answered all of the questions.',
     school:'School',code:'Code',detail_what:'What you will do',detail_where:'Where you will work',
     detail_titles:'Job titles',detail_future:'The field in 2025 and beyond',
     warnInt:'Program under 2 years — international students should verify their study permit (CAQ) conditions with the College.',
@@ -47,7 +47,7 @@ const T = {
     kg:'Seguir refinando →',reset:'↺ Volver a empezar',export:'Descargar mis resultados',
     share:'Compartir', shareMenu:'Compartir mis resultados',
     shareEmail:'Enviar por correo', shareCopy:'Copiar texto',
-    shareCopied:'✓ Copiado!', shareSubject:'Mis programas — Collège LaSalle',
+    shareCopied:'✓ Copiado!', shareSubject:'Mis programas — Collège LaSalle', noMoreQ:'Ya has respondido todas las preguntas.',
     school:'Escuela',code:'Código',detail_what:'Lo que harás',detail_where:'Dónde trabajarás',
     detail_titles:'Títulos de puestos',detail_future:'El oficio en 2025 y más allá',
     warnInt:'Programa de menos de 2 años — los estudiantes internacionales deben verificar las condiciones de su permiso de estudios (CAQ) con el Colegio.',
@@ -69,6 +69,8 @@ function setLang(l){
     renderResults();
     const panel=document.getElementById('refinePanel');
     if(panel&&panel.style.display!=='none') renderRefinePanel();
+    const nmq=document.getElementById('noMoreQ');
+    if(nmq&&nmq.style.display!=='none') nmq.textContent=t('noMoreQ');
   }
 }
 function applyT(){
@@ -98,7 +100,6 @@ const PROGS = [
     decPair:null, aecPair:'design-interieur-aec',
     name:{fr:'Techniques de design d\'intérieur',en:'Interior Design Techniques',es:'Técnicas de diseño de interiores'},
     school:{fr:'Arts, design et communication',en:'Art, Design & Communication',es:'Artes, Diseño y Comunicación'},
-    tags:['visual','creative','spatial','design','colors','shapes','people-needs','wellbeing','architecture','3d'],
     detail:{
       what:{fr:"Concevoir des espaces résidentiels, commerciaux et institutionnels — de l'esquisse au plan technique — en travaillant avec des clients réels dès la formation.",en:"Design residential, commercial and institutional spaces — from sketch to technical plan — working with real clients throughout your training.",es:"Diseñar espacios residenciales, comerciales e institucionales — desde el boceto hasta el plano técnico — trabajando con clientes reales desde la formación."},
       where:{fr:"Firmes de design et d'architecture, studios de cinéma et télévision, hôtels, commerces, résidences pour aîné·e·s, à ton compte.",en:"Design and architecture firms, film and TV studios, hotels, retail, seniors' residences, self-employed.",es:"Estudios de diseño y arquitectura, estudios de cine y TV, hoteles, comercios, residencias para mayores, por cuenta propia."},
@@ -111,7 +112,6 @@ const PROGS = [
     decPair:'design-interieur-dec', aecPair:null,
     name:{fr:"Design d'intérieur",en:'Interior Design',es:'Diseño de interiores'},
     school:{fr:'Arts, design et communication',en:'Art, Design & Communication',es:'Artes, Diseño y Comunicación'},
-    tags:['visual','creative','spatial','design','colors','shapes','people-needs','wellbeing','architecture'],
     detail:{
       what:{fr:"Même cœur de métier que le DEC mais en version accélérée, sans cours de formation générale. Tu conçois des espaces résidentiels et commerciaux de A à Z, logiciels inclus.",en:"Same core skills as the DCS but accelerated, without general education courses. You design residential and commercial spaces end-to-end, software included.",es:"El mismo núcleo del DCS pero acelerado, sin cursos de educación general. Diseñas espacios residenciales y comerciales de principio a fin."},
       where:{fr:"Firmes de design, agences de rénovation, commerces de détail, hôtellerie, à ton compte.",en:"Design firms, renovation agencies, retail, hospitality, self-employed.",es:"Estudios de diseño, agencias de renovación, comercio, hotelería, por cuenta propia."},
@@ -124,7 +124,6 @@ const PROGS = [
     decPair:null, aecPair:null,
     name:{fr:'Design graphique',en:'Graphic Design',es:'Diseño gráfico'},
     school:{fr:'Arts, design et communication',en:'Art, Design & Communication',es:'Artes, Diseño y Comunicación'},
-    tags:['visual','creative','digital','art','design','branding','colors','shapes','people-needs'],
     detail:{
       what:{fr:"Concevoir des identités visuelles, des emballages de produits, des affiches, des interfaces, des campagnes numériques et des contenus pour les médias sociaux.",en:"Design visual identities, product packaging, posters, interfaces, digital campaigns and social media content.",es:"Diseñar identidades visuales, packaging, carteles, interfaces, campañas digitales y contenidos para redes sociales."},
       where:{fr:"Agences de design et de publicité, studios créatifs, équipes marketing en entreprise, fabricants de produits de consommation, médias, à ton compte.",en:"Design and advertising agencies, creative studios, in-house marketing teams, consumer goods manufacturers, media, self-employed.",es:"Agencias de diseño y publicidad, estudios creativos, equipos de marketing, fabricantes de bienes de consumo, medios, por cuenta propia."},
@@ -137,7 +136,6 @@ const PROGS = [
     decPair:null, aecPair:null,
     name:{fr:'Montage vidéo',en:'Video Editing',es:'Edición de video'},
     school:{fr:'Arts, design et communication',en:'Art, Design & Communication',es:'Artes, Diseño y Comunicación'},
-    tags:['visual','creative','digital','video','audio','cinema','storytelling','technical','help-others'],
     detail:{
       what:{fr:"Assembler, rythmer et finaliser des contenus vidéo — documentaires, publicités, webséries, vidéos pour marques, contenu pour plateformes numériques.",en:"Assemble, pace and finalize video content — documentaries, ads, web series, branded videos, content for digital platforms.",es:"Montar, ritmar y finalizar contenidos de video — documentales, publicidad, series web, videos de marca, contenido para plataformas."},
       where:{fr:"Maisons de production, agences de contenu, chaînes de télévision, studios de création numérique, à ton compte en freelance.",en:"Production houses, content agencies, TV channels, digital creative studios, freelance.",es:"Productoras, agencias de contenido, cadenas de televisión, estudios digitales, freelance."},
@@ -152,7 +150,6 @@ const PROGS = [
     decPair:null, aecPair:null,
     name:{fr:'Production 3D et synthèse d\'images – Profil UI/UX',en:'3D Production & Image Synthesis – UI/UX Design',es:'Producción 3D y síntesis de imágenes – UI/UX'},
     school:{fr:'Jeux vidéo, animation et VFX',en:'Gaming, Animation & VFX',es:'Videojuegos, Animación y VFX'},
-    tags:['visual','creative','interactive','ux','3d','psychology','tech','code','spatial','immersive','systems','people-needs','colors','shapes','wellbeing','design'],
     detail:{
       what:{fr:"Concevoir des interfaces interactives et des environnements visuels immersifs — pour des jeux vidéo, des applications, des simulations industrielles ou des expériences web.",en:"Design interactive interfaces and immersive visual environments — for video games, apps, industrial simulations or web experiences.",es:"Diseñar interfaces interactivas y entornos visuales inmersivos — para videojuegos, aplicaciones, simulaciones industriales o experiencias web."},
       where:{fr:"Studios de jeux vidéo, agences numériques, entreprises tech, firmes de design UX, startups, à ton compte.",en:"Video game studios, digital agencies, tech companies, UX design firms, startups, self-employed.",es:"Estudios de videojuegos, agencias digitales, empresas tech, firmas de UX, startups, por cuenta propia."},
@@ -165,7 +162,6 @@ const PROGS = [
     decPair:null, aecPair:'cisco',
     name:{fr:'Techniques de l\'informatique – Programmation en jeux vidéo',en:'Computer Science – Video Game Programming',es:'Técnicas de informática – Programación de videojuegos'},
     school:{fr:'Jeux vidéo, animation et VFX',en:'Gaming, Animation & VFX',es:'Videojuegos, Animación y VFX'},
-    tags:['tech','code','games','logic','interactive','storytelling','systems','abstraction','video','audio'],
     detail:{
       what:{fr:"Écrire le code qui fait tourner les jeux — moteurs, physique, IA des personnages, multijoueur. Tu travailles en équipe avec des artistes et des designers sur des projets jouables réels.",en:"Write the code that makes games run — engines, physics, character AI, multiplayer. You work with artists and designers on real playable projects.",es:"Escribir el código que hace funcionar los juegos — motores, física, IA de personajes, multijugador. Trabajas en equipo con artistas y diseñadores."},
       where:{fr:"Studios locaux (Ubisoft, Behaviour, WB Games), petits studios indépendants, en freelance, ou dans des secteurs connexes comme la simulation ou la santé numérique.",en:"Local studios (Ubisoft, Behaviour, WB Games), small indie studios, freelance, or adjacent fields like simulation or digital health.",es:"Estudios locales (Ubisoft, Behaviour, WB Games), pequeños estudios indie, freelance, o sectores conexos como simulación o salud digital."},
@@ -178,7 +174,6 @@ const PROGS = [
     decPair:'uiux-dec', aecPair:null,
     name:{fr:'Design de jeux et de niveaux',en:'Game & Level Design',es:'Diseño de juegos y niveles'},
     school:{fr:'Jeux vidéo, animation et VFX',en:'Gaming, Animation & VFX',es:'Videojuegos, Animación y VFX'},
-    tags:['games','creative','logic','design','storytelling','interactive','systems','video','audio','empower-others'],
     detail:{
       what:{fr:"Concevoir les règles, les mécaniques, les niveaux et l'expérience globale d'un jeu vidéo. Tu documentes tes idées, crées des prototypes et travailles avec des programmeur·se·s et des artistes.",en:"Design the rules, mechanics, levels and overall experience of a video game. You document ideas, build prototypes and work with programmers and artists.",es:"Diseñar las reglas, mecánicas, niveles y experiencia global de un videojuego. Documentas ideas, creas prototipos y trabajas con programadores y artistas."},
       where:{fr:"Studios de jeux vidéo, studios indépendants, entreprises de formation interactive (serious games), à ton compte.",en:"Video game studios, indie studios, interactive training companies (serious games), self-employed.",es:"Estudios de videojuegos, estudios indie, empresas de formación interactiva (serious games), por cuenta propia."},
@@ -192,7 +187,6 @@ const PROGS = [
     decPair:null, aecPair:null,
     name:{fr:'Animation 3D pour la télévision et le cinéma',en:'3D Animation for TV & Film',es:'Animación 3D para televisión y cine'},
     school:{fr:'Jeux vidéo, animation et VFX',en:'Gaming, Animation & VFX',es:'Videojuegos, Animación y VFX'},
-    tags:['visual','creative','art','3d','cinema','storytelling','characters','video','audio'],
     detail:{ what:{fr:'—',en:'—',es:'—'}, where:{fr:'—',en:'—',es:'—'}, titles:{fr:[],en:[],es:[]}, future:{fr:[],en:[],es:[]} }
   },
 
@@ -202,7 +196,6 @@ const PROGS = [
     decPair:null, aecPair:'programmeur-analyste',
     name:{fr:'Techniques de l\'informatique – Programmation',en:'Computer Science Technology – Programming',es:'Técnicas de informática – Programación'},
     school:{fr:'Technologies de l\'information',en:'Information Technology',es:'Tecnologías de la información'},
-    tags:['tech','code','logic','systems','web','new-products','automate','abstraction','databases'],
     detail:{
       what:{fr:"Développer des applications web, mobiles (iOS et Android) et d'entreprise — de l'analyse des besoins jusqu'au déploiement. Tu apprends à coder proprement, en équipe, avec les méthodes Agile et les outils de l'industrie.",en:"Develop web, mobile (iOS and Android) and enterprise applications — from needs analysis to deployment. You learn to code cleanly, in a team, using Agile methods and industry tools.",es:"Desarrollar aplicaciones web, móviles (iOS y Android) y empresariales — desde el análisis de necesidades hasta el despliegue. Aprendes a codificar limpiamente, en equipo, con métodos Agile."},
       where:{fr:"Agences numériques, entreprises tech, startups, institutions financières, gouvernement, santé numérique, à ton compte en freelance.",en:"Digital agencies, tech companies, startups, financial institutions, government, digital health, freelance.",es:"Agencias digitales, empresas tech, startups, instituciones financieras, gobierno, salud digital, freelance."},
@@ -215,7 +208,6 @@ const PROGS = [
     decPair:null, aecPair:null,
     name:{fr:'Techniques de l\'informatique – Gestion de réseaux et sécurité',en:'Computer Science – Network Management & Security',es:'Técnicas de informática – Gestión de redes y seguridad'},
     school:{fr:'Technologies de l\'information',en:'Information Technology',es:'Tecnologías de la información'},
-    tags:['tech','networks','security','systems','infrastructure','logic','configure','optimize','abstraction'],
     detail:{
       what:{fr:"Installer, configurer et sécuriser les infrastructures réseau des organisations — serveurs, routeurs, pare-feux, VPN, services cloud. De plus en plus, ton rôle est de défendre ces systèmes contre des attaques de plus en plus sophistiquées.",en:"Install, configure and secure organizational network infrastructure — servers, routers, firewalls, VPNs, cloud services. Increasingly, your role is defending these systems against ever more sophisticated attacks.",es:"Instalar, configurar y asegurar infraestructuras de red — servidores, routers, firewalls, VPNs, servicios cloud. Cada vez más, tu rol es defender estos sistemas contra ataques sofisticados."},
       where:{fr:"Entreprises de toutes tailles, gouvernement, hôpitaux, fournisseurs de services gérés (MSP), firmes de cybersécurité, forces de l'ordre (cybercriminalité).",en:"Organizations of all sizes, government, hospitals, managed service providers (MSPs), cybersecurity firms, law enforcement (cybercrime).",es:"Organizaciones de todos los tamaños, gobierno, hospitales, proveedores de servicios gestionados (MSP), firmas de ciberseguridad."},
@@ -228,7 +220,6 @@ const PROGS = [
     decPair:null, aecPair:'bi',
     name:{fr:'Techniques de l\'informatique – Informatique de gestion',en:'Computer Science – Business IT',es:'Técnicas de informática – Gestión'},
     school:{fr:'Technologies de l\'information',en:'Information Technology',es:'Tecnologías de la información'},
-    tags:['tech','code','business','systems','databases','management','lead-teams','efficiency','automate'],
     detail:{
       what:{fr:"Faire le pont entre la technologie et les affaires — implanter des systèmes d'information, analyser les besoins des équipes, gérer des projets TI et améliorer l'efficacité des organisations.",en:"Bridge technology and business — implement information systems, analyse team needs, manage IT projects and improve organisational efficiency.",es:"Tender puentes entre tecnología y negocio — implementar sistemas de información, analizar necesidades de equipos, gestionar proyectos TI y mejorar la eficiencia organizacional."},
       where:{fr:"Entreprises de services, cabinets-conseils, institutions financières, gouvernement, commerces de détail, tout secteur utilisant des logiciels de gestion.",en:"Service companies, consulting firms, financial institutions, government, retail — any sector using management software (which is everyone).",es:"Empresas de servicios, consultoras, instituciones financieras, gobierno, comercio minorista — cualquier sector que use software de gestión."},
@@ -241,7 +232,6 @@ const PROGS = [
     decPair:'prog-dec', aecPair:null,
     name:{fr:'Programmeur-analyste en Technologies de l\'information',en:'IT Programmer-Analyst',es:'Programador-analista en TI'},
     school:{fr:'Technologies de l\'information',en:'Information Technology',es:'Tecnologías de la información'},
-    tags:['tech','code','logic','databases','systems','web','new-products','automate','abstraction'],
     detail:{
       what:{fr:"Développer des applications, analyser les besoins des utilisateur·trice·s et écrire le code qui résout des problèmes concrets. Tu travailles sur le web, les applications d'entreprise et les systèmes internes.",en:"Develop applications, analyse user needs and write code that solves concrete problems. You work on web, enterprise applications and internal systems.",es:"Desarrollar aplicaciones, analizar las necesidades de los usuarios y escribir código que resuelve problemas concretos."},
       where:{fr:"Entreprises de toutes tailles, agences numériques, institutions financières, gouvernement, startups, à ton compte.",en:"Organizations of all sizes, digital agencies, financial institutions, government, startups, freelance.",es:"Organizaciones de todos los tamaños, agencias digitales, instituciones financieras, gobierno, startups, freelance."},
@@ -254,7 +244,6 @@ const PROGS = [
     decPair:'prog-dec', aecPair:null,
     name:{fr:'Intelligence artificielle et apprentissage automatique',en:'Artificial Intelligence & Machine Learning',es:'IA y aprendizaje automático'},
     school:{fr:'Technologies de l\'information',en:'Information Technology',es:'Tecnologías de la información'},
-    tags:['tech','code','data','logic','ai','math','systems','abstraction','create-tech','insights'],
     detail:{
       what:{fr:"Construire, entraîner et déployer des modèles d'IA — classification, prédiction, traitement du langage, vision par ordinateur. Tu transformes des données brutes en systèmes intelligents.",en:"Build, train and deploy AI models — classification, prediction, natural language processing, computer vision. You transform raw data into intelligent systems.",es:"Construir, entrenar y desplegar modelos de IA — clasificación, predicción, procesamiento del lenguaje, visión por computadora."},
       where:{fr:"Entreprises tech, startups IA, institutions financières, santé numérique, transport, médias, cabinets-conseils.",en:"Tech companies, AI startups, financial institutions, digital health, transportation, media, consulting firms.",es:"Empresas tech, startups de IA, instituciones financieras, salud digital, transporte, medios, consultoras."},
@@ -267,7 +256,6 @@ const PROGS = [
     decPair:'gestion-dec', aecPair:null,
     name:{fr:'Spécialisation en intelligence d\'entreprise (Business Intelligence)',en:'Business Intelligence',es:'Inteligencia empresarial (BI)'},
     school:{fr:'Technologies de l\'information',en:'Information Technology',es:'Tecnologías de la información'},
-    tags:['tech','data','business','management','systems','logic','insights','efficiency'],
     detail:{
       what:{fr:"Extraire, transformer et visualiser des données d'entreprise pour aider les organisations à prendre de meilleures décisions. Tu construis des tableaux de bord, des rapports et des pipelines de données.",en:"Extract, transform and visualise enterprise data to help organisations make better decisions. You build dashboards, reports and data pipelines.",es:"Extraer, transformar y visualizar datos empresariales para ayudar a las organizaciones a tomar mejores decisiones. Construyes dashboards, reportes y pipelines de datos."},
       where:{fr:"Entreprises de toutes tailles, services financiers, commerce de détail, santé, gouvernement, cabinets-conseils en données.",en:"Organizations of all sizes, financial services, retail, healthcare, government, data consulting firms.",es:"Organizaciones de todos los tamaños, servicios financieros, comercio minorista, salud, gobierno, consultoras de datos."},
@@ -280,7 +268,6 @@ const PROGS = [
     decPair:'jeux-dec', aecPair:null,
     name:{fr:'Installation et administration de réseaux',en:'Network Installation and Administration',es:'Instalación y administración de redes'},
     school:{fr:'Technologies de l\'information',en:'Information Technology',es:'Tecnologías de la información'},
-    tags:['tech','networks','security','infrastructure','systems','configure','optimize'],
     detail:{
       what:{fr:"Installer, configurer et gérer des infrastructures réseau en entreprise avec les technologies CISCO, Microsoft et Linux. Tu prépares plusieurs certifications reconnues mondialement — CCNA, CCNP, CompTIA A+ et LPIC.",en:"Install, configure and manage enterprise network infrastructure using CISCO, Microsoft and Linux technologies. You prepare for globally recognised certifications — CCNA, CCNP, CompTIA A+ and LPIC.",es:"Instalar, configurar y gestionar infraestructuras de red empresarial con tecnologías CISCO, Microsoft y Linux. Te preparas para certificaciones reconocidas mundialmente — CCNA, CCNP, CompTIA A+ y LPIC."},
       where:{fr:"Fournisseurs de services gérés (MSP), entreprises de toutes tailles, gouvernement, télécommunications, firmes de cybersécurité.",en:"Managed service providers (MSPs), organizations of all sizes, government, telecommunications, cybersecurity firms.",es:"Proveedores de servicios gestionados (MSP), organizaciones de todos los tamaños, gobierno, telecomunicaciones, firmas de ciberseguridad."},
@@ -349,52 +336,544 @@ const PSTEPS = [
 
 /* ═══════════════════════════════════════════
    QUIZ QUESTIONS
+   Loaded from questions.json, shuffled per session.
+   app.js calls loadQuestions() on init.
 ═══════════════════════════════════════════ */
-const QQ = [
-  { q:{fr:'Par rapport à la créativité…',en:'When it comes to creativity…',es:'En cuanto a la creatividad…'},
-    a:{t:{fr:'Je préfère créer des choses visuelles que les gens peuvent voir et toucher',en:'I prefer creating visual things people can see and touch',es:'Prefiero crear cosas visuales que la gente pueda ver y tocar'},tags:['visual','art','design','colors','shapes','branding']},
-    b:{t:{fr:'Je préfère créer des expériences interactives que les gens peuvent vivre',en:'I prefer creating interactive experiences people can live through',es:'Prefiero crear experiencias interactivas que la gente pueda vivir'},tags:['interactive','ux','games','systems','immersive']}},
-  { q:{fr:'Les espaces physiques et les environnements…',en:'Physical spaces and environments…',es:'Los espacios físicos y entornos…'},
-    a:{t:{fr:"M'inspirent — j'aime concevoir des espaces où les gens se sentent bien",en:'Inspire me — I love designing spaces where people feel good',es:'Me inspiran — me encanta diseñar espacios donde la gente se sienta bien'},tags:['spatial','architecture','design','wellbeing','people-needs','ux']},
-    b:{t:{fr:'Me semblent moins attrayants que les mondes numériques et virtuels',en:'Feel less appealing to me than digital and virtual worlds',es:'Me atraen menos que los mundos digitales y virtuales'},tags:['digital','interactive','immersive','games','3d','tech']}},
-  { q:{fr:'Les couleurs, les formes et la composition…',en:'Colors, shapes and composition…',es:'Los colores, formas y composición…'},
-    a:{t:{fr:"Sont au cœur de ce qui m'attire dans un projet créatif",en:'Are at the heart of what draws me to a creative project',es:'Están en el corazón de lo que me atrae en un proyecto creativo'},tags:['colors','shapes','visual','design','branding','ux']},
-    b:{t:{fr:"M'intéressent moins que la logique et l'architecture des systèmes",en:'Interest me less than the logic and architecture of systems',es:'Me interesan menos que la lógica y arquitectura de sistemas'},tags:['logic','systems','abstraction','tech','networks','code']}},
-  { q:{fr:'La vidéo et le son…',en:'Video and sound…',es:'El video y el sonido…'},
-    a:{t:{fr:'Sont des outils puissants pour raconter des histoires et émouvoir',en:'Are powerful tools for storytelling and moving people',es:'Son herramientas poderosas para contar historias y emocionar'},tags:['video','audio','cinema','storytelling','creative','games']},
-    b:{t:{fr:"M'intéressent surtout comme composantes techniques de systèmes interactifs",en:'Interest me mainly as technical components of interactive systems',es:'Me interesan principalmente como componentes técnicas de sistemas interactivos'},tags:['tech','interactive','systems','code','logic']}},
-  { q:{fr:"Résoudre des problèmes pour moi, c'est avant tout…",en:'For me, problem-solving is mainly about…',es:'Para mí, resolver problemas consiste principalmente en…'},
-    a:{t:{fr:'Configurer, réarranger et optimiser des systèmes existants',en:'Configuring, rearranging and optimizing existing systems',es:'Configurar, reorganizar y optimizar sistemas existentes'},tags:['configure','optimize','networks','infrastructure','logic','systems']},
-    b:{t:{fr:"Imaginer de nouveaux produits et processus qui n'existent pas encore",en:'Imagining new products and processes that do not yet exist',es:'Imaginar nuevos productos y procesos que aún no existen'},tags:['new-products','management','code','ux','design','automate']}},
-  { q:{fr:'La narration et divertir les autres…',en:'Storytelling and entertaining others…',es:'La narración y entretener a otros…'},
-    a:{t:{fr:'Sont au centre de ce que je veux faire professionnellement',en:'Are at the center of what I want to do professionally',es:'Están en el centro de lo que quiero hacer profesionalmente'},tags:['storytelling','cinema','games','video','audio','creative','empower-others']},
-    b:{t:{fr:"M'intéressent moins que l'efficacité et l'automatisation",en:'Interest me less than efficiency and automation',es:'Me interesan menos que la eficiencia y la automatización'},tags:['automate','efficiency','management','code','systems','tech']}},
-  { q:{fr:"L'abstraction et les modèles conceptuels…",en:'Abstraction and conceptual models…',es:'La abstracción y los modelos conceptuales…'},
-    a:{t:{fr:"Me fascinent — j'aime trouver des patterns cachés dans des données complexes",en:'Fascinate me — I love finding hidden patterns in complex data',es:'Me fascinan — me encanta encontrar patrones ocultos en datos complejos'},tags:['abstraction','math','ai','logic','code','insights','data']},
-    b:{t:{fr:"M'intéressent moins que le concret et la réalisation visible",en:'Interest me less than concrete, visible results',es:'Me interesan menos que los resultados concretos y visibles'},tags:['visual','design','creative','spatial','architecture','wellbeing']}},
-  { q:{fr:'Travailler en étroite collaboration avec des gens…',en:'Working closely with people…',es:'Trabajar estrechamente con personas…'},
-    a:{t:{fr:"Est essentiel pour moi — j'aime co-créer et aider directement",en:'Is essential for me — I love co-creating and helping directly',es:'Es esencial para mí — me encanta co-crear y ayudar directamente'},tags:['people-needs','wellbeing','ux','design','help-others','empower-others']},
-    b:{t:{fr:'Est moins important que la profondeur technique et analytique',en:'Is less important than technical and analytical depth',es:'Es menos importante que la profundidad técnica y analítica'},tags:['tech','abstraction','systems','code','logic','networks']}},
-  { q:{fr:'Créer des solutions qui répondent aux besoins des gens…',en:"Creating solutions that meet people's needs…",es:'Crear soluciones que respondan a las necesidades de las personas…'},
-    a:{t:{fr:"Est ma principale motivation — je veux voir l'impact humain de mon travail",en:'Is my main motivation — I want to see the human impact of my work',es:'Es mi principal motivación — quiero ver el impacto humano de mi trabajo'},tags:['people-needs','wellbeing','ux','design','architecture','spatial','help-others']},
-    b:{t:{fr:"Est important, mais je suis surtout motivé·e par les défis intellectuels",en:'Is important, but I am mainly driven by intellectual challenges',es:'Es importante, pero me motivan principalmente los desafíos intelectuales'},tags:['abstraction','logic','math','ai','tech','code','data']}},
-  { q:{fr:'Automatiser et simplifier des tâches répétitives…',en:'Automating and simplifying repetitive tasks…',es:'Automatizar y simplificar tareas repetitivas…'},
-    a:{t:{fr:"M'enthousiasme — je veux libérer les gens de ce qui est fastidieux",en:'Excites me — I want to free people from tedious work',es:'Me entusiasma — quiero liberar a la gente del trabajo tedioso'},tags:['automate','code','systems','management','efficiency','lead-teams','new-products']},
-    b:{t:{fr:"M'intéresse moins que la conception créative ou l'analyse de données",en:'Interests me less than creative design or data analysis',es:'Me interesa menos que el diseño creativo o el análisis de datos'},tags:['visual','creative','design','data','insights','storytelling']}},
-  { q:{fr:"Extraire des insights à partir de données…",en:'Extracting insights from data…',es:'Extraer conclusiones de los datos…'},
-    a:{t:{fr:"Est fascinant — les données sont une mine d'or pour prendre de meilleures décisions",en:'Is fascinating — data is a goldmine for better decisions',es:'Es fascinante — los datos son una mina de oro para mejores decisiones'},tags:['data','insights','ai','logic','management','bi','math']},
-    b:{t:{fr:"Est moins attrayant que créer des choses visuelles ou interactives",en:'Is less appealing than creating visual or interactive things',es:'Es menos atractivo que crear cosas visuales o interactivas'},tags:['visual','creative','interactive','ux','games','storytelling','art']}},
-  { q:{fr:'La psychologie et le comportement humain…',en:'Psychology and human behaviour…',es:'La psicología y el comportamiento humano…'},
-    a:{t:{fr:"M'intéressent beaucoup — je veux comprendre pourquoi les gens agissent comme ils le font",en:'Interest me a lot — I want to understand why people act the way they do',es:'Me interesan mucho — quiero entender por qué la gente actúa como lo hace'},tags:['psychology','ux','wellbeing','people-needs','design','interactive']},
-    b:{t:{fr:"M'intéressent moins que comprendre comment la technologie fonctionne",en:'Interest me less than understanding how technology works',es:'Me interesan menos que entender cómo funciona la tecnología'},tags:['tech','code','networks','ai','systems','logic','configure']}},
-  { q:{fr:'Savoir comment la technologie fonctionne en profondeur…',en:'Understanding deeply how technology works…',es:'Entender en profundidad cómo funciona la tecnología…'},
-    a:{t:{fr:"Est une passion — j'aime démonter et reconstruire des systèmes",en:'Is a passion — I love taking systems apart and rebuilding them',es:'Es una pasión — me encanta desmontar y reconstruir sistemas'},tags:['tech','code','networks','ai','systems','logic','abstraction','create-tech']},
-    b:{t:{fr:"Est un moyen, pas une fin — ce qui m'importe c'est le résultat créatif ou humain",en:'Is a means, not an end — what matters to me is the creative or human result',es:'Es un medio, no un fin — lo que me importa es el resultado creativo o humano'},tags:['visual','creative','people-needs','design','storytelling','ux','wellbeing']}},
-  { q:{fr:"Créer de la nouvelle technologie (IA, outils, logiciels)…",en:'Creating new technology (AI, tools, software)…',es:'Crear nueva tecnología (IA, herramientas, software)…'},
-    a:{t:{fr:"Est ce que je veux faire — je veux construire ce que d'autres utiliseront",en:'Is what I want to do — I want to build what others will use',es:'Es lo que quiero hacer — quiero construir lo que otros usarán'},tags:['create-tech','code','ai','systems','tech','abstraction','automate']},
-    b:{t:{fr:"Est moins attrayant que d'utiliser la technologie au service d'une création artistique ou humaine",en:'Is less appealing than using technology in service of artistic or human creation',es:'Es menos atractivo que usar la tecnología al servicio de la creación artística o humana'},tags:['visual','creative','art','design','storytelling','people-needs','ux','empower-others']}},
-  { q:{fr:'Les expériences immersives et la réalité augmentée…',en:'Immersive experiences and augmented reality…',es:'Las experiencias inmersivas y la realidad aumentada…'},
-    a:{t:{fr:"Me fascinent — je veux concevoir des mondes et des interfaces que l'on peut habiter",en:'Fascinate me — I want to design worlds and interfaces people can inhabit',es:'Me fascinan — quiero diseñar mundos e interfaces que se puedan habitar'},tags:['immersive','ux','interactive','3d','spatial','design','create-tech']},
-    b:{t:{fr:"M'intéressent moins que les systèmes qui font tourner le monde réel",en:'Interest me less than the systems that keep the real world running',es:'Me interesan menos que los sistemas que hacen funcionar el mundo real'},tags:['tech','networks','systems','code','infrastructure','configure','logic']}},
+let QQ = [];
+
+/* Seeded pseudo-random shuffle (Mulberry32) */
+function seededShuffle(arr, seed) {
+  const a = arr.slice();
+  let s = seed >>> 0;
+  function rand() {
+    s += 0x6D2B79F5;
+    let t = Math.imul(s ^ s >>> 15, 1 | s);
+    t ^= t + Math.imul(t ^ t >>> 7, 61 | t);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  }
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* Convert JSON question to internal format */
+function convertQuestion(q) {
+  return {
+    id: q.id,
+    q:  q.q,
+    a:  { t: q.a, scores: q.scores.a || {} },
+    b:  { t: q.b, scores: q.scores.b || {} }
+  };
+}
+
+const FALLBACK_QUESTIONS = [
+  {
+    "id": "creativity-visual-vs-interactive",
+    "q": {
+      "fr": "Par rapport à la créativité…",
+      "en": "When it comes to creativity…",
+      "es": "En cuanto a la creatividad…"
+    },
+    "a": {
+      "fr": "Je préfère créer des choses visuelles que les gens peuvent voir et toucher",
+      "en": "I prefer creating visual things people can see and touch",
+      "es": "Prefiero crear cosas visuales que la gente pueda ver y tocar"
+    },
+    "b": {
+      "fr": "Je préfère créer des expériences interactives que les gens peuvent vivre",
+      "en": "I prefer creating interactive experiences people can live through",
+      "es": "Prefiero crear experiencias interactivas que la gente pueda vivir"
+    },
+    "scores": {
+      "a": {
+        "design-graphique": 3,
+        "design-interieur-dec": 3,
+        "design-interieur-aec": 3,
+        "montage-video": 2,
+        "uiux-dec": 1
+      },
+      "b": {
+        "uiux-dec": 3,
+        "jeux-dec": 2,
+        "design-jeux": 3
+      }
+    }
+  },
+  {
+    "id": "spaces-physical-vs-digital",
+    "q": {
+      "fr": "Les espaces physiques et les environnements…",
+      "en": "Physical spaces and environments…",
+      "es": "Los espacios físicos y entornos…"
+    },
+    "a": {
+      "fr": "M'inspirent — j'aime concevoir des espaces où les gens se sentent bien",
+      "en": "Inspire me — I love designing spaces where people feel good",
+      "es": "Me inspiran — me encanta diseñar espacios donde la gente se sienta bien"
+    },
+    "b": {
+      "fr": "Me semblent moins attrayants que les mondes numériques et virtuels",
+      "en": "Feel less appealing to me than digital and virtual worlds",
+      "es": "Me atraen menos que los mundos digitales y virtuales"
+    },
+    "scores": {
+      "a": {
+        "design-interieur-dec": 3,
+        "design-interieur-aec": 3,
+        "uiux-dec": 2
+      },
+      "b": {
+        "uiux-dec": 2,
+        "jeux-dec": 2,
+        "design-jeux": 2,
+        "prog-dec": 1,
+        "ia-ml": 1
+      }
+    }
+  },
+  {
+    "id": "colors-shapes-vs-logic",
+    "q": {
+      "fr": "Les couleurs, les formes et la composition…",
+      "en": "Colors, shapes and composition…",
+      "es": "Los colores, formas y composición…"
+    },
+    "a": {
+      "fr": "Sont au cœur de ce qui m'attire dans un projet créatif",
+      "en": "Are at the heart of what draws me to a creative project",
+      "es": "Están en el corazón de lo que me atrae en un proyecto creativo"
+    },
+    "b": {
+      "fr": "M'intéressent moins que la logique et l'architecture des systèmes",
+      "en": "Interest me less than the logic and architecture of systems",
+      "es": "Me interesan menos que la lógica y arquitectura de sistemas"
+    },
+    "scores": {
+      "a": {
+        "design-graphique": 3,
+        "design-interieur-dec": 2,
+        "design-interieur-aec": 2,
+        "uiux-dec": 2
+      },
+      "b": {
+        "reseaux-dec": 3,
+        "cisco": 3,
+        "prog-dec": 2,
+        "ia-ml": 2,
+        "bi": 1
+      }
+    }
+  },
+  {
+    "id": "video-audio-storytelling-vs-technical",
+    "q": {
+      "fr": "La vidéo et le son…",
+      "en": "Video and sound…",
+      "es": "El video y el sonido…"
+    },
+    "a": {
+      "fr": "Sont des outils puissants pour raconter des histoires et émouvoir",
+      "en": "Are powerful tools for storytelling and moving people",
+      "es": "Son herramientas poderosas para contar historias y emocionar"
+    },
+    "b": {
+      "fr": "M'intéressent surtout comme composantes techniques de systèmes interactifs",
+      "en": "Interest me mainly as technical components of interactive systems",
+      "es": "Me interesan principalmente como componentes técnicas de sistemas interactivos"
+    },
+    "scores": {
+      "a": {
+        "montage-video": 3,
+        "jeux-dec": 2,
+        "design-jeux": 2,
+        "uiux-dec": 1
+      },
+      "b": {
+        "jeux-dec": 2,
+        "uiux-dec": 2,
+        "prog-dec": 2
+      }
+    }
+  },
+  {
+    "id": "problem-solving-configure-vs-invent",
+    "q": {
+      "fr": "Résoudre des problèmes pour moi, c'est avant tout…",
+      "en": "For me, problem-solving is mainly about…",
+      "es": "Para mí, resolver problemas consiste principalmente en…"
+    },
+    "a": {
+      "fr": "Configurer, réarranger et optimiser des systèmes existants",
+      "en": "Configuring, rearranging and optimizing existing systems",
+      "es": "Configurar, reorganizar y optimizar sistemas existentes"
+    },
+    "b": {
+      "fr": "Imaginer de nouveaux produits et processus qui n'existent pas encore",
+      "en": "Imagining new products and processes that do not yet exist",
+      "es": "Imaginar nuevos productos y procesos que aún no existen"
+    },
+    "scores": {
+      "a": {
+        "reseaux-dec": 3,
+        "cisco": 3,
+        "bi": 1
+      },
+      "b": {
+        "prog-dec": 3,
+        "programmeur-analyste": 3,
+        "uiux-dec": 2,
+        "design-jeux": 2,
+        "ia-ml": 2
+      }
+    }
+  },
+  {
+    "id": "storytelling-vs-efficiency",
+    "q": {
+      "fr": "La narration et divertir les autres…",
+      "en": "Storytelling and entertaining others…",
+      "es": "La narración y entretener a otros…"
+    },
+    "a": {
+      "fr": "Sont au centre de ce que je veux faire professionnellement",
+      "en": "Are at the center of what I want to do professionally",
+      "es": "Están en el centro de lo que quiero hacer profesionalmente"
+    },
+    "b": {
+      "fr": "M'intéressent moins que l'efficacité et l'automatisation",
+      "en": "Interest me less than efficiency and automation",
+      "es": "Me interesan menos que la eficiencia y la automatización"
+    },
+    "scores": {
+      "a": {
+        "montage-video": 3,
+        "jeux-dec": 2,
+        "design-jeux": 3
+      },
+      "b": {
+        "prog-dec": 2,
+        "programmeur-analyste": 2,
+        "reseaux-dec": 2,
+        "cisco": 2,
+        "bi": 2,
+        "ia-ml": 1
+      }
+    }
+  },
+  {
+    "id": "abstraction-data-vs-concrete",
+    "q": {
+      "fr": "L'abstraction et les modèles conceptuels…",
+      "en": "Abstraction and conceptual models…",
+      "es": "La abstracción y los modelos conceptuales…"
+    },
+    "a": {
+      "fr": "Me fascinent — j'aime trouver des patterns cachés dans des données complexes",
+      "en": "Fascinate me — I love finding hidden patterns in complex data",
+      "es": "Me fascinan — me encanta encontrar patrones ocultos en datos complejos"
+    },
+    "b": {
+      "fr": "M'intéressent moins que le concret et la réalisation visible",
+      "en": "Interest me less than concrete, visible results",
+      "es": "Me interesan menos que los resultados concretos y visibles"
+    },
+    "scores": {
+      "a": {
+        "ia-ml": 3,
+        "bi": 3,
+        "prog-dec": 2,
+        "programmeur-analyste": 2
+      },
+      "b": {
+        "design-graphique": 2,
+        "design-interieur-dec": 2,
+        "design-interieur-aec": 2,
+        "montage-video": 1
+      }
+    }
+  },
+  {
+    "id": "people-close-vs-technical-depth",
+    "q": {
+      "fr": "Travailler en étroite collaboration avec des gens…",
+      "en": "Working closely with people…",
+      "es": "Trabajar estrechamente con personas…"
+    },
+    "a": {
+      "fr": "Est essentiel pour moi — j'aime co-créer et aider directement",
+      "en": "Is essential for me — I love co-creating and helping directly",
+      "es": "Es esencial para mí — me encanta co-crear y ayudar directamente"
+    },
+    "b": {
+      "fr": "Est moins important que la profondeur technique et analytique",
+      "en": "Is less important than technical and analytical depth",
+      "es": "Es menos importante que la profundidad técnica y analítica"
+    },
+    "scores": {
+      "a": {
+        "uiux-dec": 2,
+        "design-graphique": 2,
+        "design-interieur-dec": 2,
+        "design-interieur-aec": 2,
+        "montage-video": 1
+      },
+      "b": {
+        "ia-ml": 2,
+        "prog-dec": 2,
+        "reseaux-dec": 2,
+        "cisco": 2,
+        "bi": 1
+      }
+    }
+  },
+  {
+    "id": "people-needs-vs-intellectual",
+    "q": {
+      "fr": "Créer des solutions qui répondent aux besoins des gens…",
+      "en": "Creating solutions that meet people's needs…",
+      "es": "Crear soluciones que respondan a las necesidades de las personas…"
+    },
+    "a": {
+      "fr": "Est ma principale motivation — je veux voir l'impact humain de mon travail",
+      "en": "Is my main motivation — I want to see the human impact of my work",
+      "es": "Es mi principal motivación — quiero ver el impacto humano de mi trabajo"
+    },
+    "b": {
+      "fr": "Est important, mais je suis surtout motivé·e par les défis intellectuels",
+      "en": "Is important, but I am mainly driven by intellectual challenges",
+      "es": "Es importante, pero me motivan principalmente los desafíos intelectuales"
+    },
+    "scores": {
+      "a": {
+        "uiux-dec": 3,
+        "design-interieur-dec": 3,
+        "design-interieur-aec": 3,
+        "design-graphique": 2
+      },
+      "b": {
+        "ia-ml": 3,
+        "prog-dec": 2,
+        "bi": 2,
+        "reseaux-dec": 1
+      }
+    }
+  },
+  {
+    "id": "automate-vs-create-analyze",
+    "q": {
+      "fr": "Automatiser et simplifier des tâches répétitives…",
+      "en": "Automating and simplifying repetitive tasks…",
+      "es": "Automatizar y simplificar tareas repetitivas…"
+    },
+    "a": {
+      "fr": "M'enthousiasme — je veux libérer les gens de ce qui est fastidieux",
+      "en": "Excites me — I want to free people from tedious work",
+      "es": "Me entusiasma — quiero liberar a la gente del trabajo tedioso"
+    },
+    "b": {
+      "fr": "M'intéresse moins que la conception créative ou l'analyse de données",
+      "en": "Interests me less than creative design or data analysis",
+      "es": "Me interesa menos que el diseño creativo o el análisis de datos"
+    },
+    "scores": {
+      "a": {
+        "prog-dec": 3,
+        "programmeur-analyste": 3,
+        "ia-ml": 2,
+        "reseaux-dec": 1
+      },
+      "b": {
+        "design-graphique": 2,
+        "design-interieur-dec": 2,
+        "design-interieur-aec": 2,
+        "bi": 2,
+        "montage-video": 1
+      }
+    }
+  },
+  {
+    "id": "data-insights-vs-visual-interactive",
+    "q": {
+      "fr": "Extraire des insights à partir de données…",
+      "en": "Extracting insights from data…",
+      "es": "Extraer conclusiones de los datos…"
+    },
+    "a": {
+      "fr": "Est fascinant — les données sont une mine d'or pour prendre de meilleures décisions",
+      "en": "Is fascinating — data is a goldmine for better decisions",
+      "es": "Es fascinante — los datos son una mina de oro para mejores decisiones"
+    },
+    "b": {
+      "fr": "Est moins attrayant que créer des choses visuelles ou interactives",
+      "en": "Is less appealing than creating visual or interactive things",
+      "es": "Es menos atractivo que crear cosas visuales o interactivas"
+    },
+    "scores": {
+      "a": {
+        "bi": 3,
+        "ia-ml": 3,
+        "prog-dec": 1
+      },
+      "b": {
+        "design-graphique": 2,
+        "uiux-dec": 2,
+        "jeux-dec": 2,
+        "design-jeux": 2,
+        "montage-video": 1
+      }
+    }
+  },
+  {
+    "id": "psychology-vs-how-tech-works",
+    "q": {
+      "fr": "La psychologie et le comportement humain…",
+      "en": "Psychology and human behaviour…",
+      "es": "La psicología y el comportamiento humano…"
+    },
+    "a": {
+      "fr": "M'intéressent beaucoup — je veux comprendre pourquoi les gens agissent comme ils le font",
+      "en": "Interest me a lot — I want to understand why people act the way they do",
+      "es": "Me interesan mucho — quiero entender por qué la gente actúa como lo hace"
+    },
+    "b": {
+      "fr": "M'intéressent moins que comprendre comment la technologie fonctionne",
+      "en": "Interest me less than understanding how technology works",
+      "es": "Me interesan menos que entender cómo funciona la tecnología"
+    },
+    "scores": {
+      "a": {
+        "uiux-dec": 3,
+        "design-interieur-dec": 2,
+        "design-interieur-aec": 2,
+        "design-graphique": 1
+      },
+      "b": {
+        "prog-dec": 2,
+        "programmeur-analyste": 2,
+        "reseaux-dec": 2,
+        "cisco": 2,
+        "ia-ml": 2
+      }
+    }
+  },
+  {
+    "id": "understand-tech-deeply-vs-creative-human",
+    "q": {
+      "fr": "Savoir comment la technologie fonctionne en profondeur…",
+      "en": "Understanding deeply how technology works…",
+      "es": "Entender en profundidad cómo funciona la tecnología…"
+    },
+    "a": {
+      "fr": "Est une passion — j'aime démonter et reconstruire des systèmes",
+      "en": "Is a passion — I love taking systems apart and rebuilding them",
+      "es": "Es una pasión — me encanta desmontar y reconstruir sistemas"
+    },
+    "b": {
+      "fr": "Est un moyen, pas une fin — ce qui m'importe c'est le résultat créatif ou humain",
+      "en": "Is a means, not an end — what matters to me is the creative or human result",
+      "es": "Es un medio, no un fin — lo que me importa es el resultado creativo o humano"
+    },
+    "scores": {
+      "a": {
+        "prog-dec": 3,
+        "programmeur-analyste": 3,
+        "reseaux-dec": 3,
+        "cisco": 3,
+        "ia-ml": 2
+      },
+      "b": {
+        "design-graphique": 2,
+        "design-interieur-dec": 2,
+        "design-interieur-aec": 2,
+        "uiux-dec": 1,
+        "montage-video": 1
+      }
+    }
+  },
+  {
+    "id": "create-new-tech-vs-use-for-art",
+    "q": {
+      "fr": "Créer de la nouvelle technologie (IA, outils, logiciels)…",
+      "en": "Creating new technology (AI, tools, software)…",
+      "es": "Crear nueva tecnología (IA, herramientas, software)…"
+    },
+    "a": {
+      "fr": "Est ce que je veux faire — je veux construire ce que d'autres utiliseront",
+      "en": "Is what I want to do — I want to build what others will use",
+      "es": "Es lo que quiero hacer — quiero construir lo que otros usarán"
+    },
+    "b": {
+      "fr": "Est moins attrayant que d'utiliser la technologie au service d'une création artistique ou humaine",
+      "en": "Is less appealing than using technology in service of artistic or human creation",
+      "es": "Es menos atractivo que usar la tecnología al servicio de la creación artística o humana"
+    },
+    "scores": {
+      "a": {
+        "ia-ml": 3,
+        "prog-dec": 3,
+        "programmeur-analyste": 3,
+        "reseaux-dec": 1
+      },
+      "b": {
+        "design-graphique": 2,
+        "montage-video": 2,
+        "design-interieur-dec": 2,
+        "design-interieur-aec": 2,
+        "uiux-dec": 1,
+        "design-jeux": 1
+      }
+    }
+  },
+  {
+    "id": "immersive-ar-vs-real-world-systems",
+    "q": {
+      "fr": "Les expériences immersives et la réalité augmentée…",
+      "en": "Immersive experiences and augmented reality…",
+      "es": "Las experiencias inmersivas y la realidad aumentada…"
+    },
+    "a": {
+      "fr": "Me fascinent — je veux concevoir des mondes et des interfaces que l'on peut habiter",
+      "en": "Fascinate me — I want to design worlds and interfaces people can inhabit",
+      "es": "Me fascinan — quiero diseñar mundos e interfaces que se puedan habitar"
+    },
+    "b": {
+      "fr": "M'intéressent moins que les systèmes qui font tourner le monde réel",
+      "en": "Interest me less than the systems that keep the real world running",
+      "es": "Me interesan menos que los sistemas que hacen funcionar el mundo real"
+    },
+    "scores": {
+      "a": {
+        "uiux-dec": 3,
+        "jeux-dec": 2,
+        "design-jeux": 2,
+        "prog-dec": 1
+      },
+      "b": {
+        "reseaux-dec": 3,
+        "cisco": 3,
+        "bi": 1,
+        "prog-dec": 1
+      }
+    }
+  }
 ];
 
+/* Load questions.json, shuffle with time-based seed, populate QQ */
+function loadQuestions() {
+  const seed = Date.now();
+  return fetch('questions.json')
+    .then(r => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    })
+    .then(data => {
+      const shuffled = seededShuffle(data, seed);
+      QQ = shuffled.map(convertQuestion);
+    })
+    .catch(() => {
+      console.warn('questions.json could not be loaded. Using inline fallback questions.');
+      QQ = FALLBACK_QUESTIONS.map(convertQuestion);
+    });
+}

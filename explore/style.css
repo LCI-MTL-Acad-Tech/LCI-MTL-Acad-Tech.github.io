@@ -182,6 +182,12 @@ header {
 .refine-panel .choice-pair { margin-bottom:10px; }
 .refine-panel .choice-actions { margin-bottom:0; }
 
+/* No more questions message */
+.no-more-q {
+  font-size:13px; color:rgba(7,24,30,0.4); text-align:center;
+  padding:14px 0 4px; letter-spacing:0.01em;
+}
+
 /* btn-kg now standalone below panel area */
 .btn-kg {
   display:inline-flex; align-items:center; gap:8px; background:white;

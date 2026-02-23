@@ -33,6 +33,8 @@ function resetAll(){
   profile={}; scores={};
   const panel=document.getElementById('refinePanel');
   if(panel) panel.style.display='none';
+  const nmq=document.getElementById('noMoreQ');
+  if(nmq) nmq.style.display='none';
   const kg=document.getElementById('btnKG');
   if(kg) kg.classList.remove('hidden');
   showScreen('welcome');
@@ -156,20 +158,20 @@ function pickCard(which){
 
   // Score delta
   if(!prev&&next){
-    if(next==='a') awardTags(QQ[qIdx].a.tags,3);
-    else if(next==='b') awardTags(QQ[qIdx].b.tags,3);
-    else{awardTags(QQ[qIdx].a.tags,3);awardTags(QQ[qIdx].b.tags,3);}
+    if(next==='a') awardScores(QQ[qIdx].a.scores,1);
+    else if(next==='b') awardScores(QQ[qIdx].b.scores,1);
+    else{awardScores(QQ[qIdx].a.scores,1);awardScores(QQ[qIdx].b.scores,1);}
   } else if(prev&&next){
-    if(prev==='a'&&next==='both') awardTags(QQ[qIdx].b.tags,3);
-    else if(prev==='b'&&next==='both') awardTags(QQ[qIdx].a.tags,3);
-    else if(prev==='both'&&next==='a') awardTags(QQ[qIdx].b.tags,-3);
-    else if(prev==='both'&&next==='b') awardTags(QQ[qIdx].a.tags,-3);
-    else if(prev==='a'&&next==='b'){awardTags(QQ[qIdx].a.tags,-3);awardTags(QQ[qIdx].b.tags,3);}
-    else if(prev==='b'&&next==='a'){awardTags(QQ[qIdx].b.tags,-3);awardTags(QQ[qIdx].a.tags,3);}
+    if(prev==='a'&&next==='both') awardScores(QQ[qIdx].b.scores,1);
+    else if(prev==='b'&&next==='both') awardScores(QQ[qIdx].a.scores,1);
+    else if(prev==='both'&&next==='a') awardScores(QQ[qIdx].b.scores,-1);
+    else if(prev==='both'&&next==='b') awardScores(QQ[qIdx].a.scores,-1);
+    else if(prev==='a'&&next==='b'){awardScores(QQ[qIdx].a.scores,-1);awardScores(QQ[qIdx].b.scores,1);}
+    else if(prev==='b'&&next==='a'){awardScores(QQ[qIdx].b.scores,-1);awardScores(QQ[qIdx].a.scores,1);}
   } else if(prev&&!next){
-    if(prev==='a') awardTags(QQ[qIdx].a.tags,-3);
-    else if(prev==='b') awardTags(QQ[qIdx].b.tags,-3);
-    else{awardTags(QQ[qIdx].a.tags,-3);awardTags(QQ[qIdx].b.tags,-3);}
+    if(prev==='a') awardScores(QQ[qIdx].a.scores,-1);
+    else if(prev==='b') awardScores(QQ[qIdx].b.scores,-1);
+    else{awardScores(QQ[qIdx].a.scores,-1);awardScores(QQ[qIdx].b.scores,-1);}
   }
 
   if(next) qPicks[qIdx]=next; else delete qPicks[qIdx];
@@ -190,9 +192,9 @@ function pickNeither(){ qPicks[qIdx]='neither'; qIdx++; if(confidence()>=100&&!r
 function pickBoth(){
   const prev=qPicks[qIdx];
   // Award both tags (undo prev if needed)
-  if(prev==='a')    { awardTags(QQ[qIdx].b.tags,3); }
-  else if(prev==='b') { awardTags(QQ[qIdx].a.tags,3); }
-  else if(!prev)    { awardTags(QQ[qIdx].a.tags,3); awardTags(QQ[qIdx].b.tags,3); }
+  if(prev==='a')    { awardScores(QQ[qIdx].b.scores,1); }
+  else if(prev==='b') { awardScores(QQ[qIdx].a.scores,1); }
+  else if(!prev)    { awardScores(QQ[qIdx].a.scores,1); awardScores(QQ[qIdx].b.scores,1); }
   // if prev==='both' already, no change needed
   if(prev!=='both') qPicks[qIdx]='both';
   setTimeout(()=>{
@@ -204,11 +206,9 @@ function pickBoth(){
   },300);
 }
 
-function awardTags(tags,pts){
-  eligible.forEach(id=>{
-    const p=PROGS.find(pr=>pr.id===id);
-    const n=tags.filter(tg=>p.tags.includes(tg)).length;
-    if(n>0) scores[id]+=pts*n;
+function awardScores(scoreMap, multiplier) {
+  Object.entries(scoreMap).forEach(([id, pts]) => {
+    if (eligible.includes(id)) scores[id] += pts * multiplier;
   });
 }
 
@@ -221,7 +221,8 @@ function confidence(){
   const r=[...eligible].sort((a,b)=>scores[b]-scores[a]);
   if(r.length<3) return 100;
   const s3=scores[r[2]]||0, s4=scores[r[3]]||0;
-  return Math.max(0,Math.min(100,(s3-s4)*10+qIdx*8));
+  const gap=s3-s4;
+  return Math.max(0,Math.min(100, gap*8 + qIdx*7));
 }
 
 /* ═══════════════════════════════════════════
@@ -232,9 +233,17 @@ function peekResults(){
   renderResults(); showScreen('results');
 }
 
+function showNoMoreQ() {
+  document.getElementById('refinePanel').style.display = 'none';
+  const el = document.getElementById('noMoreQ');
+  el.textContent = t('noMoreQ');
+  el.style.display = 'block';
+}
+
 function keepGoing(){
   if(qIdx>=QQ.length){
     document.getElementById('btnKG').classList.add('hidden');
+    showNoMoreQ();
     return;
   }
   // Hide the "keep going" button, show the inline refine panel
@@ -243,10 +252,7 @@ function keepGoing(){
 }
 
 function renderRefinePanel(){
-  if(qIdx>=QQ.length){
-    document.getElementById('refinePanel').style.display='none';
-    return;
-  }
+  if(qIdx>=QQ.length){ showNoMoreQ(); return; }
   const q=QQ[qIdx];
   const panel=document.getElementById('refinePanel');
   panel.style.display='block';
@@ -275,20 +281,20 @@ function refinePickCard(which){
   else next='both';
 
   if(!prev&&next){
-    if(next==='a') awardTags(QQ[qIdx].a.tags,3);
-    else if(next==='b') awardTags(QQ[qIdx].b.tags,3);
-    else{awardTags(QQ[qIdx].a.tags,3);awardTags(QQ[qIdx].b.tags,3);}
+    if(next==='a') awardScores(QQ[qIdx].a.scores,1);
+    else if(next==='b') awardScores(QQ[qIdx].b.scores,1);
+    else{awardScores(QQ[qIdx].a.scores,1);awardScores(QQ[qIdx].b.scores,1);}
   } else if(prev&&next){
-    if(prev==='a'&&next==='both') awardTags(QQ[qIdx].b.tags,3);
-    else if(prev==='b'&&next==='both') awardTags(QQ[qIdx].a.tags,3);
-    else if(prev==='both'&&next==='a') awardTags(QQ[qIdx].b.tags,-3);
-    else if(prev==='both'&&next==='b') awardTags(QQ[qIdx].a.tags,-3);
-    else if(prev==='a'&&next==='b'){awardTags(QQ[qIdx].a.tags,-3);awardTags(QQ[qIdx].b.tags,3);}
-    else if(prev==='b'&&next==='a'){awardTags(QQ[qIdx].b.tags,-3);awardTags(QQ[qIdx].a.tags,3);}
+    if(prev==='a'&&next==='both') awardScores(QQ[qIdx].b.scores,1);
+    else if(prev==='b'&&next==='both') awardScores(QQ[qIdx].a.scores,1);
+    else if(prev==='both'&&next==='a') awardScores(QQ[qIdx].b.scores,-1);
+    else if(prev==='both'&&next==='b') awardScores(QQ[qIdx].a.scores,-1);
+    else if(prev==='a'&&next==='b'){awardScores(QQ[qIdx].a.scores,-1);awardScores(QQ[qIdx].b.scores,1);}
+    else if(prev==='b'&&next==='a'){awardScores(QQ[qIdx].b.scores,-1);awardScores(QQ[qIdx].a.scores,1);}
   } else if(prev&&!next){
-    if(prev==='a') awardTags(QQ[qIdx].a.tags,-3);
-    else if(prev==='b') awardTags(QQ[qIdx].b.tags,-3);
-    else{awardTags(QQ[qIdx].a.tags,-3);awardTags(QQ[qIdx].b.tags,-3);}
+    if(prev==='a') awardScores(QQ[qIdx].a.scores,-1);
+    else if(prev==='b') awardScores(QQ[qIdx].b.scores,-1);
+    else{awardScores(QQ[qIdx].a.scores,-1);awardScores(QQ[qIdx].b.scores,-1);}
   }
   if(next) qPicks[qIdx]=next; else delete qPicks[qIdx];
 
@@ -298,7 +304,7 @@ function refinePickCard(which){
       top3=getTop3();
       renderResults(); // update cards (may reorder)
       if(qIdx>=QQ.length){
-        document.getElementById('refinePanel').style.display='none';
+        showNoMoreQ();
       } else {
         renderRefinePanel();
       }
@@ -310,16 +316,16 @@ function refinePickCard(which){
 
 function refinePickBoth(){
   const prev=qPicks[qIdx];
-  if(prev==='a')    awardTags(QQ[qIdx].b.tags,3);
-  else if(prev==='b') awardTags(QQ[qIdx].a.tags,3);
-  else if(!prev)    {awardTags(QQ[qIdx].a.tags,3);awardTags(QQ[qIdx].b.tags,3);}
+  if(prev==='a')    awardScores(QQ[qIdx].b.scores,1);
+  else if(prev==='b') awardScores(QQ[qIdx].a.scores,1);
+  else if(!prev)    {awardScores(QQ[qIdx].a.scores,1);awardScores(QQ[qIdx].b.scores,1);}
   if(prev!=='both') qPicks[qIdx]='both';
   setTimeout(()=>{
     qIdx++;
     top3=getTop3();
     renderResults();
     if(qIdx>=QQ.length){
-      document.getElementById('refinePanel').style.display='none';
+      showNoMoreQ();
     } else {
       renderRefinePanel();
     }
@@ -331,7 +337,7 @@ function refinePickNeither(){
   top3=getTop3();
   renderResults();
   if(qIdx>=QQ.length){
-    document.getElementById('refinePanel').style.display='none';
+    showNoMoreQ();
   } else {
     renderRefinePanel();
   }
@@ -494,4 +500,6 @@ function copyShareText() {
 /* ═══════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════ */
-applyT();
+loadQuestions().finally(() => {
+  applyT();
+});

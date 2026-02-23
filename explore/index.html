@@ -24,6 +24,7 @@
 
 <div class="page">
 
+<!-- WELCOME -->
 <section id="screen-welcome" class="screen active">
   <div class="ws ws1"></div><div class="ws ws2"></div><div class="ws ws3"></div>
   <div class="welcome-inner">
@@ -37,6 +38,7 @@
   </div>
 </section>
 
+<!-- PROFILE -->
 <section id="screen-profile" class="screen form-screen">
   <div class="form-wrap">
     <div class="pdots" id="pDots"></div>
@@ -51,6 +53,7 @@
   </div>
 </section>
 
+<!-- QUIZ -->
 <section id="screen-quiz" class="screen">
   <div class="quiz-wrap">
     <div class="qpbar"><div class="qpfill" id="qFill"></div></div>
@@ -70,6 +73,7 @@
   </div>
 </section>
 
+<!-- RESULTS -->
 <section id="screen-results" class="screen">
   <div class="results-wrap">
     <div class="results-top">
@@ -79,6 +83,7 @@
       </div>
     </div>
 
+    <!-- Inline refine panel -->
     <div class="refine-panel" id="refinePanel" style="display:none;">
       <div class="refine-panel-inner">
         <div class="refine-q" id="refinePanelQ"></div>
@@ -90,7 +95,10 @@
       </div>
     </div>
 
-  
+    <!-- No more questions message -->
+    <div class="no-more-q" id="noMoreQ" style="display:none;"></div>
+
+    <!-- Keep refining button -->
     <button class="btn-kg" id="btnKG" onclick="keepGoing()">
       <span id="kgLbl">Continuer à affiner →</span>
     </button>
@@ -109,6 +117,7 @@
 </section>
 </div>
 
+<!-- SHARE MENU -->
 <div class="share-backdrop" id="shareBackdrop" onclick="closeShare()"></div>
 <div class="share-menu" id="shareMenu">
   <div class="share-menu-header">
@@ -130,5 +139,6 @@
 
 <script src="data.js"></script>
 <script src="app.js"></script>
-</body> --> 
+</body>
+ --> 
 </html>
