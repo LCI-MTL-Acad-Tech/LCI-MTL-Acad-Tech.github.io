@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Puzzle</title>
+<style>
+@font-face {
+  font-family: 'Modern Gothic';
+  src: local('Modern Gothic'), local('Modern Gothic Regular'),
+       url('https://dam.lcieducation.com/1fipm6Snk5jh2rLnFu4uq2hg8_sNzVmOTU5OWM0YzA4MDQ5/ModernGothic-Regular.woff2') format('woff2');
+  font-weight: 400; font-display: swap;
+}
+@font-face {
+  font-family: 'Modern Gothic';
+  src: local('Modern Gothic Medium'),
+       url('https://dam.lcieducation.com/1fidCrXy5z5kbAmnhACmEhth5_sYWE3Njc1ZTY2OGYwM2E1/ModernGothic-Medium.woff2') format('woff2');
+  font-weight: 500; font-display: swap;
+}
+@font-face {
+  font-family: 'Modern Gothic';
+  src: local('Modern Gothic Bold'),
+       url('https://dam.lcieducation.com/1fihEASn3qmjdpL2S77vCoz7w_sOWYzOTAxMGM2OTk3OTI5/ModernGothic-Bold.woff2') format('woff2');
+  font-weight: 700; font-display: swap;
+}
+
+:root {
+  --blue:#00587C; --red:#EB2D37; --cream:#F8F5E9; --charcoal:#07181E;
+  --c700:#2E3438; --c500:#464D52; --c400:#5C6066; --c300:#878C93;
+  --c200:#B3B8BF; --c100:#E0E2E5; --white:#FFFFFF;
+  --cobalt:#685EF7; --gold:#CC9F11; --chloro:#5B8000; --orange:#FE6C06;
+  --ease:cubic-bezier(0.4,0.14,0.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Modern Gothic',system-ui,sans-serif;font-weight:400;background:var(--cream);color:var(--charcoal);min-height:100vh;line-height:1.4}
+
+/* HEADER */
+header{background:var(--charcoal);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--blue);position:sticky;top:0;z-index:100}
+.hd-left{display:flex;align-items:center;gap:12px}
+.hd-accent{width:4px;height:32px;background:var(--blue);border-radius:2px}
+.hd-title{font-size:19px;font-weight:400;letter-spacing:-0.03em;color:var(--white);line-height:1}
+.hd-sub{font-size:11px;color:var(--c300);margin-top:2px}
+.lang-sw{display:flex;gap:3px;background:var(--c700);border-radius:6px;padding:3px}
+.lang-btn{background:transparent;border:none;color:var(--c300);font-family:inherit;font-size:11px;font-weight:500;padding:5px 10px;border-radius:4px;cursor:pointer;transition:all .2s;letter-spacing:.06em;text-transform:uppercase}
+.lang-btn:hover{color:var(--white);background:var(--c500)}
+.lang-btn.active{background:var(--blue);color:var(--white)}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--c100);background:var(--white);padding:0 28px}
+.tab-btn{background:none;border:none;border-bottom:3px solid transparent;font-family:inherit;font-size:13px;color:var(--c400);padding:13px 18px 10px;cursor:pointer;transition:all .2s;margin-bottom:-1px}
+.tab-btn:hover{color:var(--charcoal)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:500}
+.tab-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* VIEWS */
+.view{display:none}
+.view.active{display:block}
+
+/* SETUP */
+.setup-grid{display:grid;grid-template-columns:380px 1fr;min-height:calc(100vh - 118px)}
+.panel{background:var(--white);border-right:1px solid var(--c100);padding:24px 22px;display:flex;flex-direction:column;gap:22px;overflow-y:auto}
+.panel-right{padding:24px 28px;background:var(--cream);display:flex;flex-direction:column;gap:18px;overflow-y:auto}
+.sec-lbl{font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--c300);margin-bottom:8px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12px;color:var(--c500)}
+input[type=text],input[type=number],select{width:100%;padding:8px 11px;border:1px solid var(--c200);border-radius:6px;font-family:inherit;font-size:13px;color:var(--charcoal);background:var(--white);outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,88,124,.1)}
+input::placeholder{color:var(--c300)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 8px;border-radius:4px;margin-top:4px}
+.badge-ok{color:var(--chloro);background:rgba(91,128,0,.08);border:1px solid rgba(91,128,0,.25)}
+.badge-warn{color:var(--gold);background:rgba(204,159,17,.08);border:1px solid rgba(204,159,17,.25)}
+.lang-ov{display:none;background:#FFF8E7;border:1px solid var(--gold);border-radius:6px;padding:10px 12px;margin-top:6px}
+.lang-ov.vis{display:block}
+.lang-ov label{font-size:11px;color:#7a5e0a;margin-bottom:4px;display:block}
+.tok-list{display:flex;flex-direction:column;gap:7px}
+.tok-row{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:6px;border:1px solid var(--c100);cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
+.tok-row:hover{border-color:var(--c200);background:var(--cream)}
+.tok-row input[type=checkbox]{width:auto;accent-color:var(--blue);cursor:pointer}
+.tok-row-lbl{font-size:13px;flex:1}
+.tok-cnt{font-size:11px;color:var(--c300);background:var(--c100);border-radius:4px;padding:2px 6px;font-variant-numeric:tabular-nums}
+/* DIFFICULTY SLIDER */
+.slider-wrap{display:flex;flex-direction:column;gap:10px}
+.slider-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.slider-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--c300)}
+.slider-val{font-size:26px;font-weight:400;letter-spacing:-.04em;color:var(--blue);line-height:1;min-width:28px;text-align:right}
+.slider-sub{font-size:11px;color:var(--c400)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:var(--c100);outline:none;cursor:pointer;border:none;padding:0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--blue);border:2px solid var(--white);box-shadow:0 1px 4px rgba(0,0,0,.18);cursor:pointer;transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--blue);border:2px solid var(--white);cursor:pointer}
+input[type=range]:disabled{opacity:.4;cursor:not-allowed}
+.divider{height:1px;background:var(--c100)}
+.err-box{display:none;background:rgba(235,45,55,.06);border:1px solid rgba(235,45,55,.3);border-radius:6px;padding:9px 13px;font-size:12px;color:var(--red);align-items:flex-start;gap:7px}
+.err-box.vis{display:flex}
+.err-box svg{width:13px;height:13px;flex-shrink:0;margin-top:1px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.btn{padding:10px 16px;border-radius:6px;border:none;font-family:inherit;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:all .2s}
+.btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.btn-primary{background:var(--blue);color:var(--white);width:100%;justify-content:center}
+.btn-primary:hover{background:#004d6e}
+.btn-primary:disabled{background:var(--c200);cursor:not-allowed}
+.btn-secondary{background:transparent;color:var(--charcoal);border:1px solid var(--c200)}
+.btn-secondary:hover{border-color:var(--charcoal)}
+.spinner{display:none;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.spinner.vis{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* PREVIEW */
+.code-pre{background:var(--charcoal);border-radius:8px;overflow:hidden}
+.code-pre-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 13px;background:var(--c700);font-size:11px;color:var(--c300);letter-spacing:.06em}
+.code-pre pre{padding:13px 15px;overflow:auto;max-height:380px;font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:12px;line-height:1.65;color:var(--c100)}
+.code-pre pre::-webkit-scrollbar{width:5px;height:5px}
+.code-pre pre::-webkit-scrollbar-thumb{background:var(--c500);border-radius:3px}
+
+/* SYNTAX HIGHLIGHT — shared between preview and puzzle */
+.hl-keyword   {color:#a89ef9}
+.hl-operator  {color:#f48b90}
+.hl-identifier{color:#6dc0e0}
+.hl-literal   {color:#ffa55a}
+.hl-code      {color:var(--c100)}
+.stat-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--c100);border:1px solid var(--c100);border-radius:8px;overflow:hidden}
+.stat-cell{background:var(--white);padding:14px 12px;display:flex;flex-direction:column;gap:2px}
+.stat-val{font-size:26px;font-weight:400;letter-spacing:-.04em;color:var(--blue);line-height:1}
+.stat-lbl{font-size:10px;color:var(--c400)}
+
+/* PUZZLE VIEW */
+#puzzle-view{display:none;flex-direction:column;position:fixed;top:118px;left:0;right:0;bottom:0}
+#puzzle-view.active{display:flex}
+.pz-layout{display:grid;grid-template-columns:1fr 260px;flex:1;min-height:0;overflow:hidden}
+.pz-code-panel{padding:24px 28px;overflow-y:auto;height:100%}
+.pz-wrap{background:var(--charcoal);border-radius:10px;overflow:hidden}
+.pz-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 15px;background:var(--c700)}
+.pz-hdr-left{display:flex;align-items:center;gap:9px}
+.pz-lang{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--c300)}
+.pz-range{font-size:11px;color:var(--c400)}
+.pz-score{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--c300)}
+.score-n{color:var(--chloro);font-weight:500}
+.pz-body{padding:14px 0;font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:12.5px;line-height:1.8;color:var(--c100);overflow-x:auto}
+
+/* Code lines */
+.cl{display:flex;align-items:baseline;white-space:pre;padding:0 4px}
+.lnum{display:inline-block;width:34px;flex-shrink:0;color:var(--c500);font-size:10px;user-select:none;text-align:right;padding-right:12px}
+
+/* Blank slot */
+.slot{display:inline-flex;align-items:center;justify-content:center;height:20px;border-radius:4px;border:1.5px dashed var(--c400);background:rgba(255,255,255,.05);vertical-align:middle;margin:0 1px;padding:0 5px;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit;font-size:inherit;color:var(--c100);position:relative}
+.slot.hover{border-color:var(--blue);background:rgba(0,88,124,.22);box-shadow:0 0 0 2px rgba(0,88,124,.28)}
+.slot.filled{border-style:solid;border-color:var(--c500);background:rgba(255,255,255,.07);cursor:pointer}
+.slot.correct{border-color:var(--chloro);background:rgba(91,128,0,.18);color:#a8d87a;cursor:default}
+.slot.wrong{border-color:var(--red);background:rgba(235,45,55,.18);color:#f48b90}
+@keyframes fC{0%,100%{background:rgba(91,128,0,.18)}50%{background:rgba(91,128,0,.36)}}
+@keyframes fW{0%,100%{background:rgba(235,45,55,.18)}50%{background:rgba(235,45,55,.32)}}
+.slot.fC{animation:fC .4s ease}
+.slot.fW{animation:fW .4s ease}
+
+/* Pieces panel */
+.pieces-panel{background:var(--white);border-left:1px solid var(--c100);padding:18px 14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;height:100%}
+.pieces-title{font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--c300)}
+.pieces-grid{display:flex;flex-wrap:wrap;gap:7px;align-content:flex-start}
+.piece{display:inline-flex;align-items:center;padding:4px 10px;border-radius:5px;font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:12px;cursor:grab;user-select:none;border:1px solid;transition:all .15s;white-space:nowrap}
+.piece:active{cursor:grabbing;transform:scale(1.05)}
+.piece.dragging{opacity:.35}
+.piece.used{opacity:.2;pointer-events:none}
+.piece-keyword   {background:rgba(104,94,247,.12);border-color:rgba(104,94,247,.35);color:#a89ef9}
+.piece-operator  {background:rgba(235,45,55,.10);border-color:rgba(235,45,55,.30);color:#f48b90}
+.piece-identifier{background:rgba(0,88,124,.12);border-color:rgba(0,88,124,.35);color:#6dc0e0}
+.piece-literal   {background:rgba(254,108,6,.12);border-color:rgba(254,108,6,.35);color:#ffa55a}
+
+/* Action bar */
+.pz-actions{background:var(--white);border-top:1px solid var(--c100);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pz-act-l{display:flex;gap:8px;align-items:center}
+.res-msg{font-size:13px;font-weight:500;display:none}
+.res-msg.vis{display:block}
+.res-all{color:var(--chloro)}
+.res-partial{color:var(--gold)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.ani{animation:fadeUp .3s ease forwards}
+
+@media(max-width:820px){
+  .setup-grid{grid-template-columns:1fr}
+  .pz-layout{grid-template-columns:1fr}
+  .pieces-panel{border-left:none;border-top:1px solid var(--c100)}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hd-left">
+    <div class="hd-accent"></div>
+    <div>
+      <div class="hd-title" data-i18n="app.title">Code Puzzle</div>
+      <div class="hd-sub" data-i18n="app.sub">Code comprehension exercise</div>
+    </div>
+  </div>
+  <div class="lang-sw">
+    <button class="lang-btn active" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('fr')">FR</button>
+    <button class="lang-btn" onclick="setLang('es')">ES</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" id="tab-setup" onclick="showTab('setup')" data-i18n="tab.setup">Setup</button>
+  <button class="tab-btn" id="tab-puzzle" onclick="showTab('puzzle')" disabled data-i18n="tab.puzzle">Puzzle</button>
+</div>
+
+<!-- SETUP -->
+<div class="view active" id="setup-view">
+  <div class="setup-grid">
+    <div class="panel">
+
+      <div>
+        <div class="sec-lbl" data-i18n="s.source">Source</div>
+        <div class="field">
+          <label data-i18n="l.url">File URL (raw source)</label>
+          <input type="text" id="url-input" value="https://raw.githubusercontent.com/satuelisa/DiscreteMath/refs/heads/master/homework/tarjan.py" />
+        </div>
+        <div id="det-badge" style="display:none;margin-top:5px"></div>
+        <div id="lang-ov" class="lang-ov">
+          <label data-i18n="l.override">Extension not recognized — select language:</label>
+          <select id="lang-sel">
+            <option value="python">Python</option><option value="javascript">JavaScript</option>
+            <option value="typescript">TypeScript</option><option value="java">Java</option>
+            <option value="c">C</option><option value="cpp">C++</option>
+            <option value="csharp">C#</option><option value="ruby">Ruby</option>
+            <option value="bash">Bash/Shell</option><option value="r">R</option>
+            <option value="go">Go</option><option value="rust">Rust</option>
+            <option value="swift">Swift</option><option value="kotlin">Kotlin</option>
+            <option value="php">PHP</option><option value="lua">Lua</option>
+            <option value="haskell">Haskell</option><option value="scala">Scala</option>
+            <option value="matlab">MATLAB</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div>
+        <div class="sec-lbl" data-i18n="s.range">Line range</div>
+        <label class="tok-row" style="margin-bottom:10px">
+          <input type="checkbox" id="use-whole-file" checked onchange="onWholeFile()">
+          <span class="tok-row-lbl" data-i18n="l.wholefile">Use the entire file</span>
+        </label>
+        <div class="row2" id="line-range-inputs" style="opacity:.35;pointer-events:none">
+          <div class="field"><label data-i18n="l.start">Start line</label><input type="number" id="start-line" min="1" placeholder="1"></div>
+          <div class="field"><label data-i18n="l.end">End line</label><input type="number" id="end-line" min="1" placeholder="—"></div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div>
+        <div class="sec-lbl" data-i18n="s.tok">Token types to blank</div>
+        <div class="tok-list">
+          <label class="tok-row"><input type="checkbox" name="tok" value="keyword" checked><span class="tok-row-lbl" data-i18n="t.kw">Keywords</span><span class="tok-cnt" id="cnt-keyword">—</span></label>
+          <label class="tok-row"><input type="checkbox" name="tok" value="operator" checked><span class="tok-row-lbl" data-i18n="t.op">Operators</span><span class="tok-cnt" id="cnt-operator">—</span></label>
+          <label class="tok-row"><input type="checkbox" name="tok" value="identifier" checked><span class="tok-row-lbl" data-i18n="t.id">Identifiers</span><span class="tok-cnt" id="cnt-identifier">—</span></label>
+          <label class="tok-row"><input type="checkbox" name="tok" value="literal" checked><span class="tok-row-lbl" data-i18n="t.lit">Literals</span><span class="tok-cnt" id="cnt-literal">—</span></label>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div>
+        <div class="sec-lbl" data-i18n="s.diff">Difficulty</div>
+        <div class="slider-wrap">
+          <div class="slider-row">
+            <div>
+              <div class="slider-val" id="slider-val">50</div>
+            </div>
+            <input type="range" id="diff-slider" min="0" max="100" value="50" step="1"
+              oninput="onSlider()" style="flex:1">
+          </div>
+          <div class="slider-labels">
+            <span data-i18n="slider.easy">Easy</span>
+            <span data-i18n="slider.hard">Hard</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div id="err-box" class="err-box">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="err-txt"></span>
+      </div>
+
+      <button class="btn btn-primary" id="load-btn" onclick="loadAndAnalyze()">
+        <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+        <div class="spinner" id="spinner"></div>
+        <span id="load-lbl" data-i18n="btn.load">Load &amp; Analyze</span>
+      </button>
+
+    </div>
+
+    <div class="panel-right" id="preview-area">
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px;gap:12px;color:var(--c300)">
+        <svg style="width:44px;height:44px;stroke:var(--c200);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        <p style="font-size:13px;text-align:center;max-width:240px" data-i18n="empty.hint">Load a source file to preview its contents and configure the puzzle.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PUZZLE -->
+<div class="view" id="puzzle-view">
+  <div class="pz-layout">
+    <div class="pz-code-panel">
+      <div class="pz-wrap">
+        <div class="pz-hdr">
+          <div class="pz-hdr-left">
+            <span class="pz-lang" id="pz-lang">python</span>
+            <span class="pz-range" id="pz-range"></span>
+          </div>
+          <div class="pz-score">
+            <span class="score-n" id="score-n">0</span>
+            <span id="score-t" style="color:var(--c400)">/ 0</span>
+          </div>
+        </div>
+        <div class="pz-body" id="pz-body"></div>
+      </div>
+    </div>
+    <div class="pieces-panel">
+      <div class="pieces-title" data-i18n="pieces.title">Pieces</div>
+      <div class="pieces-grid" id="pieces-grid"></div>
+    </div>
+  </div>
+  <div class="pz-actions">
+    <div class="pz-act-l">
+      <button class="btn btn-secondary" onclick="showTab('setup')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        <span data-i18n="btn.back">Back</span>
+      </button>
+      <button class="btn btn-secondary" onclick="resetPuzzle()">
+        <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+        <span data-i18n="btn.reset">Reset</span>
+      </button>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span class="res-msg" id="res-msg"></span>
+      <button class="btn btn-primary" onclick="checkAnswers()" style="width:auto;padding:10px 20px">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        <span data-i18n="btn.check">Check</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── i18n ─────────────────────────────────────────────────
+const I18N = {
+  en:{
+    'app.title':'Code Puzzle','app.sub':'Code comprehension exercise',
+    'tab.setup':'Setup','tab.puzzle':'Puzzle',
+    's.source':'Source','s.range':'Line range','s.tok':'Token types to blank',
+    'l.url':'File URL (raw source)','l.start':'Start line','l.end':'End line',
+    'l.wholefile':'Use the entire file',
+    'l.override':'Extension not recognized — select language:',
+    't.kw':'Keywords','t.op':'Operators','t.id':'Identifiers','t.lit':'Literals',
+    'btn.load':'Load &amp; Analyze','btn.back':'Back','btn.reset':'Reset','btn.check':'Check',
+    'empty.hint':'Load a source file to preview its contents and configure the puzzle.',
+    'det.pre':'Detected:','det.unk':'Unknown extension',
+    'stat.total':'Total lines','stat.stripped':'After stripping','stat.blanks':'Blanks',
+    'btn.start':'Start Puzzle','preview.title':'Processed code','pieces.title':'Pieces',
+    'err.url':'Please enter a URL.','err.fetch':'Could not fetch the file. Make sure it is a raw source URL.',
+    'err.empty':'The selected line range returned no content.',
+    'err.toofew':'This code has only one unique non-empty line — not enough to build a puzzle. Try a larger file or a wider line range.',
+    'err.noblanks':'No eligible tokens found. Try enabling more token types.',
+    's.diff':'Difficulty',
+    'slider.easy':'Easy','slider.hard':'Hard',
+    'slider.sub':'{n} blank(s)',
+    'res.all':'All correct!','res.partial':'{n} of {total} correct',
+    'msg.allfilled':'All blanks filled — click Check.',
+  },
+  fr:{
+    'app.title':'Casse-tête de code','app.sub':'Exercice de compréhension de code',
+    'tab.setup':'Configuration','tab.puzzle':'Exercice',
+    's.source':'Source','s.range':'Plage de lignes','s.tok':'Types de jetons à masquer',
+    'l.url':'URL du fichier (source brute)','l.start':'Ligne de début','l.end':'Ligne de fin',
+    'l.wholefile':'Utiliser le fichier en entier',
+    'l.override':'Extension non reconnue — sélectionnez le langage\u00a0:',
+    'h.range':'Laissez vide pour traiter le fichier en entier.',
+    't.kw':'Mots-clés','t.op':'Opérateurs','t.id':'Identifiants','t.lit':'Littéraux',
+    'btn.load':'Charger et analyser','btn.back':'Retour','btn.reset':'Réinitialiser','btn.check':'Vérifier',
+    'empty.hint':'Chargez un fichier source pour prévisualiser son contenu et configurer l\u2019exercice.',
+    'det.pre':'Détecté\u00a0:','det.unk':'Extension inconnue',
+    'stat.total':'Lignes totales','stat.stripped':'Après nettoyage','stat.blanks':'Blancs',
+    'btn.start':'Commencer l\u2019exercice','preview.title':'Code traité','pieces.title':'Pièces',
+    'err.url':'Veuillez entrer une URL.','err.fetch':'Impossible de récupérer le fichier. Vérifiez que l\u2019URL pointe vers la source brute.',
+    'err.empty':'La plage sélectionnée ne contient aucune ligne.',
+    'err.toofew':'Ce code ne contient qu\u2019une seule ligne non vide unique — pas assez pour créer un exercice. Essayez un fichier plus grand ou une plage de lignes plus large.',
+    'err.noblanks':'Aucun jeton ne correspond aux types sélectionnés. Activez davantage de types.',
+    's.diff':'Difficulté',
+    'slider.easy':'Facile','slider.hard':'Difficile',
+    'slider.sub':'{n} blanc(s)',
+    'res.all':'Tout est correct\u00a0!','res.partial':'{n} sur {total} corrects',
+    'msg.allfilled':'Tous les blancs sont remplis — cliquez sur Vérifier.',
+  },
+  es:{
+    'app.title':'Puzzle de código','app.sub':'Ejercicio de comprensión de código',
+    'tab.setup':'Configuración','tab.puzzle':'Ejercicio',
+    's.source':'Fuente','s.range':'Rango de líneas','s.tok':'Tipos de tokens a ocultar',
+    'l.url':'URL del archivo (fuente sin procesar)','l.start':'Línea inicial','l.end':'Línea final',
+    'l.wholefile':'Usar el archivo completo',
+    'l.override':'Extensión no reconocida — seleccione el lenguaje:',
+    'h.range':'Deje vacío para usar el archivo completo.',
+    't.kw':'Palabras clave','t.op':'Operadores','t.id':'Identificadores','t.lit':'Literales',
+    'btn.load':'Cargar y analizar','btn.back':'Volver','btn.reset':'Reiniciar','btn.check':'Verificar',
+    'empty.hint':'Cargue un archivo fuente para previsualizar su contenido y configurar el ejercicio.',
+    'det.pre':'Detectado:','det.unk':'Extensión desconocida',
+    'stat.total':'Líneas totales','stat.stripped':'Tras limpieza','stat.blanks':'Espacios',
+    'btn.start':'Iniciar ejercicio','preview.title':'Código procesado','pieces.title':'Piezas',
+    'err.url':'Por favor ingrese una URL.','err.fetch':'No se pudo obtener el archivo. Verifique que la URL sea de fuente sin procesar.',
+    'err.empty':'El rango seleccionado no contiene ninguna línea.',
+    'err.toofew':'Este código tiene solo una línea no vacía única — no es suficiente para crear un ejercicio. Intente un archivo más grande o un rango de líneas más amplio.',
+    'err.noblanks':'Ningún token coincide con los tipos seleccionados. Active más tipos.',
+    's.diff':'Dificultad',
+    'slider.easy':'Fácil','slider.hard':'Difícil',
+    'slider.sub':'{n} espacio(s)',
+    'res.all':'¡Todo correcto!','res.partial':'{n} de {total} correctos',
+    'msg.allfilled':'Todos los espacios completados — haga clic en Verificar.',
+  }
+};
+let CL = 'en';
+function t(k,v){let s=(I18N[CL]||I18N.en)[k]||k;if(v)Object.entries(v).forEach(([a,b])=>s=s.replace(`{${a}}`,b));return s}
+function setLang(l){
+  CL=l;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===l.toUpperCase()));
+  document.querySelectorAll('[data-i18n]').forEach(el=>el.innerHTML=t(el.dataset.i18n));
+  updateBadge();
+}
+
+// ─── Tabs ─────────────────────────────────────────────────
+function showTab(w){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(w+'-view').classList.add('active');
+  document.getElementById('tab-'+w).classList.add('active');
+}
+
+// ─── Language detection ───────────────────────────────────
+const EXT={py:'python',js:'javascript',ts:'typescript',java:'java',c:'c',h:'c',
+  cpp:'cpp',cc:'cpp',cxx:'cpp',cs:'csharp',rb:'ruby',sh:'bash',bash:'bash',r:'r',
+  go:'go',rs:'rust',swift:'swift',kt:'kotlin',php:'php',lua:'lua',hs:'haskell',
+  scala:'scala',m:'matlab',pl:'perl'};
+const EXT_LABEL={python:'Python',javascript:'JavaScript',typescript:'TypeScript',
+  java:'Java',c:'C',cpp:'C++',csharp:'C#',ruby:'Ruby',bash:'Shell',r:'R',
+  go:'Go',rust:'Rust',swift:'Swift',kotlin:'Kotlin',php:'PHP',lua:'Lua',
+  haskell:'Haskell',scala:'Scala',matlab:'MATLAB',perl:'Perl'};
+let detLang=null;
+
+function getExt(url){try{const p=new URL(url).pathname,pp=p.split('.');return pp.length>1?pp.pop().toLowerCase():null}catch{return null}}
+
+function updateBadge(){
+  const url=document.getElementById('url-input').value.trim();
+  const badge=document.getElementById('det-badge');
+  const ov=document.getElementById('lang-ov');
+  const ext=getExt(url);
+  detLang=ext?(EXT[ext]||null):null;
+  const chk=`<svg style="width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`;
+  const warn=`<svg style="width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+  if(detLang){
+    badge.style.display='inline-flex';badge.className='badge badge-ok';
+    badge.innerHTML=`${chk} ${t('det.pre')} ${EXT_LABEL[detLang]}`;
+    ov.classList.remove('vis');
+  } else if(url){
+    badge.style.display='inline-flex';badge.className='badge badge-warn';
+    badge.innerHTML=`${warn} ${t('det.unk')}`;
+    ov.classList.add('vis');
+  } else {
+    badge.style.display='none';ov.classList.remove('vis');
+  }
+}
+document.getElementById('url-input').addEventListener('input',updateBadge);
+updateBadge();
+
+function onWholeFile(){
+  const whole=document.getElementById('use-whole-file').checked;
+  const wrap=document.getElementById('line-range-inputs');
+  wrap.style.opacity=whole?'.35':'1';
+  wrap.style.pointerEvents=whole?'none':'auto';
+  if(whole){
+    document.getElementById('start-line').value='';
+    document.getElementById('end-line').value='';
+  }
+}
+
+// ─── Comment stripping ────────────────────────────────────
+const CR={
+  python:{line:'#',block:['"""','"""'],altBlock:["'''","'''"]},
+  javascript:{line:'//',block:['/*','*/']},typescript:{line:'//',block:['/*','*/']},
+  java:{line:'//',block:['/*','*/']},c:{line:'//',block:['/*','*/']},
+  cpp:{line:'//',block:['/*','*/']},csharp:{line:'//',block:['/*','*/']},
+  go:{line:'//',block:['/*','*/']},rust:{line:'//',block:['/*','*/']},
+  swift:{line:'//',block:['/*','*/']},kotlin:{line:'//',block:['/*','*/']},
+  scala:{line:'//',block:['/*','*/']},php:{line:'//',block:['/*','*/'],altLine:'#'},
+  ruby:{line:'#',block:['=begin','=end']},bash:{line:'#',block:null},
+  r:{line:'#',block:null},lua:{line:'--',block:['--[[',']]']},
+  haskell:{line:'--',block:['{-','-}']},matlab:{line:'%',block:['%{','%}']},
+  perl:{line:'#',block:null}
+};
+function stripIC(line,m){
+  let inS=null;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(inS){if(c==='\\'){i++;continue}if(c===inS)inS=null}
+    else{if(c==='"'||c==="'"||c==='`'){inS=c;continue}if(line.slice(i,i+m.length)===m)return line.slice(0,i)}
+  }
+  return line;
+}
+function stripComments(lines,lang){
+  const r=CR[lang]||CR.javascript;
+  const out=[];let inB=false,bC=null,inAB=false,abC=null;
+  for(let raw of lines){
+    let line=raw;
+    if(inB){const ci=line.indexOf(bC);if(ci!==-1){inB=false;line=line.slice(ci+bC.length)}else{out.push('');continue}}
+    if(inAB){const ci=line.indexOf(abC);if(ci!==-1){inAB=false;line=line.slice(ci+abC.length)}else{out.push('');continue}}
+    if(r.block){const[bo,bc]=r.block;const oi=line.indexOf(bo);if(oi!==-1){const ci=line.indexOf(bc,oi+bo.length);if(ci!==-1)line=line.slice(0,oi)+line.slice(ci+bc.length);else{line=line.slice(0,oi);inB=true;bC=bc}}}
+    if(r.altBlock){const[bo,bc]=r.altBlock;const oi=line.indexOf(bo);if(oi!==-1){const ci=line.indexOf(bc,oi+bo.length);if(ci!==-1)line=line.slice(0,oi)+line.slice(ci+bc.length);else{line=line.slice(0,oi);inAB=true;abC=bc}}}
+    if(r.line)line=stripIC(line,r.line);
+    if(r.altLine)line=stripIC(line,r.altLine);
+    out.push(line);
+  }
+  return out;
+}
+function collapseBlank(lines){const out=[];let pb=false;for(const l of lines){const b=l.trim()==='';if(b){if(!pb)out.push(l);pb=true}else{out.push(l);pb=false}}return out}
+
+// ─── Tokenizer ────────────────────────────────────────────
+const KW={
+  python:new Set(['False','None','True','and','as','assert','async','await','break','class','continue','def','del','elif','else','except','finally','for','from','global','if','import','in','is','lambda','nonlocal','not','or','pass','raise','return','try','while','with','yield']),
+  javascript:new Set(['break','case','catch','class','const','continue','debugger','default','delete','do','else','export','extends','false','finally','for','function','if','import','in','instanceof','let','new','null','return','static','super','switch','this','throw','true','try','typeof','undefined','var','void','while','with','yield','async','await','of']),
+  typescript:new Set(['break','case','catch','class','const','continue','debugger','default','delete','do','else','enum','export','extends','false','finally','for','function','if','import','in','instanceof','interface','let','new','null','private','protected','public','readonly','return','static','super','switch','this','throw','true','try','type','typeof','undefined','var','void','while','yield','async','await','as','from','of']),
+  java:new Set(['abstract','assert','boolean','break','byte','case','catch','char','class','const','continue','default','do','double','else','enum','extends','false','final','finally','float','for','goto','if','implements','import','instanceof','int','interface','long','native','new','null','package','private','protected','public','return','short','static','super','switch','synchronized','this','throw','throws','true','try','void','volatile','while']),
+  c:new Set(['auto','break','case','char','const','continue','default','do','double','else','enum','extern','float','for','goto','if','inline','int','long','register','return','short','signed','sizeof','static','struct','switch','typedef','union','unsigned','void','volatile','while']),
+  cpp:new Set(['alignas','alignof','and','auto','bool','break','case','catch','char','class','const','constexpr','continue','default','delete','do','double','else','enum','explicit','extern','false','float','for','friend','goto','if','inline','int','long','namespace','new','noexcept','nullptr','operator','private','protected','public','return','short','signed','sizeof','static','struct','switch','template','this','throw','true','try','typedef','typename','union','unsigned','using','virtual','void','volatile','while']),
+  csharp:new Set(['abstract','as','base','bool','break','byte','case','catch','char','checked','class','const','continue','decimal','default','delegate','do','double','else','enum','event','explicit','extern','false','finally','float','for','foreach','goto','if','implicit','in','int','interface','internal','is','lock','long','namespace','new','null','object','operator','out','override','params','private','protected','public','readonly','ref','return','sbyte','sealed','short','sizeof','static','string','struct','switch','this','throw','true','try','typeof','uint','ulong','using','virtual','void','while']),
+  go:new Set(['break','case','chan','const','continue','default','defer','else','fallthrough','for','func','go','goto','if','import','interface','map','package','range','return','select','struct','switch','type','var','true','false','nil']),
+  rust:new Set(['as','async','await','break','const','continue','crate','dyn','else','enum','extern','false','fn','for','if','impl','in','let','loop','match','mod','move','mut','pub','ref','return','self','Self','static','struct','super','trait','true','type','unsafe','use','where','while']),
+  ruby:new Set(['BEGIN','END','alias','and','begin','break','case','class','def','do','else','elsif','end','ensure','false','for','if','in','module','next','nil','not','or','redo','rescue','retry','return','self','super','then','true','undef','unless','until','when','while','yield']),
+  swift:new Set(['associatedtype','class','deinit','enum','extension','fileprivate','func','import','init','inout','internal','let','open','operator','private','protocol','public','static','struct','subscript','typealias','var','break','case','continue','default','defer','do','else','fallthrough','for','guard','if','in','repeat','return','throw','switch','where','while','as','catch','false','is','nil','super','self','Self','throw','throws','true','try']),
+  kotlin:new Set(['as','break','class','continue','do','else','false','for','fun','if','in','interface','is','null','object','package','return','super','this','throw','true','try','typealias','val','var','when','while']),
+  php:new Set(['abstract','and','array','as','break','callable','case','catch','class','clone','const','continue','declare','default','do','echo','else','elseif','empty','extends','false','final','finally','fn','for','foreach','function','global','goto','if','implements','include','instanceof','interface','isset','list','match','namespace','new','null','or','print','private','protected','public','require','return','static','switch','throw','trait','true','try','use','var','while','yield']),
+  lua:new Set(['and','break','do','else','elseif','end','false','for','function','goto','if','in','local','nil','not','or','repeat','return','then','true','until','while']),
+  haskell:new Set(['case','class','data','default','deriving','do','else','forall','foreign','hiding','if','import','in','infix','infixl','infixr','instance','let','module','newtype','of','qualified','then','type','where']),
+  scala:new Set(['abstract','case','catch','class','def','do','else','extends','false','final','finally','for','if','implicit','import','lazy','match','new','null','object','override','package','private','protected','return','sealed','super','this','throw','trait','true','try','type','val','var','while','with','yield']),
+  matlab:new Set(['break','case','catch','classdef','continue','else','elseif','end','for','function','global','if','otherwise','parfor','persistent','return','spmd','switch','try','while']),
+  bash:new Set(['if','then','else','elif','fi','for','in','do','done','while','until','case','esac','function','return','break','continue','exit','export','local','readonly','unset']),
+  r:new Set(['if','else','repeat','while','function','for','in','next','break','TRUE','FALSE','NULL','Inf','NaN','NA']),
+};
+
+// Operator patterns per language
+const OP={
+  python:/^(\*\*=|\/\/=|<<=|>>=|\*\*|\/\/|==|!=|<=|>=|<<|>>|\+=|-=|\*=|\/=|%=|&=|\|=|\^=|[-+*/%&|^~<>=!@:])/,
+  r:/^(<-|->|<<-|->>|==|!=|<=|>=|\|\||&&|\+=|-=|\*=|\/=|%%|[-+*\/^<>&|!~:])/,
+  matlab:/^(\.\*|\.\^|\.\/|==|~=|<=|>=|&&|\|\||[-+*\/\\^<>&|~!:@])/,
+  default:/^(<<=|>>=|>>>|\*\*=|&&=|\|\|=|\?\?=|===|!==|==|!=|<=|>=|=>|<<|>>|\+\+|--|&&|\|\||\?\?|\+=|-=|\*=|\/=|%=|&=|\|=|\^=|[-+*/%&|^~<>!=?:])/,
+};
+function opRx(lang){return OP[lang]||OP.default}
+
+function tokenizeLine(line,lang){
+  const kws=KW[lang]||KW.javascript;
+  const segs=[];let i=0;const len=line.length;
+  while(i<len){
+    const ch=line[i];
+    // String literal
+    if(ch==='"'||ch==="'"||ch==='`'){
+      let j=i+1;while(j<len){if(line[j]==='\\'){j+=2;continue}if(line[j]===ch){j++;break}j++}
+      segs.push({text:line.slice(i,j),type:'literal'});i=j;continue;
+    }
+    // Whitespace
+    if(/\s/.test(ch)){let j=i;while(j<len&&/\s/.test(line[j]))j++;segs.push({text:line.slice(i,j),type:'space'});i=j;continue}
+    // Identifier / keyword
+    if(/[a-zA-Z_$]/.test(ch)){
+      let j=i;while(j<len&&/[a-zA-Z0-9_$]/.test(line[j]))j++;
+      const w=line.slice(i,j);
+      const type=kws.has(w)?'keyword':/^(true|false|null|undefined|none|nil|True|False|None|NULL|NaN|Inf|NA)$/i.test(w)?'literal':'identifier';
+      segs.push({text:w,type});i=j;continue;
+    }
+    // Number
+    if(/[0-9]/.test(ch)||(ch==='.'&&/[0-9]/.test(line[i+1]||''))){
+      let j=i;while(j<len&&/[0-9._eExXa-fA-FuUlLfFdD]/.test(line[j]))j++;
+      segs.push({text:line.slice(i,j),type:'literal'});i=j;continue;
+    }
+    // Operator
+    const m=line.slice(i).match(opRx(lang));
+    if(m){segs.push({text:m[0],type:'operator'});i+=m[0].length;continue}
+    // Fallback
+    segs.push({text:ch,type:'code'});i++;
+  }
+  return segs;
+}
+
+// ─── Blanking engine ──────────────────────────────────────
+function buildPuzzle(lines,lang,enabled,count){
+  const parsed=lines.map(l=>tokenizeLine(l,lang));
+  const seen=new Set();const allBlanks=[];let id=0;
+  const usedLines=new Set();
+  parsed.forEach((segs,li)=>segs.forEach((seg,si)=>{
+    if(!enabled.has(seg.type)||seg.type==='space'||seg.type==='code')return;
+    if(usedLines.has(li))return;
+    const key=seg.type+':'+seg.text;
+    if(!seen.has(key)){seen.add(key);usedLines.add(li);allBlanks.push({li,si,text:seg.text,type:seg.type,id:id++})}
+  }));
+  // If count specified, randomly sample that many blanks
+  let blanks=allBlanks;
+  if(count!==undefined&&count<allBlanks.length){
+    const rand=makePRNG(Math.floor(Date.now()/1000)%60);
+    const pool=[...allBlanks];
+    for(let i=0;i<count;i++){
+      const j=i+Math.floor(rand()*(pool.length-i));
+      [pool[i],pool[j]]=[pool[j],pool[i]];
+    }
+    blanks=pool.slice(0,count);
+    // Sort back into document order so blanks appear in sequence
+    blanks.sort((a,b)=>a.li-b.li||a.si-b.si);
+    // Re-assign ids in order
+    blanks.forEach((b,i)=>b.id=i);
+  }
+  return{parsed,blanks};
+}
+
+// ─── State ────────────────────────────────────────────────
+const S={lang:'python',lines:[],parsed:[],blanks:[],answers:{},pieces:[],startLine:1,endLine:1,maxBlanks:2};
+
+// ─── Load & Analyze ───────────────────────────────────────
+async function loadAndAnalyze(){
+  const url=document.getElementById('url-input').value.trim();
+  const btn=document.getElementById('load-btn');
+  const sp=document.getElementById('spinner');
+  const lbl=document.getElementById('load-lbl');
+  const eb=document.getElementById('err-box');
+  eb.classList.remove('vis');
+  if(!url){showErr(t('err.url'));return}
+  const lang=detLang||document.getElementById('lang-sel').value;
+  const wholeFile=document.getElementById('use-whole-file').checked;
+  const sl=wholeFile?1:(parseInt(document.getElementById('start-line').value)||1);
+  const elRaw=wholeFile?'':(document.getElementById('end-line').value.trim());
+  btn.disabled=true;sp.classList.add('vis');lbl.textContent='…';
+  let raw;
+  try{
+    const res=await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`);
+    if(!res.ok)throw new Error('http '+res.status);
+    raw=await res.text();
+    // codetabs returns 200 with a JSON error body on failure
+    if(raw.trimStart().startsWith('{')){
+      let parsed;try{parsed=JSON.parse(raw)}catch{}
+      if(parsed&&parsed.Error)throw new Error(parsed.Error);
+    }
+  }catch(e){showErr(t('err.fetch'));btn.disabled=false;sp.classList.remove('vis');lbl.innerHTML=t('btn.load');return}
+  const all=raw.split('\n');
+  const el=elRaw?parseInt(elRaw):all.length;
+  const sliced=all.slice(sl-1,el);
+  if(!sliced.length){showErr(t('err.empty'));btn.disabled=false;sp.classList.remove('vis');lbl.innerHTML=t('btn.load');return}
+  const stripped=stripComments(sliced,lang);
+  const processed=collapseBlank(stripped);
+  // Unique non-empty lines (trimmed) — this is the slider max
+  const uniqueNonEmpty=new Set(processed.map(l=>l.trim()).filter(l=>l.length>0));
+  const maxBlanks=uniqueNonEmpty.size;
+  if(maxBlanks<2){
+    showErr(t('err.toofew'));
+    btn.disabled=false;sp.classList.remove('vis');lbl.innerHTML=t('btn.load');return;
+  }
+  // Configure slider — store maxBlanks in state
+  const slider=document.getElementById('diff-slider');
+  S.maxBlanks=maxBlanks;
+  // Count unique tokens per type
+  const segs=processed.flatMap(l=>tokenizeLine(l,lang));
+  const uq={keyword:new Set(),operator:new Set(),identifier:new Set(),literal:new Set()};
+  segs.forEach(s=>{if(uq[s.type])uq[s.type].add(s.text)});
+  ['keyword','operator','identifier','literal'].forEach(tp=>{
+    const el=document.getElementById('cnt-'+tp);if(el)el.textContent=uq[tp].size;
+  });
+  S.lang=lang;S.lines=processed;S.startLine=sl;S.endLine=el;
+  renderPreview(processed,lang,sl,el);
+  btn.disabled=false;sp.classList.remove('vis');lbl.innerHTML=t('btn.load');
+  document.getElementById('tab-puzzle').disabled=false;
+}
+
+function showErr(msg){document.getElementById('err-box').classList.add('vis');document.getElementById('err-txt').textContent=msg}
+
+function renderPreview(lines,lang,sl,el){
+  const nonEmpty=lines.filter(l=>l.trim()).length;
+  const enabled=getEnabled();
+  const count=blankCount();
+  const{parsed,blanks}=buildPuzzle(lines,lang,enabled,count);
+  const highlighted=highlightLines(parsed);
+  document.getElementById('preview-area').innerHTML=`
+    <div class="ani">
+      <div class="sec-lbl">${t('preview.title')}</div>
+      <div class="stat-strip" style="margin-bottom:14px">
+        <div class="stat-cell"><div class="stat-val">${lines.length}</div><div class="stat-lbl">${t('stat.total')}</div></div>
+        <div class="stat-cell"><div class="stat-val">${nonEmpty}</div><div class="stat-lbl">${t('stat.stripped')}</div></div>
+        <div class="stat-cell"><div class="stat-val" data-stat="blanks" style="color:var(--cobalt)">${blanks.length}</div><div class="stat-lbl">${t('stat.blanks')}</div></div>
+      </div>
+      <div class="code-pre">
+        <div class="code-pre-hdr"><span>${lang}</span><span>lines ${sl}–${el}</span></div>
+        <pre>${highlighted}</pre>
+      </div>
+      <button class="btn btn-primary ani" style="margin-top:14px" onclick="startPuzzle()">
+        <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        ${t('btn.start')}
+      </button>
+    </div>`;
+}
+function getEnabled(){const e=new Set();document.querySelectorAll('input[name=tok]:checked').forEach(c=>e.add(c.value));return e}
+
+// ─── Syntax highlight helper ──────────────────────────────
+// Renders parsed segments as HTML with .hl-* colour classes.
+// Used in both the setup preview and the puzzle code view.
+function highlightLines(parsedLines){
+  return parsedLines.map(segs=>
+    segs.map(seg=>{
+      const txt=esc(seg.text);
+      if(seg.type==='space'||seg.type==='code')return txt;
+      return `<span class="hl-${seg.type}">${txt}</span>`;
+    }).join('')
+  ).join('\n');
+}
+
+// Map 0-100 slider → 2..maxBlanks (linear)
+function blankCount(){
+  const pct=parseInt(document.getElementById('diff-slider').value); // 0–100
+  const max=S.maxBlanks||2;
+  if(max<=2)return 2;
+  return Math.round(2+(pct/100)*(max-2));
+}
+
+function onSlider(){
+  const val=parseInt(document.getElementById('diff-slider').value);
+  document.getElementById('slider-val').textContent=val;
+  // Only update the blanks count stat — no need to re-render the code
+  if(S.lines.length){
+    const enabled=getEnabled();
+    const count=blankCount();
+    const{blanks}=buildPuzzle(S.lines,S.lang,enabled,count);
+    const cell=document.querySelector('#preview-area .stat-val[data-stat="blanks"]');
+    if(cell)cell.textContent=blanks.length;
+  }
+}
+
+// ─── Seeded PRNG (mulberry32) ─────────────────────────────
+function makePRNG(seed){
+  return function(){
+    seed|=0;seed=seed+0x6D2B79F5|0;
+    let t=Math.imul(seed^seed>>>15,1|seed);
+    t=t+Math.imul(t^t>>>7,61|t)^t;
+    return((t^t>>>14)>>>0)/4294967296;
+  }
+}
+
+// ─── Start Puzzle ─────────────────────────────────────────
+function startPuzzle(){
+  const enabled=getEnabled();
+  const count=blankCount();
+  const{parsed,blanks}=buildPuzzle(S.lines,S.lang,enabled,count);
+  if(!blanks.length){showErr(t('err.noblanks'));return}
+  S.parsed=parsed;S.blanks=blanks;S.answers={};
+  // Seed from current second so each start gives a different shuffle
+  const rand=makePRNG(Math.floor(Date.now()/1000)%60);
+  const pieces=blanks.map(b=>({text:b.text,type:b.type,id:b.id}));
+  for(let i=pieces.length-1;i>0;i--){const j=Math.floor(rand()*(i+1));[pieces[i],pieces[j]]=[pieces[j],pieces[i]]}
+  S.pieces=pieces;
+  renderPuzzle();showTab('puzzle');
+}
+
+// ─── Render Puzzle ────────────────────────────────────────
+function renderPuzzle(){
+  const body=document.getElementById('pz-body');
+  const bmap=new Map(S.blanks.map(b=>[`${b.li}-${b.si}`,b]));
+  body.innerHTML='';
+  let ln=1;
+  S.parsed.forEach((segs,li)=>{
+    const row=document.createElement('div');row.className='cl';
+    const num=document.createElement('span');num.className='lnum';num.textContent=ln++;row.appendChild(num);
+    segs.forEach((seg,si)=>{
+      const b=bmap.get(`${li}-${si}`);
+      if(b){
+        const slot=document.createElement('span');
+        slot.className='slot';slot.dataset.bid=b.id;slot.dataset.ans=b.text;
+        slot.style.minWidth=Math.max(40,b.text.length*7.5+14)+'px';
+        const placed=S.answers[b.id];
+        if(placed){slot.textContent=placed;slot.classList.add('filled')}
+        slot.addEventListener('dragover',e=>{e.preventDefault();slot.classList.add('hover')});
+        slot.addEventListener('dragleave',()=>slot.classList.remove('hover'));
+        slot.addEventListener('drop',e=>{
+          e.preventDefault();slot.classList.remove('hover');
+          placePiece(b.id,parseInt(e.dataTransfer.getData('pid')),e.dataTransfer.getData('txt'));
+        });
+        slot.addEventListener('click',()=>{
+          if(slot.classList.contains('filled')&&!slot.classList.contains('correct'))returnPiece(b.id);
+        });
+        row.appendChild(slot);
+      } else {
+        const sp=document.createElement('span');
+        sp.textContent=seg.text;
+        if(seg.type!=='space'&&seg.type!=='code')sp.className='hl-'+seg.type;
+        row.appendChild(sp);
+      }
+    });
+    body.appendChild(row);
+  });
+  renderPieces();
+  document.getElementById('pz-lang').textContent=S.lang;
+  document.getElementById('pz-range').textContent=`lines ${S.startLine}–${S.endLine}`;
+  updateScore();
+}
+
+function renderPieces(){
+  const grid=document.getElementById('pieces-grid');grid.innerHTML='';
+  S.pieces.forEach(p=>{
+    const el=document.createElement('div');
+    el.className=`piece piece-${p.type}`;el.textContent=p.text;
+    el.draggable=true;el.dataset.pid=p.id;
+    // Mark used if this exact piece is currently placed anywhere
+    const usedInSlot=Object.values(S.answers).includes(p.text);
+    if(usedInSlot)el.classList.add('used');
+    el.addEventListener('dragstart',e=>{
+      e.dataTransfer.setData('pid',p.id);e.dataTransfer.setData('txt',p.text);
+      el.classList.add('dragging');
+    });
+    el.addEventListener('dragend',()=>el.classList.remove('dragging'));
+    grid.appendChild(el);
+  });
+}
+
+function placePiece(slotId,pieceId,txt){
+  if(S.answers[slotId])returnPieceInternal(slotId);
+  S.answers[slotId]=txt;
+  document.querySelectorAll(`.slot[data-bid="${slotId}"]`).forEach(s=>{
+    s.textContent=txt;s.classList.add('filled');s.classList.remove('correct','wrong');
+  });
+  document.querySelectorAll(`.piece[data-pid="${pieceId}"]`).forEach(p=>p.classList.add('used'));
+  updateScore();checkAllFilled();
+}
+function returnPiece(slotId){returnPieceInternal(slotId);updateScore();document.getElementById('res-msg').classList.remove('vis')}
+function returnPieceInternal(slotId){
+  const txt=S.answers[slotId];delete S.answers[slotId];
+  document.querySelectorAll(`.slot[data-bid="${slotId}"]`).forEach(s=>{s.textContent='';s.classList.remove('filled','correct','wrong')});
+  document.querySelectorAll('.piece').forEach(p=>{if(p.textContent===txt)p.classList.remove('used')});
+}
+function updateScore(){
+  const correct=Object.entries(S.answers).filter(([bid,txt])=>{const b=S.blanks.find(b=>b.id==bid);return b&&b.text===txt}).length;
+  document.getElementById('score-n').textContent=correct;
+  document.getElementById('score-t').textContent='/ '+S.blanks.length;
+}
+function checkAllFilled(){
+  if(Object.keys(S.answers).length===S.blanks.length){
+    const m=document.getElementById('res-msg');m.textContent=t('msg.allfilled');m.className='res-msg vis res-partial';
+  }
+}
+function checkAnswers(){
+  let correct=0;const total=S.blanks.length;
+  document.querySelectorAll('.slot').forEach(slot=>{
+    const bid=parseInt(slot.dataset.bid);const placed=S.answers[bid];
+    if(!placed)return;
+    if(placed===slot.dataset.ans){
+      slot.classList.add('correct');slot.classList.remove('wrong');
+      slot.classList.add('fC');setTimeout(()=>slot.classList.remove('fC'),400);
+      correct++;
+    } else {
+      slot.classList.add('wrong');slot.classList.remove('correct');
+      slot.classList.add('fW');setTimeout(()=>slot.classList.remove('fW'),400);
+    }
+  });
+  const m=document.getElementById('res-msg');m.classList.add('vis');
+  if(correct===total&&Object.keys(S.answers).length===total){
+    m.textContent=t('res.all');m.className='res-msg vis res-all';
+  } else {
+    m.textContent=t('res.partial',{n:correct,total});m.className='res-msg vis res-partial';
+  }
+  updateScore();
+}
+function resetPuzzle(){
+  S.answers={};
+  const rand=makePRNG(Math.floor(Date.now()/1000)%60);
+  const p=[...S.pieces];
+  for(let i=p.length-1;i>0;i--){const j=Math.floor(rand()*(i+1));[p[i],p[j]]=[p[j],p[i]]}
+  S.pieces=p;
+  document.getElementById('res-msg').classList.remove('vis');
+  renderPuzzle();
+}
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+</script>
+</body>
+</html>
