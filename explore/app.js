@@ -421,7 +421,7 @@ function exportResults(){
   const d=new Date().toLocaleDateString(lang==='fr'?'fr-CA':lang==='es'?'es-419':'en-CA');
   const hdr={fr:`Résultats du ${d}`,en:`Results — ${d}`,es:`Resultados — ${d}`}[lang];
   const lines=[
-    'Collège LaSalle — Explore', hdr, '',
+    'Explore', hdr, '',
     ...top3.map((id,i)=>{
       const p=PROGS.find(pr=>pr.id===id);
       const url=p.url?p.url[profile.teach_lang==='en'?'en':'fr']:'';
