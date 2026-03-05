@@ -73,6 +73,13 @@ input::placeholder{color:var(--c300)}
 .lang-ov{display:none;background:#FFF8E7;border:1px solid var(--gold);border-radius:6px;padding:10px 12px;margin-top:6px}
 .lang-ov.vis{display:block}
 .lang-ov label{font-size:11px;color:#7a5e0a;margin-bottom:4px;display:block}
+/* SOURCE MODE TOGGLE */
+.mode-sw{display:flex;gap:0;background:var(--c100);border-radius:6px;padding:3px;margin-bottom:12px}
+.mode-btn{flex:1;background:transparent;border:none;font-family:inherit;font-size:11px;font-weight:500;color:var(--c400);padding:6px 10px;border-radius:4px;cursor:pointer;transition:all .2s;letter-spacing:.03em}
+.mode-btn.active{background:var(--white);color:var(--charcoal);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+/* PASTE TEXTAREA */
+textarea#paste-input{width:100%;height:200px;padding:9px 11px;border:1px solid var(--c200);border-radius:6px;font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:11.5px;line-height:1.6;color:var(--charcoal);background:var(--white);outline:none;resize:vertical;transition:border-color .2s,box-shadow .2s}
+textarea#paste-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,88,124,.1)}
 .tok-list{display:flex;flex-direction:column;gap:7px}
 .tok-row{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:6px;border:1px solid var(--c100);cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
 .tok-row:hover{border-color:var(--c200);background:var(--cream)}
@@ -212,11 +219,27 @@ input[type=range]:disabled{opacity:.4;cursor:not-allowed}
 
       <div>
         <div class="sec-lbl" data-i18n="s.source">Source</div>
-        <div class="field">
-          <label data-i18n="l.url">File URL (raw source)</label>
-          <input type="text" id="url-input" value="https://raw.githubusercontent.com/satuelisa/DiscreteMath/refs/heads/master/homework/tarjan.py" />
+        <!-- Mode toggle -->
+        <div class="mode-sw">
+          <button class="mode-btn active" id="mode-url" onclick="setMode('url')" data-i18n="mode.url">URL</button>
+          <button class="mode-btn" id="mode-paste" onclick="setMode('paste')" data-i18n="mode.paste">Paste code</button>
         </div>
-        <div id="det-badge" style="display:none;margin-top:5px"></div>
+        <!-- URL mode -->
+        <div id="src-url">
+          <div class="field">
+            <label data-i18n="l.url">File URL (raw source)</label>
+            <input type="text" id="url-input" value="https://raw.githubusercontent.com/satuelisa/DiscreteMath/refs/heads/master/homework/tarjan.py" />
+          </div>
+          <div id="det-badge" style="display:none;margin-top:5px"></div>
+        </div>
+        <!-- Paste mode -->
+        <div id="src-paste" style="display:none">
+          <div class="field">
+            <label data-i18n="l.paste">Paste your code here</label>
+            <textarea id="paste-input" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+          </div>
+        </div>
+        <!-- Language override: shown in URL mode when ext unknown -->
         <div id="lang-ov" class="lang-ov">
           <label data-i18n="l.override">Extension not recognized — select language:</label>
           <select id="lang-sel">
@@ -230,7 +253,28 @@ input[type=range]:disabled{opacity:.4;cursor:not-allowed}
             <option value="php">PHP</option><option value="lua">Lua</option>
             <option value="haskell">Haskell</option><option value="scala">Scala</option>
             <option value="matlab">MATLAB</option>
+            <option value="sql">SQL</option>
           </select>
+        </div>
+        <!-- Language selector: shown in paste mode, no warning text -->
+        <div id="lang-paste" style="display:none;margin-top:8px">
+          <div class="field">
+            <label data-i18n="l.lang">Language</label>
+            <select id="lang-sel-paste" onchange="updatePasteBtn()">
+              <option value="" data-i18n="l.lang.pick">— select a language —</option>
+              <option value="python">Python</option><option value="javascript">JavaScript</option>
+              <option value="typescript">TypeScript</option><option value="java">Java</option>
+              <option value="c">C</option><option value="cpp">C++</option>
+              <option value="csharp">C#</option><option value="ruby">Ruby</option>
+              <option value="bash">Bash/Shell</option><option value="r">R</option>
+              <option value="go">Go</option><option value="rust">Rust</option>
+              <option value="swift">Swift</option><option value="kotlin">Kotlin</option>
+              <option value="php">PHP</option><option value="lua">Lua</option>
+              <option value="haskell">Haskell</option><option value="scala">Scala</option>
+              <option value="matlab">MATLAB</option>
+              <option value="sql">SQL</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -354,12 +398,14 @@ const I18N = {
     'app.title':'Code Puzzle','app.sub':'Code comprehension exercise',
     'tab.setup':'Setup','tab.puzzle':'Puzzle',
     's.source':'Source','s.range':'Line range','s.tok':'Token types to blank',
-    'l.url':'File URL (raw source)','l.start':'Start line','l.end':'End line',
+    'mode.url':'URL','mode.paste':'Paste code',
+    'l.url':'File URL (raw source)','l.paste':'Paste your code here','l.lang':'Language','l.lang.pick':'— select a language —','l.start':'Start line','l.end':'End line',
     'l.wholefile':'Use the entire file',
     'l.override':'Extension not recognized — select language:',
     't.kw':'Keywords','t.op':'Operators','t.id':'Identifiers','t.lit':'Literals',
     'btn.load':'Load &amp; Analyze','btn.back':'Back','btn.reset':'Reset','btn.check':'Check',
     'empty.hint':'Load a source file to preview its contents and configure the puzzle.',
+    'err.paste':'Please paste some code first.',
     'det.pre':'Detected:','det.unk':'Unknown extension',
     'stat.total':'Total lines','stat.stripped':'After stripping','stat.blanks':'Blanks',
     'btn.start':'Start Puzzle','preview.title':'Processed code','pieces.title':'Pieces',
@@ -377,13 +423,15 @@ const I18N = {
     'app.title':'Casse-tête de code','app.sub':'Exercice de compréhension de code',
     'tab.setup':'Configuration','tab.puzzle':'Exercice',
     's.source':'Source','s.range':'Plage de lignes','s.tok':'Types de jetons à masquer',
-    'l.url':'URL du fichier (source brute)','l.start':'Ligne de début','l.end':'Ligne de fin',
+    'mode.url':'URL','mode.paste':'Coller le code',
+    'l.url':'URL du fichier (source brute)','l.paste':'Collez votre code ici','l.lang':'Langage','l.lang.pick':'— sélectionnez un langage —','l.start':'Ligne de début','l.end':'Ligne de fin',
     'l.wholefile':'Utiliser le fichier en entier',
     'l.override':'Extension non reconnue — sélectionnez le langage\u00a0:',
     'h.range':'Laissez vide pour traiter le fichier en entier.',
     't.kw':'Mots-clés','t.op':'Opérateurs','t.id':'Identifiants','t.lit':'Littéraux',
     'btn.load':'Charger et analyser','btn.back':'Retour','btn.reset':'Réinitialiser','btn.check':'Vérifier',
     'empty.hint':'Chargez un fichier source pour prévisualiser son contenu et configurer l\u2019exercice.',
+    'err.paste':'Veuillez d\u2019abord coller du code.',
     'det.pre':'Détecté\u00a0:','det.unk':'Extension inconnue',
     'stat.total':'Lignes totales','stat.stripped':'Après nettoyage','stat.blanks':'Blancs',
     'btn.start':'Commencer l\u2019exercice','preview.title':'Code traité','pieces.title':'Pièces',
@@ -401,13 +449,15 @@ const I18N = {
     'app.title':'Puzzle de código','app.sub':'Ejercicio de comprensión de código',
     'tab.setup':'Configuración','tab.puzzle':'Ejercicio',
     's.source':'Fuente','s.range':'Rango de líneas','s.tok':'Tipos de tokens a ocultar',
-    'l.url':'URL del archivo (fuente sin procesar)','l.start':'Línea inicial','l.end':'Línea final',
+    'mode.url':'URL','mode.paste':'Pegar código',
+    'l.url':'URL del archivo (fuente sin procesar)','l.paste':'Pegue su código aquí','l.lang':'Lenguaje','l.lang.pick':'— seleccione un lenguaje —','l.start':'Línea inicial','l.end':'Línea final',
     'l.wholefile':'Usar el archivo completo',
     'l.override':'Extensión no reconocida — seleccione el lenguaje:',
     'h.range':'Deje vacío para usar el archivo completo.',
     't.kw':'Palabras clave','t.op':'Operadores','t.id':'Identificadores','t.lit':'Literales',
     'btn.load':'Cargar y analizar','btn.back':'Volver','btn.reset':'Reiniciar','btn.check':'Verificar',
     'empty.hint':'Cargue un archivo fuente para previsualizar su contenido y configurar el ejercicio.',
+    'err.paste':'Por favor pegue código primero.',
     'det.pre':'Detectado:','det.unk':'Extensión desconocida',
     'stat.total':'Líneas totales','stat.stripped':'Tras limpieza','stat.blanks':'Espacios',
     'btn.start':'Iniciar ejercicio','preview.title':'Código procesado','pieces.title':'Piezas',
@@ -443,11 +493,11 @@ function showTab(w){
 const EXT={py:'python',js:'javascript',ts:'typescript',java:'java',c:'c',h:'c',
   cpp:'cpp',cc:'cpp',cxx:'cpp',cs:'csharp',rb:'ruby',sh:'bash',bash:'bash',r:'r',
   go:'go',rs:'rust',swift:'swift',kt:'kotlin',php:'php',lua:'lua',hs:'haskell',
-  scala:'scala',m:'matlab',pl:'perl'};
+  scala:'scala',m:'matlab',pl:'perl',sql:'sql'};
 const EXT_LABEL={python:'Python',javascript:'JavaScript',typescript:'TypeScript',
   java:'Java',c:'C',cpp:'C++',csharp:'C#',ruby:'Ruby',bash:'Shell',r:'R',
   go:'Go',rust:'Rust',swift:'Swift',kotlin:'Kotlin',php:'PHP',lua:'Lua',
-  haskell:'Haskell',scala:'Scala',matlab:'MATLAB',perl:'Perl'};
+  haskell:'Haskell',scala:'Scala',matlab:'MATLAB',perl:'Perl',sql:'SQL'};
 let detLang=null;
 
 function getExt(url){try{const p=new URL(url).pathname,pp=p.split('.');return pp.length>1?pp.pop().toLowerCase():null}catch{return null}}
@@ -475,6 +525,35 @@ function updateBadge(){
 document.getElementById('url-input').addEventListener('input',updateBadge);
 updateBadge();
 
+// ─── Source mode toggle ───────────────────────────────────
+let sourceMode='url'; // 'url' | 'paste'
+function setMode(m){
+  sourceMode=m;
+  document.getElementById('mode-url').classList.toggle('active',m==='url');
+  document.getElementById('mode-paste').classList.toggle('active',m==='paste');
+  document.getElementById('src-url').style.display=m==='url'?'block':'none';
+  document.getElementById('src-paste').style.display=m==='paste'?'block':'none';
+  document.getElementById('lang-paste').style.display=m==='paste'?'block':'none';
+  if(m==='paste'){
+    document.getElementById('det-badge').style.display='none';
+    document.getElementById('lang-ov').classList.remove('vis');
+    // Button enabled only when there is pasted content
+    updatePasteBtn();
+  } else {
+    document.getElementById('lang-ov').classList.remove('vis');
+    document.getElementById('load-btn').disabled=false;
+    updateBadge();
+  }
+}
+function updatePasteBtn(){
+  const hasContent=document.getElementById('paste-input').value.trim().length>0;
+  const hasLang=document.getElementById('lang-sel-paste').value!=='';
+  document.getElementById('load-btn').disabled=!(hasContent&&hasLang);
+}
+document.getElementById('paste-input').addEventListener('input',()=>{
+  if(sourceMode==='paste')updatePasteBtn();
+});
+
 function onWholeFile(){
   const whole=document.getElementById('use-whole-file').checked;
   const wrap=document.getElementById('line-range-inputs');
@@ -498,7 +577,8 @@ const CR={
   ruby:{line:'#',block:['=begin','=end']},bash:{line:'#',block:null},
   r:{line:'#',block:null},lua:{line:'--',block:['--[[',']]']},
   haskell:{line:'--',block:['{-','-}']},matlab:{line:'%',block:['%{','%}']},
-  perl:{line:'#',block:null}
+  perl:{line:'#',block:null},
+  sql:{line:'--',block:['/*','*/']}
 };
 function stripIC(line,m){
   let inS=null;
@@ -547,6 +627,7 @@ const KW={
   matlab:new Set(['break','case','catch','classdef','continue','else','elseif','end','for','function','global','if','otherwise','parfor','persistent','return','spmd','switch','try','while']),
   bash:new Set(['if','then','else','elif','fi','for','in','do','done','while','until','case','esac','function','return','break','continue','exit','export','local','readonly','unset']),
   r:new Set(['if','else','repeat','while','function','for','in','next','break','TRUE','FALSE','NULL','Inf','NaN','NA']),
+  sql:new Set(['ADD','ALL','ALTER','AND','ANY','AS','ASC','BACKUP','BETWEEN','BY','CASE','CHECK','COLUMN','CONSTRAINT','CREATE','CROSS','DATABASE','DEFAULT','DELETE','DESC','DISTINCT','DROP','EACH','ELSE','END','EXCEPT','EXISTS','FOREIGN','FROM','FULL','GROUP','HAVING','IN','INDEX','INNER','INSERT','INTERSECT','INTO','IS','JOIN','KEY','LEFT','LIKE','LIMIT','NOT','NULL','OFFSET','ON','OR','ORDER','OUTER','PRIMARY','PROCEDURE','RIGHT','ROWNUM','SELECT','SET','TABLE','TOP','TRUNCATE','UNION','UNIQUE','UPDATE','VALUES','VIEW','WHERE','WITH','add','all','alter','and','any','as','asc','backup','between','by','case','check','column','constraint','create','cross','database','default','delete','desc','distinct','drop','else','end','except','exists','foreign','from','full','group','having','in','index','inner','insert','intersect','into','is','join','key','left','like','limit','not','null','offset','on','or','order','outer','primary','procedure','right','select','set','table','top','truncate','union','unique','update','values','view','where','with']),
 };
 
 // Operator patterns per language
@@ -554,6 +635,7 @@ const OP={
   python:/^(\*\*=|\/\/=|<<=|>>=|\*\*|\/\/|==|!=|<=|>=|<<|>>|\+=|-=|\*=|\/=|%=|&=|\|=|\^=|[-+*/%&|^~<>=!@:])/,
   r:/^(<-|->|<<-|->>|==|!=|<=|>=|\|\||&&|\+=|-=|\*=|\/=|%%|[-+*\/^<>&|!~:])/,
   matlab:/^(\.\*|\.\^|\.\/|==|~=|<=|>=|&&|\|\||[-+*\/\\^<>&|~!:@])/,
+  sql:/^(<>|!=|<=|>=|[-+*\/=<>%])/,
   default:/^(<<=|>>=|>>>|\*\*=|&&=|\|\|=|\?\?=|===|!==|==|!=|<=|>=|=>|<<|>>|\+\+|--|&&|\|\||\?\?|\+=|-=|\*=|\/=|%=|&=|\|=|\^=|[-+*/%&|^~<>!=?:])/,
 };
 function opRx(lang){return OP[lang]||OP.default}
@@ -625,35 +707,65 @@ const S={lang:'python',lines:[],parsed:[],blanks:[],answers:{},pieces:[],startLi
 
 // ─── Load & Analyze ───────────────────────────────────────
 async function loadAndAnalyze(){
-  const url=document.getElementById('url-input').value.trim();
   const btn=document.getElementById('load-btn');
   const sp=document.getElementById('spinner');
   const lbl=document.getElementById('load-lbl');
   const eb=document.getElementById('err-box');
   eb.classList.remove('vis');
-  if(!url){showErr(t('err.url'));return}
-  const lang=detLang||document.getElementById('lang-sel').value;
+
+  const lang=sourceMode==='paste'
+    ? document.getElementById('lang-sel-paste').value
+    : (detLang||document.getElementById('lang-sel').value);
   const wholeFile=document.getElementById('use-whole-file').checked;
   const sl=wholeFile?1:(parseInt(document.getElementById('start-line').value)||1);
   const elRaw=wholeFile?'':(document.getElementById('end-line').value.trim());
-  btn.disabled=true;sp.classList.add('vis');lbl.textContent='…';
+
   let raw;
-  try{
-    const res=await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`);
-    if(!res.ok)throw new Error('http '+res.status);
-    raw=await res.text();
-    // codetabs returns 200 with a JSON error body on failure
-    if(raw.trimStart().startsWith('{')){
-      let parsed;try{parsed=JSON.parse(raw)}catch{}
-      if(parsed&&parsed.Error)throw new Error(parsed.Error);
-    }
-  }catch(e){showErr(t('err.fetch'));btn.disabled=false;sp.classList.remove('vis');lbl.innerHTML=t('btn.load');return}
-  const all=raw.split('\n');
+
+  if(sourceMode==='paste'){
+    // ── Paste mode: no fetch needed ──────────────────────
+    raw=document.getElementById('paste-input').value;
+    if(!raw.trim()){showErr(t('err.paste'));return}
+  } else {
+    // ── URL mode: fetch via proxy ────────────────────────
+    const url=document.getElementById('url-input').value.trim();
+    if(!url){showErr(t('err.url'));return}
+    btn.disabled=true;sp.classList.add('vis');lbl.textContent='…';
+    try{
+      const proxyUrl=`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(url)}`;
+      const fetchWithTimeout=async(ms=12000)=>{
+        const ctrl=new AbortController();
+        const id=setTimeout(()=>ctrl.abort(),ms);
+        try{return await fetch(proxyUrl,{signal:ctrl.signal})}finally{clearTimeout(id)}
+      };
+      let res=await fetchWithTimeout();
+      // On failure wait 1s then retry once
+      if(!res.ok){
+        await new Promise(r=>setTimeout(r,1000));
+        res=await fetchWithTimeout();
+      }
+      if(!res.ok)throw new Error('http '+res.status);
+      raw=await res.text();
+      // codetabs returns 200 with a JSON error body on failure
+      if(raw.trimStart().startsWith('{')){
+        let parsed;try{parsed=JSON.parse(raw)}catch{}
+        if(parsed&&parsed.Error)throw new Error(parsed.Error);
+      }
+    }catch(e){showErr(t('err.fetch'));btn.disabled=false;sp.classList.remove('vis');lbl.innerHTML=t('btn.load');return}
+  }
+
+  btn.disabled=true;sp.classList.add('vis');lbl.textContent='…';
+  const all=raw.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n');
   const el=elRaw?parseInt(elRaw):all.length;
   const sliced=all.slice(sl-1,el);
   if(!sliced.length){showErr(t('err.empty'));btn.disabled=false;sp.classList.remove('vis');lbl.innerHTML=t('btn.load');return}
   const stripped=stripComments(sliced,lang);
-  const processed=collapseBlank(stripped);
+  const collapsed=collapseBlank(stripped);
+  // Trim leading and trailing blank lines
+  let start=0,end=collapsed.length-1;
+  while(start<=end&&collapsed[start].trim()==='')start++;
+  while(end>=start&&collapsed[end].trim()==='')end--;
+  const processed=collapsed.slice(start,end+1);
   // Unique non-empty lines (trimmed) — this is the slider max
   const uniqueNonEmpty=new Set(processed.map(l=>l.trim()).filter(l=>l.length>0));
   const maxBlanks=uniqueNonEmpty.size;
