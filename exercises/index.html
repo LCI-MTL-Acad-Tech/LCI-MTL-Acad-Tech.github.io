@@ -374,11 +374,15 @@ input[type=range]:disabled{opacity:.4;cursor:not-allowed}
     <div class="pz-act-l">
       <button class="btn btn-secondary" onclick="showTab('setup')">
         <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        <span data-i18n="btn.back">Back</span>
+        <span data-i18n="btn.setup">Setup</span>
       </button>
       <button class="btn btn-secondary" onclick="resetPuzzle()">
         <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
         <span data-i18n="btn.reset">Reset</span>
+      </button>
+      <button class="btn btn-secondary" onclick="sharePuzzle()">
+        <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        <span data-i18n="btn.share">Share</span>
       </button>
     </div>
     <div style="display:flex;align-items:center;gap:12px">
@@ -388,6 +392,33 @@ input[type=range]:disabled{opacity:.4;cursor:not-allowed}
         <span data-i18n="btn.check">Check</span>
       </button>
     </div>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div id="share-modal" style="display:none;position:fixed;inset:0;z-index:200;align-items:center;justify-content:center;background:rgba(7,24,30,.55);backdrop-filter:blur(2px)">
+  <div style="background:var(--white);border-radius:10px;padding:24px 24px 20px;width:min(480px,92vw);box-shadow:0 8px 32px rgba(0,0,0,.22);display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:14px;font-weight:500;letter-spacing:-.01em" data-i18n="share.title">Share puzzle</span>
+      <button onclick="closeShareModal()" style="background:none;border:none;cursor:pointer;color:var(--c400);padding:2px" aria-label="Close">
+        <svg style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <label class="tok-row" style="margin:0">
+      <input type="checkbox" id="share-same-seed" checked>
+      <span class="tok-row-lbl" data-i18n="share.sameseed">Same puzzle order (same random seed)</span>
+    </label>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <label style="font-size:11px;color:var(--c400)" data-i18n="share.link">Link</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="share-url" readonly style="flex:1;font-size:11.5px;color:var(--c500);background:var(--cream);cursor:text" />
+        <button class="btn btn-primary" id="share-copy-btn" onclick="copyShareLink()" style="width:auto;padding:9px 16px;flex-shrink:0">
+          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span id="share-copy-lbl" data-i18n="share.copy">Copy</span>
+        </button>
+      </div>
+    </div>
+    <div id="share-warn" style="display:none;font-size:11px;color:var(--gold);line-height:1.5" data-i18n="share.warn.code"></div>
   </div>
 </div>
 
@@ -403,7 +434,10 @@ const I18N = {
     'l.wholefile':'Use the entire file',
     'l.override':'Extension not recognized — select language:',
     't.kw':'Keywords','t.op':'Operators','t.id':'Identifiers','t.lit':'Literals',
-    'btn.load':'Load &amp; Analyze','btn.back':'Back','btn.reset':'Reset','btn.check':'Check',
+    'btn.load':'Load &amp; Analyze','btn.back':'Back','btn.setup':'Setup','btn.reset':'Reset','btn.check':'Check','btn.share':'Share',
+    'share.title':'Share puzzle','share.sameseed':'Same puzzle order (same random seed)',
+    'share.link':'Link','share.copy':'Copy','share.copied':'Copied!',
+    'share.warn.code':'Note: the pasted code is embedded in the URL. Share only with people who should have access to it.',
     'empty.hint':'Load a source file to preview its contents and configure the puzzle.',
     'err.paste':'Please paste some code first.',
     'det.pre':'Detected:','det.unk':'Unknown extension',
@@ -429,7 +463,10 @@ const I18N = {
     'l.override':'Extension non reconnue — sélectionnez le langage\u00a0:',
     'h.range':'Laissez vide pour traiter le fichier en entier.',
     't.kw':'Mots-clés','t.op':'Opérateurs','t.id':'Identifiants','t.lit':'Littéraux',
-    'btn.load':'Charger et analyser','btn.back':'Retour','btn.reset':'Réinitialiser','btn.check':'Vérifier',
+    'btn.load':'Charger et analyser','btn.back':'Retour','btn.setup':'Configuration','btn.reset':'Réinitialiser','btn.check':'Vérifier','btn.share':'Partager',
+    'share.title':'Partager l\u2019exercice','share.sameseed':'Même ordre de pièces (même graine aléatoire)',
+    'share.link':'Lien','share.copy':'Copier','share.copied':'Copié\u00a0!',
+    'share.warn.code':'Note\u00a0: le code collé est intégré dans l\u2019URL. Partagez uniquement avec les personnes qui devraient y avoir accès.',
     'empty.hint':'Chargez un fichier source pour prévisualiser son contenu et configurer l\u2019exercice.',
     'err.paste':'Veuillez d\u2019abord coller du code.',
     'det.pre':'Détecté\u00a0:','det.unk':'Extension inconnue',
@@ -455,7 +492,10 @@ const I18N = {
     'l.override':'Extensión no reconocida — seleccione el lenguaje:',
     'h.range':'Deje vacío para usar el archivo completo.',
     't.kw':'Palabras clave','t.op':'Operadores','t.id':'Identificadores','t.lit':'Literales',
-    'btn.load':'Cargar y analizar','btn.back':'Volver','btn.reset':'Reiniciar','btn.check':'Verificar',
+    'btn.load':'Cargar y analizar','btn.back':'Volver','btn.setup':'Configuración','btn.reset':'Reiniciar','btn.check':'Verificar','btn.share':'Compartir',
+    'share.title':'Compartir ejercicio','share.sameseed':'Mismo orden de piezas (misma semilla aleatoria)',
+    'share.link':'Enlace','share.copy':'Copiar','share.copied':'¡Copiado!',
+    'share.warn.code':'Nota: el código pegado está incluido en la URL. Comparta solo con personas que deban tener acceso.',
     'empty.hint':'Cargue un archivo fuente para previsualizar su contenido y configurar el ejercicio.',
     'err.paste':'Por favor pegue código primero.',
     'det.pre':'Detectado:','det.unk':'Extensión desconocida',
@@ -867,7 +907,12 @@ function startPuzzle(){
   const count=blankCount();
   const{parsed,blanks}=buildPuzzle(S.lines,S.lang,enabled,count);
   if(!blanks.length){showErr(t('err.noblanks'));return}
-  S.parsed=parsed;S.blanks=blanks;S.answers={};
+  // Full state reset
+  S.parsed=parsed;S.blanks=blanks;S.answers={};S.pieces=[];
+  // Clear result message and score
+  document.getElementById('res-msg').classList.remove('vis');
+  document.getElementById('score-n').textContent='0';
+  document.getElementById('score-t').textContent='/ '+blanks.length;
   // Seed from current second so each start gives a different shuffle
   const rand=makePRNG(Math.floor(Date.now()/1000)%60);
   const pieces=blanks.map(b=>({text:b.text,type:b.type,id:b.id}));
@@ -920,13 +965,15 @@ function renderPuzzle(){
 
 function renderPieces(){
   const grid=document.getElementById('pieces-grid');grid.innerHTML='';
+  // Build a set of piece ids that are currently placed
+  const placedIds=new Set(Object.keys(S.answers).map(bid=>{
+    const b=S.blanks.find(b=>b.id==bid);return b?b.id:null;
+  }).filter(x=>x!==null));
   S.pieces.forEach(p=>{
     const el=document.createElement('div');
     el.className=`piece piece-${p.type}`;el.textContent=p.text;
     el.draggable=true;el.dataset.pid=p.id;
-    // Mark used if this exact piece is currently placed anywhere
-    const usedInSlot=Object.values(S.answers).includes(p.text);
-    if(usedInSlot)el.classList.add('used');
+    if(placedIds.has(p.id))el.classList.add('used');
     el.addEventListener('dragstart',e=>{
       e.dataTransfer.setData('pid',p.id);e.dataTransfer.setData('txt',p.text);
       el.classList.add('dragging');
@@ -994,6 +1041,142 @@ function resetPuzzle(){
 }
 
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// ─── Share ────────────────────────────────────────────────
+function sharePuzzle(){
+  const sameSeed=document.getElementById('share-same-seed').checked;
+  const params=new URLSearchParams();
+
+  if(sourceMode==='paste'){
+    params.set('code', document.getElementById('paste-input').value);
+    params.set('lang', S.lang);
+    document.getElementById('share-warn').style.display='block';
+  } else {
+    params.set('url', document.getElementById('url-input').value.trim());
+    if(detLang===null) params.set('lang', document.getElementById('lang-sel').value);
+  }
+
+  // Line range
+  const wholeFile=document.getElementById('use-whole-file').checked;
+  if(!wholeFile){
+    const sl=document.getElementById('start-line').value;
+    const el=document.getElementById('end-line').value;
+    if(sl) params.set('start', sl);
+    if(el) params.set('end', el);
+  }
+
+  // Token types (only if not all four checked)
+  const enabled=getEnabled();
+  const all4=new Set(['keyword','operator','identifier','literal']);
+  const missing=[...all4].filter(t=>!enabled.has(t));
+  if(missing.length) params.set('tok', [...enabled].join(','));
+
+  // Difficulty
+  params.set('blanks', document.getElementById('diff-slider').value);
+
+  // Seed
+  if(sameSeed) params.set('seed', Math.floor(Date.now()/1000)%60);
+
+  const shareUrl=location.href.split('?')[0]+'?'+params.toString();
+  document.getElementById('share-url').value=shareUrl;
+  document.getElementById('share-copy-lbl').textContent=t('share.copy');
+  document.getElementById('share-copy-btn').style.background='';
+
+  const modal=document.getElementById('share-modal');
+  modal.style.display='flex';
+}
+
+function copyShareLink(){
+  const val=document.getElementById('share-url').value;
+  navigator.clipboard.writeText(val).then(()=>{
+    const lbl=document.getElementById('share-copy-lbl');
+    const btn=document.getElementById('share-copy-btn');
+    lbl.textContent=t('share.copied');
+    btn.style.background='var(--chloro)';
+    setTimeout(()=>{lbl.textContent=t('share.copy');btn.style.background='';},2000);
+  });
+}
+
+function closeShareModal(){
+  document.getElementById('share-modal').style.display='none';
+  document.getElementById('share-warn').style.display='none';
+}
+
+// Close on backdrop click
+document.getElementById('share-modal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('share-modal'))closeShareModal();
+});
+
+// ─── Init from URL params ─────────────────────────────────
+async function initFromParams(){
+  const params=new URLSearchParams(location.search);
+  if(!params.has('url')&&!params.has('code')) return; // nothing to do
+
+  // Restore token types
+  if(params.has('tok')){
+    const enabled=new Set(params.get('tok').split(','));
+    document.querySelectorAll('input[name=tok]').forEach(cb=>{
+      cb.checked=enabled.has(cb.value);
+    });
+  }
+
+  // Restore difficulty slider value (set before load so maxBlanks can clamp it)
+  const sliderParam=params.get('blanks');
+
+  if(params.has('code')){
+    // Paste mode
+    setMode('paste');
+    document.getElementById('paste-input').value=params.get('code');
+    const lang=params.get('lang')||'python';
+    document.getElementById('lang-sel-paste').value=lang;
+    updatePasteBtn();
+  } else {
+    // URL mode
+    document.getElementById('url-input').value=params.get('url');
+    updateBadge();
+    if(params.has('lang')&&!detLang){
+      document.getElementById('lang-sel').value=params.get('lang');
+    }
+    // Line range
+    if(params.has('start')||params.has('end')){
+      document.getElementById('use-whole-file').checked=false;
+      onWholeFile();
+      if(params.has('start')) document.getElementById('start-line').value=params.get('start');
+      if(params.has('end'))   document.getElementById('end-line').value=params.get('end');
+    }
+  }
+
+  // Load the source — this sets S.maxBlanks
+  await loadAndAnalyze();
+
+  // Now set slider value (after maxBlanks is known)
+  if(sliderParam){
+    const slider=document.getElementById('diff-slider');
+    const v=Math.min(Math.max(2,parseInt(sliderParam)),S.maxBlanks);
+    slider.value=v;
+    document.getElementById('slider-val').textContent=v;
+  }
+
+  // Launch puzzle directly, with shared seed if provided
+  const seed=params.has('seed')?parseInt(params.get('seed')):Math.floor(Date.now()/1000)%60;
+  const enabled=getEnabled();
+  const count=blankCount();
+  const{parsed,blanks}=buildPuzzle(S.lines,S.lang,enabled,count);
+  if(!blanks.length) return;
+  S.parsed=parsed;S.blanks=blanks;S.answers={};S.pieces=[];
+  document.getElementById('res-msg').classList.remove('vis');
+  document.getElementById('score-n').textContent='0';
+  document.getElementById('score-t').textContent='/ '+blanks.length;
+  const rand=makePRNG(seed);
+  const pieces=blanks.map(b=>({text:b.text,type:b.type,id:b.id}));
+  for(let i=pieces.length-1;i>0;i--){const j=Math.floor(rand()*(i+1));[pieces[i],pieces[j]]=[pieces[j],pieces[i]]}
+  S.pieces=pieces;
+  renderPuzzle();
+  showTab('puzzle');
+  document.getElementById('tab-puzzle').disabled=false;
+}
+
+initFromParams();
 </script>
 </body>
 </html>
