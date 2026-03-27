@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code//Switch</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wordmark">Code<span>//</span>Switch</div>
+  <div class="hdr-r">
+    <button id="lang-btn">EN</button>
+  </div>
+</header>
+
+<div id="page-home">
+  <section class="home-hero">
+    <h1 id="hero-title">De C# Unity<br>vers <em>C++ Unreal</em></h1>
+    <p id="hero-sub"></p>
+    <div class="xp-row">
+      <div>
+        <div class="xp-num" id="xp-num">0 XP</div>
+        <div class="xp-lbl" id="xp-lbl"></div>
+      </div>
+      <div class="overall-wrap">
+        <div class="overall-bar"><div class="overall-fill" id="overall-fill" style="width:0%"></div></div>
+        <div class="overall-lbl" id="overall-lbl"></div>
+      </div>
+    </div>
+  </section>
+  <div id="blocs"></div>
+</div>
+
+<div id="toast"></div>
+
+<script src="engine.js"></script>
+<script>
+'use strict';
+
+const BLOCS = [
+  { id:'b1', fr:'Fondations',             en:'Foundations',         sessions:['s01','s02','s03'],          color:'#685ef7' },
+  { id:'b2', fr:'Ce qui change vraiment', en:'What Really Changes', sessions:['s04','s05','s06'],          color:'#f2f537' },
+  { id:'b3', fr:'Unreal Engine C++',      en:'Unreal Engine C++',   sessions:['s07','s08','s09','s10'],    color:'#00587c' },
+  { id:'b4', fr:'Patterns de jeu',        en:'Game Patterns',       sessions:['s11','s12','s13'],          color:'#fe6c06' },
+  { id:'b5', fr:'Consolidation',          en:'Consolidation',       sessions:['s14','s15'],                color:'#9cf6d4' },
+];
+
+// Session manifest — title, subtitle, activity count, XP per session
+// The actual content lives in sessions/sNN.js
+const MANIFEST = {
+  s01:{ num:1,  fr:'Types & Variables',              en:'Types & Variables',              sub:{fr:'Ce que tu connais déjà — en C++',en:'What you already know — in C++'},              acts:5, xp:80  },
+  s02:{ num:2,  fr:'Fonctions & Méthodes',           en:'Functions & Methods',            sub:{fr:'Même logique, syntaxe différente',en:'Same logic, different syntax'},               acts:5, xp:90  },
+  s03:{ num:3,  fr:'Conditions & Boucles',           en:'Conditionals & Loops',           sub:{fr:'if, for, while — presque identiques',en:'if, for, while — almost identical'},       acts:5, xp:90  },
+  s04:{ num:4,  fr:'Pointeurs & Références',         en:'Pointers & References',          sub:{fr:'Le concept qui fait peur — démystifié',en:'The scary concept — demystified'},        acts:5, xp:110 },
+  s05:{ num:5,  fr:'Headers .h / .cpp',              en:'Headers .h / .cpp',              sub:{fr:'Déclaration vs implémentation',en:'Declaration vs implementation'},                  acts:5, xp:100 },
+  s06:{ num:6,  fr:'Mémoire & Ownership',            en:'Memory & Ownership',             sub:{fr:'Stack, heap, et le GC Unreal',en:'Stack, heap, and Unreal GC'},                     acts:5, xp:110 },
+  s07:{ num:7,  fr:'AActor & UObject',               en:'AActor & UObject',               sub:{fr:"L'équivalent de MonoBehaviour",en:'The MonoBehaviour equivalent'},                  acts:5, xp:120 },
+  s08:{ num:8,  fr:'UPROPERTY & UFUNCTION',          en:'UPROPERTY & UFUNCTION',          sub:{fr:'[SerializeField] version Unreal',en:'[SerializeField] Unreal edition'},             acts:5, xp:120 },
+  s09:{ num:9,  fr:'BeginPlay & Tick',               en:'BeginPlay & Tick',               sub:{fr:'Start() et Update() — version Unreal',en:'Start() and Update() — Unreal edition'},  acts:5, xp:110 },
+  s10:{ num:10, fr:'Composants & Héritage',          en:'Components & Inheritance',       sub:{fr:'GetComponent vs FindComponentByClass',en:'GetComponent vs FindComponentByClass'},   acts:5, xp:120 },
+  s11:{ num:11, fr:'Input & Mouvement',              en:'Input & Movement',               sub:{fr:'Enhanced Input System',en:'Enhanced Input System'},                                 acts:4, xp:130 },
+  s12:{ num:12, fr:'Collision & Overlap',            en:'Collision & Overlap',            sub:{fr:'OnTriggerEnter → NotifyActorBeginOverlap',en:'OnTriggerEnter → NotifyActorBeginOverlap'}, acts:5, xp:130 },
+  s13:{ num:13, fr:'Blueprint ↔ C++',               en:'Blueprint ↔ C++',               sub:{fr:'Quand utiliser quoi',en:'When to use which'},                                        acts:4, xp:130 },
+  s14:{ num:14, fr:'Débogage & Erreurs',             en:'Debugging & Errors',             sub:{fr:'Lire les logs Unreal, survivre aux crashes',en:'Reading Unreal logs, surviving crashes'}, acts:5, xp:140 },
+  s15:{ num:15, fr:'Mini-Projet',                    en:'Mini-Project',                   sub:{fr:'Un collectible C++ complet',en:'A complete C++ collectible'},                        acts:3, xp:200 },
+};
+
+function initHome(){
+  // Apply lang strings
+  document.documentElement.lang=L;
+  document.getElementById('hero-title').innerHTML=t('heroTitle');
+  document.getElementById('hero-sub').textContent=t('heroSub');
+  document.getElementById('xp-lbl').textContent=t('xpLabel');
+  renderHome();
+}
+
+function renderHome(){
+  // XP & overall progress
+  const totalSess=Object.keys(MANIFEST).length;
+  const doneSess=Object.keys(MANIFEST).filter(id=>isSessComplete(id)).length;
+  const pct=Math.round(doneSess/totalSess*100);
+  document.getElementById('overall-fill').style.width=pct+'%';
+  document.getElementById('overall-lbl').textContent=t('sessionsOf',doneSess,totalSess);
+  // XP: proportional by activities done per session
+  let xp=0;
+  Object.entries(MANIFEST).forEach(([id,m])=>{
+    const p=getP()[id];
+    const done=p?.acts?Object.values(p.acts).filter(Boolean).length:0;
+    const ratio=done/Math.max(m.acts,1);
+    xp+=Math.floor(m.xp*ratio*(isSessComplete(id)?1:.8));
+  });
+  document.getElementById('xp-num').textContent=xp+' XP';
+
+  // Render blocs
+  const container=document.getElementById('blocs');
+  container.innerHTML='';
+  BLOCS.forEach(bloc=>{
+    const bSessions=bloc.sessions;
+    const bDone=bSessions.filter(id=>isSessComplete(id)).length;
+    const bPct=Math.round(bDone/bSessions.length*100);
+
+    const sec=document.createElement('div');
+    sec.className='bloc-section';
+    sec.innerHTML=`<div class="bloc-hdr">
+        <span class="bloc-pip" style="background:${bloc.color}"></span>
+        <span class="bloc-title">${bloc[L]}</span>
+        <span class="bloc-prog">${t('of',bDone,bSessions.length)}</span>
+        <div class="bloc-bar"><div class="bloc-bar-fill" style="background:${bloc.color};width:${bPct}%"></div></div>
+      </div>
+      <div class="session-grid" id="grid-${bloc.id}"></div>`;
+    container.appendChild(sec);
+
+    const grid=document.getElementById('grid-'+bloc.id);
+    bSessions.forEach((id,idx)=>{
+      const m=MANIFEST[id];
+      if(!m) return;
+      const complete=isSessComplete(id);
+      const p=getP()[id];
+      const doneActs=p?.acts?Object.values(p.acts).filter(Boolean).length:0;
+      const partial=doneActs>0&&!complete;
+      // Unlock: first session of bloc always open; others unlock after previous
+      const prevId=idx>0?bSessions[idx-1]:null;
+      const unlocked=!prevId||isSessComplete(prevId)||doneActs>0;
+
+      const statusKey=!unlocked?'sessLocked':complete?'sessDone':partial?'sessPartial':'sessAvail';
+      const statusClass=!unlocked?'locked':complete?'done':partial?'partial':'available';
+
+      const dots=Array.from({length:m.acts},(_,i)=>{
+        const d=p?.acts?.[`a${m.num}_${i+1}`];
+        return `<span class="adot${d?(complete?' doneb':' done'):''}"></span>`;
+      }).join('');
+
+      const card=document.createElement('div');
+      card.className='scard'+(complete?' done':'')+((!unlocked)?' locked':'');
+      card.style.setProperty('--accent',bloc.color);
+      if(unlocked) card.onclick=()=>{ location.href=`sessions/${id}.html`; };
+
+      card.innerHTML=`<div class="snum">S${m.num} — ${bloc[L]}</div>
+        <h3>${m[L]}</h3>
+        <p>${m.sub[L]}</p>
+        <div class="scard-meta">
+          <span class="sstatus ${statusClass}">${t(statusKey)}</span>
+          <div class="adots">${dots}</div>
+        </div>`;
+      grid.appendChild(card);
+    });
+  });
+}
+</script>
+</body>
+</html>
