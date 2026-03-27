@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Code//Switch — S01 : Types &amp; Variables</title>
+<title>Code//Switch — S01</title>
 <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -24,19 +24,24 @@
     <div class="sess-bloc-lbl" id="sess-bloc-lbl"></div>
     <h2 id="sess-title"></h2>
     <p id="sess-sub"></p>
-    <div class="mode-tabs">
-      <button class="mtab" id="tab-tutor"></button>
-      <button class="mtab" id="tab-student"></button>
-    </div>
   </div>
-  <div id="panel-tutor" style="display:none"></div>
-  <div id="panel-student" style="display:none"></div>
+
+  <!-- Shared concept block — rendered above path tabs -->
+  <div id="sess-concept"></div>
+
+  <!-- Path tabs -->
+  <div class="path-tabs">
+    <button class="path-tab" id="tab-ide"></button>
+    <button class="path-tab" id="tab-engine"></button>
+  </div>
+
+  <!-- Path panels -->
+  <div id="panel-ide"    style="display:none"></div>
+  <div id="panel-engine" style="display:none"></div>
+
   <div class="sess-nav">
-    <button class="btn sec hidden" id="prev-sess-btn">← Précédent</button>
-    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
-      <button class="btn orange comp-btn" id="comp-sess-btn"></button>
-      <button class="btn" id="next-sess-btn"></button>
-    </div>
+    <button class="btn sec" id="prev-sess-btn">← Précédent</button>
+    <button class="btn"     id="next-sess-btn"></button>
   </div>
 </div>
 
