@@ -186,9 +186,11 @@ pre { overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
 .sstatus.locked    { color: var(--ch4); }
 .sstatus.partial   { color: var(--orange); }
 .adots { display: flex; gap: 4px; }
-.adot  { width: 6px; height: 6px; border-radius: 50%; background: var(--ch5); }
-.adot.done  { background: var(--canary); }
-.adot.doneb { background: var(--blue); }
+.adot          { width: 6px; height: 6px; border-radius: 50%; background: var(--ch5); }
+.adot.done     { background: var(--canary); }
+.adot.doneb    { background: var(--blue); }
+.adot.done-ide { background: var(--cobalt); }
+.adot.done-eng { background: var(--aqua); }
 
 /* ── Session page ── */
 #page-session { max-width: 860px; margin: 0 auto; padding: 3.2rem 2.4rem 8rem; }
@@ -360,3 +362,94 @@ pre { overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
   .session-grid { grid-template-columns: 1fr; }
   .wordmark { font-size: 1.8rem; }
 }
+
+/* ================================================================
+   TWO-PATH MODEL — v3 additions
+   ================================================================ */
+
+/* Path tabs (top-level: IDE | Engine) */
+.path-tabs { display:flex; gap:.8rem; margin:2rem 0; flex-wrap:wrap; }
+.path-tab {
+  padding:.9rem 2.4rem; border-radius:var(--r);
+  font-family:var(--f); font-size:1.5rem; font-weight:500; letter-spacing:.04em;
+  border: 2px solid var(--ch6); color:var(--ch3); background:var(--ch7);
+  cursor:pointer; transition:all .2s var(--ease);
+}
+.path-tab:hover { color:var(--white); border-color:var(--ch4); }
+.path-tab.active-ide {
+  background:rgba(104,94,247,.15); border-color:var(--cobalt); color:var(--cobalt);
+}
+.path-tab.active-eng {
+  background:rgba(156,246,212,.12); border-color:var(--aqua); color:var(--aqua);
+}
+
+/* Mode pill — two-path version */
+.mode-pill.ide-pill { border-color:var(--cobalt); color:var(--cobalt); }
+.mode-pill.eng-pill { border-color:var(--aqua);   color:var(--aqua); }
+
+/* Tutor collapsible */
+.path-tutor-wrap { margin-bottom:2.4rem; }
+.tutor-toggle {
+  display:flex; align-items:center; gap:1rem; width:100%;
+  background:var(--ch7); border:1.5px solid var(--ch6);
+  border-radius:var(--r); padding:1.4rem 1.8rem;
+  font-family:var(--f); font-size:1.5rem; color:var(--ch2);
+  cursor:pointer; text-align:left; transition:all .2s var(--ease);
+}
+.tutor-toggle:hover { border-color:var(--ch4); color:var(--white); }
+.tutor-toggle-icon { font-size:1.2rem; color:var(--ch4); flex-shrink:0; }
+.tutor-toggle-badge {
+  margin-left:auto; font-size:1.1rem; letter-spacing:.07em;
+  text-transform:uppercase; color:var(--ch4); white-space:nowrap;
+}
+.tutor-body {
+  background:rgba(254,108,6,.05); border:1.5px solid rgba(254,108,6,.2);
+  border-top:none; border-radius:0 0 var(--r) var(--r);
+  padding:2.4rem;
+}
+.tutor-sub {
+  font-size:1.3rem; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--ch4); margin:1.6rem 0 .8rem;
+}
+.tutor-concept { font-size:1.6rem; color:var(--ch2); line-height:1.6; margin-bottom:1.2rem; }
+
+/* IDE compare panel header (standard C++ — different colour from Unity/Unreal) */
+.cpanel-hdr.cpp-std { background:#002a1a; color:#6dd9a0; border-bottom:1px solid #004030; }
+
+/* Path progress */
+.path-progress-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:.8rem; }
+.path-prog-label   { font-size:1.2rem; color:var(--ch4); }
+.path-progress-bar { background:var(--ch7); border-radius:2px; height:4px; margin-bottom:1.8rem; }
+.path-progress-fill{ height:100%; border-radius:2px; transition:width .5s var(--ease); }
+
+/* Path complete button */
+.path-comp-row { display:flex; justify-content:flex-end; margin-top:2.4rem; padding-top:1.6rem; border-top:1px solid var(--ch7); }
+.comp-path-btn { display:none; }
+.comp-path-btn.show { display:inline-flex; }
+
+/* New badge types */
+.bcpp     { background:rgba(104,94,247,.18); color:#b086e8; }
+.bpredict { background:rgba(156,246,212,.12); color:#7ec8e3; }
+
+/* Path coming-soon */
+.path-coming-soon { padding:3.2rem 0; color:var(--ch3); font-size:1.6rem; }
+
+/* ── Shared concept (above path tabs) ── */
+.shared-concept {
+  background: var(--ch7); border: 1.5px solid var(--ch6);
+  border-radius: var(--rl); padding: 2rem 2.4rem;
+  margin-bottom: 1.6rem;
+}
+.concept-text { font-size:1.6rem; color:var(--ch2); line-height:1.6; }
+
+/* ── Path demo section ── */
+.path-demo-wrap { margin-bottom:2.4rem; }
+.path-demo-badge {
+  display:inline-block; font-size:1.1rem; letter-spacing:.08em; text-transform:uppercase;
+  padding:.3rem 1rem; border-radius:12px; border:1.5px solid; margin-bottom:1.2rem;
+}
+.path-demo-title { font-size:1.8rem; margin-bottom:1.4rem; }
+.path-panel-inner { padding-top:.8rem; }
+
+/* ── Combined dot (done in both paths) ── */
+.adot.done-both { background: var(--canary); }

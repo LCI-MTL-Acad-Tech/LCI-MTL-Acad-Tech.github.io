@@ -1,11 +1,15 @@
 'use strict';
 // ================================================================
-// CODE//SWITCH — Shared Engine
-// Loaded by every page (index + all session pages)
-// Depends on: SESSION global (set by each sNN.js)
+// CODE//SWITCH — Shared Engine v3.1
+// Two-path model: IDE | Engine
+// SESSION structure:
+//   SESSION.tutor          — shared concept + deep dive (shown above tabs)
+//   SESSION.ide            — { demoSteps, discussion, compare:{std,unreal}, activities }
+//   SESSION.engine         — { demoSteps, discussion, compare:{cs,cpp}, activities }
+// Progress: tracked per path (ide/eng), EITHER path ≥60% = session done
+// Home screen: single progress indicator per card
 // ================================================================
 
-// ── Language ──────────────────────────────────────────────────
 let L = getCookie('cs_lang') || 'fr';
 
 const TXT = {
@@ -15,22 +19,31 @@ const TXT = {
     heroSub:"Renforce tes bases de programmation et réduis la charge cognitive du passage d'un moteur à l'autre — une session à la fois.",
     xpLabel:'points accumulés',
     sessAvail:'Disponible', sessDone:'Terminée', sessLocked:'Verrouillée', sessPartial:'En cours',
-    tutorTab:'Intro tuteur·rice', studentTab:'Activités autonomes',
-    tutorBadge:'MODE TUTEUR·RICE — Session interactive (~45 min)',
-    demoTitle:'Démonstration en direct',
+    ideTab:'Parcours IDE',
+    engineTab:'Parcours moteur',
+    concept:'Concept',
+    demoTitle:'Démonstration',
     discTitle:'Questions de discussion',
     deepToggle:'Approfondir — <span>contenu avancé (optionnel)</span>',
-    actLabel:'Activités autonomes',
-    checkBtn:'Vérifier', nextBtn:'Suivant →', retryBtn:'Réessayer', revealBtn:'Voir la solution',
+    ideLbl:'Exercices IDE — C++ sans moteur',
+    engineLbl:'Exercices dans le moteur',
+    checkBtn:'Vérifier', retryBtn:'Réessayer', revealBtn:'Voir la solution',
     homeBtn:'Accueil', nextSessBtn:'Session suivante →',
     markDone:'Marquer terminé',
     hint:'Indice',
     quizLabel:'Quiz', fillLabel:'Complète le code', bugLabel:'Trouve le bug',
+    cppLabel:'C++ pur', predictLabel:'Prédis la sortie',
     engineLabel:'Dans le moteur', reflectLabel:'Réflexion',
+    predictQ:'Quelle est la sortie de ce programme ?',
+    showOutput:'Voir la sortie',
     of:(a,b)=>`${a} / ${b}`,
     sessionsOf:(a,b)=>`${a} session${a!==1?'s':''} terminée${a!==1?'s':''} sur ${b}`,
     xpGain:n=>`+${n} XP`,
     unlockMsg:s=>`🔓 Déverrouillée : ${s}`,
+    idePathLabel:'IDE C++',
+    enginePathLabel:'Moteur',
+    ideBadge:'IDE — C++ sans moteur',
+    engineBadge:'Moteur — session interactive',
   },
   en: {
     back:'Home', langBtn:'FR',
@@ -38,28 +51,37 @@ const TXT = {
     heroSub:'Strengthen your programming fundamentals and reduce the cognitive load of switching engines — one session at a time.',
     xpLabel:'points earned',
     sessAvail:'Available', sessDone:'Completed', sessLocked:'Locked', sessPartial:'In Progress',
-    tutorTab:'Tutor Intro', studentTab:'Independent Activities',
-    tutorBadge:'TUTOR MODE — Live interactive session (~45 min)',
-    demoTitle:'Live Demonstration',
+    ideTab:'IDE Path',
+    engineTab:'Engine Path',
+    concept:'Concept',
+    demoTitle:'Demonstration',
     discTitle:'Discussion Prompts',
     deepToggle:'Go Deeper — <span>advanced content (optional)</span>',
-    actLabel:'Independent Activities',
-    checkBtn:'Check', nextBtn:'Next →', retryBtn:'Try Again', revealBtn:'Show Solution',
+    ideLbl:'IDE Exercises — Pure C++, no engine',
+    engineLbl:'In-engine exercises',
+    checkBtn:'Check', retryBtn:'Try Again', revealBtn:'Show Solution',
     homeBtn:'Home', nextSessBtn:'Next Session →',
     markDone:'Mark Complete',
     hint:'Hint',
     quizLabel:'Quiz', fillLabel:'Complete the Code', bugLabel:'Find the Bug',
+    cppLabel:'Pure C++', predictLabel:'Predict the Output',
     engineLabel:'In the Engine', reflectLabel:'Reflection',
+    predictQ:'What is the output of this program?',
+    showOutput:'Show Output',
     of:(a,b)=>`${a} / ${b}`,
     sessionsOf:(a,b)=>`${a} of ${b} session${b!==1?'s':''} completed`,
     xpGain:n=>`+${n} XP`,
     unlockMsg:s=>`🔓 Unlocked: ${s}`,
+    idePathLabel:'IDE C++',
+    enginePathLabel:'Engine',
+    ideBadge:'IDE — Pure C++, no engine',
+    engineBadge:'Engine — live interactive session',
   }
 };
 function t(k,...a){ const v=TXT[L][k]; return typeof v==='function'?v(...a):v||k; }
 
 function toggleLang(){
-  L = L==='fr'?'en':'fr';
+  L=L==='fr'?'en':'fr';
   setCookie('cs_lang',L,365);
   location.reload();
 }
@@ -70,18 +92,32 @@ function getCookie(n){ const m=document.cookie.match(new RegExp('(^| )'+n+'=([^;
 function getP(){ try{ return JSON.parse(getCookie('cs_p')||'{}'); }catch{ return {}; } }
 function saveP(p){ setCookie('cs_p',JSON.stringify(p),365); }
 
-// ── Progress helpers ──────────────────────────────────────────
-function actDone(sessId,actId){ return !!getP()[sessId]?.acts?.[actId]; }
-function markAct(sessId,actId){
+// ── Progress ── ns: 'ide' | 'eng' ────────────────────────────
+function actDone(sessId,actId,ns){
+  return !!(getP()[sessId]?.[ns]?.[actId]);
+}
+function markActNs(sessId,actId,ns){
   const p=getP();
-  if(!p[sessId]) p[sessId]={acts:{},complete:false};
-  if(!p[sessId].acts) p[sessId].acts={};
-  p[sessId].acts[actId]=true;
+  if(!p[sessId]) p[sessId]={};
+  if(!p[sessId][ns]) p[sessId][ns]={};
+  p[sessId][ns][actId]=true;
   saveP(p);
 }
-function sessDoneCount(id,acts){ return acts.filter(a=>actDone(id,a.id)).length; }
-function isSessComplete(id){ return !!getP()[id]?.complete; }
-function markSessComplete(id){ const p=getP(); if(!p[id]) p[id]={acts:{},complete:false}; p[id].complete=true; saveP(p); }
+function pathDone(sessId,acts,ns){
+  return acts.filter(a=>actDone(sessId,a.id,ns)).length;
+}
+// Session counts as done if EITHER path ≥60%
+function isSessDone(sessId){
+  const rec=getP()[sessId]||{};
+  return !!(rec.complete_ide||rec.complete_eng);
+}
+function markPathComplete(sessId,ns){
+  const p=getP();
+  if(!p[sessId]) p[sessId]={};
+  p[sessId]['complete_'+ns]=true;
+  saveP(p);
+}
+function isPathComplete(sessId,ns){ return !!(getP()[sessId]?.['complete_'+ns]); }
 
 // ── Toast ─────────────────────────────────────────────────────
 let _tt=null;
@@ -93,7 +129,7 @@ function showToast(msg){
   _tt=setTimeout(()=>el.classList.remove('show'),3200);
 }
 
-// ── Header init (both pages) ──────────────────────────────────
+// ── Header ────────────────────────────────────────────────────
 function initHeader(){
   document.documentElement.lang=L;
   const lb=document.getElementById('lang-btn');
@@ -103,168 +139,216 @@ function initHeader(){
 }
 
 // ================================================================
-// SESSION PAGE ENGINE
-// Runs when a session page loads and window.SESSION is defined
+// SESSION PAGE
 // ================================================================
 function initSessionPage(){
   if(typeof SESSION==='undefined') return;
   const S=SESSION;
   const sessId=S.id;
 
-  // Apply lang to static elements
   document.title=`Code//Switch — S${S.num}: ${S.title[L]}`;
-  document.getElementById('sess-bloc-lbl').textContent=S.blocName[L];
-  document.getElementById('sess-bloc-lbl').style.color=S.blocColor;
-  document.getElementById('sess-title').textContent=S.title[L];
-  document.getElementById('sess-sub').textContent=S.sub[L];
+  const blbl=document.getElementById('sess-bloc-lbl');
+  if(blbl){ blbl.textContent=S.blocName[L]; blbl.style.color=S.blocColor; }
+  const stitle=document.getElementById('sess-title');
+  if(stitle) stitle.textContent=S.title[L];
+  const ssub=document.getElementById('sess-sub');
+  if(ssub) ssub.textContent=S.sub[L];
 
-  // Mode pill
-  updateModePill();
+  // Shared concept block (above tabs)
+  const conceptEl=document.getElementById('sess-concept');
+  if(conceptEl&&S.tutor) conceptEl.innerHTML=renderSharedConcept(S);
 
-  // Mode tabs
-  document.getElementById('tab-tutor').textContent=t('tutorTab');
-  document.getElementById('tab-student').textContent=t('studentTab');
-  document.getElementById('tab-tutor').onclick=()=>switchMode('tutor');
-  document.getElementById('tab-student').onclick=()=>switchMode('student');
+  // Tab labels + handlers
+  const tabIde=document.getElementById('tab-ide');
+  const tabEng=document.getElementById('tab-engine');
+  if(tabIde){ tabIde.textContent=t('ideTab'); tabIde.onclick=()=>switchPath('ide'); }
+  if(tabEng){ tabEng.textContent=t('engineTab'); tabEng.onclick=()=>switchPath('engine'); }
 
-  // Render initial panel based on saved mode
-  const p=getP();
-  const savedMode=(p[sessId]?.mode)||'student';
-  switchMode(savedMode);
+  // Render both path panels
+  const pIde=document.getElementById('panel-ide');
+  const pEng=document.getElementById('panel-engine');
+  if(pIde) pIde.innerHTML=S.ide ? renderPathPanel(S,'ide') : renderComingSoon();
+  if(pEng) pEng.innerHTML=S.engine ? renderPathPanel(S,'engine') : renderComingSoon();
 
-  // Session nav buttons
+  // Restore saved path
+  const saved=(getP()[sessId]?.lastPath)||'ide';
+  switchPath(saved);
+
+  // Nav
   const prevBtn=document.getElementById('prev-sess-btn');
   const nextBtn=document.getElementById('next-sess-btn');
-  const compBtn=document.getElementById('comp-sess-btn');
-  if(prevBtn && S.prev){ prevBtn.onclick=()=>{ location.href=`s${String(S.prev).padStart(2,'0')}.html`; }; }
+  if(prevBtn&&S.prev){ prevBtn.onclick=()=>{ location.href=`s${String(S.prev).padStart(2,'0')}.html`; }; }
   else if(prevBtn) prevBtn.classList.add('hidden');
-  if(nextBtn && S.next){ nextBtn.textContent=t('nextSessBtn'); nextBtn.onclick=()=>{ location.href=`s${String(S.next).padStart(2,'0')}.html`; }; }
+  if(nextBtn&&S.next){ nextBtn.textContent=t('nextSessBtn'); nextBtn.onclick=()=>{ location.href=`s${String(S.next).padStart(2,'0')}.html`; }; }
   else if(nextBtn) nextBtn.classList.add('hidden');
-  if(compBtn){
-    compBtn.textContent=t('markDone');
-    compBtn.onclick=()=>{
-      markSessComplete(sessId);
-      compBtn.classList.remove('show');
-      showToast(t('xpGain',S.xp||100));
-      updateCompBtn();
-    };
-    updateCompBtn();
-  }
 }
 
-function updateModePill(){
+function switchPath(path){
   if(typeof SESSION==='undefined') return;
+  const sessId=SESSION.id;
   const p=getP();
-  const mode=(p[SESSION.id]?.mode)||'student';
-  const pill=document.getElementById('mode-pill');
-  if(!pill) return;
-  pill.className='mode-pill '+(mode==='tutor'?'tutor':'student');
-  pill.textContent=mode==='tutor'?(L==='fr'?'TUTEUR·RICE':'TUTOR'):(L==='fr'?'ÉTUDIANT·E':'STUDENT');
-}
-
-function switchMode(mode){
-  if(typeof SESSION==='undefined') return;
-  const p=getP();
-  if(!p[SESSION.id]) p[SESSION.id]={acts:{},complete:false};
-  p[SESSION.id].mode=mode;
+  if(!p[sessId]) p[sessId]={};
+  p[sessId].lastPath=path;
   saveP(p);
 
-  const tp=document.getElementById('panel-tutor');
-  const sp=document.getElementById('panel-student');
-  const tt=document.getElementById('tab-tutor');
-  const st=document.getElementById('tab-student');
-  if(tp) tp.style.display=mode==='tutor'?'block':'none';
-  if(sp) sp.style.display=mode==='student'?'block':'none';
-  if(tt){ tt.className='mtab'+(mode==='tutor'?' at':''); }
-  if(st){ st.className='mtab'+(mode==='student'?' as':''); }
-  updateModePill();
-}
-
-function updateCompBtn(){
-  if(typeof SESSION==='undefined') return;
-  const S=SESSION;
-  const btn=document.getElementById('comp-sess-btn');
-  if(!btn) return;
-  const done=sessDoneCount(S.id,S.activities);
-  const total=S.activities.length;
-  const complete=isSessComplete(S.id);
-  if(!complete && done>=Math.ceil(total*.6)) btn.classList.add('show');
-  else btn.classList.remove('show');
-}
-
-// ── Render tutor panel ────────────────────────────────────────
-function renderTutorPanel(S){
-  const t_=t;
-  let h=`<div class="tutor-panel">
-    <div class="tutor-badge">${t_('tutorBadge')}</div>
-    <h3>${t_('demoTitle')}</h3>
-    <p>${S.tutor.concept[L]}</p>
-    <div class="demo-steps">`;
-  S.tutor.demoSteps.forEach((step,i)=>{
-    h+=`<div class="dstep">
-      <div class="dstep-num">${i+1}</div>
-      <div class="dstep-body">
-        <strong>${step.label[L]}</strong>
-        <p>${step[L]}</p>
-      </div>
-    </div>`;
+  ['ide','engine'].forEach(pt=>{
+    const panel=document.getElementById('panel-'+pt);
+    const tab=document.getElementById('tab-'+(pt));
+    if(panel) panel.style.display=(pt===path?'block':'none');
+    if(tab) tab.className='path-tab'+(pt===path?' active-'+(pt==='ide'?'ide':'eng'):'');
   });
-  h+=`</div>`;
-  if(S.tutor.discussion?.length){
-    h+=`<div class="disc-section"><h4>${t_('discTitle')}</h4>`;
-    S.tutor.discussion.forEach(q=>{ h+=`<div class="disc-q">${q[L]}</div>`; });
-    h+=`</div>`;
+  // update mode pill
+  const pill=document.getElementById('mode-pill');
+  if(pill){
+    if(path==='ide'){
+      pill.className='mode-pill ide-pill';
+      pill.textContent=t('idePathLabel');
+    } else {
+      pill.className='mode-pill eng-pill';
+      pill.textContent=t('enginePathLabel');
+    }
   }
-  h+=`</div>`;
-  // Code compare
-  if(S.compare){
-    h+=`<div class="compare">
-      <div class="cpanel"><div class="cpanel-hdr cs">C# — Unity</div><pre>${S.compare.cs}</pre></div>
-      <div class="cpanel"><div class="cpanel-hdr cpp">C++ — Unreal</div><pre>${S.compare.cpp}</pre></div>
-    </div>`;
-  }
-  // Deep dive
+}
+
+// ── Shared concept block (above path tabs) ────────────────────
+function renderSharedConcept(S){
+  let h=`<div class="shared-concept">
+    <p class="concept-text">${S.tutor.concept[L]}</p>`;
   if(S.tutor.deep){
     const did='dd-'+S.id;
     h+=`<div class="deep-toggle" onclick="toggleDeep('${did}')">
       <input type="checkbox" id="${did}-cb" onclick="event.stopPropagation()">
-      <label for="${did}-cb">${t_('deepToggle')}</label>
+      <label for="${did}-cb">${t('deepToggle')}</label>
     </div>
     <div class="deep-body" id="${did}">${S.tutor.deep[L]}</div>`;
   }
-  return h;
-}
-
-// ── Render student panel ──────────────────────────────────────
-function renderStudentPanel(S){
-  const sessId=S.id;
-  let h=`<div class="acts-section"><div class="acts-lbl">${t('actLabel')}</div>`;
-  S.activities.forEach(act=>{
-    const done=actDone(sessId,act.id);
-    const badgeClass={quiz:'bq',fill:'bf',bug:'bb',engine:'be',reflect:'br'}[act.type]||'bq';
-    const badgeLabel={quiz:t('quizLabel'),fill:t('fillLabel'),bug:t('bugLabel'),engine:t('engineLabel'),reflect:t('reflectLabel')}[act.type]||act.type;
-    h+=`<div class="activity${done?' completed':''}" id="wrap-${act.id}">
-      <div class="act-top">
-        <span class="abadge ${badgeClass}">${badgeLabel} · ${act.xp||10} XP</span>
-        <button class="acheck${done?' done':''}" onclick="toggleActCheck('${sessId}','${act.id}')">${done?'✓':''}</button>
-      </div>`;
-    if(act.type==='quiz')    h+=renderQuiz(act,sessId);
-    if(act.type==='fill')    h+=renderFill(act,sessId);
-    if(act.type==='bug')     h+=renderBug(act,sessId);
-    if(act.type==='engine')  h+=renderEngine(act);
-    if(act.type==='reflect') h+=renderReflect(act);
-    h+=`</div>`;
-  });
   h+=`</div>`;
   return h;
 }
 
-function renderQuiz(act,sessId){
-  const done=actDone(sessId,act.id);
+// ── Path panel (demo steps + compare + activities) ────────────
+function renderPathPanel(S, path){
+  const ns   = path==='ide'?'ide':'eng';
+  const data = path==='ide'?S.ide:S.engine;
+  const acts = data.activities||[];
+  const done = pathDone(S.id,acts,ns);
+  const pct  = acts.length ? Math.round(done/acts.length*100) : 0;
+  const pathColor = path==='ide' ? 'var(--cobalt)' : 'var(--aqua)';
+  const badge = path==='ide' ? t('ideBadge') : t('engineBadge');
+  const isComplete = isPathComplete(S.id,ns);
+
+  let h=`<div class="path-panel-inner">`;
+
+  // Demo steps section
+  if(data.demoSteps?.length){
+    h+=`<div class="path-demo-wrap">
+      <div class="path-demo-badge" style="border-color:${pathColor};color:${pathColor}">${badge}</div>
+      <h3 class="path-demo-title">${t('demoTitle')}</h3>
+      <div class="demo-steps">`;
+    data.demoSteps.forEach((step,i)=>{
+      h+=`<div class="dstep">
+        <div class="dstep-num" style="color:${pathColor}">${i+1}</div>
+        <div class="dstep-body">
+          <strong>${step.label[L]}</strong>
+          <p>${step[L]}</p>
+        </div>
+      </div>`;
+    });
+    h+=`</div>`;
+    if(data.discussion?.length){
+      h+=`<div class="disc-section"><h4>${t('discTitle')}</h4>`;
+      data.discussion.forEach(q=>{ h+=`<div class="disc-q">${q[L]}</div>`; });
+      h+=`</div>`;
+    }
+    h+=`</div>`;
+  }
+
+  // Code compare
+  if(data.compare){
+    if(path==='ide'){
+      h+=`<div class="compare">
+        <div class="cpanel"><div class="cpanel-hdr cpp-std">C++ standard</div><pre>${data.compare.std}</pre></div>
+        <div class="cpanel"><div class="cpanel-hdr cpp">C++ — Unreal</div><pre>${data.compare.unreal}</pre></div>
+      </div>`;
+    } else {
+      h+=`<div class="compare">
+        <div class="cpanel"><div class="cpanel-hdr cs">C# — Unity</div><pre>${data.compare.cs}</pre></div>
+        <div class="cpanel"><div class="cpanel-hdr cpp">C++ — Unreal</div><pre>${data.compare.cpp}</pre></div>
+      </div>`;
+    }
+  }
+
+  // Activities
+  h+=`<div class="acts-section">
+    <div class="path-progress-row">
+      <span class="acts-lbl">${path==='ide'?t('ideLbl'):t('engineLbl')}</span>
+      <span class="path-prog-label">${done}/${acts.length}</span>
+    </div>
+    <div class="path-progress-bar">
+      <div class="path-progress-fill" style="width:${pct}%;background:${pathColor}"></div>
+    </div>`;
+
+  acts.forEach(act=>{ h+=renderAct(act,S.id,ns); });
+
+  // Complete button — shown if ≥60% done and not yet complete
+  if(acts.length){
+    const showBtn=!isComplete&&done>=Math.ceil(acts.length*.6);
+    h+=`<div class="path-comp-row">
+      <button class="btn orange comp-path-btn${showBtn?' show':''}" id="comp-${ns}"
+        onclick="completePathBtn('${S.id}','${ns}')">${t('markDone')}</button>
+    </div>`;
+  }
+
+  h+=`</div></div>`;
+  return h;
+}
+
+function renderComingSoon(){
+  return `<div style="padding:3.2rem 0;color:var(--ch3);font-size:1.6rem">
+    ${L==='fr'?'Contenu à venir pour ce parcours.':'Content coming soon for this path.'}
+  </div>`;
+}
+
+// ── Mark path complete ────────────────────────────────────────
+function completePathBtn(sessId,ns){
+  markPathComplete(sessId,ns);
+  const btn=document.getElementById('comp-'+ns);
+  if(btn) btn.classList.remove('show');
+  const xp=typeof SESSION!=='undefined'?Math.round((SESSION.xp||100)*.5):50;
+  showToast(t('xpGain',xp));
+}
+
+// ── Single activity renderer ──────────────────────────────────
+function renderAct(act,sessId,ns){
+  const isDone=actDone(sessId,act.id,ns);
+  const badgeMap={quiz:'bq',fill:'bf',bug:'bb',cpp:'bcpp',predict:'bpredict',engine:'be',reflect:'br'};
+  const labelMap={
+    quiz:t('quizLabel'),fill:t('fillLabel'),bug:t('bugLabel'),
+    cpp:t('cppLabel'),predict:t('predictLabel'),engine:t('engineLabel'),reflect:t('reflectLabel')
+  };
+  let h=`<div class="activity${isDone?' completed':''}" id="wrap-${act.id}">
+    <div class="act-top">
+      <span class="abadge ${badgeMap[act.type]||'bq'}">${labelMap[act.type]||act.type} · ${act.xp||10} XP</span>
+      <button class="acheck${isDone?' done':''}" onclick="toggleActCheck('${sessId}','${act.id}','${ns}')">${isDone?'✓':''}</button>
+    </div>`;
+  if(act.type==='quiz')    h+=renderQuiz(act,sessId,ns);
+  if(act.type==='fill')    h+=renderFill(act,sessId,ns);
+  if(act.type==='bug')     h+=renderBug(act,sessId,ns);
+  if(act.type==='cpp')     h+=renderCpp(act,sessId,ns);
+  if(act.type==='predict') h+=renderPredict(act,sessId,ns);
+  if(act.type==='engine')  h+=renderEngine(act);
+  if(act.type==='reflect') h+=renderReflect(act);
+  h+=`</div>`;
+  return h;
+}
+
+// ── Renderers ─────────────────────────────────────────────────
+function renderQuiz(act,sessId,ns){
+  const done=actDone(sessId,act.id,ns);
   const choices=act.choices.map((c,i)=>{
     const label=typeof c.t==='object'?c.t[L]:c.t;
     return `<button class="choice" id="qc-${act.id}-${i}"
-      onclick="checkQ('${sessId}','${act.id}',${i},${act.choices.length})"
+      onclick="checkQ('${sessId}','${act.id}',${i},${act.choices.length},'${ns}')"
       data-correct="${c.c}"
       data-fb="${encodeURIComponent(typeof c.fb==='object'?c.fb[L]:c.fb)}"
       ${done?'disabled':''}>${label}</button>`;
@@ -272,34 +356,57 @@ function renderQuiz(act,sessId){
   return `<h4>${act.q[L]}</h4><div class="choices">${choices}</div><div class="feedback" id="fb-${act.id}"></div>`;
 }
 
-function renderFill(act,sessId){
-  const done=actDone(sessId,act.id);
+function renderFill(act,sessId,ns){
+  const done=actDone(sessId,act.id,ns);
   const code=act.template[L].replace('______',
     `<input class="blank" id="bi-${act.id}" placeholder="???" autocomplete="off" autocorrect="off" spellcheck="false"
-      onkeydown="if(event.key==='Enter')checkF('${sessId}','${act.id}')"
+      onkeydown="if(event.key==='Enter')checkF('${sessId}','${act.id}','${ns}')"
       ${done?'disabled':''}>`);
   return `<h4>${act.instr[L]}</h4>
     <div class="code-block">${code}</div>
     <p style="font-size:1.3rem;color:var(--ch4);margin-bottom:1rem">${t('hint')}: ${act.hint[L]}</p>
     <div style="display:flex;gap:.8rem;flex-wrap:wrap">
-      <button class="btn" onclick="checkF('${sessId}','${act.id}')" ${done?'disabled':''}>${t('checkBtn')}</button>
+      <button class="btn" onclick="checkF('${sessId}','${act.id}','${ns}')" ${done?'disabled':''}>${t('checkBtn')}</button>
       <button class="btn sec" id="retry-${act.id}" style="display:none" onclick="retryF('${act.id}')">${t('retryBtn')}</button>
     </div>
     <div class="feedback" id="fb-${act.id}"></div>`;
 }
 
-function renderBug(act,sessId){
+function renderBug(act,sessId,ns){
   const rid='br-'+act.id;
   return `<h4>${act.instr[L]}</h4>
     <div class="bug-code">${act.bugCode}</div>
-    <button class="btn sec" onclick="revealBug('${rid}','${sessId}','${act.id}')">${t('revealBtn')}</button>
+    <button class="btn sec" onclick="revealAns('${rid}','${sessId}','${act.id}','${ns}')">${t('revealBtn')}</button>
     <div class="bug-reveal" id="${rid}">${act.explanation[L]}</div>`;
+}
+
+function renderCpp(act,sessId,ns){
+  let h=`<h4>${act.instr[L]}</h4>`;
+  if(act.stub) h+=`<div class="code-block" style="white-space:pre-wrap">${act.stub}</div>`;
+  if(act.hint) h+=`<p style="font-size:1.3rem;color:var(--ch4);margin-bottom:1rem">${t('hint')}: ${act.hint[L]}</p>`;
+  const rid='cpp-'+act.id;
+  h+=`<button class="btn sec" onclick="revealAns('${rid}','${sessId}','${act.id}','${ns}')">${t('revealBtn')}</button>
+    <div class="bug-reveal" id="${rid}">${act.solution[L]}</div>`;
+  return h;
+}
+
+function renderPredict(act,sessId,ns){
+  const rid='pr-'+act.id;
+  return `<h4>${t('predictQ')}</h4>
+    <div class="code-block" style="white-space:pre-wrap">${act.code}</div>
+    <p style="font-size:1.3rem;color:var(--ch4);margin-bottom:1rem">${act.question[L]}</p>
+    <button class="btn sec" onclick="revealAns('${rid}','${sessId}','${act.id}','${ns}')">${t('showOutput')}</button>
+    <div class="bug-reveal" id="${rid}">
+      <strong style="display:block;margin-bottom:.4rem;font-size:1.1rem;letter-spacing:.08em;text-transform:uppercase;color:var(--aqua)">${L==='fr'?'Sortie':'Output'}</strong>
+      <pre style="font-family:var(--mono);font-size:1.3rem;line-height:1.6;color:#e0e8ef;margin-bottom:.8rem">${act.output}</pre>
+      <p style="font-size:1.4rem;color:var(--ch2);line-height:1.5">${act.explanation[L]}</p>
+    </div>`;
 }
 
 function renderEngine(act){
   return `<h4>${act.task[L]}</h4>
     <div class="engine-task">
-      <h5>${act.label?act.label[L]:(act.engine||'Engine')}</h5>
+      <h5>${act.label?act.label[L]:'Engine'}</h5>
       <p>${act.task[L]}</p>
       ${act.note?`<p class="note">${act.note[L]}</p>`:''}
     </div>`;
@@ -310,7 +417,7 @@ function renderReflect(act){
 }
 
 // ── Interaction handlers ──────────────────────────────────────
-function checkQ(sessId,actId,idx,total){
+function checkQ(sessId,actId,idx,total,ns){
   const btn=document.getElementById(`qc-${actId}-${idx}`);
   if(!btn||btn.disabled) return;
   const correct=btn.dataset.correct==='true';
@@ -322,13 +429,14 @@ function checkQ(sessId,actId,idx,total){
   if(!correct) btn.classList.add('wrong');
   const f=document.getElementById('fb-'+actId);
   if(f){ f.textContent=fb; f.className=`feedback show ${correct?'ok':'nok'}`; }
-  if(correct){ markAct(sessId,actId); updateActCheck(actId,true); showToast(t('xpGain',10)); updateCompBtn(); }
+  if(correct){ markActNs(sessId,actId,ns); updateActCheck(actId,true); showToast(t('xpGain',10)); updateCompBtn(sessId,ns); }
 }
 
-function checkF(sessId,actId){
+function checkF(sessId,actId,ns){
   const input=document.getElementById('bi-'+actId);
   if(!input||input.disabled) return;
-  const act=SESSION.activities.find(a=>a.id===actId);
+  const allActs=[...(SESSION.ide?.activities||[]),...(SESSION.engine?.activities||[])];
+  const act=allActs.find(a=>a.id===actId);
   if(!act) return;
   const correct=input.value.trim().toLowerCase()===act.answer.toLowerCase();
   input.classList.remove('ok','nok'); input.classList.add(correct?'ok':'nok');
@@ -337,7 +445,7 @@ function checkF(sessId,actId){
   if(f){ f.textContent=correct?(L==='fr'?`✓ Correct ! Réponse : ${act.answer}`:`✓ Correct! Answer: ${act.answer}`):(L==='fr'?`✗ Réponse : ${act.answer}`:`✗ Answer: ${act.answer}`); f.className=`feedback show ${correct?'ok':'nok'}`; }
   const r=document.getElementById('retry-'+actId);
   if(r&&!correct) r.style.display='inline-flex';
-  if(correct){ markAct(sessId,actId); updateActCheck(actId,true); showToast(t('xpGain',15)); updateCompBtn(); }
+  if(correct){ markActNs(sessId,actId,ns); updateActCheck(actId,true); showToast(t('xpGain',15)); updateCompBtn(sessId,ns); }
 }
 
 function retryF(actId){
@@ -351,27 +459,39 @@ function retryF(actId){
   input.focus();
 }
 
-function revealBug(rid,sessId,actId){
+function revealAns(rid,sessId,actId,ns){
   const el=document.getElementById(rid);
-  if(el){ el.classList.add('show'); markAct(sessId,actId); updateActCheck(actId,true); showToast(t('xpGain',20)); updateCompBtn(); }
+  if(el){ el.classList.add('show'); markActNs(sessId,actId,ns); updateActCheck(actId,true); showToast(t('xpGain',20)); updateCompBtn(sessId,ns); }
 }
 
-function toggleActCheck(sessId,actId){
+function toggleActCheck(sessId,actId,ns){
   const p=getP();
-  if(!p[sessId]) p[sessId]={acts:{},complete:false};
-  if(!p[sessId].acts) p[sessId].acts={};
-  const current=!!p[sessId].acts[actId];
-  p[sessId].acts[actId]=!current;
+  if(!p[sessId]) p[sessId]={};
+  if(!p[sessId][ns]) p[sessId][ns]={};
+  p[sessId][ns][actId]=!p[sessId][ns][actId];
   saveP(p);
-  updateActCheck(actId,!current);
-  updateCompBtn();
+  updateActCheck(actId,!!p[sessId][ns][actId]);
+  updateCompBtn(sessId,ns);
 }
 
 function updateActCheck(actId,done){
-  const btn=document.querySelector(`.acheck[onclick*="${actId}"]`);
+  const btn=document.querySelector(`.acheck[onclick*="'${actId}'"]`);
   if(btn){ btn.className=`acheck${done?' done':''}`; btn.textContent=done?'✓':''; }
   const wrap=document.getElementById('wrap-'+actId);
   if(wrap){ wrap.className=`activity${done?' completed':''}`; }
+}
+
+function updateCompBtn(sessId,ns){
+  const S=SESSION;
+  const data=ns==='ide'?S.ide:S.engine;
+  const acts=data?.activities||[];
+  if(!acts.length) return;
+  const done=pathDone(sessId,acts,ns);
+  const isComplete=isPathComplete(sessId,ns);
+  const btn=document.getElementById('comp-'+ns);
+  if(!btn) return;
+  if(!isComplete&&done>=Math.ceil(acts.length*.6)) btn.classList.add('show');
+  else btn.classList.remove('show');
 }
 
 function toggleDeep(id){

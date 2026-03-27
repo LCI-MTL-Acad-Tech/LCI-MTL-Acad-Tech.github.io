@@ -50,21 +50,21 @@ const BLOCS = [
 // Session manifest — title, subtitle, activity count, XP per session
 // The actual content lives in sessions/sNN.js
 const MANIFEST = {
-  s01:{ num:1,  fr:'Types & Variables',              en:'Types & Variables',              sub:{fr:'Ce que tu connais déjà — en C++',en:'What you already know — in C++'},              acts:5, xp:80  },
-  s02:{ num:2,  fr:'Fonctions & Méthodes',           en:'Functions & Methods',            sub:{fr:'Même logique, syntaxe différente',en:'Same logic, different syntax'},               acts:5, xp:90  },
-  s03:{ num:3,  fr:'Conditions & Boucles',           en:'Conditionals & Loops',           sub:{fr:'if, for, while — presque identiques',en:'if, for, while — almost identical'},       acts:5, xp:90  },
-  s04:{ num:4,  fr:'Pointeurs & Références',         en:'Pointers & References',          sub:{fr:'Le concept qui fait peur — démystifié',en:'The scary concept — demystified'},        acts:5, xp:110 },
-  s05:{ num:5,  fr:'Headers .h / .cpp',              en:'Headers .h / .cpp',              sub:{fr:'Déclaration vs implémentation',en:'Declaration vs implementation'},                  acts:5, xp:100 },
-  s06:{ num:6,  fr:'Mémoire & Ownership',            en:'Memory & Ownership',             sub:{fr:'Stack, heap, et le GC Unreal',en:'Stack, heap, and Unreal GC'},                     acts:5, xp:110 },
-  s07:{ num:7,  fr:'AActor & UObject',               en:'AActor & UObject',               sub:{fr:"L'équivalent de MonoBehaviour",en:'The MonoBehaviour equivalent'},                  acts:5, xp:120 },
-  s08:{ num:8,  fr:'UPROPERTY & UFUNCTION',          en:'UPROPERTY & UFUNCTION',          sub:{fr:'[SerializeField] version Unreal',en:'[SerializeField] Unreal edition'},             acts:5, xp:120 },
-  s09:{ num:9,  fr:'BeginPlay & Tick',               en:'BeginPlay & Tick',               sub:{fr:'Start() et Update() — version Unreal',en:'Start() and Update() — Unreal edition'},  acts:5, xp:110 },
-  s10:{ num:10, fr:'Composants & Héritage',          en:'Components & Inheritance',       sub:{fr:'GetComponent vs FindComponentByClass',en:'GetComponent vs FindComponentByClass'},   acts:5, xp:120 },
-  s11:{ num:11, fr:'Input & Mouvement',              en:'Input & Movement',               sub:{fr:'Enhanced Input System',en:'Enhanced Input System'},                                 acts:4, xp:130 },
-  s12:{ num:12, fr:'Collision & Overlap',            en:'Collision & Overlap',            sub:{fr:'OnTriggerEnter → NotifyActorBeginOverlap',en:'OnTriggerEnter → NotifyActorBeginOverlap'}, acts:5, xp:130 },
-  s13:{ num:13, fr:'Blueprint ↔ C++',               en:'Blueprint ↔ C++',               sub:{fr:'Quand utiliser quoi',en:'When to use which'},                                        acts:4, xp:130 },
-  s14:{ num:14, fr:'Débogage & Erreurs',             en:'Debugging & Errors',             sub:{fr:'Lire les logs Unreal, survivre aux crashes',en:'Reading Unreal logs, surviving crashes'}, acts:5, xp:140 },
-  s15:{ num:15, fr:'Mini-Projet',                    en:'Mini-Project',                   sub:{fr:'Un collectible C++ complet',en:'A complete C++ collectible'},                        acts:3, xp:200 },
+  s01:{ num:1,  fr:'Types & Variables',              en:'Types & Variables',              sub:{fr:'Ce que tu connais déjà — en C++',en:'What you already know — in C++'},              ideActs:4, engActs:4, xp:80  },
+  s02:{ num:2,  fr:'Fonctions & Méthodes',           en:'Functions & Methods',            sub:{fr:'Même logique, syntaxe différente',en:'Same logic, different syntax'},               ideActs:4, engActs:4, xp:90  },
+  s03:{ num:3,  fr:'Conditions & Boucles',           en:'Conditionals & Loops',           sub:{fr:'if, for, while — presque identiques',en:'if, for, while — almost identical'},       ideActs:4, engActs:4, xp:90  },
+  s04:{ num:4,  fr:'Pointeurs & Références',         en:'Pointers & References',          sub:{fr:'Le concept qui fait peur — démystifié',en:'The scary concept — demystified'},        ideActs:4, engActs:4, xp:110 },
+  s05:{ num:5,  fr:'Headers .h / .cpp',              en:'Headers .h / .cpp',              sub:{fr:'Déclaration vs implémentation',en:'Declaration vs implementation'},                  ideActs:4, engActs:4, xp:100 },
+  s06:{ num:6,  fr:'Mémoire & Ownership',            en:'Memory & Ownership',             sub:{fr:'Stack, heap, et le GC Unreal',en:'Stack, heap, and Unreal GC'},                     ideActs:4, engActs:4, xp:110 },
+  s07:{ num:7,  fr:'AActor & UObject',               en:'AActor & UObject',               sub:{fr:"L'équivalent de MonoBehaviour",en:'The MonoBehaviour equivalent'},                  ideActs:4, engActs:4, xp:120 },
+  s08:{ num:8,  fr:'UPROPERTY & UFUNCTION',          en:'UPROPERTY & UFUNCTION',          sub:{fr:'[SerializeField] version Unreal',en:'[SerializeField] Unreal edition'},             ideActs:4, engActs:4, xp:120 },
+  s09:{ num:9,  fr:'BeginPlay & Tick',               en:'BeginPlay & Tick',               sub:{fr:'Start() et Update() — version Unreal',en:'Start() and Update() — Unreal edition'},  ideActs:4, engActs:4, xp:110 },
+  s10:{ num:10, fr:'Composants & Héritage',          en:'Components & Inheritance',       sub:{fr:'GetComponent vs FindComponentByClass',en:'GetComponent vs FindComponentByClass'},   ideActs:4, engActs:4, xp:120 },
+  s11:{ num:11, fr:'Input & Mouvement',              en:'Input & Movement',               sub:{fr:'Enhanced Input System',en:'Enhanced Input System'},                                 ideActs:4, engActs:3, xp:130 },
+  s12:{ num:12, fr:'Collision & Overlap',            en:'Collision & Overlap',            sub:{fr:'OnTriggerEnter → NotifyActorBeginOverlap',en:'OnTriggerEnter → NotifyActorBeginOverlap'}, ideActs:4, engActs:4, xp:130 },
+  s13:{ num:13, fr:'Blueprint ↔ C++',               en:'Blueprint ↔ C++',               sub:{fr:'Quand utiliser quoi',en:'When to use which'},                                        ideActs:4, engActs:3, xp:130 },
+  s14:{ num:14, fr:'Débogage & Erreurs',             en:'Debugging & Errors',             sub:{fr:'Lire les logs Unreal, survivre aux crashes',en:'Reading Unreal logs, surviving crashes'}, ideActs:4, engActs:4, xp:140 },
+  s15:{ num:15, fr:'Mini-Projet',                    en:'Mini-Project',                   sub:{fr:'Un collectible C++ complet',en:'A complete C++ collectible'},                        ideActs:3, engActs:3, xp:200 },
 };
 
 function initHome(){
@@ -83,24 +83,32 @@ function renderHome(){
   const pct=Math.round(doneSess/totalSess*100);
   document.getElementById('overall-fill').style.width=pct+'%';
   document.getElementById('overall-lbl').textContent=t('sessionsOf',doneSess,totalSess);
-  // XP: proportional by activities done per session
+  // XP: sum of activities done across both paths
   let xp=0;
   Object.entries(MANIFEST).forEach(([id,m])=>{
-    const p=getP()[id];
-    const done=p?.acts?Object.values(p.acts).filter(Boolean).length:0;
-    const ratio=done/Math.max(m.acts,1);
-    xp+=Math.floor(m.xp*ratio*(isSessComplete(id)?1:.8));
+    const rec=getP()[id]||{};
+    const done=Object.values(rec.ide||{}).filter(Boolean).length
+              +Object.values(rec.eng||{}).filter(Boolean).length;
+    const maxActs=Math.max((m.ideActs||0)+(m.engActs||0),1);
+    xp+=Math.floor(m.xp*(done/maxActs)*((rec.complete_ide||rec.complete_eng)?1:.8));
   });
   document.getElementById('xp-num').textContent=xp+' XP';
+
+  // Overall: session done = either path marked complete
+  const totalSess=Object.keys(MANIFEST).length;
+  const doneSess=Object.keys(MANIFEST).filter(id=>{
+    const r=getP()[id]||{}; return r.complete_ide||r.complete_eng;
+  }).length;
+  document.getElementById('overall-fill').style.width=Math.round(doneSess/totalSess*100)+'%';
+  document.getElementById('overall-lbl').textContent=t('sessionsOf',doneSess,totalSess);
 
   // Render blocs
   const container=document.getElementById('blocs');
   container.innerHTML='';
   BLOCS.forEach(bloc=>{
     const bSessions=bloc.sessions;
-    const bDone=bSessions.filter(id=>isSessComplete(id)).length;
+    const bDone=bSessions.filter(id=>{ const r=getP()[id]||{}; return r.complete_ide||r.complete_eng; }).length;
     const bPct=Math.round(bDone/bSessions.length*100);
-
     const sec=document.createElement('div');
     sec.className='bloc-section';
     sec.innerHTML=`<div class="bloc-hdr">
@@ -116,27 +124,38 @@ function renderHome(){
     bSessions.forEach((id,idx)=>{
       const m=MANIFEST[id];
       if(!m) return;
-      const complete=isSessComplete(id);
-      const p=getP()[id];
-      const doneActs=p?.acts?Object.values(p.acts).filter(Boolean).length:0;
-      const partial=doneActs>0&&!complete;
-      // Unlock: first session of bloc always open; others unlock after previous
+      const rec=getP()[id]||{};
+      const anyDone=Object.values(rec.ide||{}).filter(Boolean).length>0
+                   ||Object.values(rec.eng||{}).filter(Boolean).length>0;
+      const anyComplete=!!(rec.complete_ide||rec.complete_eng);
+
+      // Unlock when previous session has any activity done
       const prevId=idx>0?bSessions[idx-1]:null;
-      const unlocked=!prevId||isSessComplete(prevId)||doneActs>0;
+      const prevRec=prevId?(getP()[prevId]||{}):null;
+      const prevStarted=prevRec
+        ?(Object.values(prevRec.ide||{}).filter(Boolean).length>0
+          ||Object.values(prevRec.eng||{}).filter(Boolean).length>0)
+        :true;
+      const unlocked=!prevId||prevStarted;
 
-      const statusKey=!unlocked?'sessLocked':complete?'sessDone':partial?'sessPartial':'sessAvail';
-      const statusClass=!unlocked?'locked':complete?'done':partial?'partial':'available';
+      const statusKey=!unlocked?'sessLocked':anyComplete?'sessDone':anyDone?'sessPartial':'sessAvail';
+      const statusClass=!unlocked?'locked':anyComplete?'done':anyDone?'partial':'available';
 
-      const dots=Array.from({length:m.acts},(_,i)=>{
-        const d=p?.acts?.[`a${m.num}_${i+1}`];
-        return `<span class="adot${d?(complete?' doneb':' done'):''}"></span>`;
+      // Single combined dot row — dots from whichever path has more acts
+      const totalDots=Math.max(m.ideActs||3, m.engActs||3);
+      const ideDone=Object.values(rec.ide||{}).filter(Boolean).length;
+      const engDone=Object.values(rec.eng||{}).filter(Boolean).length;
+      const dots=Array.from({length:totalDots},(_,i)=>{
+        const fromIde=i<ideDone;
+        const fromEng=i<engDone;
+        const cls=fromIde&&fromEng?'done-both':fromIde?'done-ide':fromEng?'done-eng':'';
+        return `<span class="adot${cls?' '+cls:''}"></span>`;
       }).join('');
 
       const card=document.createElement('div');
-      card.className='scard'+(complete?' done':'')+((!unlocked)?' locked':'');
+      card.className='scard'+(anyComplete?' done':'')+((!unlocked)?' locked':'');
       card.style.setProperty('--accent',bloc.color);
       if(unlocked) card.onclick=()=>{ location.href=`sessions/${id}.html`; };
-
       card.innerHTML=`<div class="snum">S${m.num} — ${bloc[L]}</div>
         <h3>${m[L]}</h3>
         <p>${m.sub[L]}</p>
