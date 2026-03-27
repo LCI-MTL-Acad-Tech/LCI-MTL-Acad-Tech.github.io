@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code//Switch — S03</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site-header">
+  <div style="display:flex;align-items:center;gap:1.4rem">
+    <button id="back-btn">← Accueil</button>
+    <div class="wordmark">Code<span>//</span>Switch</div>
+  </div>
+  <div class="hdr-r">
+    <span class="mode-pill" id="mode-pill"></span>
+    <button id="lang-btn">EN</button>
+  </div>
+</header>
+<div id="page-session">
+  <div class="sess-hdr">
+    <div class="sess-bloc-lbl" id="sess-bloc-lbl"></div>
+    <h2 id="sess-title"></h2>
+    <p id="sess-sub"></p>
+    <div class="mode-tabs">
+      <button class="mtab" id="tab-tutor"></button>
+      <button class="mtab" id="tab-student"></button>
+    </div>
+  </div>
+  <div id="panel-tutor" style="display:none"></div>
+  <div id="panel-student" style="display:none"></div>
+  <div class="sess-nav">
+    <button class="btn sec" id="prev-sess-btn">← Précédent</button>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
+      <button class="btn orange comp-btn" id="comp-sess-btn"></button>
+      <button class="btn" id="next-sess-btn"></button>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+<script src="../engine.js"></script>
+<script src="s03.js"></script>
+</body>
+</html>
