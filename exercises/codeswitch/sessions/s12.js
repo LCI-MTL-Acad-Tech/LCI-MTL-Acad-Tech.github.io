@@ -1,153 +1,235 @@
 'use strict';
 // Session 12 — Collision & Overlap
+// IDE arc S12: multi-file project with inheritance — Event/Observer pattern in pure C++
 
 const SESSION = {
-  id:        's12',
-  num:       12,
-  prev:      11,
-  next:      13,
-  xp:        130,
-  blocName:  { fr:'Patterns de jeu', en:'Game Patterns' },
-  blocColor: '#fe6c06',
-  title:     { fr:'Collision & Overlap', en:'Collision & Overlap' },
-  sub:       { fr:'OnTriggerEnter → NotifyActorBeginOverlap', en:'OnTriggerEnter → NotifyActorBeginOverlap' },
+  id:'s12', num:12, prev:11, next:13, xp:130,
+  blocName:{ fr:'Patterns de jeu', en:'Game Patterns' },
+  blocColor:'#fe6c06',
+  title:{ fr:'Collision & Overlap', en:'Collision & Overlap' },
+  sub:{ fr:'OnTriggerEnter → NotifyActorBeginOverlap — Collision Channels en C++', en:'OnTriggerEnter → NotifyActorBeginOverlap — Collision Channels in C++' },
 
-  tutor: {
-    concept: {
-      fr:`En Unity : OnTriggerEnter, OnCollisionEnter, Physics.Raycast. En Unreal : NotifyActorBeginOverlap, OnComponentHit, LineTraceSingleByChannel. Les concepts sont identiques, la syntaxe diffère. La grande différence : Unreal a un système de Collision Channels très granulaire qui remplace et dépasse les Physics Layers Unity.`,
-      en:`In Unity: OnTriggerEnter, OnCollisionEnter, Physics.Raycast. In Unreal: NotifyActorBeginOverlap, OnComponentHit, LineTraceSingleByChannel. Concepts are identical, syntax differs. The big difference: Unreal has a very granular Collision Channels system that replaces and surpasses Unity's Physics Layers.`
+  tutor:{
+    concept:{
+      fr:`En Unity, OnTriggerEnter(Collider other) est déclenché automatiquement. En Unreal C++, l'équivalent est NotifyActorBeginOverlap(AActor* OtherActor) pour les Actors, ou OnComponentBeginOverlap pour les Components spécifiques. La collision en Unreal est plus granulaire : chaque Component a son propre Collision Channel et ses réponses (Ignore, Overlap, Block). Configurable en code et dans l'éditeur.`,
+      en:`In Unity, OnTriggerEnter(Collider other) fires automatically. In Unreal C++, the equivalent is NotifyActorBeginOverlap(AActor* OtherActor) for Actors, or OnComponentBeginOverlap for specific Components. Collision in Unreal is more granular: each Component has its own Collision Channel and responses (Ignore, Overlap, Block). Configurable in code and in the editor.`
     },
-    demoSteps: [
-      {
-        label: { fr:'NotifyActorBeginOverlap = OnTriggerEnter', en:'NotifyActorBeginOverlap = OnTriggerEnter' },
-        fr:`Montre NotifyActorBeginOverlap(AActor* OtherActor) dans un Actor Unreal. Compare avec OnTriggerEnter(Collider other) en Unity. Même logique : appelé quand un autre objet entre dans la zone. OtherActor est l'équivalent de other.gameObject. Montre aussi NotifyActorEndOverlap pour la sortie.`,
-        en:`Show NotifyActorBeginOverlap(AActor* OtherActor) in an Unreal Actor. Compare with OnTriggerEnter(Collider other) in Unity. Same logic: called when another object enters the zone. OtherActor is the equivalent of other.gameObject. Also show NotifyActorEndOverlap for exit.`
-      },
-      {
-        label: { fr:'OnComponentBeginOverlap — sur un Component spécifique', en:'OnComponentBeginOverlap — on a specific Component' },
-        fr:`Plutôt que de surcharger NotifyActorBeginOverlap (qui réagit à tout), on peut lier un callback directement sur un Component via son delegate. Dans BeginPlay() : MySphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AMyActor::OnSphereOverlap). C'est plus précis — seulement la sphere, pas la capsule ou le mesh. Analogie Unity : ajouter un listener sur un Collider spécifique.`,
-        en:`Rather than overriding NotifyActorBeginOverlap (which reacts to everything), we can bind a callback directly on a Component via its delegate. In BeginPlay(): MySphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AMyActor::OnSphereOverlap). More precise — only the sphere, not the capsule or mesh. Unity analogy: adding a listener on a specific Collider.`
-      },
-      {
-        label: { fr:'LineTraceSingleByChannel = Raycast', en:'LineTraceSingleByChannel = Raycast' },
-        fr:`Physics.Raycast en Unity → GetWorld()->LineTraceSingleByChannel() en Unreal. Montre la structure FHitResult qui contient les infos du hit (Actor touché, Component, point de contact, normale). Plus verbose qu'Unity mais bien plus riche en informations. Montre aussi la visualisation avec DrawDebugLine pour le debug.`,
-        en:`Physics.Raycast in Unity → GetWorld()->LineTraceSingleByChannel() in Unreal. Show the FHitResult structure containing hit info (hit Actor, Component, contact point, normal). More verbose than Unity but much richer in information. Also show DrawDebugLine for debug visualization.`
-      },
-      {
-        label: { fr:'Block vs Overlap — la distinction Unreal', en:'Block vs Overlap — the Unreal distinction' },
-        fr:`Unreal distingue Block (collision physique qui stoppe le mouvement) et Overlap (trigger sans résistance). En Unity, c'est Collider (block) vs Trigger (overlap). La différence : en Unreal, un même objet peut bloquer certains types de collision tout en permettant l'overlap pour d'autres, configuré via les Collision Channels dans l'éditeur.`,
-        en:`Unreal distinguishes Block (physical collision that stops movement) and Overlap (trigger without resistance). In Unity, it's Collider (block) vs Trigger (overlap). The difference: in Unreal, the same object can block certain collision types while allowing overlap for others, configured via Collision Channels in the editor.`
-      },
-    ],
-    discussion: [
-      {
-        fr:`En Unity, pour faire un raycast d'arme vers une cible, tu utilisais quel pattern ? Comment tu gérais les layers pour ignorer certains objets (ex. ignorer le propre corps du joueur) ?`,
-        en:`In Unity, for a weapon raycast to the target, what pattern did you use? How did you manage layers to ignore certain objects (e.g. ignore the player's own body)?`
-      },
-    ],
-    deep: {
-      fr:`<p><strong>Multi-trace et SweepTrace.</strong> LineTraceSingleByChannel retourne le premier hit. Pour tous les hits sur le trajet, utilise <code>LineTraceMultiByChannel</code>. Pour un "rayon avec épaisseur" (ex. une balle grosse ou un objet qui balaye une zone), utilise <code>SweepSingleByChannel</code> avec une forme (sphere, capsule, box).</p>
-<p>Exemple pratique : une attaque de mêlée au corps à corps utilise souvent un SweepTrace en forme de capsule pour simuler le volume de l'arme. Beaucoup plus précis qu'un simple raycast fin, et toujours plus performant que créer un Component de collision temporaire.</p>`,
-      en:`<p><strong>Multi-trace and SweepTrace.</strong> LineTraceSingleByChannel returns the first hit. For all hits along the path, use <code>LineTraceMultiByChannel</code>. For a "ray with thickness" (e.g. a large bullet or an object sweeping an area), use <code>SweepSingleByChannel</code> with a shape (sphere, capsule, box).</p>
-<p>Practical example: a melee attack often uses a capsule-shaped SweepTrace to simulate the weapon's volume. Much more precise than a thin raycast, and still more performant than creating a temporary collision Component.</p>`
+    deep:{
+      fr:`<p><strong>Channels personnalisés et traces.</strong> Unreal permet de créer des Collision Channels personnalisés (ex. "Projectile", "Pickup") via le Project Settings. Les traces (LineTrace, SphereTrace) utilisent ces channels pour ne détecter que ce qui est pertinent — une balle ne teste que les ennemis et les décors, pas les autres balles.</p>
+<p>En C++ : <code>GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility)</code>. C'est l'équivalent de Physics.Raycast en Unity, mais avec un contrôle plus fin sur quels objects sont "vus".</p>`,
+      en:`<p><strong>Custom channels and traces.</strong> Unreal allows creating custom Collision Channels (e.g. "Projectile", "Pickup") via Project Settings. Traces (LineTrace, SphereTrace) use these channels to detect only what's relevant — a bullet only tests enemies and scenery, not other bullets.</p>
+<p>In C++: <code>GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility)</code>. It's the equivalent of Physics.Raycast in Unity, but with finer control over which objects are "seen".</p>`
     }
   },
 
-  compare: {
-    cs:`<span class="cm">// Unity — trigger</span>
+  ide:{
+    demoSteps:[
+      {
+        label:{ fr:'Pattern Observer — callback sur événement', en:'Observer pattern — event callback' },
+        fr:`Crée event.h avec une classe EventSystem simple : class EventSystem { vector<function<void()>> listeners; public: void subscribe(function<void()> cb) { listeners.push_back(cb); } void fire() { for(auto& cb : listeners) cb(); } };. Inclus <functional> et <vector>. C'est le pattern Observer — équivalent d'un UnityEvent ou d'un delegate C#.`,
+        en:`Create event.h with a simple EventSystem class: class EventSystem { vector<function<void()>> listeners; public: void subscribe(function<void()> cb) { listeners.push_back(cb); } void fire() { for(auto& cb : listeners) cb(); } };. Include <functional> and <vector>. This is the Observer pattern — equivalent of a UnityEvent or a C# delegate.`
+      },
+      {
+        label:{ fr:'Collision simulée — deux zones rectangulaires', en:'Simulated collision — two rectangular zones' },
+        fr:`Crée une struct Rect { float x, y, w, h; bool overlaps(const Rect& o) const { return x < o.x+o.w && x+w > o.x && y < o.y+o.h && y+h > o.y; } };. Dans main(), simule un test de collision chaque "frame" dans une boucle et déclenche l'EventSystem quand overlaps() retourne true. C'est le principe derrière tout système de collision — vérification géométrique + événement.`,
+        en:`Create a struct Rect { float x, y, w, h; bool overlaps(const Rect& o) const { return x < o.x+o.w && x+w > o.x && y < o.y+o.h && y+h > o.y; } };. In main(), simulate a collision check each "frame" in a loop and trigger the EventSystem when overlaps() returns true. This is the principle behind every collision system — geometric check + event.`
+      },
+      {
+        label:{ fr:'std::function et lambda — callbacks modernes', en:'std::function and lambda — modern callbacks' },
+        fr:`Montre comment s'abonner à l'EventSystem avec une lambda : system.subscribe([]() { cout << "Collision!"; });. La lambda [] () { ... } est une fonction anonyme — équivalent de () => en C#. Montre aussi la capture : int count = 0; system.subscribe([&count]() { count++; cout << count; }); — le [&count] capture la variable par référence.`,
+        en:`Show how to subscribe to the EventSystem with a lambda: system.subscribe([]() { cout << "Collision!"; });. The lambda [] () { ... } is an anonymous function — equivalent of () => in C#. Also show capture: int count = 0; system.subscribe([&count]() { count++; cout << count; }); — the [&count] captures the variable by reference.`
+      },
+    ],
+    discussion:[
+      { fr:`Le pattern Observer (EventSystem) décorrèle l'émetteur des receveurs. En quoi c'est plus flexible qu'un appel direct de méthode ? Donne un exemple de jeu où ça évite du couplage fort.`, en:`The Observer pattern (EventSystem) decouples the emitter from receivers. Why is that more flexible than a direct method call? Give a game example where it avoids tight coupling.` },
+    ],
+    compare:{
+      std:`<span class="cm">// C++ — std::function callback</span>
+#include &lt;functional&gt;
+#include &lt;vector&gt;
+
+<span class="kw2">int</span> count = <span class="num">0</span>;
+<span class="ty">EventSystem</span> onCollide;
+
+onCollide.<span class="fn2">subscribe</span>(
+    [&amp;count]() { count++; }
+);
+onCollide.<span class="fn2">subscribe</span>(
+    []() { std::cout &lt;&lt; <span class="str">"Hit!"</span>; }
+);
+onCollide.<span class="fn2">fire</span>();  <span class="cm">// tous les callbacks</span>`,
+      unreal:`<span class="cm">// Unreal — delegate / overlap</span>
+<span class="kw2">void</span> <span class="fn2">BeginPlay</span>() <span class="kw2">override</span> {
+    <span class="kw2">Super</span>::<span class="fn2">BeginPlay</span>();
+    Sphere-&gt;OnComponentBeginOverlap
+        .<span class="fn2">AddDynamic</span>(<span class="kw2">this</span>,
+        &amp;<span class="ty">ACollectible</span>::<span class="fn2">OnOverlap</span>);
+}
+<span class="mac">UFUNCTION</span>()
+<span class="kw2">void</span> <span class="fn2">OnOverlap</span>(
+    <span class="ty">UPrimitiveComponent</span>* Self,
+    <span class="ty">AActor</span>* Other, ...);`
+    },
+    activities:[
+      {
+        id:'i12_1', type:'predict', xp:15,
+        code:`#include &lt;iostream&gt;
+#include &lt;functional&gt;
+#include &lt;vector&gt;
+struct Event {
+    std::vector&lt;std::function&lt;void(int)&gt;&gt; cbs;
+    void on(std::function&lt;void(int)&gt; cb) { cbs.push_back(cb); }
+    void emit(int v) { for(auto& c : cbs) c(v); }
+};
+int main() {
+    Event e;
+    int total = 0;
+    e.on([&total](int v){ total += v; });
+    e.on([](int v){ std::cout &lt;&lt; v*2 &lt;&lt; " "; });
+    e.emit(3);
+    e.emit(5);
+    std::cout &lt;&lt; total;
+}`,
+        question:{ fr:`Dans quel ordre les callbacks s'exécutent-ils, et quelle est la sortie complète ?`, en:`In what order do the callbacks execute, and what is the full output?` },
+        output:`6 10 8`,
+        explanation:{ fr:`emit(3) : callback 1 (total += 3 = 3), callback 2 (affiche 6). emit(5) : callback 1 (total += 5 = 8), callback 2 (affiche 10). Puis total (8) est affiché. Sortie : "6 10 8". Les callbacks s'exécutent dans l'ordre d'abonnement.`, en:`emit(3): callback 1 (total += 3 = 3), callback 2 (prints 6). emit(5): callback 1 (total += 5 = 8), callback 2 (prints 10). Then total (8) is printed. Output: "6 10 8". Callbacks execute in subscription order.` }
+      },
+      {
+        id:'i12_2', type:'cpp', xp:35,
+        instr:{ fr:`Implémente un système de collision 2D simplifié. Crée une struct AABB (Axis-Aligned Bounding Box) avec float x, y, w, h et une méthode bool intersects(const AABB& o) const. Crée deux AABB dans main(), teste si elles se superposent, et affiche "Collision!" ou "Pas de collision".`, en:`Implement a simplified 2D collision system. Create an AABB (Axis-Aligned Bounding Box) struct with float x, y, w, h and a bool intersects(const AABB& o) const method. Create two AABBs in main(), test if they overlap, and print "Collision!" or "No collision".` },
+        stub:`#include &lt;iostream&gt;
+struct AABB {
+    float x, y, w, h;
+    bool intersects(const AABB& o) const {
+        // vrai si les deux rectangles se superposent
+        // true if the two rectangles overlap
+    }
+};
+int main() {
+    AABB a{0, 0, 4, 4};
+    AABB b{3, 3, 4, 4};  // superposition partielle
+    AABB c{10, 10, 2, 2}; // pas de contact
+    std::cout &lt;&lt; (a.intersects(b) ? "Collision!" : "Pas de collision") &lt;&lt; std::endl;
+    std::cout &lt;&lt; (a.intersects(c) ? "Collision!" : "Pas de collision") &lt;&lt; std::endl;
+    return 0;
+}`,
+        hint:{ fr:`Deux rectangles se superposent si : x < o.x+o.w && x+w > o.x && y < o.y+o.h && y+h > o.y`, en:`Two rectangles overlap if: x < o.x+o.w && x+w > o.x && y < o.y+o.h && y+h > o.y` },
+        solution:{
+          fr:`<pre style="font-family:var(--mono);font-size:1.3rem;line-height:1.8;color:#e0e8ef">bool intersects(const AABB& o) const {
+    return x < o.x + o.w &&
+           x + w > o.x   &&
+           y < o.y + o.h &&
+           y + h > o.y;
+}</pre><p style="margin-top:.8rem;font-size:1.4rem;color:var(--ch2)">Sortie : <code>Collision!</code> puis <code>Pas de collision</code></p>`,
+          en:`<pre style="font-family:var(--mono);font-size:1.3rem;line-height:1.8;color:#e0e8ef">bool intersects(const AABB& o) const {
+    return x < o.x + o.w &&
+           x + w > o.x   &&
+           y < o.y + o.h &&
+           y + h > o.y;
+}</pre><p style="margin-top:.8rem;font-size:1.4rem;color:var(--ch2)">Output: <code>Collision!</code> then <code>No collision</code></p>`
+        }
+      },
+      {
+        id:'i12_3', type:'bug', xp:20,
+        instr:{ fr:`Cette lambda capture une variable par valeur alors qu'elle devrait la modifier. Identifie et corrige.`, en:`This lambda captures a variable by value when it should modify it. Identify and fix.` },
+        bugCode:`<span class="kw2">int</span> score = <span class="num">0</span>;
+<span class="kw2">auto</span> onHit = [<span class="bug-line">score</span>]() {
+    score += <span class="num">10</span>;  <span class="cm">// ne modifie pas score !</span>
+};
+onHit(); onHit();
+std::cout &lt;&lt; score;  <span class="cm">// affiche 0</span>`,
+        explanation:{ fr:`[score] capture score par valeur — une copie locale est modifiée, pas la variable originale. score restera 0 après les appels. Correction : [&score] pour capturer par référence. Règle : pour modifier une variable extérieure dans une lambda, toujours capturer par référence (&).`, en:`[score] captures score by value — a local copy is modified, not the original variable. score will remain 0 after calls. Fix: [&score] to capture by reference. Rule: to modify an outer variable inside a lambda, always capture by reference (&).` }
+      },
+      {
+        id:'i12_4', type:'fill', xp:15,
+        instr:{ fr:`Pour capturer une variable extérieure par référence dans une lambda C++ :`, en:`To capture an outer variable by reference in a C++ lambda:` },
+        template:{ fr:'auto cb = [______count]() { count++; };', en:'auto cb = [______count]() { count++; };' },
+        answer:'&',
+        hint:{ fr:`Le préfixe de capture qui prend l'adresse de la variable au lieu de la copier`, en:`The capture prefix that takes the variable's address instead of copying it` }
+      },
+    ],
+  },
+
+  engine:{
+    demoSteps:[
+      {
+        label:{ fr:'Configure la collision sur un Component', en:'Configure collision on a Component' },
+        fr:`Dans le constructeur de l'Actor, crée un USphereComponent : Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere")). Configure : Sphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly); Sphere->SetCollisionResponseToAllChannels(ECR_Ignore); Sphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);. C'est plus explicite qu'Unity — on contrôle exactement avec quoi le component interagit.`,
+        en:`In the Actor's constructor, create a USphereComponent: Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere")). Configure: Sphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly); Sphere->SetCollisionResponseToAllChannels(ECR_Ignore); Sphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);. More explicit than Unity — you control exactly what the component interacts with.`
+      },
+      {
+        label:{ fr:'Lie OnComponentBeginOverlap dans BeginPlay()', en:'Bind OnComponentBeginOverlap in BeginPlay()' },
+        fr:`Dans BeginPlay() : Sphere->OnComponentBeginOverlap.AddDynamic(this, &AMyActor::OnOverlap);. Dans le .h, déclare : UFUNCTION() void OnOverlap(UPrimitiveComponent* Self, AActor* Other, UPrimitiveComponent* OtherComp, int32 OtherIdx, bool bFromSweep, const FHitResult& Hit);. La signature doit être exacte — AddDynamic est sensible aux types des paramètres.`,
+        en:`In BeginPlay(): Sphere->OnComponentBeginOverlap.AddDynamic(this, &AMyActor::OnOverlap);. In the .h, declare: UFUNCTION() void OnOverlap(UPrimitiveComponent* Self, AActor* Other, UPrimitiveComponent* OtherComp, int32 OtherIdx, bool bFromSweep, const FHitResult& Hit);. The signature must be exact — AddDynamic is sensitive to parameter types.`
+      },
+      {
+        label:{ fr:'Implémente OnOverlap et teste', en:'Implement OnOverlap and test' },
+        fr:`void AMyActor::OnOverlap(...) { if(AActor* Pawn = Cast<AActor>(Other)) { UE_LOG(LogTemp, Display, TEXT("Overlap avec: %s"), *Pawn->GetName()); Destroy(); } }. Place l'Actor dans la scène avec le ThirdPerson character. Joue et marche dans l'Actor. L'Actor doit loguer l'overlap et se détruire. Compare avec OnTriggerEnter en Unity — même logique, syntaxe plus explicite.`,
+        en:`void AMyActor::OnOverlap(...) { if(AActor* Pawn = Cast<AActor>(Other)) { UE_LOG(LogTemp, Display, TEXT("Overlap with: %s"), *Pawn->GetName()); Destroy(); } }. Place the Actor in the scene with the ThirdPerson character. Play and walk into the Actor. It should log the overlap and destroy itself. Compare with OnTriggerEnter in Unity — same logic, more explicit syntax.`
+      },
+    ],
+    discussion:[
+      { fr:`En Unity, la collision est configurée sur le GameObject via le Collider inspector. En Unreal, c'est par Component en code. Lequel donne plus de contrôle dans un jeu avec beaucoup de types d'objets différents ?`, en:`In Unity, collision is configured on the GameObject via the Collider inspector. In Unreal, it's per Component in code. Which gives more control in a game with many different object types?` },
+    ],
+    compare:{
+      cs:`<span class="cm">// Unity</span>
 <span class="kw">void</span> <span class="fn">OnTriggerEnter</span>(
     <span class="ty">Collider</span> other)
 {
     <span class="kw">if</span>(other.<span class="fn">CompareTag</span>(<span class="str">"Player"</span>))
-        <span class="fn">PickUp</span>();
-}
-<span class="cm">// Raycast</span>
-<span class="ty">Physics</span>.<span class="fn">Raycast</span>(
-    origin, dir, <span class="kw">out</span> hit);`,
-    cpp:`<span class="cm">// Unreal — overlap</span>
-<span class="kw2">void</span> <span class="fn2">NotifyActorBeginOverlap</span>(
-    <span class="ty">AActor</span>* Other)
-{
-    <span class="kw2">if</span>(Other-&gt;<span class="fn2">ActorHasTag</span>(<span class="str">"Player"</span>))
-        <span class="fn2">PickUp</span>();
-}
-<span class="cm">// LineTrace</span>
-<span class="ty">FHitResult</span> Hit;
-GetWorld()-&gt;<span class="fn2">LineTraceSingleByChannel</span>(
-    Hit, Start, End, ECC_Visibility);`
-  },
-
-  activities: [
     {
-      id:'a12_1', type:'quiz', xp:15,
-      q:{
-        fr:`Quel est l'équivalent Unreal de OnTriggerEnter() en Unity ?`,
-        en:`What is the Unreal equivalent of Unity's OnTriggerEnter()?`
-      },
-      choices:[
-        { t:'OnComponentHit()', c:false,
-          fb:{ fr:`OnComponentHit est pour les collisions physiques (Block), pas les overlaps (Trigger).`, en:`OnComponentHit is for physical collisions (Block), not overlaps (Trigger).` } },
-        { t:'NotifyActorBeginOverlap()', c:true,
-          fb:{ fr:`Correct. NotifyActorBeginOverlap est appelé sur l'Actor quand un autre Actor entre en overlap. Équivalent direct de OnTriggerEnter.`, en:`Correct. NotifyActorBeginOverlap is called on the Actor when another Actor begins overlapping. Direct equivalent of OnTriggerEnter.` } },
-        { t:'BeginPlay()', c:false,
-          fb:{ fr:`BeginPlay est appelé au démarrage de l'Actor, pas lors d'une collision.`, en:`BeginPlay is called when the Actor starts, not on collision.` } },
-        { t:'Tick(float DeltaTime)', c:false,
-          fb:{ fr:`Tick est appelé chaque frame, pas spécifiquement lors d'un overlap.`, en:`Tick is called every frame, not specifically on overlap.` } },
-      ]
-    },
-    {
-      id:'a12_2', type:'fill', xp:20,
-      instr:{
-        fr:`Complète la déclaration de la structure qui stocke les informations d'un LineTrace en Unreal :`,
-        en:`Complete the declaration of the structure that stores LineTrace information in Unreal:`
-      },
-      template:{ fr:'F______ HitResult;\nGetWorld()->LineTraceSingleByChannel(..., HitResult, ...);', en:'F______ HitResult;\nGetWorld()->LineTraceSingleByChannel(..., HitResult, ...);' },
-      answer:'HitResult',
-      hint:{ fr:'La structure Unreal qui stocke les infos d\'un impact (commence par F)', en:'The Unreal structure that stores impact information (starts with F)' }
-    },
-    {
-      id:'a12_3', type:'bug', xp:30,
-      instr:{
-        fr:`Ce code de pickup ne se déclenche jamais, même quand le joueur touche le collectible. Trouve pourquoi.`,
-        en:`This pickup code never triggers, even when the player touches the collectible. Find why.`
-      },
-      bugCode:`<span class="kw2">void</span> <span class="fn2">NotifyActorBeginOverlap</span>(
-    <span class="ty">AActor</span>* OtherActor)
-{
-    <span class="kw2">if</span>(OtherActor-&gt;<span class="fn2">ActorHasTag</span>(
-        <span class="str"><span class="bug-line">"player"</span></span>))
-        <span class="fn2">Collect</span>();
+        <span class="fn">Destroy</span>(gameObject);
+    }
 }`,
-      explanation:{
-        fr:`Les tags Unreal sont sensibles à la casse. Si le joueur a le tag "Player" (P majuscule) et qu'on cherche "player" (p minuscule), ActorHasTag retourne false. Toujours vérifier la casse exacte des tags dans l'éditeur Unreal — et préférer des constantes nommées plutôt que des strings en dur pour éviter ce type d'erreur.`,
-        en:`Unreal tags are case-sensitive. If the player has tag "Player" (capital P) and we search for "player" (lowercase p), ActorHasTag returns false. Always verify the exact case of tags in the Unreal editor — and prefer named constants over hardcoded strings to avoid this type of error.`
-      }
+      cpp:`<span class="cm">// Unreal</span>
+<span class="mac">UFUNCTION</span>()
+<span class="kw2">void</span> <span class="fn2">OnOverlap</span>(
+    <span class="ty">UPrimitiveComponent</span>* Self,
+    <span class="ty">AActor</span>* Other, ...)
+{
+    <span class="kw2">if</span>(<span class="fn2">Cast</span>&lt;<span class="ty">ACharacter</span>&gt;(Other))
+        <span class="fn2">Destroy</span>();
+}`
     },
-    {
-      id:'a12_4', type:'engine', xp:50,
-      label:{ fr:'Dans Unreal', en:'In Unreal' },
-      task:{
-        fr:`1. Crée un Actor C++ avec une USphereComponent comme trigger zone. 2. Dans BeginPlay(), lie MySphere->OnComponentBeginOverlap.AddDynamic(this, &AMyActor::OnOverlap). 3. Implémente OnOverlap pour logger "Overlap!" avec UE_LOG quand un Actor entre. 4. Configure le SphereComponent pour qu'il génère des overlaps (SetGenerateOverlapEvents(true)). 5. Place l'Actor dans la scène avec le personnage et teste.`,
-        en:`1. Create a C++ Actor with a USphereComponent as a trigger zone. 2. In BeginPlay(), bind MySphere->OnComponentBeginOverlap.AddDynamic(this, &AMyActor::OnOverlap). 3. Implement OnOverlap to log "Overlap!" with UE_LOG when an Actor enters. 4. Configure the SphereComponent to generate overlaps (SetGenerateOverlapEvents(true)). 5. Place the Actor in the scene with the character and test.`
+    activities:[
+      {
+        id:'e12_1', type:'quiz', xp:15,
+        q:{ fr:`Pourquoi la méthode OnOverlap liée avec AddDynamic doit-elle être marquée UFUNCTION() ?`, en:`Why must the OnOverlap method bound with AddDynamic be marked UFUNCTION()?` },
+        choices:[
+          { t:{ fr:`Pour la rendre plus rapide à l'exécution`, en:`To make it faster at runtime` }, c:false, fb:{ fr:`UFUNCTION() n'affecte pas les performances — c'est une macro de réflexion.`, en:`UFUNCTION() doesn't affect performance — it's a reflection macro.` } },
+          { t:{ fr:`Pour qu'Unreal puisse la trouver via le système de réflexion au moment du binding`, en:`So Unreal can find it via the reflection system at binding time` }, c:true, fb:{ fr:`Correct. AddDynamic utilise la réflexion Unreal pour lier la fonction par nom — sans UFUNCTION(), la fonction est invisible au système de delegates.`, en:`Correct. AddDynamic uses Unreal's reflection to bind the function by name — without UFUNCTION(), the function is invisible to the delegate system.` } },
+          { t:{ fr:`Pour pouvoir l'appeler depuis Blueprint`, en:`To be able to call it from Blueprint` }, c:false, fb:{ fr:`UFUNCTION() sans spécificateur BlueprintCallable ne l'expose pas aux Blueprints. C'est pour le système de réflexion interne.`, en:`UFUNCTION() without BlueprintCallable doesn't expose it to Blueprints. It's for the internal reflection system.` } },
+          { t:{ fr:`Pour éviter que le GC ne supprime la fonction`, en:`To prevent the GC from deleting the function` }, c:false, fb:{ fr:`Le GC gère les UObjects — pas les fonctions membres C++. UFUNCTION() est pour la réflexion.`, en:`The GC manages UObjects — not C++ member functions. UFUNCTION() is for reflection.` } },
+        ]
       },
-      note:{
-        fr:`C'est l'un des exercices les plus complets jusqu'ici — prends le temps de lire les erreurs de compilation si ça ne compile pas du premier coup.`,
-        en:`This is one of the most complete exercises so far — take time to read compilation errors if it doesn't compile on the first try.`
-      }
-    },
-    {
-      id:'a12_5', type:'reflect', xp:10,
-      prompt:{
-        fr:`Unreal distingue Block (collision physique) et Overlap (trigger). Dans ton dernier projet Unity, as-tu eu des cas où tu avais besoin des deux sur le même objet — ex. un personnage qui bloque physiquement ET détecte les pickups ? Comment tu avais résolu ça, et comment le ferais-tu en Unreal ?`,
-        en:`Unreal distinguishes Block (physical collision) and Overlap (trigger). In your last Unity project, did you need both on the same object — e.g. a character that physically blocks AND detects pickups? How did you solve it, and how would you do it in Unreal?`
-      }
-    },
-  ],
-};
+      {
+        id:'e12_2', type:'fill', xp:20,
+        instr:{ fr:`Pour qu'un Component Unreal génère des événements Overlap (et non Block), la réponse de collision correcte est :`, en:`For an Unreal Component to generate Overlap events (not Block), the correct collision response is:` },
+        template:{ fr:'Sphere->SetCollisionResponseToChannel(ECC_Pawn, ______);', en:'Sphere->SetCollisionResponseToChannel(ECC_Pawn, ______);' },
+        answer:'ECR_Overlap',
+        hint:{ fr:`L'une des trois réponses Unreal : ECR_Ignore, ECR_Overlap, ECR_Block`, en:`One of Unreal's three responses: ECR_Ignore, ECR_Overlap, ECR_Block` }
+      },
+      {
+        id:'e12_3', type:'bug', xp:25,
+        instr:{ fr:`Cet Actor est censé détecter les overlaps avec le personnage, mais ne reçoit jamais l'événement. Identifie pourquoi.`, en:`This Actor is supposed to detect overlaps with the character, but never receives the event. Identify why.` },
+        bugCode:`<span class="cm">// Constructeur</span>
+Sphere-&gt;<span class="fn2">SetCollisionEnabled</span>(
+    <span class="ty">ECollisionEnabled</span>::QueryOnly);
+Sphere-&gt;<span class="fn2">SetCollisionResponseToAllChannels</span>(
+    <span class="bug-line"><span class="ty">ECR_Block</span></span>);
 
-document.addEventListener('DOMContentLoaded', () => {
-  const tp = document.getElementById('panel-tutor');
-  const sp = document.getElementById('panel-student');
-  if (tp) tp.innerHTML = renderTutorPanel(SESSION);
-  if (sp) sp.innerHTML = renderStudentPanel(SESSION);
-});
+<span class="cm">// BeginPlay</span>
+Sphere-&gt;OnComponentBeginOverlap.<span class="fn2">AddDynamic</span>(
+    <span class="kw2">this</span>, &amp;<span class="ty">AItem</span>::<span class="fn2">OnOverlap</span>);`,
+        explanation:{ fr:`ECR_Block ne génère pas d'événements Overlap — il bloque le mouvement. Pour recevoir OnComponentBeginOverlap, il faut ECR_Overlap. Correction : SetCollisionResponseToAllChannels(ECR_Ignore); puis SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap); — ignore tout sauf les Pawns qu'on detecte par Overlap.`, en:`ECR_Block doesn't generate Overlap events — it blocks movement. To receive OnComponentBeginOverlap, you need ECR_Overlap. Fix: SetCollisionResponseToAllChannels(ECR_Ignore); then SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap); — ignore everything except Pawns detected by Overlap.` }
+      },
+      {
+        id:'e12_4', type:'engine', xp:40,
+        label:{ fr:'Dans Unreal', en:'In Unreal' },
+        task:{ fr:`Crée un Actor C++ "Collectible" qui se détruit quand le joueur le touche et affiche un message dans le log. Étapes : 1. USphereComponent comme RootComponent. 2. SetCollisionResponseToAllChannels(ECR_Ignore), puis ECR_Overlap pour ECC_Pawn. 3. AddDynamic vers une fonction OnOverlap marquée UFUNCTION(). 4. Dans OnOverlap, Cast<ACharacter>(Other) pour vérifier que c'est le joueur, puis UE_LOG + Destroy(). 5. Place 5 instances dans la scène et collecte-les toutes.`, en:`Create a C++ "Collectible" Actor that destroys itself when the player touches it and logs a message. Steps: 1. USphereComponent as RootComponent. 2. SetCollisionResponseToAllChannels(ECR_Ignore), then ECR_Overlap for ECC_Pawn. 3. AddDynamic to an OnOverlap function marked UFUNCTION(). 4. In OnOverlap, Cast<ACharacter>(Other) to verify it's the player, then UE_LOG + Destroy(). 5. Place 5 instances in the scene and collect them all.` },
+        note:{ fr:`Ce Collectible sera réutilisé et enrichi dans la session 15.`, en:`This Collectible will be reused and enhanced in session 15.` }
+      },
+    ],
+  },
+};
+document.addEventListener('DOMContentLoaded',()=>{});
