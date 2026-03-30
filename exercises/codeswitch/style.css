@@ -453,3 +453,97 @@ pre { overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
 
 /* ── Combined dot (done in both paths) ── */
 .adot.done-both { background: var(--canary); }
+
+/* ================================================================
+   SETUP SECTION
+   ================================================================ */
+#setup-section { margin-bottom: 3.2rem; }
+
+.setup-toggle {
+  display: flex; align-items: center; gap: 1.2rem; width: 100%;
+  background: var(--ch7); border: 1.5px solid var(--ch6);
+  border-radius: var(--rl); padding: 1.4rem 2rem;
+  font-family: var(--f); font-size: 1.5rem; color: var(--ch2);
+  cursor: pointer; text-align: left; transition: all .2s var(--ease);
+}
+.setup-toggle:hover { border-color: var(--canary); color: var(--white); }
+.setup-toggle-icon { font-size: 1.2rem; color: var(--canary); flex-shrink: 0; }
+.setup-toggle-sub  { margin-left: auto; font-size: 1.2rem; color: var(--ch4);
+                     letter-spacing: .06em; white-space: nowrap; }
+
+.setup-body {
+  border: 1.5px solid var(--ch6); border-top: none;
+  border-radius: 0 0 var(--rl) var(--rl);
+  padding: 2.4rem; background: rgba(0,0,0,.15);
+}
+.setup-intro { font-size: 1.55rem; color: var(--ch2); line-height: 1.6;
+               margin-bottom: 2rem; }
+
+/* OS tabs */
+.os-tabs { display: flex; gap: .8rem; margin-bottom: 2.4rem; flex-wrap: wrap; }
+.os-tab {
+  padding: .7rem 1.6rem; border-radius: var(--r);
+  font-family: var(--f); font-size: 1.4rem;
+  border: 1.5px solid var(--ch6); color: var(--ch3); background: var(--ch7);
+  cursor: pointer; transition: all .2s var(--ease);
+}
+.os-tab:hover { border-color: var(--ch4); color: var(--white); }
+.os-tab.active { background: rgba(242,245,55,.1); border-color: var(--canary); color: var(--canary); }
+
+/* Two-column layout: IDE path | Engine path */
+.os-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 2.4rem; }
+@media(max-width:760px){ .os-panel { grid-template-columns: 1fr; } }
+
+.setup-path-label {
+  font-size: 1.1rem; letter-spacing: .1em; text-transform: uppercase;
+  padding: .4rem 1rem; border-radius: 12px; display: inline-block;
+  margin-bottom: 1.6rem;
+}
+.ide-label    { background: rgba(104,94,247,.15); color: var(--cobalt);
+                border: 1.5px solid rgba(104,94,247,.3); }
+.engine-label { background: rgba(156,246,212,.12); color: var(--aqua);
+                border: 1.5px solid rgba(156,246,212,.3); }
+
+/* Steps */
+.setup-steps { display: flex; flex-direction: column; gap: 1.4rem; }
+.setup-step  { display: flex; gap: 1.2rem; }
+.step-num {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  background: var(--ch6); color: var(--ch2);
+  font-size: 1.3rem; font-weight: 500;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: .2rem;
+}
+.step-body { flex: 1; min-width: 0; }
+.step-body strong { display: block; font-size: 1.45rem; color: var(--white);
+                    margin-bottom: .4rem; font-weight: 500; }
+.step-body p  { font-size: 1.4rem; color: var(--ch2); line-height: 1.5;
+                margin-bottom: .6rem; }
+.step-verify  { font-size: 1.3rem; color: var(--ch4); margin-bottom: .4rem !important; }
+.step-note    { font-size: 1.3rem; color: var(--ch4); margin-top: .4rem !important;
+                font-style: italic; }
+
+/* Inline code command */
+.code-cmd {
+  background: #0d1f27; border: 1px solid var(--ch6); border-radius: var(--r);
+  padding: .7rem 1.2rem; font-family: var(--mono); font-size: 1.3rem;
+  color: var(--canary); margin: .5rem 0; user-select: all;
+  white-space: nowrap; overflow-x: auto;
+}
+
+/* Extension pills */
+.ext-list { display: flex; gap: .6rem; flex-wrap: wrap; margin: .6rem 0; }
+.ext-pill {
+  background: var(--ch7); border: 1px solid var(--ch5);
+  border-radius: 4px; padding: .3rem .9rem;
+  font-size: 1.3rem; color: var(--ch1);
+}
+.ext-pill em { color: var(--ch4); font-style: normal; font-size: 1.2rem; }
+
+/* Download links */
+.setup-link {
+  display: inline-block; font-size: 1.35rem; color: var(--cobalt);
+  text-decoration: none; border-bottom: 1px solid rgba(104,94,247,.4);
+  margin: .4rem 0; transition: color .2s, border-color .2s;
+}
+.setup-link:hover { color: #b086e8; border-bottom-color: #b086e8; }

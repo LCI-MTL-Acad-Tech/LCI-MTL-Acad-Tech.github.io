@@ -30,6 +30,275 @@
       </div>
     </div>
   </section>
+  <!-- ── Setup section ── -->
+  <div id="setup-section">
+    <button class="setup-toggle" id="setup-toggle" onclick="toggleSetup()">
+      <span class="setup-toggle-icon" id="setup-icon">▸</span>
+      <span id="setup-toggle-label">Configurer ton environnement de développement</span>
+      <span class="setup-toggle-sub" id="setup-toggle-sub">g++ · VS Code · Unity · Unreal Engine</span>
+    </button>
+    <div class="setup-body" id="setup-body" style="display:none">
+
+      <p class="setup-intro" id="setup-intro"></p>
+
+      <!-- OS tabs -->
+      <div class="os-tabs">
+        <button class="os-tab active" id="os-linux"   onclick="switchOS('linux')"  >🐧 Linux (Ubuntu)</button>
+        <button class="os-tab"        id="os-mac"     onclick="switchOS('mac')"    >🍎 macOS</button>
+        <button class="os-tab"        id="os-windows" onclick="switchOS('windows')">🪟 Windows 11</button>
+      </div>
+
+      <!-- Linux -->
+      <div class="os-panel" id="panel-linux">
+        <div class="setup-path">
+          <div class="setup-path-label ide-label" id="label-ide-linux"></div>
+          <div class="setup-steps">
+            <div class="setup-step">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <strong id="ls1-title"></strong>
+                <p id="ls1-body"></p>
+                <div class="code-cmd">sudo apt update &amp;&amp; sudo apt install -y build-essential</div>
+                <p class="step-verify" id="ls1-verify"></p>
+                <div class="code-cmd">g++ --version</div>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <strong id="ls2-title"></strong>
+                <p id="ls2-body"></p>
+                <a class="setup-link" href="https://code.visualstudio.com/Download" target="_blank">code.visualstudio.com/Download</a>
+                <p class="step-note" id="ls2-note"></p>
+                <div class="code-cmd">sudo apt install ./code_*.deb</div>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <strong id="ls3-title"></strong>
+                <p id="ls3-body"></p>
+                <div class="ext-list">
+                  <span class="ext-pill">C/C++ <em>Microsoft</em></span>
+                  <span class="ext-pill">C/C++ Extension Pack <em>Microsoft</em></span>
+                </div>
+                <p class="step-note" id="ls3-note"></p>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">4</div>
+              <div class="step-body">
+                <strong id="ls4-title"></strong>
+                <p id="ls4-body"></p>
+                <div class="code-cmd">g++ main.cpp -o main &amp;&amp; ./main</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="setup-path">
+          <div class="setup-path-label engine-label" id="label-engine-linux"></div>
+          <div class="setup-steps">
+            <div class="setup-step">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <strong id="le1-title"></strong>
+                <p id="le1-body"></p>
+                <a class="setup-link" href="https://store.epicgames.com/fr/download" target="_blank">store.epicgames.com → Epic Games Launcher</a>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <strong id="le2-title"></strong>
+                <p id="le2-body"></p>
+                <a class="setup-link" href="https://unity.com/download" target="_blank">unity.com/download → Unity Hub</a>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <strong id="le3-title"></strong>
+                <p id="le3-body"></p>
+                <div class="callout info"><strong id="le3-note-title"></strong><p id="le3-note-body"></p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- macOS -->
+      <div class="os-panel" id="panel-mac" style="display:none">
+        <div class="setup-path">
+          <div class="setup-path-label ide-label" id="label-ide-mac"></div>
+          <div class="setup-steps">
+            <div class="setup-step">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <strong id="ms1-title"></strong>
+                <p id="ms1-body"></p>
+                <div class="code-cmd">xcode-select --install</div>
+                <p class="step-verify" id="ms1-verify"></p>
+                <div class="code-cmd">g++ --version</div>
+                <p class="step-note" id="ms1-note"></p>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <strong id="ms2-title"></strong>
+                <p id="ms2-body"></p>
+                <a class="setup-link" href="https://code.visualstudio.com/Download" target="_blank">code.visualstudio.com/Download</a>
+                <p class="step-note" id="ms2-note"></p>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <strong id="ms3-title"></strong>
+                <p id="ms3-body"></p>
+                <div class="ext-list">
+                  <span class="ext-pill">C/C++ <em>Microsoft</em></span>
+                  <span class="ext-pill">C/C++ Extension Pack <em>Microsoft</em></span>
+                </div>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">4</div>
+              <div class="step-body">
+                <strong id="ms4-title"></strong>
+                <p id="ms4-body"></p>
+                <div class="code-cmd">g++ main.cpp -o main &amp;&amp; ./main</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="setup-path">
+          <div class="setup-path-label engine-label" id="label-engine-mac"></div>
+          <div class="setup-steps">
+            <div class="setup-step">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <strong id="me1-title"></strong>
+                <p id="me1-body"></p>
+                <a class="setup-link" href="https://store.epicgames.com/fr/download" target="_blank">store.epicgames.com → Epic Games Launcher</a>
+                <div class="callout warn" style="margin-top:1rem"><strong id="me1-warn-title"></strong><p id="me1-warn-body"></p></div>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <strong id="me2-title"></strong>
+                <p id="me2-body"></p>
+                <a class="setup-link" href="https://unity.com/download" target="_blank">unity.com/download → Unity Hub</a>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <strong id="me3-title"></strong>
+                <p id="me3-body"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Windows 11 -->
+      <div class="os-panel" id="panel-windows" style="display:none">
+        <div class="setup-path">
+          <div class="setup-path-label ide-label" id="label-ide-win"></div>
+          <p class="step-note" style="margin-bottom:1.2rem" id="win-ide-note"></p>
+          <div class="setup-steps">
+            <div class="setup-step">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <strong id="ws1-title"></strong>
+                <p id="ws1-body"></p>
+                <div class="code-cmd">winget install MSYS2.MSYS2</div>
+                <p class="step-note" id="ws1-note"></p>
+                <div class="code-cmd">pacman -S mingw-w64-ucrt-x86_64-gcc</div>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <strong id="ws2-title"></strong>
+                <p id="ws2-body"></p>
+                <p class="step-note" id="ws2-note"></p>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <strong id="ws3-title"></strong>
+                <p id="ws3-body"></p>
+                <a class="setup-link" href="https://code.visualstudio.com/Download" target="_blank">code.visualstudio.com/Download</a>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">4</div>
+              <div class="step-body">
+                <strong id="ws4-title"></strong>
+                <p id="ws4-body"></p>
+                <div class="ext-list">
+                  <span class="ext-pill">C/C++ <em>Microsoft</em></span>
+                  <span class="ext-pill">C/C++ Extension Pack <em>Microsoft</em></span>
+                </div>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">5</div>
+              <div class="step-body">
+                <strong id="ws5-title"></strong>
+                <p id="ws5-body"></p>
+                <div class="code-cmd">g++ main.cpp -o main.exe &amp;&amp; ./main.exe</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="setup-path">
+          <div class="setup-path-label engine-label" id="label-engine-win"></div>
+          <div class="setup-steps">
+            <div class="setup-step">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <strong id="we1-title"></strong>
+                <p id="we1-body"></p>
+                <a class="setup-link" href="https://visualstudio.microsoft.com/downloads/" target="_blank">visualstudio.microsoft.com → Community 2022</a>
+                <p class="step-note" id="we1-note"></p>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <strong id="we2-title"></strong>
+                <p id="we2-body"></p>
+                <a class="setup-link" href="https://store.epicgames.com/fr/download" target="_blank">store.epicgames.com → Epic Games Launcher</a>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <strong id="we3-title"></strong>
+                <p id="we3-body"></p>
+                <a class="setup-link" href="https://unity.com/download" target="_blank">unity.com/download → Unity Hub</a>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num">4</div>
+              <div class="step-body">
+                <strong id="we4-title"></strong>
+                <p id="we4-body"></p>
+                <div class="callout info"><strong id="we4-note-title"></strong><p id="we4-note-body"></p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /setup-body -->
+  </div><!-- /setup-section -->
+
   <div id="blocs"></div>
 </div>
 
@@ -67,12 +336,258 @@ const MANIFEST = {
   s15:{ num:15, fr:'Mini-Projet',                    en:'Mini-Project',                   sub:{fr:'Un collectible C++ complet',en:'A complete C++ collectible'},                        ideActs:3, engActs:3, xp:200 },
 };
 
+// ── Setup section strings ──────────────────────────────────────
+const SETUP = {
+  fr:{
+    toggleLabel:'Configurer ton environnement de développement',
+    toggleSub:'g++ · VS Code · Unity · Unreal Engine',
+    intro:`Le <strong>Parcours IDE</strong> nécessite g++ et VS Code. Le <strong>Parcours moteur</strong> nécessite Unity et Unreal Engine. Tu peux faire les deux — ou commencer par l'un.`,
+    ideLabel:'Parcours IDE — C++ pur',
+    engineLabel:'Parcours moteur — Unity + Unreal',
+    // Linux IDE
+    ls1_title:'Installe g++ (compilateur C++)',
+    ls1_body:'Ouvre un terminal et installe les outils de compilation. build-essential inclut g++, make, et les bibliothèques standard.',
+    ls1_verify:'Vérifie que g++ est installé :',
+    ls2_title:'Télécharge VS Code',
+    ls2_body:'Télécharge le paquet .deb depuis le site officiel, puis installe-le :',
+    ls2_note:'Ou installe depuis le snap : sudo snap install code --classic',
+    ls3_title:'Installe les extensions C++',
+    ls3_body:'Dans VS Code : Ctrl+Shift+X, puis cherche et installe ces deux extensions :',
+    ls3_note:'Le Extension Pack inclut déjà C/C++ — installe juste le pack si tu préfères.',
+    ls4_title:'Teste la compilation',
+    ls4_body:'Crée un fichier main.cpp avec un simple cout, puis dans le terminal intégré :',
+    // Linux Engine
+    le1_title:'Installe Unreal Engine via Epic Games Launcher',
+    le1_body:'Télécharge le launcher, connecte ton compte Epic (gratuit), puis installe Unreal Engine 5.x depuis l\'onglet Unreal Engine.',
+    le2_title:'Installe Unity via Unity Hub',
+    le2_body:'Télécharge Unity Hub, crée un compte Unity (gratuit), puis installe Unity 6 LTS ou 2022 LTS.',
+    le3_title:'Configure le compilateur pour Unreal',
+    le3_body:'Unreal Engine sous Linux utilise Clang. Il est généralement installé automatiquement. Si une erreur apparaît au premier lancement :',
+    le3_note_title:'Commande si Clang manque',
+    le3_note_body:'sudo apt install clang lld',
+    // macOS IDE
+    ms1_title:'Installe g++ via Xcode Command Line Tools',
+    ms1_body:'Ouvre le Terminal (Applications → Utilitaires) et exécute :',
+    ms1_verify:'Vérifie l\'installation :',
+    ms1_note:'Sur Mac, g++ utilise le backend Clang d\'Apple — compatible avec tout le code du cours.',
+    ms2_title:'Télécharge VS Code',
+    ms2_body:'Télécharge la version macOS (Universal ou Apple Silicon selon ton Mac) :',
+    ms2_note:'Glisse l\'app dans ton dossier Applications.',
+    ms3_title:'Installe les extensions C++',
+    ms3_body:'Dans VS Code : ⌘+Shift+X, puis installe :',
+    ms4_title:'Teste la compilation',
+    ms4_body:'Dans le terminal intégré de VS Code :',
+    // macOS Engine
+    me1_title:'Installe Unreal Engine',
+    me1_body:'Télécharge le launcher depuis le site officiel :',
+    me1_warn_title:'Apple Silicon (M1/M2/M3)',
+    me1_warn_body:'Unreal Engine 5.x supporte nativement Apple Silicon. Vérifie que tu télécharges la version Universal ou ARM64.',
+    me2_title:'Installe Unity Hub',
+    me2_body:'Télécharge Unity Hub depuis le site officiel, crée un compte Unity (gratuit), puis installe Unity 6 LTS ou 2022 LTS depuis l\'onglet Installs.',
+    me3_title:'Éditeur de code pour Unreal',
+    me3_body:'Pour Unreal sur Mac, VS Code ou Rider sont recommandés (Xcode fonctionne aussi). Dans Unreal : Edit → Editor Preferences → Source Code → Source Code Editor → Visual Studio Code.',
+    // Windows IDE
+    ws1_title:'Installe g++ via MSYS2',
+    ws1_body:'Ouvre PowerShell en tant qu\'administrateur et installe MSYS2 via winget. Puis ouvre le terminal MSYS2 (UCRT64) et installe g++ :',
+    ws1_note:'Après installation, ajoute C:\\msys64\\ucrt64\\bin à la variable d\'environnement PATH (Paramètres → Variables d\'environnement).',
+    win_ide_note:'g++ via MSYS2 est utilisé uniquement pour le Parcours IDE (exercices C++ purs). Le Parcours moteur utilise Visual Studio 2022, dans la colonne de droite.',
+    ws2_title:'Ajoute g++ au PATH',
+    ws2_body:'Pour que VS Code trouve g++, son chemin doit être dans le PATH système.',
+    ws2_note:'Ouvre Paramètres → Recherche "variables d\'environnement" → Variables système → Path → Nouveau → C:\\msys64\\ucrt64\\bin. Redémarre VS Code.',
+    ws3_title:'Télécharge et installe VS Code',
+    ws3_body:'Télécharge le User Installer (64-bit) :',
+    ws4_title:'Installe les extensions C++',
+    ws4_body:'Dans VS Code : Ctrl+Shift+X, installe :',
+    ws5_title:'Teste la compilation',
+    ws5_body:'Dans le terminal intégré (sélectionne UCRT64 comme shell si demandé) :',
+    // Windows Engine
+    we1_title:'Installe Visual Studio 2022 Community (requis par Unreal)',
+    we1_body:'Unreal Engine sous Windows utilise MSVC comme compilateur. Installe Visual Studio 2022 Community avec la charge de travail "Développement Desktop en C++" :',
+    we1_note:'Important : coche "Développement de jeux avec C++" dans l\'installeur. Cela installe aussi les composants Unreal nécessaires.',
+    we2_title:'Installe Unreal Engine',
+    we2_body:'Dans le launcher Epic, va dans l\'onglet Unreal Engine → Library, puis installe Unreal Engine 5.x. La première installation prend 30–60 min.',
+    we3_title:'Installe Unity Hub',
+    we3_body:'Télécharge Unity Hub depuis le site officiel, crée un compte Unity (gratuit), puis installe Unity 6 LTS ou 2022 LTS depuis l\'onglet Installs.',
+    we4_title:'Configure VS Code pour Unreal (optionnel)',
+    we4_body:'Visual Studio 2022 est l\'éditeur par défaut pour Unreal sur Windows. Pour utiliser VS Code à la place :',
+    we4_note_title:'Dans Unreal',
+    we4_note_body:'Edit → Editor Preferences → Source Code → Visual Studio Code. Installe l\'extension "Unreal Engine 5 C++ for VS Code" dans VS Code.',
+  },
+  en:{
+    toggleLabel:'Set up your development environment',
+    toggleSub:'g++ · VS Code · Unity · Unreal Engine',
+    intro:`The <strong>IDE Path</strong> requires g++ and VS Code. The <strong>Engine Path</strong> requires Unity and Unreal Engine. You can do both — or start with one.`,
+    ideLabel:'IDE Path — Pure C++',
+    engineLabel:'Engine Path — Unity + Unreal',
+    // Linux IDE
+    ls1_title:'Install g++ (C++ compiler)',
+    ls1_body:'Open a terminal and install the build tools. build-essential includes g++, make, and the standard libraries.',
+    ls1_verify:'Verify g++ is installed:',
+    ls2_title:'Download VS Code',
+    ls2_body:'Download the .deb package from the official site, then install it:',
+    ls2_note:'Or install from snap: sudo snap install code --classic',
+    ls3_title:'Install C++ extensions',
+    ls3_body:'In VS Code: Ctrl+Shift+X, then search and install these two extensions:',
+    ls3_note:'The Extension Pack already includes C/C++ — just install the pack if you prefer.',
+    ls4_title:'Test compilation',
+    ls4_body:'Create a main.cpp file with a simple cout, then in the integrated terminal:',
+    // Linux Engine
+    le1_title:'Install Unreal Engine via Epic Games Launcher',
+    le1_body:'Download the launcher, connect your Epic account (free), then install Unreal Engine 5.x from the Unreal Engine tab.',
+    le2_title:'Install Unity via Unity Hub',
+    le2_body:'Download Unity Hub, create a Unity account (free), then install Unity 6 LTS or 2022 LTS.',
+    le3_title:'Configure compiler for Unreal',
+    le3_body:'Unreal Engine on Linux uses Clang. It\'s usually installed automatically. If an error appears on first launch:',
+    le3_note_title:'Command if Clang is missing',
+    le3_note_body:'sudo apt install clang lld',
+    // macOS IDE
+    ms1_title:'Install g++ via Xcode Command Line Tools',
+    ms1_body:'Open Terminal (Applications → Utilities) and run:',
+    ms1_verify:'Verify the installation:',
+    ms1_note:'On Mac, g++ uses Apple\'s Clang backend — compatible with all code in this course.',
+    ms2_title:'Download VS Code',
+    ms2_body:'Download the macOS version (Universal or Apple Silicon depending on your Mac):',
+    ms2_note:'Drag the app to your Applications folder.',
+    ms3_title:'Install C++ extensions',
+    ms3_body:'In VS Code: ⌘+Shift+X, then install:',
+    ms4_title:'Test compilation',
+    ms4_body:'In VS Code\'s integrated terminal:',
+    // macOS Engine
+    me1_title:'Install Unreal Engine',
+    me1_body:'Download the launcher from the official site:',
+    me1_warn_title:'Apple Silicon (M1/M2/M3)',
+    me1_warn_body:'Unreal Engine 5.x natively supports Apple Silicon. Make sure you download the Universal or ARM64 version.',
+    me2_title:'Install Unity Hub',
+    me2_body:'Download Unity Hub from the official site, create a Unity account (free), then install Unity 6 LTS or 2022 LTS from the Installs tab.',
+    me3_title:'Code editor for Unreal',
+    me3_body:'For Unreal on Mac, VS Code or Rider are recommended (Xcode also works). In Unreal: Edit → Editor Preferences → Source Code → Source Code Editor → Visual Studio Code.',
+    // Windows IDE
+    ws1_title:'Install g++ via MSYS2',
+    ws1_body:'Open PowerShell as administrator and install MSYS2 via winget. Then open the MSYS2 terminal (UCRT64) and install g++:',
+    ws1_note:'After installation, add C:\\msys64\\ucrt64\\bin to the PATH environment variable (Settings → Environment Variables).',
+    win_ide_note:'g++ via MSYS2 is only needed for the IDE Path (pure C++ exercises). The Engine Path uses Visual Studio 2022, in the right-hand column.',
+    ws2_title:'Add g++ to PATH',
+    ws2_body:'For VS Code to find g++, its path must be in the system PATH.',
+    ws2_note:'Open Settings → Search "environment variables" → System variables → Path → New → C:\\msys64\\ucrt64\\bin. Restart VS Code.',
+    ws3_title:'Download and install VS Code',
+    ws3_body:'Download the User Installer (64-bit):',
+    ws4_title:'Install C++ extensions',
+    ws4_body:'In VS Code: Ctrl+Shift+X, install:',
+    ws5_title:'Test compilation',
+    ws5_body:'In the integrated terminal (select UCRT64 as shell if prompted):',
+    // Windows Engine
+    we1_title:'Install Visual Studio 2022 Community (required by Unreal)',
+    we1_body:'Unreal Engine on Windows uses MSVC as compiler. Install Visual Studio 2022 Community with the "Desktop development with C++" workload:',
+    we1_note:'Important: check "Game development with C++" in the installer. This also installs the necessary Unreal components.',
+    we2_title:'Install Unreal Engine',
+    we2_body:'In the Epic launcher, go to Unreal Engine → Library, then install Unreal Engine 5.x. First install takes 30–60 min.',
+    we3_title:'Install Unity Hub',
+    we3_body:'Download Unity Hub from the official site, create a Unity account (free), then install Unity 6 LTS or 2022 LTS from the Installs tab.',
+    we4_title:'Configure VS Code for Unreal (optional)',
+    we4_body:'Visual Studio 2022 is the default editor for Unreal on Windows. To use VS Code instead:',
+    we4_note_title:'In Unreal',
+    we4_note_body:'Edit → Editor Preferences → Source Code → Visual Studio Code. Install the "Unreal Engine 5 C++ for VS Code" extension in VS Code.',
+  }
+};
+
+let _currentOS = 'linux';
+
+function toggleSetup(){
+  const body=document.getElementById('setup-body');
+  const icon=document.getElementById('setup-icon');
+  const open=body.style.display==='none'||!body.style.display;
+  body.style.display=open?'block':'none';
+  icon.textContent=open?'▾':'▸';
+}
+
+function switchOS(os){
+  _currentOS=os;
+  ['linux','mac','windows'].forEach(o=>{
+    document.getElementById('panel-'+o).style.display=o===os?'block':'none';
+    document.getElementById('os-'+o).className='os-tab'+(o===os?' active':'');
+  });
+}
+
+function applySetupStrings(){
+  const s=SETUP[L];
+  // toggle
+  const tl=document.getElementById('setup-toggle-label');
+  const ts=document.getElementById('setup-toggle-sub');
+  if(tl) tl.textContent=s.toggleLabel;
+  if(ts) ts.textContent=s.toggleSub;
+  // intro
+  const intro=document.getElementById('setup-intro');
+  if(intro) intro.innerHTML=s.intro;
+  // path labels
+  ['linux','mac','win'].forEach(os=>{
+    const il=document.getElementById('label-ide-'+os);
+    const el=document.getElementById('label-engine-'+os);
+    if(il) il.textContent=s.ideLabel;
+    if(el) el.textContent=s.engineLabel;
+  });
+  // Linux IDE steps
+  const lid=['ls1','ls2','ls3','ls4'];
+  lid.forEach(id=>{
+    const t=document.getElementById(id+'-title');
+    const b=document.getElementById(id+'-body');
+    if(t) t.textContent=s[id+'_title']||'';
+    if(b) b.textContent=s[id+'_body']||'';
+  });
+  setInner('ls1-verify',s.ls1_verify);
+  setInner('ls2-note',s.ls2_note);
+  setInner('ls3-note',s.ls3_note);
+  // Linux Engine
+  ['le1','le2','le3'].forEach(id=>{
+    setInner(id+'-title',s[id+'_title']);
+    setInner(id+'-body',s[id+'_body']);
+  });
+  setInner('le3-note-title',s.le3_note_title);
+  setInner('le3-note-body',s.le3_note_body);
+  // macOS IDE
+  ['ms1','ms2','ms3','ms4'].forEach(id=>{
+    setInner(id+'-title',s[id+'_title']);
+    setInner(id+'-body',s[id+'_body']);
+  });
+  setInner('ms1-verify',s.ms1_verify);
+  setInner('ms1-note',s.ms1_note);
+  setInner('ms2-note',s.ms2_note);
+  // macOS Engine
+  ['me1','me2','me3'].forEach(id=>{
+    setInner(id+'-title',s[id+'_title']);
+    setInner(id+'-body',s[id+'_body']);
+  });
+  setInner('me1-warn-title',s.me1_warn_title);
+  setInner('me1-warn-body',s.me1_warn_body);
+  // Windows IDE
+  ['ws1','ws2','ws3','ws4','ws5'].forEach(id=>{
+    setInner(id+'-title',s[id+'_title']);
+    setInner(id+'-body',s[id+'_body']);
+  });
+  setInner('ws1-note',s.ws1_note);
+  setInner('ws2-note',s.ws2_note);
+  setInner('win-ide-note',s.win_ide_note);
+  // Windows Engine
+  ['we1','we2','we3','we4'].forEach(id=>{
+    setInner(id+'-title',s[id+'_title']);
+    setInner(id+'-body',s[id+'_body']);
+  });
+  setInner('we1-note',s.we1_note);
+  setInner('we4-note-title',s.we4_note_title);
+  setInner('we4-note-body',s.we4_note_body);
+}
+
+function setInner(id,val){
+  const el=document.getElementById(id);
+  if(el&&val) el.textContent=val;
+}
+
 function initHome(){
   // Apply lang strings
   document.documentElement.lang=L;
   document.getElementById('hero-title').innerHTML=t('heroTitle');
   document.getElementById('hero-sub').textContent=t('heroSub');
   document.getElementById('xp-lbl').textContent=t('xpLabel');
+  applySetupStrings();
   renderHome();
 }
 

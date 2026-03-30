@@ -86,38 +86,79 @@ function toggleLang(){
   location.reload();
 }
 
-// ── Cookies ───────────────────────────────────────────────────
+// ── Lang cookie (kept as cookie — small, needs no migration) ──
 function setCookie(n,v,d){ const e=new Date(); e.setTime(e.getTime()+d*864e5); document.cookie=`${n}=${encodeURIComponent(v)};expires=${e.toUTCString()};path=/;SameSite=Lax`; }
 function getCookie(n){ const m=document.cookie.match(new RegExp('(^| )'+n+'=([^;]+)')); return m?decodeURIComponent(m[2]):null; }
-function getP(){ try{ return JSON.parse(getCookie('cs_p')||'{}'); }catch{ return {}; } }
-function saveP(p){ setCookie('cs_p',JSON.stringify(p),365); }
 
-// ── Progress ── ns: 'ide' | 'eng' ────────────────────────────
+// ── Per-session localStorage ───────────────────────────────────
+// Key pattern: cs_s01, cs_s02, …
+// Value: JSON { ide:{actId:true,…}, eng:{actId:true,…},
+//               complete_ide:bool, complete_eng:bool, lastPath:'ide'|'engine' }
+// Fallback: if localStorage unavailable (private browsing without storage), silently no-op.
+
+function _lsGet(sessId){
+  try{ return JSON.parse(localStorage.getItem('cs_'+sessId)||'null')||{}; }
+  catch{ return {}; }
+}
+function _lsSet(sessId,rec){
+  try{ localStorage.setItem('cs_'+sessId, JSON.stringify(rec)); }catch{}
+}
+
+// One-time migration from old monolithic cookie
+(function migrateLegacyCookie(){
+  try{
+    const raw=getCookie('cs_p');
+    if(!raw) return;
+    const all=JSON.parse(decodeURIComponent(raw));
+    Object.entries(all).forEach(([sessId,rec])=>{
+      if(sessId.startsWith('s')&&!localStorage.getItem('cs_'+sessId)){
+        _lsSet(sessId,rec);
+      }
+    });
+    // Expire the old cookie
+    document.cookie='cs_p=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/';
+  }catch{}
+})();
+
+// Aggregate read — returns a proxy-like object for bulk home-screen reads
+// Individual session pages always use _lsGet(sessId) directly via helpers below
+function getP(){
+  // Used only on home page for iterating all sessions.
+  // Assembles a map on demand — not cached (home renders once per load).
+  const all={};
+  try{
+    for(let i=1;i<=15;i++){
+      const id='s'+String(i).padStart(2,'0');
+      const rec=_lsGet(id);
+      if(Object.keys(rec).length) all[id]=rec;
+    }
+  }catch{}
+  return all;
+}
+
+// ── Progress helpers ── ns: 'ide' | 'eng' ────────────────────
 function actDone(sessId,actId,ns){
-  return !!(getP()[sessId]?.[ns]?.[actId]);
+  return !!(_lsGet(sessId)?.[ns]?.[actId]);
 }
 function markActNs(sessId,actId,ns){
-  const p=getP();
-  if(!p[sessId]) p[sessId]={};
-  if(!p[sessId][ns]) p[sessId][ns]={};
-  p[sessId][ns][actId]=true;
-  saveP(p);
+  const rec=_lsGet(sessId);
+  if(!rec[ns]) rec[ns]={};
+  rec[ns][actId]=true;
+  _lsSet(sessId,rec);
 }
 function pathDone(sessId,acts,ns){
   return acts.filter(a=>actDone(sessId,a.id,ns)).length;
 }
-// Session counts as done if EITHER path ≥60%
 function isSessDone(sessId){
-  const rec=getP()[sessId]||{};
+  const rec=_lsGet(sessId);
   return !!(rec.complete_ide||rec.complete_eng);
 }
 function markPathComplete(sessId,ns){
-  const p=getP();
-  if(!p[sessId]) p[sessId]={};
-  p[sessId]['complete_'+ns]=true;
-  saveP(p);
+  const rec=_lsGet(sessId);
+  rec['complete_'+ns]=true;
+  _lsSet(sessId,rec);
 }
-function isPathComplete(sessId,ns){ return !!(getP()[sessId]?.['complete_'+ns]); }
+function isPathComplete(sessId,ns){ return !!(_lsGet(sessId)?.['complete_'+ns]); }
 
 // ── Toast ─────────────────────────────────────────────────────
 let _tt=null;
@@ -171,7 +212,7 @@ function initSessionPage(){
   if(pEng) pEng.innerHTML=S.engine ? renderPathPanel(S,'engine') : renderComingSoon();
 
   // Restore saved path
-  const saved=(getP()[sessId]?.lastPath)||'ide';
+  const saved=(_lsGet(sessId)?.lastPath)||'ide';
   switchPath(saved);
 
   // Nav
@@ -186,10 +227,9 @@ function initSessionPage(){
 function switchPath(path){
   if(typeof SESSION==='undefined') return;
   const sessId=SESSION.id;
-  const p=getP();
-  if(!p[sessId]) p[sessId]={};
-  p[sessId].lastPath=path;
-  saveP(p);
+  const rec=_lsGet(sessId);
+  rec.lastPath=path;
+  _lsSet(sessId,rec);
 
   ['ide','engine'].forEach(pt=>{
     const panel=document.getElementById('panel-'+pt);
@@ -465,12 +505,11 @@ function revealAns(rid,sessId,actId,ns){
 }
 
 function toggleActCheck(sessId,actId,ns){
-  const p=getP();
-  if(!p[sessId]) p[sessId]={};
-  if(!p[sessId][ns]) p[sessId][ns]={};
-  p[sessId][ns][actId]=!p[sessId][ns][actId];
-  saveP(p);
-  updateActCheck(actId,!!p[sessId][ns][actId]);
+  const rec=_lsGet(sessId);
+  if(!rec[ns]) rec[ns]={};
+  rec[ns][actId]=!rec[ns][actId];
+  _lsSet(sessId,rec);
+  updateActCheck(actId,!!rec[ns][actId]);
   updateCompBtn(sessId,ns);
 }
 
