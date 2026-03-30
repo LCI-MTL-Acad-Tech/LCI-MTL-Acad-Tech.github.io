@@ -822,7 +822,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <input type="checkbox"><div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Format de fichier : PDF avec texte sélectionnable (pas une image)" data-en="File format: PDF with selectable text (not an image)">Format de fichier : PDF avec texte sélectionnable (pas une image)</span><span class="tag tag-ai" data-fr="Lisible IA" data-en="AI-readable">Lisible IA</span></div>
-          <div class="item-hint" data-fr="Les systèmes ATS et les IA extracteurs ne lisent pas les images. Exporter depuis Word ou Google Docs en PDF natif." data-en="ATS systems and AI extractors cannot read images. Export from Word or Google Docs as native PDF.">Les systèmes ATS et les IA extracteurs ne lisent pas les images. Exporter depuis Word ou Google Docs en PDF natif.</div>
+          <div class="item-hint" data-fr="PDF est le format par défaut — sauf si l'offre demande explicitement autre chose. Ne jamais envoyer un fichier Word (.docx) non sollicité : la mise en page peut se déformer selon la version de Word du destinataire, et certains ATS le lisent mal. Exporter depuis Word ou Google Docs en PDF natif (pas via impression)." data-en="PDF is the default format — unless the posting explicitly requests something else. Never send an unsolicited Word file (.docx): layout may break depending on the recipient's Word version, and some ATS systems parse it poorly. Export from Word or Google Docs as native PDF (not via print).">PDF est le format par défaut — sauf si l'offre demande explicitement autre chose. Ne jamais envoyer un fichier Word (.docx) non sollicité.</div>
         </div>
       
         <button class="tip-btn" data-tip="cv-2" aria-label="Comment faire" aria-expanded="false">?</button>
@@ -1453,12 +1453,20 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
     </div>
 
     <div class="progress-label" style="margin-top:1.6rem;">
-      <span id="cl-progress-text" data-fr-template="0 / 12 complété" data-en-template="0 / 12 completed">0 / 12 complété</span>
+      <span id="cl-progress-text" data-fr-template="0 / 13 complété" data-en-template="0 / 13 completed">0 / 12 complété</span>
     </div>
     <div class="progress-bar-wrap"><div class="progress-bar" id="cl-bar" style="width:0%"></div></div>
 
     <div class="checklist-section" style="margin-top:2rem;">
       <div class="section-label" data-fr="Structure" data-en="Structure">Structure</div>
+
+      <label class="checklist-item" data-key="cl-0">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Format d’envoi adapté au mode de candidature" data-en="Submission format matched to the application method">Format d’envoi adapté au mode de candidature</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Le bon format dépend de comment vous postulez. Par courriel avec pièce jointe : PDF de préférence (mise en page préservée, lisible partout). Via un formulaire en ligne avec champ texte : collez le texte brut directement — pas de pièce jointe. Via un ATS (Workday, Greenhouse, Lever…) : vérifiez si le système accepte PDF ou demande du texte brut. Fichier Word (.docx) : seulement si explicitement demandé — jamais par défaut." data-en="The right format depends on how you are applying. Email with attachment: PDF by default (layout preserved, readable everywhere). Online form with a text field: paste plain text directly — no attachment. ATS portal (Workday, Greenhouse, Lever…): check whether the system accepts PDF or requires plain text. Word file (.docx): only if explicitly requested — never by default.">Le bon format dépend de comment vous postulez. Par courriel : PDF. Formulaire en ligne : texte brut. Word : seulement si demandé explicitement.</div>
+        </div>
+      </label>
 
       <label class="checklist-item" data-key="cl-1">
         <input type="checkbox"><div class="check-box"></div>
@@ -1903,7 +1911,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 // CONFIG
 // ================================================================
 const TABS   = ['cv', 'portfolio', 'cl', 'op'];
-const TOTALS = { cv: 19, portfolio: 20, cl: 12, op: 24 };
+const TOTALS = { cv: 19, portfolio: 20, cl: 13, op: 24 };
 const COOKIE_KEY = 'lci_career_checklist_v3';
 let currentLang = 'fr';
 let profileValue = 50; // 0=tech … 100=design
