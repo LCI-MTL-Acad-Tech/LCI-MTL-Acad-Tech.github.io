@@ -539,9 +539,200 @@ function toggleDeep(id){
   if(el){ el.classList.toggle('open'); if(cb) cb.checked=el.classList.contains('open'); }
 }
 
+// ================================================================
+// MODULE 0 — Single-panel warmup (no IDE/Engine split)
+// SESSION.solo = true signals this page to engine
+// Activities support: predict, quiz, fill, diff (spot-the-difference)
+// Progress stored under cs_s00 in localStorage, ns='m0'
+// ================================================================
+
+const TXT_M0 = {
+  fr:{
+    tryItLabel:'Essaie ce code en ligne — aucune installation',
+    tryItNote:'S\'ouvre dans onecompiler.com — clique Run ▶ pour exécuter',
+    diffPrompt:'Qu\'est-ce qui a changé entre le C# et le C++ ?',
+    actLabel:'Activités — C# ↔ C++',
+    diffLabel:'Spot la diff',
+    markDone:'Marquer terminé',
+  },
+  en:{
+    tryItLabel:'Try this code online — no install needed',
+    tryItNote:'Opens in onecompiler.com — click Run ▶ to execute',
+    diffPrompt:'What changed between C# and C++?',
+    actLabel:'Activities — C# ↔ C++',
+    diffLabel:'Spot the diff',
+    markDone:'Mark Complete',
+  }
+};
+function tm0(k){ return TXT_M0[L][k]||k; }
+
+function initM0Page(){
+  if(typeof SESSION==='undefined'||!SESSION.solo) return;
+  const S=SESSION;
+  const sessId=S.id; // 's00'
+
+  document.title=`Code//Switch — ${S.title[L]}`;
+  const blbl=document.getElementById('sess-bloc-lbl');
+  if(blbl){ blbl.textContent=S.blocName[L]; blbl.style.color=S.blocColor; }
+  const stitle=document.getElementById('sess-title');
+  if(stitle) stitle.textContent=S.title[L];
+  const ssub=document.getElementById('sess-sub');
+  if(ssub) ssub.textContent=S.sub[L];
+
+  // Mode pill
+  const pill=document.getElementById('mode-pill');
+  if(pill){ pill.textContent=L==='fr'?'ÉCHAUFFEMENT':'WARMUP'; }
+
+  // Concept block
+  const conceptEl=document.getElementById('sess-concept');
+  if(conceptEl&&S.tutor) conceptEl.innerHTML=renderSharedConcept(S);
+
+  // Render the single panel
+  const panel=document.getElementById('panel-m0');
+  if(panel) panel.innerHTML=renderM0Panel(S);
+
+  // Nav — no prev, next goes to s01
+  const prevBtn=document.getElementById('prev-sess-btn');
+  const nextBtn=document.getElementById('next-sess-btn');
+  if(prevBtn) prevBtn.classList.add('hidden');
+  if(nextBtn&&S.next){
+    nextBtn.textContent=t('nextSessBtn');
+    nextBtn.onclick=()=>{ location.href=`s${String(S.next).padStart(2,'0')}.html`; };
+  }
+}
+
+function renderM0Panel(S){
+  const sessId=S.id;
+  const ns='m0';
+  const acts=S.activities||[];
+  const done=pathDone(sessId,acts,ns);
+  const pct=acts.length?Math.round(done/acts.length*100):0;
+  const isComplete=isPathComplete(sessId,ns);
+
+  let h=`<div class="acts-section">
+    <div class="path-progress-row">
+      <span class="acts-lbl">${tm0('actLabel')}</span>
+      <span class="path-prog-label">${done}/${acts.length}</span>
+    </div>
+    <div class="path-progress-bar">
+      <div class="path-progress-fill" style="width:${pct}%;background:var(--canary)"></div>
+    </div>`;
+
+  // Render concepts interleaved with activities
+  (S.concepts||[]).forEach(concept=>{
+    h+=renderM0Concept(concept,sessId,ns,acts);
+  });
+
+  // Complete button
+  if(acts.length){
+    const showBtn=!isComplete&&done>=Math.ceil(acts.length*.6);
+    h+=`<div class="path-comp-row">
+      <button class="btn orange comp-path-btn${showBtn?' show':''}" id="comp-m0"
+        onclick="completeM0('${sessId}')">${tm0('markDone')}</button>
+    </div>`;
+  }
+
+  h+=`</div>`;
+  return h;
+}
+
+function renderM0Concept(concept,sessId,ns,allActs){
+  let h=`<div class="m0-concept-block">
+    <h3 class="m0-concept-title">${concept.title[L]}</h3>
+    <p class="m0-concept-body">${concept.body[L]}</p>`;
+
+  // Side-by-side code comparison
+  h+=`<div class="m0-side-by-side">
+    <div class="m0-col">
+      <div class="m0-lang-hdr cs-hdr">C# — Unity / .NET</div>
+      <div class="code-block" style="white-space:pre-wrap">${concept.cs}</div>
+    </div>
+    <div class="m0-col">
+      <div class="m0-lang-hdr cpp-hdr">C++ — équivalent</div>
+      <div class="code-block" style="white-space:pre-wrap">${concept.cpp}</div>
+    </div>
+  </div>`;
+
+  // Single web compiler link (OneCompiler, pre-set to C++)
+  if(concept.runUrl){
+    h+=`<div class="m0-run-row">
+      <a class="m0-run-btn" href="${concept.runUrl}" target="_blank">
+        <span>▶</span> ${tm0('tryItLabel')}
+      </a>
+      <span class="m0-run-note">${tm0('tryItNote')}</span>
+    </div>`;
+  }
+
+  // Key differences callout
+  if(concept.diff){
+    h+=`<div class="m0-diff-callout">
+      <strong>${L==='fr'?'Ce qui change :':'What changes:'}</strong>
+      <ul>${concept.diff[L].map(d=>`<li>${d}</li>`).join('')}</ul>
+    </div>`;
+  }
+
+  // Activities for this concept
+  const conceptActs=(concept.actIds||[]).map(id=>allActs.find(a=>a.id===id)).filter(Boolean);
+  conceptActs.forEach(act=>{ h+=renderM0Act(act,sessId,ns); });
+
+  h+=`</div>`;
+  return h;
+}
+
+function renderM0Act(act,sessId,ns){
+  const isDone=actDone(sessId,act.id,ns);
+  const badgeMap={quiz:'bq',fill:'bf',predict:'bpredict',diff:'bdiff'};
+  const labelMap={
+    quiz:t('quizLabel'),fill:t('fillLabel'),
+    predict:t('predictLabel'),diff:tm0('diffLabel')
+  };
+  let h=`<div class="activity${isDone?' completed':''}" id="wrap-${act.id}">
+    <div class="act-top">
+      <span class="abadge ${badgeMap[act.type]||'bq'}">${labelMap[act.type]||act.type} · ${act.xp||10} XP</span>
+      <button class="acheck${isDone?' done':''}" onclick="toggleActCheck('${sessId}','${act.id}','${ns}')">${isDone?'✓':''}</button>
+    </div>`;
+  if(act.type==='quiz')    h+=renderQuiz(act,sessId,ns);
+  if(act.type==='fill')    h+=renderFill(act,sessId,ns);
+  if(act.type==='predict') h+=renderPredict(act,sessId,ns);
+  if(act.type==='diff')    h+=renderDiff(act,sessId,ns);
+  h+=`</div>`;
+  return h;
+}
+
+function renderDiff(act,sessId,ns){
+  // Shows C# and C++ side by side, asks what changed — quiz format
+  const done=actDone(sessId,act.id,ns);
+  const choices=act.choices.map((c,i)=>{
+    const label=typeof c.t==='object'?c.t[L]:c.t;
+    return `<button class="choice" id="qc-${act.id}-${i}"
+      onclick="checkQ('${sessId}','${act.id}',${i},${act.choices.length},'${ns}')"
+      data-correct="${c.c}"
+      data-fb="${encodeURIComponent(typeof c.fb==='object'?c.fb[L]:c.fb)}"
+      ${done?'disabled':''}>${label}</button>`;
+  }).join('');
+  return `<div class="m0-diff-pair">
+    <div class="m0-diff-col"><div class="m0-diff-col-hdr cs-hdr">C#</div>
+      <div class="code-block" style="white-space:pre-wrap;font-size:1.25rem">${act.cs}</div></div>
+    <div class="m0-diff-col"><div class="m0-diff-col-hdr cpp-hdr">C++</div>
+      <div class="code-block" style="white-space:pre-wrap;font-size:1.25rem">${act.cpp}</div></div>
+  </div>
+  <p style="font-size:1.4rem;color:var(--ch2);margin-bottom:.8rem">${tm0('diffPrompt')}</p>
+  <div class="choices">${choices}</div>
+  <div class="feedback" id="fb-${act.id}"></div>`;
+}
+
+function completeM0(sessId){
+  markPathComplete(sessId,'m0');
+  const btn=document.getElementById('comp-m0');
+  if(btn) btn.classList.remove('show');
+  showToast(t('xpGain',typeof SESSION!=='undefined'?SESSION.xp:50));
+}
+
 // ── Auto-init ─────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
   initHeader();
-  if(typeof SESSION!=='undefined') initSessionPage();
+  if(typeof SESSION!=='undefined'&&SESSION.solo) initM0Page();
+  else if(typeof SESSION!=='undefined') initSessionPage();
   else if(typeof initHome==='function') initHome();
 });
+

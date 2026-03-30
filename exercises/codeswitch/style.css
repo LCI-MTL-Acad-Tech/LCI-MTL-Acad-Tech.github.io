@@ -547,3 +547,71 @@ pre { overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
   margin: .4rem 0; transition: color .2s, border-color .2s;
 }
 .setup-link:hover { color: #b086e8; border-bottom-color: #b086e8; }
+
+/* ================================================================
+   MODULE 0 — Warmup styles
+   ================================================================ */
+.m0-pill { border-color: var(--canary); color: var(--canary); }
+
+.m0-concept-block {
+  background: var(--ch7); border: 1.5px solid var(--ch6);
+  border-radius: var(--rl); padding: 2.4rem;
+  margin-bottom: 2.8rem;
+}
+.m0-concept-title {
+  font-size: 2rem; color: var(--white); margin-bottom: .8rem; font-weight: 500;
+}
+.m0-concept-body {
+  font-size: 1.55rem; color: var(--ch2); line-height: 1.6; margin-bottom: 2rem;
+}
+
+/* Two-column side-by-side code comparison */
+.m0-side-by-side {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem;
+}
+@media(max-width:640px){ .m0-side-by-side { grid-template-columns: 1fr; } }
+.m0-col { display: flex; flex-direction: column; gap: .6rem; }
+
+/* "Try it online" row */
+.m0-run-row {
+  display: flex; align-items: center; gap: 1.2rem; margin-bottom: 1.4rem; flex-wrap: wrap;
+}
+.m0-run-btn {
+  display: inline-flex; align-items: center; gap: .6rem;
+  background: rgba(242,245,55,.1); border: 1.5px solid rgba(242,245,55,.35);
+  border-radius: var(--r); padding: .6rem 1.4rem;
+  font-family: var(--f); font-size: 1.4rem; color: var(--canary);
+  text-decoration: none; transition: all .2s var(--ease);
+}
+.m0-run-btn:hover { background: rgba(242,245,55,.18); border-color: var(--canary); }
+.m0-run-note { font-size: 1.3rem; color: var(--ch4); }
+
+/* Key differences callout */
+.m0-diff-callout {
+  background: rgba(242,245,55,.06); border: 1.5px solid rgba(242,245,55,.2);
+  border-radius: var(--r); padding: 1.2rem 1.6rem; margin: 1.6rem 0;
+}
+.m0-diff-callout strong { color: var(--canary); font-size: 1.4rem; }
+.m0-diff-callout ul { margin: .6rem 0 0 1.6rem; padding: 0; }
+.m0-diff-callout li { font-size: 1.4rem; color: var(--ch2); line-height: 1.7; }
+
+/* Diff activity — side by side C# / C++ */
+.m0-diff-pair {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem;
+}
+@media(max-width:600px){ .m0-diff-pair { grid-template-columns: 1fr; } }
+.m0-diff-col-hdr {
+  font-size: 1.1rem; letter-spacing: .1em; text-transform: uppercase;
+  padding: .2rem .7rem; border-radius: 8px; display: inline-block; margin-bottom: .6rem;
+}
+
+/* bdiff badge */
+.bdiff { background: rgba(242,245,55,.12); color: var(--canary); }
+
+/* Module 0 home card */
+.m0-section { margin-bottom: 2.4rem; }
+.m0-card {
+  border-color: rgba(242,245,55,.3) !important;
+  background: rgba(242,245,55,.04) !important;
+}
+.m0-card:hover { border-color: var(--canary) !important; }

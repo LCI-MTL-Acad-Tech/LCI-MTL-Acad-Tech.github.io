@@ -299,6 +299,11 @@
     </div><!-- /setup-body -->
   </div><!-- /setup-section -->
 
+  <!-- Module 0 standalone card -->
+  <div class="m0-section">
+    <div class="scard m0-card" id="m0-card" style="cursor:pointer"></div>
+  </div>
+
   <div id="blocs"></div>
 </div>
 
@@ -592,16 +597,36 @@ function initHome(){
 }
 
 function renderHome(){
-  // XP & overall progress
-  const totalSess=Object.keys(MANIFEST).length;
-  const doneSess=Object.keys(MANIFEST).filter(id=>isSessComplete(id)).length;
-  const pct=Math.round(doneSess/totalSess*100);
-  document.getElementById('overall-fill').style.width=pct+'%';
-  document.getElementById('overall-lbl').textContent=t('sessionsOf',doneSess,totalSess);
-  // XP: sum of activities done across both paths
-  let xp=0;
+  // Module 0 — standalone card above the bloc grid
+  const m0rec=_lsGet('s00');
+  const m0done=Object.values(m0rec.m0||{}).filter(Boolean).length;
+  const m0total=11; // 11 activities in s00
+  const m0complete=!!(m0rec.complete_m0);
+  const m0pct=Math.round(m0done/m0total*100);
+  const m0el=document.getElementById('m0-card');
+  if(m0el){
+    const statusKey=m0complete?'sessDone':m0done>0?'sessPartial':'sessAvail';
+    const statusClass=m0complete?'done':m0done>0?'partial':'available';
+    const dots=Array.from({length:m0total},(_,i)=>{
+      const done=(m0rec.m0||{})[`a00_${i+1}`];
+      return `<span class="adot${done?' done-both':''}"></span>`;
+    }).join('');
+    m0el.innerHTML=`
+      <div class="snum">${L==='fr'?'Module 0 — Échauffement':'Module 0 — Warmup'}</div>
+      <h3>${L==='fr'?'C# que tu connais déjà':'C# you already know'}</h3>
+      <p>${L==='fr'?'Cinq concepts côte à côte sans rien installer':'Five concepts side by side — no install needed'}</p>
+      <div class="scard-meta">
+        <span class="sstatus ${statusClass}">${t(statusKey)}</span>
+        <div class="adots">${dots}</div>
+      </div>`;
+    m0el.className='scard m0-card'+(m0complete?' done':'');
+    m0el.onclick=()=>{ location.href='sessions/s00.html'; };
+  }
+
+  // XP — include Module 0 bonus
+  let xp=Math.floor(60*(m0done/m0total)*(m0complete?1:.8));
   Object.entries(MANIFEST).forEach(([id,m])=>{
-    const rec=getP()[id]||{};
+    const rec=_lsGet(id);
     const done=Object.values(rec.ide||{}).filter(Boolean).length
               +Object.values(rec.eng||{}).filter(Boolean).length;
     const maxActs=Math.max((m.ideActs||0)+(m.engActs||0),1);
@@ -609,10 +634,10 @@ function renderHome(){
   });
   document.getElementById('xp-num').textContent=xp+' XP';
 
-  // Overall: session done = either path marked complete
+  // Overall: session done = either path marked complete (Module 0 excluded from count)
   const totalSess=Object.keys(MANIFEST).length;
   const doneSess=Object.keys(MANIFEST).filter(id=>{
-    const r=getP()[id]||{}; return r.complete_ide||r.complete_eng;
+    const r=_lsGet(id); return r.complete_ide||r.complete_eng;
   }).length;
   document.getElementById('overall-fill').style.width=Math.round(doneSess/totalSess*100)+'%';
   document.getElementById('overall-lbl').textContent=t('sessionsOf',doneSess,totalSess);
@@ -622,7 +647,7 @@ function renderHome(){
   container.innerHTML='';
   BLOCS.forEach(bloc=>{
     const bSessions=bloc.sessions;
-    const bDone=bSessions.filter(id=>{ const r=getP()[id]||{}; return r.complete_ide||r.complete_eng; }).length;
+    const bDone=bSessions.filter(id=>{ const r=_lsGet(id); return r.complete_ide||r.complete_eng; }).length;
     const bPct=Math.round(bDone/bSessions.length*100);
     const sec=document.createElement('div');
     sec.className='bloc-section';
@@ -639,14 +664,14 @@ function renderHome(){
     bSessions.forEach((id,idx)=>{
       const m=MANIFEST[id];
       if(!m) return;
-      const rec=getP()[id]||{};
+      const rec=_lsGet(id);
       const anyDone=Object.values(rec.ide||{}).filter(Boolean).length>0
                    ||Object.values(rec.eng||{}).filter(Boolean).length>0;
       const anyComplete=!!(rec.complete_ide||rec.complete_eng);
 
       // Unlock when previous session has any activity done
       const prevId=idx>0?bSessions[idx-1]:null;
-      const prevRec=prevId?(getP()[prevId]||{}):null;
+      const prevRec=prevId?((_lsGet(prevId))):null;
       const prevStarted=prevRec
         ?(Object.values(prevRec.ide||{}).filter(Boolean).length>0
           ||Object.values(prevRec.eng||{}).filter(Boolean).length>0)
