@@ -695,6 +695,65 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
   padding: 0.25rem 0.7rem;
 }
 
+
+/* === NETWORKING TAB === */
+.net-section {
+  margin-bottom: 3.2rem;
+}
+.net-section-title {
+  font-size: 1.1rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--c300);
+  margin-bottom: 1.6rem; padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--c50);
+}
+.net-tips {
+  display: flex; flex-direction: column; gap: 1.6rem;
+}
+.net-tip {
+  background: var(--white);
+  border: 1.5px solid var(--c50);
+  border-left: 4px solid var(--blue);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 1.4rem 1.8rem;
+}
+.net-tip__title {
+  font-size: 1.4rem; font-weight: 500; color: var(--charcoal);
+  margin-bottom: 0.5rem;
+}
+.net-tip__body {
+  font-size: 1.35rem; color: var(--c500); line-height: 1.65;
+}
+.net-tip__body strong { color: var(--charcoal); font-weight: 500; }
+.net-tip__body a { color: var(--blue); text-decoration: underline; text-underline-offset: 2px; }
+.net-tip__body a:hover { color: var(--blue-dark); }
+.net-tip--caution { border-left-color: var(--red); }
+.net-tip--caution .net-tip__title { color: var(--red); }
+
+/* Interaction tips reuse generic-tips style but with slight variation */
+.interaction-tips {
+  background: var(--cream);
+  border: 1.5px solid var(--c50);
+  border-radius: var(--radius);
+  padding: 1.6rem 2rem;
+  margin-bottom: 2.8rem;
+}
+.interaction-tips__title {
+  font-size: 1.1rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--c300);
+  margin-bottom: 1.2rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--c50);
+}
+.interaction-tips__list { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
+.interaction-tips__list li {
+  font-size: 1.4rem; color: var(--c500); line-height: 1.5;
+  padding-left: 1.6rem; position: relative;
+}
+.interaction-tips__list li::before {
+  content: ''; position: absolute; left: 0; top: 0.7rem;
+  width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--blue);
+}
+.interaction-tips__list li.caution::before { background: var(--red); }
+.interaction-tips__list li strong { color: var(--charcoal); font-weight: 500; }
+
 </style>
 </head>
 <body>
@@ -739,6 +798,9 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
     <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-op" onclick="switchTab('op')" id="tab-op">
       <span data-fr="Présence en ligne" data-en="Online Presence">Présence en ligne</span>
       <span class="tab-count" id="count-op">0</span>
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-net" onclick="switchTab('net')" id="tab-net">
+      <span data-fr="Réseautage" data-en="Networking">Réseautage</span>
     </button>
   </div>
 
@@ -1623,6 +1685,21 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
     </div>
 
 
+
+    <!-- Social media interaction tips -->
+    <div class="interaction-tips">
+      <div class="interaction-tips__title" data-fr="Interagir avec le contenu des autres — bonne pratique" data-en="Engaging with others' content — best practice">Interagir avec le contenu des autres — bonne pratique</div>
+      <ul class="interaction-tips__list">
+        <li data-fr="<strong>Ton professionnel constant.</strong> Vos commentaires publics font partie de votre marque personnelle. Évitez l'humour ambigu, les raccourcis argotiques ou les prises de position clivantes — ce que vous écrivez est visible de tous vos contacts, y compris des recruteurs." data-en="<strong>Consistently professional tone.</strong> Your public comments are part of your personal brand. Avoid ambiguous humour, slang shortcuts, or divisive positions — what you write is visible to all your contacts, including recruiters."><strong>Ton professionnel constant.</strong> Vos commentaires publics font partie de votre marque personnelle. Évitez l'humour ambigu, les raccourcis argotiques ou les prises de position clivantes — ce que vous écrivez est visible de tous vos contacts, y compris des recruteurs.</li>
+        <li data-fr="<strong>Commenter avec valeur ajoutée.</strong> Un commentaire comme « Super post! » n'apporte rien. Réagissez avec une question, une nuance, un exemple tiré de votre expérience — cela montre votre expertise et augmente votre visibilité." data-en="<strong>Comment with added value.</strong> A comment like 'Great post!' adds nothing. React with a question, a nuance, or an example from your experience — it demonstrates expertise and increases your visibility."><strong>Commenter avec valeur ajoutée.</strong> Un commentaire comme « Super post! » n'apporte rien. Réagissez avec une question, une nuance, un exemple tiré de votre expérience.</li>
+        <li data-fr="<strong>Fréquence : régularité plutôt que volume.</strong> Mieux vaut 2–3 interactions réfléchies par semaine que 20 likes en rafale un vendredi soir. L'algorithme et les humains valorisent la constance." data-en="<strong>Frequency: consistency over volume.</strong> 2–3 thoughtful interactions per week beats 20 rapid likes on a Friday evening. Both the algorithm and humans value consistency."><strong>Fréquence : régularité plutôt que volume.</strong> Mieux vaut 2–3 interactions réfléchies par semaine que 20 likes en rafale. L'algorithme et les humains valorisent la constance.</li>
+        <li data-fr="<strong>Partager avec contexte.</strong> Quand vous repartagez un article ou un projet, ajoutez 2–3 phrases expliquant pourquoi vous le trouvez pertinent — pour vous, pour votre domaine, pour votre réseau. Un partage muet ne dit rien de vous." data-en="<strong>Share with context.</strong> When resharing an article or project, add 2–3 sentences explaining why you find it relevant — for you, your field, your network. A silent reshare says nothing about you."><strong>Partager avec contexte.</strong> Quand vous repartagez un contenu, ajoutez pourquoi vous le trouvez pertinent. Un partage muet ne dit rien de vous.</li>
+        <li data-fr="<strong>Demandes de connexion : personnalisez toujours.</strong> Un message d'invitation générique est souvent ignoré ou refusé. Précisez qui vous êtes, pourquoi vous souhaitez vous connecter et ce que vous avez en commun (cours, événement, secteur, contenu partagé)." data-en="<strong>Connection requests: always personalise.</strong> A generic invitation is often ignored or declined. State who you are, why you want to connect, and what you have in common (class, event, sector, shared content)."><strong>Demandes de connexion : personnalisez toujours.</strong> Un message générique est souvent ignoré. Précisez qui vous êtes, pourquoi vous souhaitez vous connecter et ce que vous avez en commun.</li>
+        <li data-fr="<strong>Ne pas demander de l'aide immédiatement après une connexion.</strong> Construisez d'abord la relation : interagissez avec le contenu de la personne, montrez un intérêt réel. Attendre au moins quelques échanges avant de solliciter une faveur est une règle non écrite du réseautage professionnel." data-en="<strong>Do not ask for favours immediately after connecting.</strong> Build the relationship first: engage with the person's content, show genuine interest. Waiting for at least a few exchanges before making a request is an unwritten rule of professional networking."><strong>Ne pas demander de l'aide immédiatement après une connexion.</strong> Construisez d'abord la relation — interagissez avec leur contenu, montrez un intérêt réel avant de solliciter.</li>
+        <li class="caution" data-fr="<strong>À éviter.</strong> Commenter pour contredire sans nuance, tagger des inconnus sans raison, s'abonner puis se désabonner pour gonfler les chiffres, ou publier du contenu purement personnel (vacances, opinions politiques) sur un profil professionnel." data-en="<strong>To avoid.</strong> Commenting to contradict without nuance, tagging strangers for no reason, follow-then-unfollow tactics to inflate numbers, or posting purely personal content (holidays, political opinions) on a professional profile."><strong>À éviter.</strong> Contredire sans nuance, tagger des inconnus, gonfler les chiffres artificiellement, ou publier du contenu purement personnel sur un profil professionnel.</li>
+      </ul>
+    </div>
+
     <!-- ── Principes transversaux ── -->
     <div class="checklist-section">
       <div class="section-label" data-fr="Principes transversaux — toutes plateformes" data-en="Cross-platform principles — all platforms">Principes transversaux — toutes plateformes</div>
@@ -1904,13 +1981,142 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 
   </div>
 
+
+  <!-- ==================== TAB 5: NETWORKING ==================== -->
+  <div class="tab-panel" id="panel-net" role="tabpanel" aria-labelledby="tab-net">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title" data-fr="Réseautage" data-en="Networking">Réseautage</h2>
+        <p class="panel-desc" data-fr="Le réseautage ne consiste pas à distribuer des cartes de visite — c'est construire des relations professionnelles authentiques dans la durée. Cette section couvre comment trouver des événements, comment s'y comporter, comment poursuivre en ligne, et comment trouver des gens avec qui y aller." data-en="Networking is not about handing out business cards — it is about building genuine professional relationships over time. This section covers finding events, how to behave at them, following up online, and finding people to attend with.">Le réseautage ne consiste pas à distribuer des cartes de visite — c'est construire des relations professionnelles authentiques dans la durée.</p>
+      </div>
+    </div>
+
+    <!-- ── Finding events ── -->
+    <div class="net-section">
+      <div class="net-section-title" data-fr="Trouver des événements (gratuitement)" data-en="Finding events (for free)">Trouver des événements (gratuitement)</div>
+      <div class="net-tips">
+
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Eventbrite" data-en="Eventbrite">Eventbrite</div>
+          <div class="net-tip__body" data-fr="La plateforme la plus complète pour trouver des événements professionnels locaux. Filtrez par « Gratuit », par catégorie (technologie, design, affaires) et par date. Abonnez-vous aux organisateurs récurrents dans votre secteur pour être notifié automatiquement. <a href='https://www.eventbrite.ca' target='_blank' rel='noopener'>eventbrite.ca</a>" data-en="The most comprehensive platform for finding local professional events. Filter by 'Free', by category (technology, design, business), and by date. Follow recurring organisers in your sector to be notified automatically. <a href='https://www.eventbrite.ca' target='_blank' rel='noopener'>eventbrite.ca</a>">La plateforme la plus complète pour trouver des événements professionnels locaux. Filtrez par « Gratuit », par catégorie (technologie, design, affaires) et par date. Abonnez-vous aux organisateurs récurrents dans votre secteur. <a href="https://www.eventbrite.ca" target="_blank" rel="noopener">eventbrite.ca</a></div>
+        </div>
+
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Meetup" data-en="Meetup">Meetup</div>
+          <div class="net-tip__body" data-fr="Plateforme centrée sur les groupes récurrents plutôt que les événements ponctuels. Idéale pour les communautés tech (Python, UX, AI, cybersécurité, game dev…). La plupart des groupes sont gratuits à rejoindre. Avantage : vous retrouvez les mêmes personnes d'une rencontre à l'autre, ce qui facilite l'approfondissement des relations. <a href='https://www.meetup.com' target='_blank' rel='noopener'>meetup.com</a>" data-en="A platform centred on recurring groups rather than one-off events. Ideal for tech communities (Python, UX, AI, cybersecurity, game dev…). Most groups are free to join. Advantage: you see the same people meeting after meeting, making it easier to deepen relationships. <a href='https://www.meetup.com' target='_blank' rel='noopener'>meetup.com</a>">Plateforme centrée sur les groupes récurrents. Idéale pour les communautés tech et créatives. La plupart des groupes sont gratuits. Vous retrouvez les mêmes personnes d'une rencontre à l'autre. <a href="https://www.meetup.com" target="_blank" rel="noopener">meetup.com</a></div>
+        </div>
+
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="LinkedIn Events" data-en="LinkedIn Events">LinkedIn Events</div>
+          <div class="net-tip__body" data-fr="LinkedIn recense les événements organisés par des entreprises, des associations professionnelles et des universités. Avantage : vous voyez quels contacts y participent avant même d'arriver, ce qui facilite l'approche sur place. Cherchez dans la barre de recherche → filtrez par « Événements »." data-en="LinkedIn lists events organised by companies, professional associations, and universities. Advantage: you can see which of your contacts are attending before you arrive, making it easier to approach people. Search in the search bar → filter by 'Events'.">LinkedIn recense les événements organisés par des entreprises et associations. Vous voyez quels contacts y participent — ce qui facilite l'approche sur place. Cherchez → filtrez par « Événements ».</div>
+        </div>
+
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Autres sources à ne pas négliger" data-en="Other sources worth checking">Autres sources à ne pas négliger</div>
+          <div class="net-tip__body" data-fr="<strong>Associations sectorielles</strong> — AQIII (TI au Québec), MTL NewTech, C2 Montréal, Montréal en Lumière pour les créatifs. <strong>Universités et collèges</strong> — les établissements organisent régulièrement des conférences et journées carrière ouvertes aux non-étudiants. <strong>Discord et Slack communautaires</strong> — beaucoup de communautés tech annoncent leurs événements IRL dans leurs serveurs. <strong>Reddit et Facebook</strong> — les groupes locaux par secteur affichent souvent des événements non listés ailleurs." data-en="<strong>Sector associations</strong> — AQIII (IT in Québec), MTL NewTech, C2 Montréal, Montréal en Lumière for creatives. <strong>Universities and colleges</strong> — institutions regularly host conferences and career days open to non-students. <strong>Community Discord and Slack</strong> — many tech communities announce IRL events in their servers. <strong>Reddit and Facebook</strong> — local sector groups often post events not listed elsewhere."><strong>Associations sectorielles</strong> — AQIII, MTL NewTech, C2 Montréal. <strong>Établissements d'enseignement</strong> — conférences et journées carrière souvent ouvertes au public. <strong>Discord et Slack communautaires</strong> — les communautés tech annoncent leurs événements IRL dans leurs serveurs. <strong>Reddit et Facebook</strong> — groupes locaux par secteur.</div>
+        </div>
+
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Le bénévolat comme porte d'entrée au réseautage" data-en="Volunteering as a networking entry point">Le bénévolat comme porte d'entrée au réseautage</div>
+          <div class="net-tip__body" data-fr="S'impliquer bénévolement dans un événement de votre secteur est l'une des façons les plus efficaces de rencontrer des professionnels — sans la pression de devoir « networker ». Vous travaillez côte à côte avec des gens du milieu, vous démontrez votre engagement, et la conversation vient naturellement du contexte partagé. Les festivals créatifs, conférences tech, game jams et événements communautaires recrutent régulièrement des bénévoles. C'est aussi une ligne concrète à ajouter à votre CV." data-en="Volunteering at an event in your sector is one of the most effective ways to meet professionals — without the pressure of having to 'network'. You work side by side with people from the industry, demonstrate your commitment, and conversation comes naturally from shared context. Creative festivals, tech conferences, game jams, and community events regularly recruit volunteers. It is also a concrete line to add to your CV.">S'impliquer bénévolement dans un événement de votre secteur vous place côte à côte avec des professionnels du milieu — sans la pression de devoir « networker ». La conversation vient naturellement du contexte partagé. C'est aussi une ligne concrète à ajouter à votre CV.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Finding people to attend with ── -->
+    <div class="net-section">
+      <div class="net-section-title" data-fr="Trouver des gens avec qui y aller" data-en="Finding people to attend with">Trouver des gens avec qui y aller</div>
+      <div class="net-tips">
+
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Pourquoi y aller à plusieurs" data-en="Why going with others helps">Pourquoi y aller à plusieurs</div>
+          <div class="net-tip__body" data-fr="Arriver seul·e à un événement de réseautage est intimidant — et c'est normal. Aller avec un·e ou deux collègues ou camarades réduit l'anxiété, permet de se séparer pour couvrir plus de terrain, et offre un point de réunion naturel si une conversation tourne en rond. L'objectif reste de rencontrer des <em>nouveaux</em> contacts, pas de rester en groupe fermé toute la soirée." data-en="Arriving alone at a networking event is intimidating — and that is normal. Going with one or two colleagues or classmates reduces anxiety, lets you split up to cover more ground, and provides a natural meeting point if a conversation stalls. The goal is still to meet <em>new</em> contacts, not to stay in a closed group all evening.">Arriver seul·e est intimidant. Aller à plusieurs réduit l'anxiété et permet de se séparer pour couvrir plus de terrain. L'objectif reste de rencontrer de nouveaux contacts — pas de rester en groupe fermé.</div>
+        </div>
+
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Comment trouver des accompagnateurs" data-en="How to find people to go with">Comment trouver des accompagnateurs</div>
+          <div class="net-tip__body" data-fr="<strong>Vos pairs de programme</strong> — partagez l'événement dans un groupe de classe ou un serveur Discord de programme. <strong>LinkedIn</strong> — postez que vous prévoyez d'assister et demandez si quelqu'un d'autre y va. <strong>La page de l'événement elle-même</strong> — sur Eventbrite et Meetup, vous pouvez voir qui d'autre s'est inscrit; envoyez un message direct. <strong>Groupes Reddit locaux</strong> — r/montreal et les subreddits sectoriels accueillent souvent ce type de demande." data-en="<strong>Your programme peers</strong> — share the event in a class group or programme Discord server. <strong>LinkedIn</strong> — post that you plan to attend and ask if anyone else is going. <strong>The event page itself</strong> — on Eventbrite and Meetup, you can see who else has registered; send a direct message. <strong>Local Reddit groups</strong> — r/montreal and sector subreddits often welcome this kind of request."><strong>Pairs de programme</strong> — partagez l'événement dans votre groupe de classe ou Discord. <strong>LinkedIn</strong> — postez que vous prévoyez d'y aller. <strong>La page de l'événement</strong> — sur Eventbrite et Meetup, vous pouvez voir qui s'est inscrit et envoyer un message. <strong>Reddit local</strong> — r/montreal et subreddits sectoriels.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Behaviour at events ── -->
+    <div class="net-section">
+      <div class="net-section-title" data-fr="Se comporter à un événement" data-en="Behaviour at events">Se comporter à un événement</div>
+      <div class="net-tips">
+
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Avant d'arriver : préparez votre pitch de 30 secondes" data-en="Before arriving: prepare your 30-second pitch">Avant d'arriver : préparez votre pitch de 30 secondes</div>
+          <div class="net-tip__body" data-fr="Vous allez répondre des dizaines de fois à « Qu'est-ce que vous faites? ». Préparez une réponse courte et mémorable : discipline + spécialité + ce que vous cherchez en ce moment. Ex. : « Je termine un programme en développement web, je me spécialise en interfaces accessibles, et je cherche un stage pour l'automne. »" data-en="You will answer 'What do you do?' dozens of times. Prepare a short, memorable answer: discipline + specialty + what you are currently looking for. E.g. 'I am finishing a web development programme, specialising in accessible interfaces, and looking for an internship this autumn.'">Préparez une réponse courte à « Qu'est-ce que vous faites? » : discipline + spécialité + ce que vous cherchez. Ex. : « Je termine un programme en développement web, je me spécialise en interfaces accessibles, et je cherche un stage pour l'automne. »</div>
+        </div>
+
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Approcher quelqu'un : commencer par écouter" data-en="Approaching someone: start by listening">Approcher quelqu'un : commencer par écouter</div>
+          <div class="net-tip__body" data-fr="La règle d'or du réseautage : poser des questions sur l'autre avant de parler de soi. « Sur quoi travaillez-vous en ce moment? », « Qu'est-ce qui vous a amené à cet événement? », « Qu'est-ce que vous pensez de [thème de l'événement]? ». Les gens aiment parler de leur travail — et une bonne écoute vous démarque immédiatement. <strong>L'objectif d'une première conversation n'est pas d'obtenir quelque chose</strong> — c'est d'établir un contact humain mémorable. Demander un emploi ou une connexion LinkedIn dans les premières minutes d'une conversation coupe court à toute relation possible." data-en="The golden rule of networking: ask about the other person before talking about yourself. 'What are you working on right now?', 'What brought you to this event?', 'What do you think of [event theme]?'. People enjoy talking about their work — and good listening immediately sets you apart. <strong>The goal of a first conversation is not to get something</strong> — it is to make a memorable human connection. Asking for a job or a LinkedIn connection within the first few minutes of a conversation shuts down any possible relationship.">Posez des questions sur l'autre avant de parler de vous. « Sur quoi travaillez-vous? », « Qu'est-ce qui vous a amené ici? ». Les gens aiment parler de leur travail — une bonne écoute vous démarque. <strong>L'objectif n'est pas d'obtenir quelque chose</strong> — c'est d'établir un contact humain mémorable.</div>
+        </div>
+
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Quitter une conversation gracieusement" data-en="Leaving a conversation gracefully">Quitter une conversation gracieusement</div>
+          <div class="net-tip__body" data-fr="Une conversation de réseautage n'a pas besoin de durer 30 minutes. Il est tout à fait approprié de dire : « Je ne veux pas monopoliser votre soirée — je vais continuer à circuler, mais je serais ravi·e de rester en contact sur LinkedIn. » Échangez les informations, puis circulez." data-en="A networking conversation does not need to last 30 minutes. It is perfectly appropriate to say: 'I do not want to take up your whole evening — I will keep circulating, but I would love to stay in touch on LinkedIn.' Exchange details, then move on.">Dites simplement : « Je ne veux pas monopoliser votre soirée — je vais continuer à circuler, mais j'aimerais rester en contact sur LinkedIn. » Échangez les informations et continuez.</div>
+        </div>
+
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="La substance avant les transactions" data-en="Substance before transactions">La substance avant les transactions</div>
+          <div class="net-tip__body" data-fr="Un réseautage efficace repose sur l'échange de valeur, pas sur la collecte de contacts. Avant de solliciter quoi que ce soit — un emploi, un stage, une connexion, une recommandation — demandez-vous : <strong>qu'est-ce que vous apportez à cette relation?</strong> Une perspective intéressante, une question réfléchie, de l'enthousiasme sincère pour leur travail. Les relations professionnelles durables se construisent sur la réciprocité, même asymétrique : partager un article pertinent, féliciter un accomplissement public, proposer un service avant d'en demander un." data-en="Effective networking is built on exchanging value, not collecting contacts. Before asking for anything — a job, an internship, a connection, a recommendation — ask yourself: <strong>what do you bring to this relationship?</strong> An interesting perspective, a thoughtful question, genuine enthusiasm for their work. Lasting professional relationships are built on reciprocity, even asymmetric: sharing a relevant article, congratulating a public achievement, offering something before asking for something.">Un réseautage efficace repose sur l'échange de valeur. Avant de solliciter quoi que ce soit, demandez-vous : <strong>qu'est-ce que vous apportez à cette relation?</strong> Une perspective, une question réfléchie, de l'enthousiasme sincère. Les relations durables se construisent sur la réciprocité.</div>
+        </div>
+
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Cartes de visite et alternatives numériques" data-en="Business cards and digital alternatives">Cartes de visite et alternatives numériques</div>
+          <div class="net-tip__body" data-fr="En 2025, l'URL LinkedIn ou un QR code vers votre portfolio remplace avantageusement la carte de visite papier. Si vous souhaitez quand même des cartes, gardez-les sobres : nom, discipline, courriel, LinkedIn, portfolio. N'attendez pas que l'autre sorte la sienne — proposez l'échange vous-même." data-en="In 2025, a LinkedIn URL or QR code to your portfolio effectively replaces a paper business card. If you still want cards, keep them simple: name, discipline, email, LinkedIn, portfolio. Do not wait for the other person to offer theirs — propose the exchange yourself.">En 2025, l'URL LinkedIn ou un QR code vers votre portfolio remplace avantageusement la carte papier. Si vous en faites, gardez-les sobres. N'attendez pas que l'autre sorte la sienne — proposez l'échange vous-même.</div>
+        </div>
+
+        <div class="net-tip net-tip--caution">
+          <div class="net-tip__title" data-fr="À éviter à un événement" data-en="What to avoid at an event">À éviter à un événement</div>
+          <div class="net-tip__body" data-fr="Rester collé à vos amis toute la soirée. Dominer la conversation ou parler uniquement de vous. Demander un emploi ou un stage dès les premières minutes. Consulter votre téléphone en permanence. Manger ou boire de façon à rendre la conversation difficile. Collecter le maximum de contacts sans intention de suivi — la qualité des relations prime sur le nombre." data-en="Staying glued to your friends all evening. Dominating the conversation or talking only about yourself. Asking for a job or internship within the first few minutes. Constantly checking your phone. Eating or drinking in a way that makes conversation difficult. Collecting as many contacts as possible with no follow-up intention — quality of relationships trumps quantity.">Rester avec vos amis toute la soirée. Dominer la conversation. Demander un emploi dès les premières minutes. Consulter votre téléphone en permanence. Collecter des contacts sans intention de suivi — la qualité prime sur le nombre.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Online networking ── -->
+    <div class="net-section">
+      <div class="net-section-title" data-fr="Réseautage en ligne : approche et messages" data-en="Online networking: outreach and messages">Réseautage en ligne : approche et messages</div>
+      <div class="net-tips">
+
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Le message de connexion LinkedIn" data-en="The LinkedIn connection message">Le message de connexion LinkedIn</div>
+          <div class="net-tip__body" data-fr="Personnalisez toujours — les messages génériques sont presque toujours ignorés. Structure efficace : (1) qui vous êtes en une phrase, (2) pourquoi vous contactez cette personne spécifiquement (leur travail, un article, un projet commun, un événement partagé), (3) ce que vous souhaitez — rester en contact, poser une question, suivre leur travail. Exemple : « Bonjour [prénom], je suis étudiant·e en design d'interaction et j'ai lu votre article sur l'accessibilité des formulaires — très éclairant. Je serais ravi·e de vous avoir dans mon réseau. »" data-en="Always personalise — generic messages are almost always ignored. Effective structure: (1) who you are in one sentence, (2) why you are contacting this specific person (their work, an article, a shared event), (3) what you are hoping for — to stay in touch, ask a question, follow their work. Example: 'Hi [first name], I am a student in interaction design and read your article on form accessibility — very insightful. I would love to have you in my network.'">Personnalisez toujours. Structure : (1) qui vous êtes, (2) pourquoi cette personne spécifiquement, (3) ce que vous souhaitez. Ex. : « Bonjour [prénom], je suis étudiant·e en design d'interaction et j'ai lu votre article sur l'accessibilité — très éclairant. Je serais ravi·e de vous avoir dans mon réseau. »</div>
+        </div>
+
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Le suivi après un événement" data-en="Following up after an event">Le suivi après un événement</div>
+          <div class="net-tip__body" data-fr="Envoyez un message dans les 24–48 heures. Rappelez le contexte (où vous vous êtes rencontrés, de quoi vous avez parlé), exprimez un intérêt réel, et proposez une prochaine étape légère si pertinent (un article à partager, une question, une invitation à un prochain événement). Ne demandez pas de faveur dans ce premier message de suivi." data-en="Send a message within 24–48 hours. Remind them of the context (where you met, what you discussed), express genuine interest, and suggest a light next step if relevant (an article to share, a question, an invitation to a future event). Do not ask for a favour in this first follow-up message.">Envoyez un message dans les 24–48h. Rappelez le contexte, exprimez un intérêt réel, proposez une étape légère si pertinent. Ne demandez pas de faveur dans ce premier message.</div>
+        </div>
+
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Les messages à froid (cold outreach)" data-en="Cold outreach messages">Les messages à froid (cold outreach)</div>
+          <div class="net-tip__body" data-fr="Contacter quelqu'un que vous ne connaissez pas du tout est délicat mais tout à fait légitime si c'est bien fait. Règles : soyez bref (5–7 lignes maximum), montrez que vous connaissez leur travail spécifiquement, n'exigez rien — proposez plutôt une question précise ou une courte rencontre de 15–20 minutes. Le piège le plus fréquent : un message qui commence par parler de soi et se termine par une demande. <strong>Commencez par eux</strong> — ce qui vous a frappé dans leur travail, pourquoi leur parcours spécifiquement. Acceptez gracieusement si la personne ne répond pas ou décline. Taux de réponse typique : 20–30% avec un bon message." data-en="Contacting someone you do not know at all is delicate but entirely legitimate if done well. Rules: be brief (5–7 lines maximum), show you know their specific work, demand nothing — instead propose a precise question or a short 15–20 minute meeting. The most common trap: a message that opens by talking about yourself and ends with a request. <strong>Start with them</strong> — what struck you about their work, why their specific path. Accept gracefully if the person does not respond or declines. Typical response rate: 20–30% with a good message.">Soyez bref (5–7 lignes max), montrez que vous connaissez leur travail. Le piège fréquent : parler de soi et terminer par une demande. <strong>Commencez par eux.</strong> Acceptez gracieusement un refus. Taux de réponse : ~20–30% avec un bon message.</div>
+        </div>
+
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Entretiens d'information (informational interviews)" data-en="Informational interviews">Entretiens d'information (informational interviews)</div>
+          <div class="net-tip__body" data-fr="Un entretien d'information est une rencontre de 20–30 minutes avec un·e professionnel·le pour en apprendre davantage sur un secteur, un poste ou une entreprise — ce n'est pas une entrevue d'embauche. C'est l'une des façons les plus efficaces d'explorer une carrière et d'élargir son réseau. Demandez-le explicitement : « Seriez-vous disponible pour un entretien d'information de 20 minutes? Je souhaite en apprendre davantage sur votre parcours en [domaine]. »" data-en="An informational interview is a 20–30 minute meeting with a professional to learn more about a sector, a role, or a company — it is not a job interview. It is one of the most effective ways to explore a career path and expand your network. Ask explicitly: 'Would you be available for a 20-minute informational interview? I would love to learn more about your path in [field].'">Une rencontre de 20–30 minutes avec un·e professionnel·le pour en apprendre sur un secteur ou un poste — pas une entrevue d'embauche. Demandez explicitement : « Seriez-vous disponible pour un entretien d'information de 20 minutes? »</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
 </div><!-- /page-wrap -->
 
 <script>
 // ================================================================
 // CONFIG
 // ================================================================
-const TABS   = ['cv', 'portfolio', 'cl', 'op'];
+const TABS   = ['cv', 'portfolio', 'cl', 'op', 'net'];
 const TOTALS = { cv: 19, portfolio: 20, cl: 13, op: 24 };
 const COOKIE_KEY = 'lci_career_checklist_v3';
 let currentLang = 'fr';
@@ -1948,6 +2154,7 @@ function setLang(lang) {
     // Skip elements that need innerHTML (handled separately below)
     if (el.classList.contains('lang-advisory__card-body')) return;
     if (el.classList.contains('footer-html-text')) return;
+    if (el.classList.contains('net-tip__body')) return;
     if (el.closest('.generic-tips__list')) return;
     el.textContent = el.getAttribute('data-' + lang) || el.textContent;
   });
@@ -1972,6 +2179,12 @@ function setLang(lang) {
 
   // Footer paragraphs contain HTML — must use innerHTML
   document.querySelectorAll('.footer-html-text[data-fr]').forEach(el => {
+    const val = el.getAttribute('data-' + lang);
+    if (val) el.innerHTML = val;
+  });
+
+  // Networking tip bodies and interaction tips contain HTML
+  document.querySelectorAll('.net-tip__body[data-fr], .interaction-tips__list li[data-fr]').forEach(el => {
     const val = el.getAttribute('data-' + lang);
     if (val) el.innerHTML = val;
   });
