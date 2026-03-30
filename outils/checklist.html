@@ -1,0 +1,2351 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Checklists interactives pour préparer CV, portfolio, lettre de motivation et présence en ligne. Interactive career checklists for CV, portfolio, cover letter and online presence.">
+<meta name="robots" content="index, follow">
+<title>Outils carrière · Career Tools</title>
+<style>
+/* === LCI BRAND FONTS v4.4.6 === */
+@font-face {
+  font-family: 'Modern Gothic';
+  src: local('Modern Gothic'), local('Modern Gothic Regular'),
+       url('https://dam.lcieducation.com/1fipm6Snk5jh2rLnFu4uq2hg8_sNzVmOTU5OWM0YzA4MDQ5/ModernGothic-Regular.woff2') format('woff2');
+  font-weight: 400; font-display: swap;
+}
+@font-face {
+  font-family: 'Modern Gothic';
+  src: local('Modern Gothic Medium'),
+       url('https://dam.lcieducation.com/1fidCrXy5z5kbAmnhACmEhth5_sYWE3Njc1ZTY2OGYwM2E1/ModernGothic-Medium.woff2') format('woff2');
+  font-weight: 500; font-display: swap;
+}
+@font-face {
+  font-family: 'Modern Gothic';
+  src: local('Modern Gothic Bold'),
+       url('https://dam.lcieducation.com/1fihEASn3qmjdpL2S77vCoz7w_sOWYzOTAxMGM2OTk3OTI5/ModernGothic-Bold.woff2') format('woff2');
+  font-weight: 700; font-display: swap;
+}
+
+/* === CSS VARIABLES === */
+:root {
+  --blue:       #00587c;
+  --blue-dark:  #00435e;
+  --blue-dim:   #e0ebef;
+  --red:        #eb2d37;
+  --cream:      #f8f5e9;
+  --cream-alt:  #ede9d8;
+  --charcoal:   #07181e;
+  --c700:       #2a3438;
+  --c500:       #424f54;
+  --c400:       #576266;
+  --c300:       #6d7478;
+  --c200:       #9ca3a5;
+  --c100:       #babfc0;
+  --c50:        #e1e3e4;
+  --white:      #ffffff;
+  --success:    #5b8000;
+  --cobalt:     #685ef7;   /* tech accent */
+  --taupe:      #cdc19e;   /* design accent */
+  --radius:     6px;
+  --duration:   0.25s;
+  --ease:       cubic-bezier(0.4, 0.14, 0.3, 1);
+}
+
+/* === RESET & BASE === */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 62.5%; scroll-behavior: smooth; }
+body {
+  font-family: 'Modern Gothic', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  font-size: 1.6rem;
+  line-height: 1.5;
+  color: var(--charcoal);
+  background: var(--cream);
+  min-height: 100vh;
+}
+
+/* === LAYOUT === */
+.page-wrap { max-width: 860px; margin: 0 auto; padding: 0 2.4rem 6rem; }
+
+/* === HEADER === */
+.site-header {
+  background: var(--charcoal);
+  padding: 2rem 2.4rem;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
+}
+.site-header__wordmark {
+  font-size: 1.3rem; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--c100);
+}
+.site-header__wordmark strong { color: var(--white); font-weight: 700; }
+
+.lang-toggle {
+  display: flex; background: rgba(255,255,255,0.1);
+  border-radius: 4px; overflow: hidden; flex-shrink: 0;
+}
+.lang-btn {
+  padding: 0.5rem 1.2rem; font-family: inherit;
+  font-size: 1.3rem; font-weight: 500; letter-spacing: 0.05em;
+  background: none; border: none; color: var(--c200);
+  cursor: pointer; transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
+}
+.lang-btn.active { background: var(--blue); color: var(--white); }
+.lang-btn:hover:not(.active) { background: rgba(255,255,255,0.15); color: var(--white); }
+
+/* === HERO === */
+.hero {
+  background: var(--blue); margin: 0 -2.4rem;
+  padding: 4rem 2.4rem 3.2rem; color: var(--white);
+}
+.hero__eyebrow {
+  font-size: 1.2rem; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 0.8rem;
+}
+.hero__title {
+  font-size: clamp(2.8rem, 5vw, 4.4rem); font-weight: 400;
+  letter-spacing: -0.03em; line-height: 1; margin-bottom: 1.2rem;
+}
+.hero__title em { font-style: normal; color: rgba(255,255,255,0.55); }
+.hero__sub { font-size: 1.5rem; color: rgba(255,255,255,0.75); max-width: 52ch; line-height: 1.5; }
+
+/* === TABS === */
+.tab-bar {
+  display: flex; border-bottom: 2px solid var(--c50);
+  margin: 3.2rem 0 0; background: var(--white);
+  border-radius: var(--radius) var(--radius) 0 0; overflow: hidden;
+}
+.tab-btn {
+  flex: 1; padding: 1.4rem 1.6rem; font-family: inherit;
+  font-size: 1.4rem; font-weight: 500; letter-spacing: 0.01em;
+  background: none; border: none; border-bottom: 3px solid transparent;
+  margin-bottom: -2px; color: var(--c400); cursor: pointer;
+  transition: all var(--duration) var(--ease); text-align: center;
+}
+.tab-btn .tab-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 2rem; height: 2rem; border-radius: 10px;
+  font-size: 1.1rem; font-weight: 700; background: var(--c50);
+  color: var(--c400); margin-left: 0.6rem; transition: all var(--duration) var(--ease);
+}
+.tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+.tab-btn.active .tab-count { background: var(--blue); color: var(--white); }
+.tab-btn:hover:not(.active) { color: var(--charcoal); background: var(--cream); }
+
+/* === PROFILE SLIDER BAR (sticky, portfolio only) === */
+.profile-slider-bar {
+  display: none; /* shown via JS when portfolio tab active */
+  position: sticky;
+  top: 65px; /* height of site-header */
+  z-index: 100;
+  background: var(--white);
+  border-bottom: 1.5px solid var(--c50);
+  padding: 1.4rem 3.2rem;
+  animation: fadeIn 0.2s ease;
+  box-shadow: 0 2px 12px rgba(7,24,30,0.06);
+}
+.profile-slider-bar.visible { display: block; }
+
+.slider-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem; gap: 1.6rem;
+}
+.slider-label-group { display: flex; flex-direction: column; gap: 0.2rem; }
+.slider-title {
+  font-size: 1.2rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--c400);
+}
+.slider-profile-name {
+  font-size: 1.5rem; font-weight: 500; color: var(--charcoal);
+  transition: color var(--duration) var(--ease);
+}
+
+/* The track + thumb */
+.slider-track-wrap { position: relative; padding: 0 0.4rem; }
+
+.slider-gradient {
+  height: 6px; border-radius: 3px;
+  background: linear-gradient(to right, var(--cobalt), var(--c100) 50%, var(--taupe));
+  margin-bottom: 0.8rem;
+}
+
+input[type="range"]#profile-slider {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 6px;
+  background: transparent;
+  position: absolute; top: 0; left: 0;
+  margin: 0; cursor: pointer;
+}
+input[type="range"]#profile-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 2rem; height: 2rem;
+  border-radius: 50%;
+  background: var(--white);
+  border: 3px solid var(--blue);
+  box-shadow: 0 1px 6px rgba(0,88,124,0.25);
+  transition: border-color var(--duration) var(--ease), transform 0.1s ease;
+}
+input[type="range"]#profile-slider::-moz-range-thumb {
+  width: 2rem; height: 2rem; border-radius: 50%;
+  background: var(--white); border: 3px solid var(--blue);
+  box-shadow: 0 1px 6px rgba(0,88,124,0.25);
+  cursor: pointer;
+}
+input[type="range"]#profile-slider:focus { outline: none; }
+input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
+  border-color: var(--charcoal); transform: scale(1.15);
+}
+
+.slider-endpoints {
+  display: flex; justify-content: space-between;
+  font-size: 1.2rem; font-weight: 500; margin-top: 0.6rem;
+}
+.slider-end-tech { color: var(--cobalt); }
+.slider-end-design { color: var(--c500); }
+
+/* Relevance dim for low-relevance items */
+.checklist-item[data-relevance="low"] {
+  opacity: 0.38;
+  transition: opacity 0.35s var(--ease);
+}
+.checklist-item[data-relevance="low"]:hover { opacity: 0.6; }
+.checklist-item[data-relevance="medium"] {
+  opacity: 0.72;
+  transition: opacity 0.35s var(--ease);
+}
+.checklist-item[data-relevance="high"] {
+  opacity: 1;
+  transition: opacity 0.35s var(--ease);
+}
+
+/* Relevance accent stripe */
+.checklist-item { position: relative; }
+.item-relevance-bar {
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 3px; border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.35s var(--ease), background 0.35s var(--ease);
+}
+.checklist-item[data-relevance="high"] .item-relevance-bar { opacity: 1; }
+.checklist-item[data-relevance="medium"] .item-relevance-bar { opacity: 0; }
+
+/* === TAB PANELS === */
+.tab-panel {
+  display: none; background: var(--white);
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 3.2rem; animation: fadeIn 0.2s ease;
+}
+.tab-panel.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* === PANEL HEADER === */
+.panel-header {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 1.6rem;
+  margin-bottom: 2.4rem; flex-wrap: wrap;
+}
+.panel-title { font-size: 2rem; font-weight: 400; letter-spacing: -0.02em; color: var(--charcoal); }
+.panel-desc { font-size: 1.4rem; color: var(--c400); margin-top: 0.4rem; max-width: 58ch; line-height: 1.5; }
+
+.btn-reset {
+  flex-shrink: 0; padding: 0.8rem 1.6rem; font-family: inherit;
+  font-size: 1.3rem; font-weight: 500; background: none;
+  border: 1.5px solid var(--c100); border-radius: 4px;
+  color: var(--c400); cursor: pointer;
+  transition: all var(--duration) var(--ease); white-space: nowrap;
+}
+.btn-reset:hover { border-color: var(--red); color: var(--red); background: rgba(235,45,55,0.04); }
+
+/* === PROGRESS === */
+.progress-bar-wrap {
+  background: var(--c50); border-radius: 3px; height: 4px;
+  margin-bottom: 2.8rem; overflow: hidden;
+}
+.progress-bar {
+  height: 100%; background: var(--blue); border-radius: 3px;
+  transition: width 0.4s var(--ease);
+}
+.progress-label {
+  font-size: 1.2rem; font-weight: 500; color: var(--c300);
+  letter-spacing: 0.04em; margin-bottom: 0.8rem; display: flex; justify-content: space-between;
+}
+
+/* === SECTIONS === */
+.checklist-section { margin-bottom: 2.8rem; }
+.section-label {
+  font-size: 1.1rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--c300);
+  margin-bottom: 1.2rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--c50);
+}
+
+/* === CHECKLIST ITEMS === */
+.checklist-item {
+  display: flex; gap: 1.2rem; align-items: flex-start;
+  padding: 1.2rem 0.8rem; border-bottom: 1px solid var(--c50);
+  cursor: pointer; border-radius: 4px; margin: 0 -0.8rem;
+  transition: background var(--duration) var(--ease), opacity 0.35s var(--ease);
+}
+.checklist-item:last-child { border-bottom: none; }
+.checklist-item:hover { background: var(--cream); }
+.checklist-item input[type="checkbox"] { display: none; }
+
+.check-box {
+  width: 2rem; height: 2rem; border: 2px solid var(--c100);
+  border-radius: 4px; flex-shrink: 0; margin-top: 0.1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--duration) var(--ease); background: var(--white);
+}
+.check-box::after {
+  content: ''; width: 0.5rem; height: 0.9rem;
+  border-right: 2.5px solid var(--white); border-bottom: 2.5px solid var(--white);
+  transform: rotate(45deg) translateY(-1px); opacity: 0; transition: opacity 0.15s ease;
+}
+.checklist-item.checked .check-box { background: var(--blue); border-color: var(--blue); }
+.checklist-item.checked .check-box::after { opacity: 1; }
+
+.item-text { flex: 1; }
+.item-label { font-size: 1.5rem; color: var(--charcoal); transition: color var(--duration) var(--ease); }
+.checklist-item.checked .item-label { color: var(--c300); text-decoration: line-through; text-decoration-color: var(--c100); }
+.item-hint { font-size: 1.25rem; color: var(--c300); margin-top: 0.3rem; line-height: 1.4; transition: color 0.35s var(--ease); }
+
+/* Tags */
+.tag {
+  display: inline-block; font-size: 1rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 0.2rem 0.7rem; border-radius: 3px; margin-left: 0.8rem;
+  vertical-align: middle; line-height: 1.6;
+}
+.tag-must   { background: rgba(235,45,55,0.1); color: var(--red); }
+.tag-ai     { background: var(--blue-dim); color: var(--blue-dark); }
+.tag-tip    { background: rgba(91,128,0,0.12); color: var(--success); }
+.tag-tech   { background: rgba(104,94,247,0.1); color: #4a40c8; }
+.tag-design { background: rgba(205,193,158,0.3); color: #7a6e50; }
+.tag-li     { background: rgba(0,119,181,0.1); color: #005885; }
+.tag-gh     { background: rgba(36,41,47,0.1); color: #24292f; }
+
+/* === HOW-TO TOOLTIP === */
+.tip-btn {
+  flex-shrink: 0;
+  width: 2rem; height: 2rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--c100);
+  background: var(--white);
+  color: var(--c400);
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color var(--duration) var(--ease),
+              color var(--duration) var(--ease),
+              background var(--duration) var(--ease);
+  margin-top: 0.1rem;
+  position: relative;
+  z-index: 1;
+}
+.tip-btn:hover,
+.tip-btn[aria-expanded="true"] {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: var(--blue-dim);
+}
+
+/* Tooltip bubble */
+.tip-bubble {
+  display: none;
+  position: fixed;
+  z-index: 500;
+  max-width: 32rem;
+  min-width: 22rem;
+  background: var(--charcoal);
+  color: var(--white);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.6rem;
+  box-shadow: 0 8px 24px rgba(7,24,30,0.28);
+  font-size: 1.3rem;
+  line-height: 1.55;
+  pointer-events: auto;
+}
+.tip-bubble.visible { display: block; animation: tipIn 0.18s var(--ease); }
+
+@keyframes tipIn {
+  from { opacity: 0; transform: translateY(4px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Arrow pointing up from bubble */
+.tip-bubble::before {
+  content: '';
+  position: absolute;
+  top: -6px; left: var(--arrow-left, 1.6rem);
+  width: 12px; height: 12px;
+  background: var(--charcoal);
+  transform: rotate(45deg);
+  border-radius: 2px;
+}
+.tip-bubble.flip-up::before {
+  top: auto; bottom: -6px;
+}
+
+.tip-bubble__title {
+  font-size: 1.2rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 0.6rem;
+}
+.tip-bubble__body {
+  color: rgba(255,255,255,0.9);
+}
+.tip-bubble__body p { margin-bottom: 0.6rem; }
+.tip-bubble__body p:last-child { margin-bottom: 0; }
+.tip-bubble__link {
+  display: inline-block;
+  margin-top: 0.8rem;
+  color: #7ec8e3;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-size: 1.2rem;
+  word-break: break-all;
+}
+.tip-bubble__link:hover { color: #fff; }
+
+/* Dismiss hint */
+.tip-bubble__dismiss {
+  margin-top: 1rem; padding-top: 0.8rem;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  font-size: 1.1rem; color: rgba(255,255,255,0.4);
+}
+
+.tag-itch   { background: rgba(235,45,55,0.08); color: #c22; }
+
+/* === LANGUAGE ADVISORY BOX === */
+.lang-advisory {
+  background: #f0f5f8;
+  border: 1.5px solid var(--blue-dim);
+  border-left: 4px solid var(--blue);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 1.6rem 2rem;
+  margin-bottom: 2.8rem;
+}
+.lang-advisory__title {
+  font-size: 1.2rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--blue-dark); margin-bottom: 1rem;
+}
+.lang-advisory__grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;
+}
+@media (max-width:620px) { .lang-advisory__grid { grid-template-columns: 1fr; } }
+.lang-advisory__card {
+  background: var(--white); border-radius: 4px;
+  border: 1px solid var(--c50); padding: 1.2rem 1.4rem;
+}
+.lang-advisory__card-title {
+  font-size: 1.25rem; font-weight: 700; color: var(--charcoal);
+  margin-bottom: 0.5rem; letter-spacing: 0.02em;
+}
+.lang-advisory__card-body {
+  font-size: 1.25rem; color: var(--c500); line-height: 1.5;
+}
+.lang-advisory__card-body strong { color: var(--charcoal); font-weight: 500; }
+
+/* === PLATFORM SOURCE LINK === */
+.source-link {
+  display: inline-block; font-size: 1.2rem; color: var(--blue);
+  text-decoration: underline; text-underline-offset: 2px;
+  margin-top: 0.4rem;
+}
+.source-link:hover { color: var(--blue-dark); }
+
+/* === COVER LETTER === */
+.cl-form { display: flex; flex-direction: column; gap: 2rem; }
+.field-group { display: flex; flex-direction: column; gap: 0.6rem; }
+.field-label { font-size: 1.3rem; font-weight: 500; color: var(--c500); letter-spacing: 0.02em; }
+.field-input, .field-textarea {
+  font-family: inherit; font-size: 1.5rem; color: var(--charcoal);
+  background: var(--white); border: 1.5px solid var(--c100);
+  border-radius: 4px; padding: 1rem 1.2rem;
+  transition: border-color var(--duration) var(--ease); width: 100%;
+}
+.field-input:focus, .field-textarea:focus {
+  outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-dim);
+}
+.field-textarea { resize: vertical; min-height: 8rem; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem; }
+@media (max-width: 580px) { .field-row { grid-template-columns: 1fr; } }
+
+.btn-primary {
+  align-self: flex-start; padding: 1.1rem 2.4rem; font-family: inherit;
+  font-size: 1.5rem; font-weight: 500; background: var(--blue);
+  color: var(--white); border: none; border-radius: 4px; cursor: pointer;
+  transition: background var(--duration) var(--ease), transform 0.1s ease;
+}
+.btn-primary:hover { background: var(--blue-dark); }
+.btn-primary:active { transform: scale(0.98); }
+
+.cl-outline {
+  display: none; margin-top: 2.4rem;
+  border: 1.5px solid var(--blue-dim); border-left: 4px solid var(--blue);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: #f0f5f8; padding: 2rem 2.4rem;
+}
+.cl-outline.visible { display: block; animation: fadeIn 0.3s ease; }
+.cl-outline__title {
+  font-size: 1.3rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--blue-dark); margin-bottom: 1.2rem;
+}
+.cl-outline__body { font-size: 1.4rem; color: var(--c700); line-height: 1.7; }
+.cl-outline__body p { margin-bottom: 1rem; }
+.cl-outline__body strong { font-weight: 500; color: var(--charcoal); }
+.cl-divider { margin: 3.2rem 0; border: none; border-top: 2px dashed var(--c50); }
+
+/* === COMPLETION BANNER === */
+.completion-banner {
+  display: none; background: linear-gradient(135deg, var(--success) 0%, #3d6b00 100%);
+  color: var(--white); border-radius: var(--radius);
+  padding: 2rem 2.4rem; margin-bottom: 2.4rem; animation: fadeIn 0.4s var(--ease);
+}
+.completion-banner.visible { display: block; }
+.completion-banner__title { font-size: 1.8rem; font-weight: 400; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+.completion-banner__sub { font-size: 1.4rem; color: rgba(255,255,255,0.8); }
+
+@media (max-width: 600px) {
+  .tab-panel { padding: 2rem 1.6rem; }
+  .tab-btn { font-size: 1.25rem; padding: 1.2rem 0.8rem; }
+  .profile-slider-bar { padding: 1.2rem 1.6rem; top: 61px; }
+}
+
+/* === COLLAPSIBLE PLATFORM SECTIONS === */
+.platform-section { margin-bottom: 2.4rem; border: 1.5px solid var(--c50); border-radius: var(--radius); overflow: hidden; }
+
+.platform-toggle {
+  width: 100%; display: flex; align-items: center; gap: 1.2rem;
+  padding: 1.4rem 1.6rem; background: var(--cream); border: none;
+  cursor: pointer; text-align: left; font-family: inherit;
+  transition: background var(--duration) var(--ease);
+}
+.platform-toggle:hover { background: var(--cream-alt); }
+.platform-toggle[aria-expanded="true"] { background: var(--white); }
+
+.platform-toggle__label {
+  flex: 1; display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap;
+}
+.platform-toggle__name { font-size: 1.4rem; font-weight: 700; color: var(--charcoal); }
+.platform-toggle__audience {
+  font-size: 1.2rem; color: var(--c400); font-weight: 400; font-style: italic;
+}
+.platform-toggle__count {
+  font-size: 1.2rem; color: var(--c300); white-space: nowrap;
+}
+.platform-toggle__chevron {
+  width: 1.6rem; height: 1.6rem; flex-shrink: 0; color: var(--c300);
+  transition: transform var(--duration) var(--ease);
+}
+.platform-toggle[aria-expanded="true"] .platform-toggle__chevron { transform: rotate(180deg); }
+
+.platform-body {
+  display: none; padding: 1.2rem 1.6rem 1.6rem; background: var(--white);
+}
+.platform-body.open { display: block; animation: fadeIn 0.2s ease; }
+
+/* Generic tips box */
+.generic-tips {
+  background: var(--cream); border: 1.5px solid var(--c50);
+  border-radius: var(--radius); padding: 1.6rem 2rem; margin-bottom: 2.4rem;
+}
+.generic-tips__title {
+  font-size: 1.1rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--c300);
+  margin-bottom: 1.2rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--c50);
+}
+.generic-tips__list { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
+.generic-tips__list li {
+  font-size: 1.4rem; color: var(--c500); line-height: 1.5;
+  padding-left: 1.6rem; position: relative;
+}
+.generic-tips__list li::before {
+  content: ''; position: absolute; left: 0; top: 0.7rem;
+  width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--blue);
+}
+.generic-tips__list li strong { color: var(--charcoal); font-weight: 500; }
+
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__wordmark">
+    <strong>Outils carrière</strong> &nbsp;·&nbsp; Career Tools
+  </div>
+  <div class="lang-toggle" role="group" aria-label="Language / Langue">
+    <button class="lang-btn active" onclick="setLang('fr')" id="lang-fr" aria-pressed="true">FR</button>
+    <button class="lang-btn" onclick="setLang('en')" id="lang-en" aria-pressed="false">EN</button>
+  </div>
+</header>
+
+<div class="page-wrap">
+
+  <section class="hero">
+    <p class="hero__eyebrow" data-fr="Développement professionnel" data-en="Professional Development">Développement professionnel</p>
+    <h1 class="hero__title">
+      <span data-fr="Prêt·e pour le" data-en="Ready for the">Prêt·e pour le</span>
+      <em data-fr=" marché du travail" data-en=" job market"> marché du travail</em>
+    </h1>
+    <p class="hero__sub" data-fr="Outils de base pour construire votre candidature : CV lisible par humains et par IA, portfolio qui impressionne, et lettre de motivation adaptée à chaque offre." data-en="Basic tools to build your application: a CV readable by humans and AI, a portfolio that impresses, and a cover letter tailored to each posting.">
+      Outils de base pour construire votre candidature : CV lisible par humains et par IA, portfolio qui impressionne, et lettre de motivation adaptée à chaque offre.
+    </p>
+  </section>
+
+  <!-- TAB BAR -->
+  <div class="tab-bar" role="tablist">
+    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="panel-cv" onclick="switchTab('cv')" id="tab-cv">
+      <span data-fr="CV" data-en="CV">CV</span>
+      <span class="tab-count" id="count-cv">0</span>
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-portfolio" onclick="switchTab('portfolio')" id="tab-portfolio">
+      <span data-fr="Portfolio" data-en="Portfolio">Portfolio</span>
+      <span class="tab-count" id="count-portfolio">0</span>
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-cl" onclick="switchTab('cl')" id="tab-cl">
+      <span data-fr="Lettre de motivation" data-en="Cover Letter">Lettre de motivation</span>
+      <span class="tab-count" id="count-cl">0</span>
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-op" onclick="switchTab('op')" id="tab-op">
+      <span data-fr="Présence en ligne" data-en="Online Presence">Présence en ligne</span>
+      <span class="tab-count" id="count-op">0</span>
+    </button>
+  </div>
+
+  <!-- PROFILE SLIDER BAR — sticky, portfolio only -->
+  <div class="profile-slider-bar" id="profile-slider-bar" role="region" aria-label="Profil">
+    <div class="slider-header">
+      <div class="slider-label-group">
+        <span class="slider-title" data-fr="Mon profil" data-en="My profile">Mon profil</span>
+        <span class="slider-profile-name" id="slider-profile-label">—</span>
+      </div>
+    </div>
+    <div class="slider-track-wrap">
+      <div class="slider-gradient"></div>
+      <input type="range" id="profile-slider" min="0" max="100" value="50"
+             aria-label="Profil tech vs design" oninput="onSliderMove(this.value)">
+    </div>
+    <div class="slider-endpoints">
+      <span class="slider-end-tech" data-fr="Développement / Tech" data-en="Development / Tech">Développement / Tech</span>
+      <span class="slider-end-design" data-fr="Design / Créatif" data-en="Design / Creative">Design / Créatif</span>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 1: CV ==================== -->
+  <div class="tab-panel active" id="panel-cv" role="tabpanel" aria-labelledby="tab-cv">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title" data-fr="Checklist CV" data-en="CV Checklist">Checklist CV</h2>
+        <p class="panel-desc" data-fr="Un CV efficace est concis, structuré et lisible par les systèmes ATS autant que par les recruteurs humains." data-en="An effective CV is concise, structured, and readable by ATS systems as well as human recruiters.">Un CV efficace est concis, structuré et lisible par les systèmes ATS autant que par les recruteurs humains.</p>
+      </div>
+      <button class="btn-reset" onclick="resetTab('cv')">
+        <span data-fr="Réinitialiser" data-en="Reset">Réinitialiser</span>
+      </button>
+    </div>
+
+    <div class="completion-banner" id="complete-cv">
+      <div class="completion-banner__title" data-fr="CV complété ✓" data-en="CV Complete ✓">CV complété ✓</div>
+      <div class="completion-banner__sub" data-fr="Toutes les bonnes pratiques sont en place. Votre CV est prêt." data-en="All best practices are in place. Your CV is ready.">Toutes les bonnes pratiques sont en place. Votre CV est prêt.</div>
+    </div>
+
+
+    <!-- Language advisory: CV -->
+    <div class="lang-advisory" id="cv-lang-advisory">
+      <div class="lang-advisory__title" data-fr="Dans quelle langue rédiger votre CV?" data-en="What language should your CV be in?">Dans quelle langue rédiger votre CV?</div>
+      <div class="lang-advisory__grid">
+        <div class="lang-advisory__card">
+          <div class="lang-advisory__card-title" data-fr="Étudiant·e local·e (Québec)" data-en="Local student (Québec)">Étudiant·e local·e (Québec)</div>
+          <div class="lang-advisory__card-body" data-fr="<strong>Français d'abord.</strong> Au Québec, la Loi 101 s'applique : les employeurs québécois exigent le français. Si le poste ou l'entreprise est bilingue, préparez deux versions — la version française reste la version principale. Joindre un CV unilingue anglais à une offre en français est une faute professionnelle." data-en="<strong>French first.</strong> In Québec, Law 101 applies: Québec employers require French. If the role or company is bilingual, prepare two versions — the French version remains primary. Submitting an English-only CV for a French-language posting is a professional misstep."><strong>Français d'abord.</strong> Au Québec, la Loi 101 s'applique : les employeurs québécois exigent le français. Si le poste ou l'entreprise est bilingue, préparez deux versions — la version française reste la version principale. Joindre un CV unilingue anglais à une offre en français est une faute professionnelle.</div>
+        </div>
+        <div class="lang-advisory__card">
+          <div class="lang-advisory__card-title" data-fr="Étudiant·e international·e" data-en="International student">Étudiant·e international·e</div>
+          <div class="lang-advisory__card-body" data-fr="<strong>Adaptez à l'offre.</strong> Pour le marché québécois, un CV en français est attendu. Pour des postes à l'international ou dans des entreprises anglophones (tech, startups, multinationales), une version anglaise peut être préférable. En cas de doute, préparez les deux et envoyez celle qui correspond à la langue de l'annonce." data-en="<strong>Match the posting.</strong> For the Québec market, a French CV is expected. For international positions or anglophone companies (tech, startups, multinationals), an English version may be preferable. When in doubt, prepare both and send whichever matches the language of the job posting."><strong>Adaptez à l'offre.</strong> Pour le marché québécois, un CV en français est attendu. Pour des postes à l'international ou dans des entreprises anglophones (tech, startups, multinationales), une version anglaise peut être préférable. En cas de doute, préparez les deux et envoyez celle qui correspond à la langue de l'annonce.</div>
+        </div>
+        <div class="lang-advisory__card">
+          <div class="lang-advisory__card-title" data-fr="Poste fédéral ou hors Québec" data-en="Federal or out-of-province role">Poste fédéral ou hors Québec</div>
+          <div class="lang-advisory__card-body" data-fr="<strong>Anglais ou bilingue.</strong> Pour la fonction publique fédérale ou les employeurs hors Québec, l'anglais est généralement la norme. Les postes bilingues demandent souvent les deux versions. Vérifiez la langue de l'offre et les exigences linguistiques du poste." data-en="<strong>English or bilingual.</strong> For the federal public service or employers outside Québec, English is generally the standard. Bilingual postings often expect both versions. Check the language of the offer and the linguistic requirements of the role."><strong>Anglais ou bilingue.</strong> Pour la fonction publique fédérale ou les employeurs hors Québec, l'anglais est généralement la norme. Les postes bilingues demandent souvent les deux versions. Vérifiez la langue de l'offre et les exigences linguistiques du poste.</div>
+        </div>
+        <div class="lang-advisory__card">
+          <div class="lang-advisory__card-title" data-fr="Secteurs internationaux (tech, jeux, design)" data-en="International sectors (tech, games, design)">Secteurs internationaux (tech, jeux, design)</div>
+          <div class="lang-advisory__card-body" data-fr="<strong>Anglais souvent attendu.</strong> Dans les studios de jeux, les agences de design international et les entreprises tech mondiales présentes à Montréal (Ubisoft, Unity, Autodesk…), l'anglais est souvent la langue de travail. Un CV en anglais — ou une version anglaise en complément — est stratégique." data-en="<strong>English often expected.</strong> In game studios, international design agencies, and global tech companies in Montréal (Ubisoft, Unity, Autodesk…), English is often the working language. An English CV — or an English version as a supplement — is strategic."><strong>Anglais souvent attendu.</strong> Dans les studios de jeux, les agences de design international et les entreprises tech mondiales présentes à Montréal (Ubisoft, Unity, Autodesk…), l'anglais est souvent la langue de travail. Un CV en anglais — ou une version anglaise en complément — est stratégique.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="progress-label">
+      <span id="cv-progress-text" data-fr-template="0 / 19 complété" data-en-template="0 / 19 completed">0 / 18 complété</span>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="cv-bar" style="width:0%"></div></div>
+
+    <div class="checklist-section">
+      <div class="section-label" data-fr="Structure et format" data-en="Structure & Format">Structure et format</div>
+
+      <label class="checklist-item" data-key="cv-1">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Longueur : 1 page (junior) ou 2 pages maximum" data-en="Length: 1 page (junior) or 2 pages maximum">Longueur : 1 page (junior) ou 2 pages maximum</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Les recruteurs lisent en moyenne 6 secondes. Chaque ligne doit justifier sa place." data-en="Recruiters read for an average of 6 seconds. Every line must earn its place.">Les recruteurs lisent en moyenne 6 secondes. Chaque ligne doit justifier sa place.</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="cv-2">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Format de fichier : PDF avec texte sélectionnable (pas une image)" data-en="File format: PDF with selectable text (not an image)">Format de fichier : PDF avec texte sélectionnable (pas une image)</span><span class="tag tag-ai" data-fr="Lisible IA" data-en="AI-readable">Lisible IA</span></div>
+          <div class="item-hint" data-fr="Les systèmes ATS et les IA extracteurs ne lisent pas les images. Exporter depuis Word ou Google Docs en PDF natif." data-en="ATS systems and AI extractors cannot read images. Export from Word or Google Docs as native PDF.">Les systèmes ATS et les IA extracteurs ne lisent pas les images. Exporter depuis Word ou Google Docs en PDF natif.</div>
+        </div>
+      
+        <button class="tip-btn" data-tip="cv-2" aria-label="Comment faire" aria-expanded="false">?</button>
+      </label>
+
+      <label class="checklist-item" data-key="cv-3">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Police standard : Arial, Calibri, Georgia ou équivalent (≥ 10pt)" data-en="Standard font: Arial, Calibri, Georgia or equivalent (≥ 10pt)">Police standard : Arial, Calibri, Georgia ou équivalent (≥ 10pt)</span><span class="tag tag-ai" data-fr="Lisible IA" data-en="AI-readable">Lisible IA</span></div>
+          <div class="item-hint" data-fr="Les polices décoratives ou d'icônes brisent la lecture automatique." data-en="Decorative or icon fonts break automated parsing.">Les polices décoratives ou d'icônes brisent la lecture automatique.</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="cv-4">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Pas de tableaux, colonnes multiples, zones de texte, ou en-têtes/pieds de page" data-en="No tables, multiple columns, text boxes, or headers/footers">Pas de tableaux, colonnes multiples, zones de texte, ou en-têtes/pieds de page</span><span class="tag tag-ai" data-fr="Lisible IA" data-en="AI-readable">Lisible IA</span></div>
+          <div class="item-hint" data-fr="Ces éléments visuels désorganisent l'ordre de lecture des ATS." data-en="These visual elements disrupt the reading order for ATS systems.">Ces éléments visuels désorganisent l'ordre de lecture des ATS.</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="cv-5">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Nom du fichier professionnel : Prenom-Nom-CV.pdf" data-en="Professional file name: FirstName-LastName-CV.pdf">Nom du fichier professionnel : Prenom-Nom-CV.pdf</span></div>
+        </div>
+      </label>
+    </div>
+
+    <div class="checklist-section">
+      <div class="section-label" data-fr="Contenu essentiel" data-en="Essential Content">Contenu essentiel</div>
+
+      <label class="checklist-item" data-key="cv-6">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="En-tête : nom complet, ville, courriel professionnel, téléphone, LinkedIn" data-en="Header: full name, city, professional email, phone, LinkedIn">En-tête : nom complet, ville, courriel professionnel, téléphone, LinkedIn</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Pas d'adresse complète ni de date de naissance. Inclure l'URL du portfolio si pertinent." data-en="No full address or date of birth. Include portfolio URL if relevant.">Pas d'adresse complète ni de date de naissance. Inclure l'URL du portfolio si pertinent.</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="cv-7">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Résumé professionnel ou objectif (2–4 phrases, adapté au poste)" data-en="Professional summary or objective (2–4 sentences, tailored to the role)">Résumé professionnel ou objectif (2–4 phrases, adapté au poste)</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
+          <div class="item-hint" data-fr="Répondre à : Qui suis-je? Quelle valeur j'apporte? Quel type de poste je cherche?" data-en="Answer: Who am I? What value do I bring? What kind of role am I seeking?">Répondre à : Qui suis-je? Quelle valeur j'apporte? Quel type de poste je cherche?</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="cv-8">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Expériences en ordre chronologique inverse, avec dates et titres clairs" data-en="Experiences in reverse chronological order, with clear dates and titles">Expériences en ordre chronologique inverse, avec dates et titres clairs</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="cv-9">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Chaque expérience contient des réalisations quantifiées, pas seulement des tâches" data-en="Each experience contains quantified achievements, not just tasks">Chaque expérience contient des réalisations quantifiées, pas seulement des tâches</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Ex. : « Augmenté le taux d'engagement de 35% » plutôt que « Géré les réseaux sociaux »." data-en="e.g. 'Increased engagement rate by 35%' rather than 'Managed social media'.">Ex. : « Augmenté le taux d'engagement de 35% » plutôt que « Géré les réseaux sociaux ».</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="cv-10">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Section compétences : techniques d'abord, puis transversales" data-en="Skills section: technical first, then transferable">Section compétences : techniques d'abord, puis transversales</span></div>
+          <div class="item-hint" data-fr="Listez les logiciels, langages, outils nommément. Les ATS cherchent des mots-clés exacts." data-en="List software, languages, and tools by name. ATS searches for exact keywords.">Listez les logiciels, langages, outils nommément. Les ATS cherchent des mots-clés exacts.</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="cv-11">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Formation : programme, établissement, année de diplôme" data-en="Education: programme, institution, graduation year">Formation : programme, établissement, année de diplôme</span></div>
+        </div>
+      </label>
+    </div>
+
+    <div class="checklist-section">
+      <div class="section-label" data-fr="Langue et ton" data-en="Language & Tone">Langue et ton</div>
+
+      <label class="checklist-item" data-key="cv-12">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Verbes d'action au passé pour les expériences passées (conçu, développé, dirigé…)" data-en="Action verbs in past tense for past experiences (designed, developed, led…)">Verbes d'action au passé pour les expériences passées (conçu, développé, dirigé…)</span></div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="cv-13">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Orthographe et grammaire vérifiées (langue de dépôt + langue du secteur)" data-en="Spelling and grammar checked (submission language + industry language)">Orthographe et grammaire vérifiées (langue de dépôt + langue du secteur)</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="cv-14">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Pas de pronoms personnels (je, nous, mon…)" data-en="No personal pronouns (I, we, my…)">Pas de pronoms personnels (je, nous, mon…)</span></div>
+          <div class="item-hint" data-fr="Le CV parle de vous, mais jamais à la première personne." data-en="The CV is about you, but never written in the first person.">Le CV parle de vous, mais jamais à la première personne.</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="cv-15">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Mots-clés tirés de l'offre d'emploi ciblée inclus naturellement" data-en="Keywords from the target job posting included naturally">Mots-clés tirés de l'offre d'emploi ciblée inclus naturellement</span><span class="tag tag-ai" data-fr="Lisible IA" data-en="AI-readable">Lisible IA</span></div>
+          <div class="item-hint" data-fr="Les systèmes ATS comparent votre CV au texte de l'offre. Le vocabulaire doit correspondre." data-en="ATS systems compare your CV to the posting text. Vocabulary must match.">Les systèmes ATS comparent votre CV au texte de l'offre. Le vocabulaire doit correspondre.</div>
+        </div>
+      
+        <button class="tip-btn" data-tip="cv-15" aria-label="Comment faire" aria-expanded="false">?</button>
+      </label>
+    </div>
+
+    <div class="checklist-section">
+      <div class="section-label" data-fr="Vérification finale" data-en="Final Check">Vérification finale</div>
+
+      <label class="checklist-item" data-key="cv-16">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Tous les liens (LinkedIn, portfolio, GitHub…) sont fonctionnels" data-en="All links (LinkedIn, portfolio, GitHub…) are working">Tous les liens (LinkedIn, portfolio, GitHub…) sont fonctionnels</span></div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="cv-17">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Lu à voix haute : le texte sonne naturel et professionnel" data-en="Read aloud: the text sounds natural and professional">Lu à voix haute : le texte sonne naturel et professionnel</span></div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="cv-18">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Relu par une autre personne (collègue, tuteur, conseiller carrière)" data-en="Reviewed by another person (peer, tutor, career advisor)">Relu par une autre personne (collègue, tuteur, conseiller carrière)</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
+        </div>
+      </label>
+    
+      <label class="checklist-item" data-key="cv-19">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Expériences de bénévolat ou d’implication communautaire incluses" data-en="Volunteer or community involvement experiences included">Expériences de bénévolat ou d’implication communautaire incluses</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
+          <div class="item-hint" data-fr="Le bénévolat démontre l’engagement, les compétences transversales et la proactivité — particulièrement valorisé quand l’expérience professionnelle est limitée. Incluez l’organisation, votre rôle et ce que vous avez accompli." data-en="Volunteering demonstrates engagement, transferable skills, and proactivity — especially valued when professional experience is limited. Include the organisation, your role, and what you accomplished.">Le bénévolat démontre l’engagement, les compétences transversales et la proactivité.</div>
+        </div>
+        <button class="tip-btn" data-tip="cv-19" aria-label="Comment faire" aria-expanded="false">?</button>
+      </label>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 2: PORTFOLIO ==================== -->
+  <!--
+    data-tech  = relevance score on the TECH end   (1–3)
+    data-design = relevance score on the DESIGN end (1–3)
+    Slider 0 = full tech, 100 = full design, 50 = balanced
+    hint elements carry both data-hint-fr and data-hint-en PER PROFILE
+  -->
+  <div class="tab-panel" id="panel-portfolio" role="tabpanel" aria-labelledby="tab-portfolio">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title" data-fr="Checklist Portfolio Web" data-en="Portfolio Website Checklist">Checklist Portfolio Web</h2>
+        <p class="panel-desc" data-fr="Votre portfolio est votre vitrine. Ajustez le curseur ci-dessus selon votre profil pour voir les recommandations adaptées." data-en="Your portfolio is your showcase. Adjust the slider above to match your profile and see tailored recommendations.">Votre portfolio est votre vitrine. Ajustez le curseur ci-dessus selon votre profil pour voir les recommandations adaptées.</p>
+      </div>
+      <button class="btn-reset" onclick="resetTab('portfolio')">
+        <span data-fr="Réinitialiser" data-en="Reset">Réinitialiser</span>
+      </button>
+    </div>
+
+    <div class="completion-banner" id="complete-portfolio">
+      <div class="completion-banner__title" data-fr="Portfolio complété ✓" data-en="Portfolio Complete ✓">Portfolio complété ✓</div>
+      <div class="completion-banner__sub" data-fr="Votre portfolio est prêt à être partagé." data-en="Your portfolio is ready to share.">Votre portfolio est prêt à être partagé.</div>
+    </div>
+
+    <div class="progress-label">
+      <span id="portfolio-progress-text" data-fr-template="0 / 20 complété" data-en-template="0 / 20 completed">0 / 20 complété</span>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="portfolio-bar" style="width:0%"></div></div>
+
+    <!-- SECTION: Identité -->
+    <div class="checklist-section">
+      <div class="section-label" data-fr="Identité et premier impact" data-en="Identity & First Impact">Identité et premier impact</div>
+
+      <label class="checklist-item" data-key="pf-1" data-tech="3" data-design="3">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="La page d'accueil communique qui vous êtes en moins de 5 secondes" data-en="The homepage communicates who you are in under 5 seconds">La page d'accueil communique qui vous êtes en moins de 5 secondes</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Nom, titre technique, stack principale visible sans défiler. Les recruteurs tech scannent vite."
+            data-hint-tech-en="Name, technical title, main stack — all visible above the fold. Tech recruiters scan fast."
+            data-hint-mid-fr="Nom, discipline, proposition de valeur visible sans défiler."
+            data-hint-mid-en="Name, discipline, and value proposition visible without scrolling."
+            data-hint-design-fr="Nom, spécialité créative, et accroche visuelle forte — tout doit parler avant même qu'on lise."
+            data-hint-design-en="Name, creative specialty, and a strong visual hook — everything should communicate before they even read.">
+            Nom, discipline, proposition de valeur visible sans défiler.
+          </div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="pf-2" data-tech="2" data-design="3">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Style visuel cohérent et intentionnel (palette, typographie, espacement)" data-en="Consistent and intentional visual style (palette, typography, spacing)">Style visuel cohérent et intentionnel (palette, typographie, espacement)</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Même pour un profil tech, la cohérence visuelle est un signal de rigueur. Sobre et propre suffit."
+            data-hint-tech-en="Even for a tech profile, visual coherence signals rigor. Clean and minimal is enough."
+            data-hint-mid-fr="Le style du portfolio reflète votre sensibilité créative — c'est déjà un projet en soi."
+            data-hint-mid-en="The portfolio's style reflects your creative sensibility — it is already a project in itself."
+            data-hint-design-fr="Le portfolio est lui-même votre meilleur projet design. Typographie, grille, couleurs : chaque choix dit quelque chose."
+            data-hint-design-en="The portfolio is itself your best design project. Typography, grid, colour — every choice says something.">
+            Le style du portfolio reflète votre sensibilité créative — c'est déjà un projet en soi.
+          </div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="pf-3" data-tech="2" data-design="3">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Un point de vue clair : généraliste assumé ou niche définie" data-en="A clear point of view: deliberate generalist or defined niche">Un point de vue clair : généraliste assumé ou niche définie</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Précisez votre stack ou domaine : dev front-end, cloud, sécurité, data — les recruteurs ne devinent pas."
+            data-hint-tech-en="Specify your stack or domain: front-end, cloud, security, data — recruiters don't guess."
+            data-hint-mid-fr="Éviter le « je fais un peu de tout » implicite. Même un généraliste a un angle."
+            data-hint-mid-en="Avoid the implicit 'I do a bit of everything'. Even generalists have an angle."
+            data-hint-design-fr="En design, le positionnement est crucial : UX, motion, branding, illustration — assumez votre niche ou votre hybridité."
+            data-hint-design-en="In design, positioning is crucial: UX, motion, branding, illustration — own your niche or your hybrid identity.">
+            Éviter le « je fais un peu de tout » implicite. Même un généraliste a un angle.
+          </div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="pf-4" data-tech="1" data-design="2">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Photo professionnelle (optionnelle mais recommandée si votre domaine le valorise)" data-en="Professional photo (optional but recommended if your field values it)">Photo professionnelle (optionnelle mais recommandée si votre domaine le valorise)</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Moins attendue dans les portfolios tech — facultatif, mais ajoute de l'humanité si bien faite."
+            data-hint-tech-en="Less expected in tech portfolios — optional, but adds humanity if done well."
+            data-hint-mid-fr="Recommandée si votre domaine valorise la personnalité (design, communication, éducation)."
+            data-hint-mid-en="Recommended if your field values personality (design, communication, education)."
+            data-hint-design-fr="Fortement recommandée en design : vous êtes aussi votre marque. Une photo bien choisie renforce l'identité visuelle."
+            data-hint-design-en="Strongly recommended in design: you are also your brand. A well-chosen photo reinforces your visual identity.">
+            Recommandée si votre domaine valorise la personnalité (design, communication, éducation).
+          </div>
+        </div>
+      </label>
+    </div>
+
+    <!-- SECTION: Projets -->
+    <div class="checklist-section">
+      <div class="section-label" data-fr="Présentation des projets" data-en="Project Presentation">Présentation des projets</div>
+
+      <label class="checklist-item" data-key="pf-5" data-tech="3" data-design="3">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="3 à 6 projets sélectionnés : qualité > quantité" data-en="3 to 6 selected projects: quality > quantity">3 à 6 projets sélectionnés : qualité > quantité</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Privilégiez des projets avec code source consultable (GitHub). Un projet complexe bien documenté vaut plus que dix snippets."
+            data-hint-tech-en="Prioritize projects with accessible source code (GitHub). One well-documented complex project beats ten snippets."
+            data-hint-mid-fr="Mieux vaut 4 projets forts qu'une galerie de 20 travaux inégaux."
+            data-hint-mid-en="4 strong projects outweigh a gallery of 20 uneven works."
+            data-hint-design-fr="Choisissez des projets qui représentent des types de travail différents : produit, marque, UX, print… La variété montre l'amplitude."
+            data-hint-design-en="Choose projects that represent different types of work: product, brand, UX, print… Variety shows range.">
+            Mieux vaut 4 projets forts qu'une galerie de 20 travaux inégaux.
+          </div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="pf-6" data-tech="3" data-design="3">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Chaque projet inclut : titre, contexte, rôle, process, résultats" data-en="Each project includes: title, context, role, process, results">Chaque projet inclut : titre, contexte, rôle, process, résultats</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Pour un projet tech : problème résolu, technologies choisies (et pourquoi), architecture, et métriques de performance ou d'impact."
+            data-hint-tech-en="For a tech project: problem solved, technologies chosen (and why), architecture, and performance or impact metrics."
+            data-hint-mid-fr="Ne montrez pas seulement le résultat final. Le processus de pensée est ce qui distingue les professionnels."
+            data-hint-mid-en="Don't just show the final result. The thinking process is what distinguishes professionals."
+            data-hint-design-fr="Pour un projet design : brief, recherche utilisateur, itérations, décisions clés, résultat final. Montrez la pensée, pas juste les mockups."
+            data-hint-design-en="For a design project: brief, user research, iterations, key decisions, final result. Show the thinking, not just the mockups.">
+            Ne montrez pas seulement le résultat final. Le processus de pensée est ce qui distingue les professionnels.
+          </div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="pf-7" data-tech="1" data-design="3">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Visuels haute résolution, bien cadrés, avec une légende si nécessaire" data-en="High-resolution visuals, well-framed, with captions if needed">Visuels haute résolution, bien cadrés, avec une légende si nécessaire</span><span class="tag tag-design" data-fr="Design" data-en="Design">Design</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Moins critique pour un profil purement tech. Des captures d'écran propres d'interfaces ou de diagrammes d'architecture suffisent."
+            data-hint-tech-en="Less critical for a purely tech profile. Clean screenshots of interfaces or architecture diagrams are sufficient."
+            data-hint-mid-fr="Les visuels flous ou mal cadrés nuisent immédiatement à la perception de qualité."
+            data-hint-mid-en="Blurry or poorly framed visuals immediately undermine the perception of quality."
+            data-hint-design-fr="Critique. La qualité de présentation de votre travail est jugée autant que le travail lui-même. Mockups soignés, fond neutre, zoom sur les détails importants."
+            data-hint-design-en="Critical. The quality of how you present your work is judged as much as the work itself. Polished mockups, neutral background, zoom on important details.">
+            Les visuels flous ou mal cadrés nuisent immédiatement à la perception de qualité.
+          </div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="pf-8" data-tech="3" data-design="2">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Liens vers dépôts GitHub, démos en ligne, prototypes ou publications" data-en="Links to GitHub repos, live demos, prototypes, or publications">Liens vers dépôts GitHub, démos en ligne, prototypes ou publications</span><span class="tag tag-tech" data-fr="Tech" data-en="Tech">Tech</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Indispensable. Un recruteur tech voudra voir votre code. README soigné, commits lisibles, démo fonctionnelle si possible."
+            data-hint-tech-en="Indispensable. A tech recruiter will want to see your code. Clean README, readable commits, working demo if possible."
+            data-hint-mid-fr="Liens vers prototypes, dépôts GitHub, démos ou publications si applicable."
+            data-hint-mid-en="Links to prototypes, GitHub repos, demos or publications if applicable."
+            data-hint-design-fr="Liens vers prototypes Figma ou démos interactives si applicable. Moins critique qu'en tech, mais valorisé pour l'UX/UI."
+            data-hint-design-en="Links to Figma prototypes or interactive demos if applicable. Less critical than in tech, but valued for UX/UI.">
+            Liens vers prototypes, dépôts GitHub, démos ou publications si applicable.
+          </div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="pf-9" data-tech="2" data-design="2">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Le projet phare est affiché en premier" data-en="The flagship project is displayed first">Le projet phare est affiché en premier</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Mettez en tête le projet le plus complexe techniquement ou le plus à fort impact mesurable."
+            data-hint-tech-en="Lead with the most technically complex project or the one with the most measurable impact."
+            data-hint-mid-fr="Commencer et terminer avec vos meilleurs travaux — l'effet de primauté et récence s'applique."
+            data-hint-mid-en="Start and end with your best work — the primacy and recency effect applies."
+            data-hint-design-fr="Mettez en tête le projet qui illustre le mieux votre processus et votre sensibilité — pas forcément le plus récent."
+            data-hint-design-en="Lead with the project that best illustrates your process and sensibility — not necessarily the most recent.">
+            Commencer et terminer avec vos meilleurs travaux — l'effet de primauté et récence s'applique.
+          </div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="pf-10" data-tech="2" data-design="2">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Les projets de groupe précisent clairement votre contribution individuelle" data-en="Group projects clearly state your individual contribution">Les projets de groupe précisent clairement votre contribution individuelle</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Précisez les composants que vous avez développés, vos décisions d'architecture, votre rôle dans la revue de code."
+            data-hint-tech-en="Specify the components you built, your architectural decisions, your role in code review."
+            data-hint-mid-fr="Les recruteurs veulent savoir ce que vous avez fait, pas ce que l'équipe a fait."
+            data-hint-mid-en="Recruiters want to know what you did, not what the team did."
+            data-hint-design-fr="Précisez votre rôle : recherche, wireframes, direction artistique, tests utilisateurs — évitez le flou du travail d'équipe."
+            data-hint-design-en="Specify your role: research, wireframes, art direction, user testing — avoid the blur of team work.">
+            Les recruteurs veulent savoir ce que vous avez fait, pas ce que l'équipe a fait.
+          </div>
+        </div>
+      </label>
+    </div>
+
+    <!-- SECTION: Performance -->
+    <div class="checklist-section">
+      <div class="section-label" data-fr="Performance et accessibilité" data-en="Performance & Accessibility">Performance et accessibilité</div>
+
+      <label class="checklist-item" data-key="pf-11" data-tech="3" data-design="2">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Chargement rapide : images optimisées (WebP ou JPEG compressé)" data-en="Fast loading: optimized images (WebP or compressed JPEG)">Chargement rapide : images optimisées (WebP ou JPEG compressé)</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Score Lighthouse ≥ 90 en performance : c'est un signal de compétence technique directement visible. Cible < 2s."
+            data-hint-tech-en="Lighthouse performance score ≥ 90: it is a visible signal of technical competence. Target < 2s."
+            data-hint-mid-fr="Un recruteur ne patientera pas. Viser &lt; 3 secondes de chargement."
+            data-hint-mid-en="A recruiter won't wait. Aim for < 3 seconds load time."
+            data-hint-design-fr="Les portfolios design sont souvent lourds en images — optimisation indispensable. Viser &lt; 3s même avec des visuels riches."
+            data-hint-design-en="Design portfolios are often image-heavy — optimization is essential. Target < 3s even with rich visuals.">
+            Un recruteur ne patientera pas. Viser &lt; 3 secondes de chargement.
+          </div>
+        </div>
+      
+        <button class="tip-btn" data-tip="pf-11" aria-label="Comment faire" aria-expanded="false">?</button>
+      </label>
+
+      <label class="checklist-item" data-key="pf-12" data-tech="3" data-design="3">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Site responsive : testé sur mobile, tablette et bureau" data-en="Responsive site: tested on mobile, tablet, and desktop">Site responsive : testé sur mobile, tablette et bureau</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Un site non-responsive en 2025 est un signal d'alarme technique. Testez sur de vrais appareils, pas seulement en DevTools."
+            data-hint-tech-en="A non-responsive site in 2025 is a technical red flag. Test on real devices, not just DevTools."
+            data-hint-mid-fr="Testé sur de vrais appareils : iPhone, Android, tablette, écran large."
+            data-hint-mid-en="Tested on real devices: iPhone, Android, tablet, wide screen."
+            data-hint-design-fr="Un design responsif est aussi un critère de design, pas seulement technique. Montrez que l'expérience est pensée pour chaque format."
+            data-hint-design-en="Responsive design is also a design criterion, not just technical. Show that the experience is considered for each format.">
+            Testé sur de vrais appareils : iPhone, Android, tablette, écran large.
+          </div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="pf-13" data-tech="2" data-design="1">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Texte alternatif (alt text) sur toutes les images significatives" data-en="Alt text on all meaningful images">Texte alternatif (alt text) sur toutes les images significatives</span><span class="tag tag-ai" data-fr="Lisible IA" data-en="AI-readable">Lisible IA</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Critique pour les profils tech : l'accessibilité est une compétence attendue, pas un bonus. Score WCAG AA minimum."
+            data-hint-tech-en="Critical for tech profiles: accessibility is an expected competency, not a bonus. Minimum WCAG AA score."
+            data-hint-mid-fr="Améliore l'accessibilité et l'indexation par les moteurs de recherche."
+            data-hint-mid-en="Improves accessibility and indexing by search engines."
+            data-hint-design-fr="Moins souvent évalué pour les profils purement créatifs, mais démontre une sensibilité UX précieuse."
+            data-hint-design-en="Less often evaluated for purely creative profiles, but demonstrates valuable UX sensibility.">
+            Améliore l'accessibilité et l'indexation par les moteurs de recherche.
+          </div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="pf-14" data-tech="2" data-design="3">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Nom de domaine personnalisé (fortement recommandé)" data-en="Custom domain name (strongly recommended)">Nom de domaine personnalisé (fortement recommandé)</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="prenom-nom.dev ou prenom-nom.io — les extensions tech signalent l'appartenance à la communauté."
+            data-hint-tech-en="firstname-lastname.dev or firstname-lastname.io — tech extensions signal community membership."
+            data-hint-mid-fr="prenom-nom.com ou prenomnom.ca — plus professionnel que site.wix.com/monnom."
+            data-hint-mid-en="firstname-lastname.com or firstname.ca — more professional than site.wix.com/myname."
+            data-hint-design-fr="prenom-nom.com ou prenom-nom.ca — choisissez un domaine qui sonne comme votre marque personnelle."
+            data-hint-design-en="firstname-lastname.com or firstname.ca — choose a domain that sounds like your personal brand.">
+            prenom-nom.com ou prenomnom.ca — plus professionnel que site.wix.com/monnom.
+          </div>
+        </div>
+      
+        <button class="tip-btn" data-tip="pf-14" aria-label="Comment faire" aria-expanded="false">?</button>
+      </label>
+
+      <label class="checklist-item" data-key="pf-15" data-tech="3" data-design="2">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="HTTPS actif (certificat SSL)" data-en="HTTPS active (SSL certificate)">HTTPS actif (certificat SSL)</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Indispensable et trivial à configurer — un site HTTP en 2025 est un signal de négligence technique rédhibitoire."
+            data-hint-tech-en="Indispensable and trivial to set up — an HTTP site in 2025 is an unacceptable signal of technical negligence."
+            data-hint-mid-fr="Tous les hébergeurs modernes offrent SSL gratuit (Let's Encrypt). Aucune excuse pour ne pas l'avoir."
+            data-hint-mid-en="All modern hosts offer free SSL (Let's Encrypt). No excuse not to have it."
+            data-hint-design-fr="Inclus automatiquement sur la plupart des plateformes (Squarespace, Webflow, Framer). Vérifiez quand même."
+            data-hint-design-en="Automatically included on most platforms (Squarespace, Webflow, Framer). Still worth verifying.">
+            Tous les hébergeurs modernes offrent SSL gratuit. Aucune excuse pour ne pas l'avoir.
+          </div>
+        </div>
+      </label>
+    </div>
+
+    <!-- SECTION: Navigation -->
+    <div class="checklist-section">
+      <div class="section-label" data-fr="Navigation et contact" data-en="Navigation & Contact">Navigation et contact</div>
+
+      <label class="checklist-item" data-key="pf-16" data-tech="2" data-design="2">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Navigation claire : max. 5–6 entrées, aucune page orpheline" data-en="Clear navigation: max. 5–6 entries, no orphan pages">Navigation claire : max. 5–6 entrées, aucune page orpheline</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Structure suggérée pour un profil tech : Projets / À propos / Stack / Contact. Simple et efficace."
+            data-hint-tech-en="Suggested structure for a tech profile: Projects / About / Stack / Contact. Simple and effective."
+            data-hint-mid-fr="Structure suggérée : Accueil / Projets / À propos / Contact."
+            data-hint-mid-en="Suggested structure: Home / Projects / About / Contact."
+            data-hint-design-fr="Structure suggérée pour un profil design : Work / About / Process / Contact. Montrez votre approche."
+            data-hint-design-en="Suggested structure for a design profile: Work / About / Process / Contact. Show your approach.">
+            Structure suggérée : Accueil / Projets / À propos / Contact.
+          </div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="pf-17" data-tech="2" data-design="3">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Page « À propos » avec biographie brève et photo" data-en="'About' page with short bio and photo">Page « À propos » avec biographie brève et photo</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Mentionnez votre stack préférée, vos centres d'intérêt techniques, et ce qui vous différencie comme développeur."
+            data-hint-tech-en="Mention your preferred stack, your technical interests, and what differentiates you as a developer."
+            data-hint-mid-fr="Les recruteurs veulent savoir à qui ils ont affaire avant de regarder vos projets."
+            data-hint-mid-en="Recruiters want to know who they're dealing with before looking at your projects."
+            data-hint-design-fr="Essentielle en design : votre personnalité, vos influences, votre regard font partie de votre proposition de valeur."
+            data-hint-design-en="Essential in design: your personality, your influences, your perspective are part of your value proposition.">
+            Les recruteurs veulent savoir à qui ils ont affaire avant de regarder vos projets.
+          </div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="pf-18" data-tech="3" data-design="3">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Formulaire de contact ou courriel visible, fonctionnel" data-en="Contact form or email visible and working">Formulaire de contact ou courriel visible, fonctionnel</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Ajoutez aussi votre profil GitHub et LinkedIn. Les recruteurs tech cherchent souvent directement ces liens."
+            data-hint-tech-en="Also add your GitHub and LinkedIn profiles. Tech recruiters often look for these links directly."
+            data-hint-mid-fr="Testez le formulaire vous-même — les formulaires brisés sont une erreur classique."
+            data-hint-mid-en="Test the form yourself — broken contact forms are a classic mistake."
+            data-hint-design-fr="Ajoutez aussi votre profil Behance, Dribbble ou LinkedIn selon votre discipline."
+            data-hint-design-en="Also add your Behance, Dribbble, or LinkedIn profile depending on your discipline.">
+            Testez le formulaire vous-même — les formulaires brisés sont une erreur classique.
+          </div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="pf-19" data-tech="2" data-design="2">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="CV téléchargeable disponible (bouton ou lien visible)" data-en="Downloadable CV available (visible button or link)">CV téléchargeable disponible (bouton ou lien visible)</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Le recruteur passera souvent du portfolio au CV — facilitez la transition avec un bouton bien visible."
+            data-hint-tech-en="The recruiter will often move from portfolio to CV — make the transition easy with a clearly visible button."
+            data-hint-mid-fr="Facilitez la vie du recruteur — un lien de téléchargement direct est toujours apprécié."
+            data-hint-mid-en="Make the recruiter's job easy — a direct download link is always appreciated."
+            data-hint-design-fr="Idéalement un CV au design cohérent avec votre portfolio — c'est un détail qui se remarque."
+            data-hint-design-en="Ideally a CV whose design is consistent with your portfolio — it's a detail that gets noticed.">
+            Facilitez la vie du recruteur — un lien de téléchargement direct est toujours apprécié.
+          </div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="pf-20" data-tech="3" data-design="2">
+        <div class="item-relevance-bar"></div>
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Testé dans Chrome, Firefox et Safari" data-en="Tested in Chrome, Firefox, and Safari">Testé dans Chrome, Firefox et Safari</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Critique pour un profil tech — les bugs de compatibilité sont une faute professionnelle dans ce domaine. Testez aussi sur Edge."
+            data-hint-tech-en="Critical for a tech profile — cross-browser bugs are a professional fault in this field. Also test on Edge."
+            data-hint-mid-fr="Les différences de rendu entre navigateurs peuvent surprendre. Un test rapide évite les mauvaises surprises."
+            data-hint-mid-en="Rendering differences between browsers can be surprising. A quick test avoids bad surprises."
+            data-hint-design-fr="Vérifiez surtout la typographie et les animations — les rendus varient selon le navigateur."
+            data-hint-design-en="Pay special attention to typography and animations — rendering varies across browsers.">
+            Les différences de rendu entre navigateurs peuvent surprendre.
+          </div>
+        </div>
+      </label>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 3: COVER LETTER ==================== -->
+  <div class="tab-panel" id="panel-cl" role="tabpanel" aria-labelledby="tab-cl">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title" data-fr="Lettre de motivation" data-en="Cover Letter">Lettre de motivation</h2>
+        <p class="panel-desc" data-fr="Remplissez les champs pour générer votre plan de lettre, puis vérifiez votre rédaction avec la checklist." data-en="Fill in the fields to generate your letter outline, then check your writing with the checklist.">Remplissez les champs pour générer votre plan de lettre, puis vérifiez votre rédaction avec la checklist.</p>
+      </div>
+      <button class="btn-reset" onclick="resetTab('cl')">
+        <span data-fr="Réinitialiser" data-en="Reset">Réinitialiser</span>
+      </button>
+    </div>
+
+
+    <!-- Language advisory: Cover Letter -->
+    <div class="lang-advisory" id="cl-lang-advisory" style="margin-top:2rem;">
+      <div class="lang-advisory__title" data-fr="Dans quelle langue rédiger votre lettre?" data-en="What language should your cover letter be in?">Dans quelle langue rédiger votre lettre?</div>
+      <div class="lang-advisory__grid">
+        <div class="lang-advisory__card">
+          <div class="lang-advisory__card-title" data-fr="Règle d'or" data-en="Golden rule">Règle d'or</div>
+          <div class="lang-advisory__card-body" data-fr="<strong>Toujours dans la langue de l'offre.</strong> Si l'annonce est en français, votre lettre est en français. Si elle est en anglais, en anglais. Si elle est bilingue, choisissez la langue dominante de l'entreprise ou préparez une version dans chaque langue." data-en="<strong>Always match the language of the job posting.</strong> If the posting is in French, write in French. If in English, write in English. If bilingual, use the company's dominant language or prepare one version in each."><strong>Toujours dans la langue de l'offre.</strong> Si l'annonce est en français, votre lettre est en français. Si elle est en anglais, en anglais. Si elle est bilingue, choisissez la langue dominante de l'entreprise ou préparez une version dans chaque langue.</div>
+        </div>
+        <div class="lang-advisory__card">
+          <div class="lang-advisory__card-title" data-fr="Contexte québécois" data-en="Québec context">Contexte québécois</div>
+          <div class="lang-advisory__card-body" data-fr="<strong>Le français est la langue normale du travail au Québec</strong> (Loi 101). Une lettre en français est le défaut attendu pour tout employeur québécois. Une lettre en anglais uniquement pour un poste local peut être perçue comme un manque de connaissance du contexte ou un manque de respect de la langue officielle." data-en="<strong>French is the normal language of work in Québec</strong> (Law 101). A French letter is the expected default for any Québec employer. An English-only letter for a local position may be perceived as lacking contextual awareness or disregarding the official language."><strong>Le français est la langue normale du travail au Québec</strong> (Loi 101). Une lettre en français est le défaut attendu pour tout employeur québécois. Une lettre en anglais uniquement pour un poste local peut être perçue comme un manque de connaissance du contexte ou un manque de respect de la langue officielle.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label" data-fr="1 — Informations sur le poste" data-en="1 — Job Information">1 — Informations sur le poste</div>
+
+    <div class="cl-form" id="cl-form" style="margin-top:1.6rem;">
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label" for="cl-jobtitle" data-fr="Titre du poste *" data-en="Job title *">Titre du poste *</label>
+          <input type="text" id="cl-jobtitle" class="field-input" placeholder="" data-fr-ph="ex. : Développeur front-end" data-en-ph="e.g. Front-end Developer">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="cl-company" data-fr="Entreprise *" data-en="Company *">Entreprise *</label>
+          <input type="text" id="cl-company" class="field-input" placeholder="" data-fr-ph="ex. : Ubisoft Montréal" data-en-ph="e.g. Ubisoft Montreal">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="cl-why" data-fr="Pourquoi cette entreprise? (2–3 raisons spécifiques)" data-en="Why this company? (2–3 specific reasons)">Pourquoi cette entreprise? (2–3 raisons spécifiques)</label>
+        <textarea id="cl-why" class="field-textarea" data-fr-ph="ex. : Culture d'innovation, projets à impact social, technologies utilisées…" data-en-ph="e.g. Innovation culture, social impact projects, technologies used…"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="cl-skills" data-fr="Vos 2–3 compétences les plus pertinentes pour CE poste" data-en="Your 2–3 most relevant skills for THIS role">Vos 2–3 compétences les plus pertinentes pour CE poste</label>
+        <textarea id="cl-skills" class="field-textarea" data-fr-ph="ex. : Maîtrise de React, expérience en design d'interface, gestion de projets Agile…" data-en-ph="e.g. React proficiency, UI design experience, Agile project management…"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="cl-example" data-fr="Un exemple concret de réalisation (avec chiffre si possible)" data-en="One concrete achievement example (with numbers if possible)">Un exemple concret de réalisation (avec chiffre si possible)</label>
+        <textarea id="cl-example" class="field-textarea" data-fr-ph="ex. : J'ai conçu l'interface d'une application utilisée par 400 étudiants, réduisant le temps d'onboarding de 30%." data-en-ph="e.g. I designed the interface for an app used by 400 students, reducing onboarding time by 30%."></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="cl-tone" data-fr="Ton souhaité" data-en="Desired tone">Ton souhaité</label>
+        <select id="cl-tone" class="field-input">
+          <option value="professionnel" data-fr="Professionnel et direct" data-en="Professional and direct">Professionnel et direct</option>
+          <option value="enthousiaste" data-fr="Enthousiaste et dynamique" data-en="Enthusiastic and dynamic">Enthousiaste et dynamique</option>
+          <option value="academique" data-fr="Formel et académique" data-en="Formal and academic">Formel et académique</option>
+          <option value="creatif" data-fr="Créatif et personnel" data-en="Creative and personal">Créatif et personnel</option>
+        </select>
+      </div>
+
+      <button class="btn-primary" onclick="generateOutline()">
+        <span data-fr="Générer le plan de lettre →" data-en="Generate letter outline →">Générer le plan de lettre →</span>
+      </button>
+    </div>
+
+    <div class="cl-outline" id="cl-outline">
+      <div class="cl-outline__title" data-fr="Plan suggéré" data-en="Suggested Outline">Plan suggéré</div>
+      <div class="cl-outline__body" id="cl-outline-body"></div>
+    </div>
+
+    <hr class="cl-divider">
+
+    <div class="section-label" data-fr="2 — Révision de votre lettre rédigée" data-en="2 — Review Your Written Letter">2 — Révision de votre lettre rédigée</div>
+
+    <div class="completion-banner" id="complete-cl" style="margin-top:1.6rem;">
+      <div class="completion-banner__title" data-fr="Lettre prête à envoyer ✓" data-en="Letter Ready to Send ✓">Lettre prête à envoyer ✓</div>
+      <div class="completion-banner__sub" data-fr="Toutes les cases cochées — votre lettre est solide." data-en="All boxes checked — your letter is solid.">Toutes les cases cochées — votre lettre est solide.</div>
+    </div>
+
+    <div class="progress-label" style="margin-top:1.6rem;">
+      <span id="cl-progress-text" data-fr-template="0 / 12 complété" data-en-template="0 / 12 completed">0 / 12 complété</span>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="cl-bar" style="width:0%"></div></div>
+
+    <div class="checklist-section" style="margin-top:2rem;">
+      <div class="section-label" data-fr="Structure" data-en="Structure">Structure</div>
+
+      <label class="checklist-item" data-key="cl-1">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Longueur : 3 à 4 paragraphes, max. une page" data-en="Length: 3 to 4 paragraphs, max. one page">Longueur : 3 à 4 paragraphes, max. une page</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+        </div>
+      </label>
+      <label class="checklist-item" data-key="cl-2">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="En-tête complet : vos coordonnées + date + coordonnées de l'entreprise" data-en="Complete header: your contact info + date + company contact info">En-tête complet : vos coordonnées + date + coordonnées de l'entreprise</span></div>
+        </div>
+      </label>
+      <label class="checklist-item" data-key="cl-3">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Formule d'appel personnalisée (nom du gestionnaire si connu)" data-en="Personalized salutation (manager's name if known)">Formule d'appel personnalisée (nom du gestionnaire si connu)</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
+          <div class="item-hint" data-fr="Éviter « À qui de droit » — chercher le nom sur LinkedIn ou le site de l'entreprise." data-en="Avoid 'To Whom It May Concern' — find the name on LinkedIn or the company website.">Éviter « À qui de droit » — chercher le nom sur LinkedIn ou le site de l'entreprise.</div>
+        </div>
+      
+        <button class="tip-btn" data-tip="cl-3" aria-label="Comment faire" aria-expanded="false">?</button>
+      </label>
+      <label class="checklist-item" data-key="cl-4">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Paragraphe d'ouverture : accroche forte + poste ciblé nommé explicitement" data-en="Opening paragraph: strong hook + explicitly named target role">Paragraphe d'ouverture : accroche forte + poste ciblé nommé explicitement</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Ne pas commencer par « Je m'appelle… » ou « Je vous écris pour… »." data-en="Do not start with 'My name is…' or 'I am writing to…'.">Ne pas commencer par « Je m'appelle… » ou « Je vous écris pour… ».</div>
+        </div>
+      </label>
+      <label class="checklist-item" data-key="cl-5">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Corps : compétences + exemple concret lié à un besoin de l'employeur" data-en="Body: skills + concrete example linked to an employer need">Corps : compétences + exemple concret lié à un besoin de l'employeur</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+        </div>
+      </label>
+      <label class="checklist-item" data-key="cl-6">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Paragraphe sur l'entreprise : vous montrez que vous la connaissez vraiment" data-en="Company paragraph: you show you genuinely know them">Paragraphe sur l'entreprise : vous montrez que vous la connaissez vraiment</span></div>
+          <div class="item-hint" data-fr="Citer un projet, une valeur, une actualité spécifique — pas juste « votre réputation »." data-en="Cite a specific project, value, or news item — not just 'your reputation'.">Citer un projet, une valeur, une actualité spécifique — pas juste « votre réputation ».</div>
+        </div>
+      </label>
+      <label class="checklist-item" data-key="cl-7">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Conclusion : appel à l'action (demande d'entretien) + remerciement" data-en="Conclusion: call to action (interview request) + thank you">Conclusion : appel à l'action (demande d'entretien) + remerciement</span></div>
+        </div>
+      </label>
+    </div>
+
+    <div class="checklist-section">
+      <div class="section-label" data-fr="Contenu et ton" data-en="Content & Tone">Contenu et ton</div>
+      <label class="checklist-item" data-key="cl-8">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="La lettre répond à « Pourquoi vous? » et « Pourquoi eux? »" data-en="The letter answers 'Why you?' and 'Why them?'">La lettre répond à « Pourquoi vous? » et « Pourquoi eux? »</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+        </div>
+      </label>
+      <label class="checklist-item" data-key="cl-9">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Aucun copier-coller du CV — la lettre complète, elle ne répète pas" data-en="No CV copy-paste — the letter complements, it doesn't repeat">Aucun copier-coller du CV — la lettre complète, elle ne répète pas</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+        </div>
+      </label>
+      <label class="checklist-item" data-key="cl-10">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Ton cohérent du début à la fin — pas de changement de registre" data-en="Consistent tone throughout — no register shift">Ton cohérent du début à la fin — pas de changement de registre</span></div>
+        </div>
+      </label>
+      <label class="checklist-item" data-key="cl-11">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Orthographe, grammaire et ponctuation irréprochables" data-en="Flawless spelling, grammar, and punctuation">Orthographe, grammaire et ponctuation irréprochables</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Une faute dans une lettre de motivation est éliminatoire dans beaucoup d'entreprises." data-en="A single error in a cover letter disqualifies candidates in many organizations.">Une faute dans une lettre de motivation est éliminatoire dans beaucoup d'entreprises.</div>
+        </div>
+      </label>
+      <label class="checklist-item" data-key="cl-12">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Relecture à voix haute — si vous trébuchez, reformulez" data-en="Read aloud — if you stumble, rewrite">Relecture à voix haute — si vous trébuchez, reformulez</span></div>
+        </div>
+      </label>
+    </div>
+  </div>
+
+
+  <!-- ==================== TAB 4: ONLINE PRESENCE ==================== -->
+  <div class="tab-panel" id="panel-op" role="tabpanel" aria-labelledby="tab-op">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title" data-fr="Présence en ligne" data-en="Online Presence">Présence en ligne</h2>
+        <p class="panel-desc" data-fr="LinkedIn, GitHub et itch.io sont des vitrines actives — pas de simples annuaires. Trois principes transversaux s'appliquent à toutes les plateformes : URL courte et propre, nom d'utilisateur cohérent partout, photo de profil professionnelle et uniforme." data-en="LinkedIn, GitHub, and itch.io are active showcases — not mere directories. Three principles apply across all platforms: short and clean URL, consistent username everywhere, professional and uniform profile picture.">LinkedIn, GitHub et itch.io sont des vitrines actives — pas de simples annuaires. Trois principes transversaux s'appliquent à toutes les plateformes : URL courte et propre, nom d'utilisateur cohérent partout, photo de profil professionnelle et uniforme.</p>
+      </div>
+      <button class="btn-reset" onclick="resetTab('op')">
+        <span data-fr="Réinitialiser" data-en="Reset">Réinitialiser</span>
+      </button>
+    </div>
+
+    <div class="completion-banner" id="complete-op">
+      <div class="completion-banner__title" data-fr="Présence en ligne complétée ✓" data-en="Online Presence Complete ✓">Présence en ligne complétée ✓</div>
+      <div class="completion-banner__sub" data-fr="Votre empreinte numérique professionnelle est en place." data-en="Your professional digital footprint is in place.">Votre empreinte numérique professionnelle est en place.</div>
+    </div>
+
+    <div class="progress-label">
+      <span id="op-progress-text" data-fr-template="0 / 24 complété" data-en-template="0 / 24 completed">0 / 24 complété</span>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="op-bar" style="width:0%"></div></div>
+
+    <!-- Generic networking tips -->
+    <div class="generic-tips">
+      <div class="generic-tips__title" data-fr="Principes généraux — toute plateforme professionnelle" data-en="General principles — every professional platform">Principes généraux — toute plateforme professionnelle</div>
+      <ul class="generic-tips__list">
+        <li data-fr="<strong>Cohérence du nom d’utilisateur</strong> — le même pseudo partout, ou aussi proche que possible. Un recruteur qui vous trouve sur une plateforme doit vous retrouver sur les autres sans effort." data-en="<strong>Consistent username</strong> — the same handle everywhere, or as close as possible. A recruiter who finds you on one platform must find you on others without effort."><strong>Cohérence du nom d’utilisateur</strong> — le même pseudo partout, ou aussi proche que possible.</li>
+        <li data-fr="<strong>URL courte et propre</strong> — personnalisez chaque URL dès la création du compte. Une URL avec des chiffres aléatoires signale un profil non soigné." data-en="<strong>Short, clean URL</strong> — customise every URL at account creation. A URL with random numbers signals an unpolished profile."><strong>URL courte et propre</strong> — personnalisez chaque URL dès la création du compte.</li>
+        <li data-fr="<strong>Photo de profil professionnelle et uniforme</strong> — même photo (ou même style) sur toutes les plateformes. Fond neutre, visage visible, expression professionnelle." data-en="<strong>Professional and consistent profile picture</strong> — same photo (or same style) across all platforms. Neutral background, face visible, professional expression."><strong>Photo de profil professionnelle et uniforme</strong> — même photo sur toutes les plateformes.</li>
+        <li data-fr="<strong>Bio complète</strong> — ne laissez jamais une bio vide. Même une seule phrase avec votre discipline et votre statut vaut mieux que rien." data-en="<strong>Complete bio</strong> — never leave a bio empty. Even one sentence with your discipline and status is better than nothing."><strong>Bio complète</strong> — ne laissez jamais une bio vide.</li>
+        <li data-fr="<strong>Liens croisés</strong> — chaque profil doit pointer vers les autres. LinkedIn → GitHub → portfolio → itch.io, et inversement." data-en="<strong>Cross-linking</strong> — every profile should link to the others. LinkedIn → GitHub → portfolio → itch.io, and back."><strong>Liens croisés</strong> — chaque profil doit pointer vers les autres.</li>
+        <li data-fr="<strong>Activité régulière</strong> — les algorithmes favorisent les profils actifs. Même une contribution par semaine maintient votre visibilité." data-en="<strong>Regular activity</strong> — algorithms favour active profiles. Even one contribution per week maintains your visibility."><strong>Activité régulière</strong> — les algorithmes favorisent les profils actifs.</li>
+        <li data-fr="<strong>Cohérence entre plateformes et CV</strong> — les informations de votre CV (titre, expériences, compétences) doivent correspondre à ce qui figure sur vos profils en ligne." data-en="<strong>Consistency with your CV</strong> — the information on your CV (title, experiences, skills) must match what appears on your online profiles."><strong>Cohérence entre plateformes et CV</strong> — votre CV et vos profils doivent concorder.</li>
+      </ul>
+    </div>
+
+
+    <!-- ── Principes transversaux ── -->
+    <div class="checklist-section">
+      <div class="section-label" data-fr="Principes transversaux — toutes plateformes" data-en="Cross-platform principles — all platforms">Principes transversaux — toutes plateformes</div>
+
+      <label class="checklist-item" data-key="op-1">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Nom d'utilisateur identique sur toutes les plateformes (ou aussi proche que possible)" data-en="Identical username across all platforms (or as close as possible)">Nom d'utilisateur identique sur toutes les plateformes (ou aussi proche que possible)</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Un recruteur qui trouve votre LinkedIn doit retrouver immédiatement votre GitHub et itch.io. La cohérence construit la marque personnelle. Exemples : @marieleblanc, @marie-leblanc, @mleblanc — choisissez-en un et tenez-vous-y." data-en="A recruiter who finds your LinkedIn should immediately find your GitHub and itch.io. Consistency builds personal brand. Examples: @marieleblanc, @marie-leblanc, @mleblanc — pick one and stick with it.">Un recruteur qui trouve votre LinkedIn doit retrouver immédiatement votre GitHub et itch.io. La cohérence construit la marque personnelle. Exemples : @marieleblanc, @marie-leblanc, @mleblanc — choisissez-en un et tenez-vous-y.</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="op-2">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="URL de profil courte et propre, sans chiffres aléatoires ni caractères inutiles" data-en="Short and clean profile URL, free of random numbers or unnecessary characters">URL de profil courte et propre, sans chiffres aléatoires ni caractères inutiles</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="linkedin.com/in/marieleblanc est professionnel. linkedin.com/in/marieleblanc-4a7b3c2 ne l'est pas. Personnalisez votre URL sur chaque plateforme. Ces URLs se copient dans des CV et des e-mails — elles doivent être mémorables et partageables." data-en="linkedin.com/in/marieleblanc is professional. linkedin.com/in/marieleblanc-4a7b3c2 is not. Customize your URL on every platform. These URLs get copied into CVs and emails — they need to be memorable and shareable.">linkedin.com/in/marieleblanc est professionnel. linkedin.com/in/marieleblanc-4a7b3c2 ne l'est pas. Personnalisez votre URL sur chaque plateforme. Ces URLs se copient dans des CV et des e-mails — elles doivent être mémorables et partageables.</div>
+        </div>
+      
+        <button class="tip-btn" data-tip="op-2" aria-label="Comment faire" aria-expanded="false">?</button>
+      </label>
+
+      <label class="checklist-item" data-key="op-3">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Photo de profil professionnelle, identique (ou cohérente) sur toutes les plateformes" data-en="Professional profile picture, identical (or consistent) across all platforms">Photo de profil professionnelle, identique (ou cohérente) sur toutes les plateformes</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Fond neutre, éclairage correct, visage visible. Pas de photo de soirée recadrée. Utiliser la même photo partout aide les recruteurs à vous reconnaître d'une plateforme à l'autre — c'est un détail de personal branding souvent négligé." data-en="Neutral background, good lighting, face clearly visible. No cropped party photos. Using the same photo everywhere helps recruiters recognise you across platforms — a personal branding detail often overlooked.">Fond neutre, éclairage correct, visage visible. Pas de photo de soirée recadrée. Utiliser la même photo partout aide les recruteurs à vous reconnaître d'une plateforme à l'autre — c'est un détail de personal branding souvent négligé.</div>
+        </div>
+      </label>
+    </div>
+
+    
+    <div class="platform-section" id="plat-li">
+      <button class="platform-toggle" aria-expanded="false" aria-controls="plat-li-body" onclick="togglePlatform(this, \'plat-li-body\')">
+        <div class="platform-toggle__label">
+          <span class="platform-toggle__name"><span class="tag tag-li" style="margin:0 0.8rem 0 0;">LinkedIn</span><span data-fr="Profil LinkedIn" data-en="LinkedIn Profile">Profil LinkedIn</span></span>
+          <span class="platform-toggle__audience" data-fr="Toutes disciplines — indispensable" data-en="All disciplines — essential">Toutes disciplines — indispensable</span>
+        </div>
+        <span class="platform-toggle__count" id="li-count-label"></span>
+        <svg class="platform-toggle__chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="4,6 8,10 12,6"/></svg>
+      </button>
+      <div class="platform-body" id="plat-li-body">
+        <!-- ── LinkedIn ── -->
+    <div class="checklist-section">
+      <div class="section-label">
+        <span class="tag tag-li" style="margin-left:0;margin-right:0.8rem;">LinkedIn</span>
+        <span data-fr="Profil LinkedIn" data-en="LinkedIn Profile">Profil LinkedIn</span>
+      </div>
+
+      <label class="checklist-item" data-key="op-4">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="URL personnalisée : linkedin.com/in/prenom-nom" data-en="Custom URL: linkedin.com/in/firstname-lastname">URL personnalisée : linkedin.com/in/prenom-nom</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="À faire dans Paramètres → Identité publique → Modifier votre URL publique. C'est votre carte de visite numérique principale." data-en="Go to Settings → Public profile → Edit your custom URL. This is your primary digital business card.">À faire dans Paramètres → Identité publique → Modifier votre URL publique. C'est votre carte de visite numérique principale.</div>
+        </div>
+      
+        <button class="tip-btn" data-tip="op-4" aria-label="Comment faire" aria-expanded="false">?</button>
+      </label>
+
+      <label class="checklist-item" data-key="op-5">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Titre (headline) : discipline + spécialité + statut (ex. : « Développeuse full-stack | Diplômée 2025 »)" data-en="Headline: discipline + specialty + status (e.g. 'Full-stack developer | Graduating 2025')">Titre (headline) : discipline + spécialité + statut (ex. : « Développeuse full-stack | Diplômée 2025 »)</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Évitez « Étudiant·e en [programme] » — ce n'est pas un titre professionnel. Soyez précis·e sur ce que vous faites et ce que vous cherchez." data-en="Avoid 'Student at [programme]' — that is not a professional title. Be specific about what you do and what you're looking for.">Évitez « Étudiant·e en [programme] » — ce n'est pas un titre professionnel. Soyez précis·e sur ce que vous faites et ce que vous cherchez.</div>
+        </div>
+      
+        <button class="tip-btn" data-tip="op-5" aria-label="Comment faire" aria-expanded="false">?</button>
+      </label>
+
+      <label class="checklist-item" data-key="op-6">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Résumé (section À propos) rédigé : 3–5 phrases, mots-clés du secteur, appel à l'action" data-en="About section written: 3–5 sentences, industry keywords, call to action">Résumé (section À propos) rédigé : 3–5 phrases, mots-clés du secteur, appel à l'action</span></div>
+          <div class="item-hint" data-fr="Seules les 2–3 premières lignes sont visibles avant « Voir plus ». L'accroche doit capter l'attention immédiatement. Terminez par une invitation : « Contactez-moi à… » ou « Disponible pour des stages dès mai 2025 »." data-en="Only the first 2–3 lines are visible before 'See more'. The hook must capture attention immediately. End with an invitation: 'Reach me at…' or 'Available for internships from May 2025'.">Seules les 2–3 premières lignes sont visibles avant « Voir plus ». L'accroche doit capter l'attention immédiatement. Terminez par une invitation : « Contactez-moi à… » ou « Disponible pour des stages dès mai 2025 ».</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="op-7">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Image de bannière personnalisée (pas le fond gris par défaut)" data-en="Custom banner image (not the default grey background)">Image de bannière personnalisée (pas le fond gris par défaut)</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
+          <div class="item-hint" data-fr="La bannière est un espace design gratuit et largement inutilisé. Une bannière sobre avec votre discipline, vos outils ou une image liée à votre domaine renforce immédiatement l'identité professionnelle." data-en="The banner is free design space that most people ignore. A clean banner showing your discipline, tools, or domain-relevant image immediately strengthens professional identity.">La bannière est un espace design gratuit et largement inutilisé. Une bannière sobre avec votre discipline, vos outils ou une image liée à votre domaine renforce immédiatement l'identité professionnelle.</div>
+        </div>
+      
+        <button class="tip-btn" data-tip="op-7" aria-label="Comment faire" aria-expanded="false">?</button>
+      </label>
+
+      <label class="checklist-item" data-key="op-8">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Section compétences remplie avec les outils et technologies nommément" data-en="Skills section filled with tools and technologies listed by name">Section compétences remplie avec les outils et technologies nommément</span></div>
+          <div class="item-hint" data-fr="LinkedIn indexe ces compétences dans les recherches de recruteurs. Nommez les logiciels, langages, frameworks — pas des généralités comme « créativité »." data-en="LinkedIn indexes these skills in recruiter searches. Name the software, languages, frameworks — not generalities like 'creativity'.">LinkedIn indexe ces compétences dans les recherches de recruteurs. Nommez les logiciels, langages, frameworks — pas des généralités comme « créativité ».</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="op-9">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Lien vers portfolio, GitHub ou itch.io ajouté dans les coordonnées" data-en="Link to portfolio, GitHub or itch.io added in contact info">Lien vers portfolio, GitHub ou itch.io ajouté dans les coordonnées</span></div>
+          <div class="item-hint" data-fr="LinkedIn permet d'ajouter plusieurs sites web dans vos coordonnées. Utilisez des étiquettes personnalisées (« Portfolio », « GitHub ») plutôt que « Site web »." data-en="LinkedIn allows adding multiple websites in your contact info. Use custom labels ('Portfolio', 'GitHub') rather than 'Website'.">LinkedIn permet d'ajouter plusieurs sites web dans vos coordonnées. Utilisez des étiquettes personnalisées (« Portfolio », « GitHub ») plutôt que « Site web ».</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="op-10">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Mode « Open to Work » activé avec les types de postes ciblés" data-en="'Open to Work' mode enabled with target role types specified">'Open to Work' activé avec les types de postes ciblés</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
+          <div class="item-hint" data-fr="En tant qu'étudiant·e ou diplômé·e récent·e, l'afficher publiquement est un avantage — pas une faiblesse. Précisez le type de poste, la localisation et la disponibilité." data-en="As a student or recent graduate, showing it publicly is an advantage — not a weakness. Specify role type, location, and availability.">En tant qu'étudiant·e ou diplômé·e récent·e, l'afficher publiquement est un avantage — pas une faiblesse. Précisez le type de poste, la localisation et la disponibilité.</div>
+        </div>
+      
+        <button class="tip-btn" data-tip="op-10" aria-label="Comment faire" aria-expanded="false">?</button>
+      </label>
+
+      <label class="checklist-item" data-key="op-11">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Profil actif : partage ou commentaire dans votre domaine au moins 1× par semaine" data-en="Active profile: share or comment in your field at least 1× per week">Profil actif : partage ou commentaire dans votre domaine au moins 1× par semaine</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
+          <div class="item-hint" data-fr="Un profil silencieux est invisible. L'algorithme de LinkedIn favorise les profils actifs. Commentez des posts de votre secteur, partagez vos projets, réagissez à des actualités pertinentes." data-en="A silent profile is invisible. LinkedIn's algorithm favours active profiles. Comment on industry posts, share your projects, react to relevant news.">Un profil silencieux est invisible. L'algorithme de LinkedIn favorise les profils actifs. Commentez des posts de votre secteur, partagez vos projets, réagissez à des actualités pertinentes.</div>
+        </div>
+      </label>
+
+      <p style="margin-top:0.8rem;font-size:1.2rem;color:var(--c400);">
+        <span data-fr="Ressource complémentaire recommandée : " data-en="Recommended additional resource: ">Ressource complémentaire recommandée : </span>
+        <a href="https://tinyurl.com/2fdaweun" target="_blank" rel="noopener" class="source-link">linkedin.com post — For last year students looking for jobs (Byron Baron V.)</a>
+      </p>
+    </div>
+      </div>
+    </div>
+
+    <div class="platform-section" id="plat-gh">
+      <button class="platform-toggle" aria-expanded="false" aria-controls="plat-gh-body" onclick="togglePlatform(this, \'plat-gh-body\')">
+        <div class="platform-toggle__label">
+          <span class="platform-toggle__name"><span class="tag tag-gh" style="margin:0 0.8rem 0 0;">GitHub</span><span data-fr="Profil GitHub" data-en="GitHub Profile">Profil GitHub</span></span>
+          <span class="platform-toggle__audience" data-fr="Développement, IT, data, sécurité" data-en="Development, IT, data, security">Développement, IT, data, sécurité</span>
+        </div>
+        <span class="platform-toggle__count" id="gh-count-label"></span>
+        <svg class="platform-toggle__chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="4,6 8,10 12,6"/></svg>
+      </button>
+      <div class="platform-body" id="plat-gh-body">
+        <!-- ── GitHub ── -->
+    <div class="checklist-section">
+      <div class="section-label">
+        <span class="tag tag-gh" style="margin-left:0;margin-right:0.8rem;">GitHub</span>
+        <span data-fr="Profil GitHub" data-en="GitHub Profile">Profil GitHub</span>
+      </div>
+
+      <label class="checklist-item" data-key="op-12">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Nom d'utilisateur professionnel — le même que LinkedIn si possible" data-en="Professional username — same as LinkedIn if possible">Nom d'utilisateur professionnel — le même que LinkedIn si possible</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="github.com/marie-leblanc est une URL que vous allez mettre sur votre CV. Évitez les pseudos de gamers, les chiffres ou les underscores excessifs." data-en="github.com/marie-leblanc is a URL you will put on your CV. Avoid gamer handles, numbers, or excessive underscores.">github.com/marie-leblanc est une URL que vous allez mettre sur votre CV. Évitez les pseudos de gamers, les chiffres ou les underscores excessifs.</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="op-13">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Profil GitHub complété : nom, bio, lieu, lien vers portfolio ou LinkedIn" data-en="GitHub profile completed: name, bio, location, link to portfolio or LinkedIn">Profil GitHub complété : nom, bio, lieu, lien vers portfolio ou LinkedIn</span></div>
+          <div class="item-hint" data-fr="Beaucoup de développeurs laissent leur profil GitHub vide — c'est une occasion manquée. La bio est indexée dans les recherches GitHub." data-en="Many developers leave their GitHub profile blank — a missed opportunity. The bio is indexed in GitHub searches.">Beaucoup de développeurs laissent leur profil GitHub vide — c'est une occasion manquée. La bio est indexée dans les recherches GitHub.</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="op-14">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="README de profil (fichier README.md dans un dépôt du même nom) créé et soigné" data-en="Profile README (README.md in a repo matching your username) created and polished">README de profil créé et soigné</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
+          <div class="item-hint" data-fr="Le README de profil s'affiche sur votre page GitHub. C'est votre page d'accueil en tant que développeur·se : présentez-vous, listez vos technologies, liez vos projets phares." data-en="The profile README appears on your GitHub page. It is your homepage as a developer: introduce yourself, list your technologies, link your flagship projects.">Le README de profil s'affiche sur votre page GitHub. C'est votre page d'accueil en tant que développeur·se : présentez-vous, listez vos technologies, liez vos projets phares.</div>
+        </div>
+      
+        <button class="tip-btn" data-tip="op-14" aria-label="Comment faire" aria-expanded="false">?</button>
+      </label>
+
+      <label class="checklist-item" data-key="op-15">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Projets épinglés (pinned repositories) : 4–6 meilleurs projets mis en avant" data-en="Pinned repositories: 4–6 best projects highlighted">Projets épinglés : 4–6 meilleurs projets mis en avant</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Les projets épinglés sont la première chose qu'un recruteur tech voit. Choisissez ceux qui montrent le mieux votre niveau et votre polyvalence." data-en="Pinned repos are the first thing a tech recruiter sees. Choose the ones that best demonstrate your level and versatility.">Les projets épinglés sont la première chose qu'un recruteur tech voit. Choisissez ceux qui montrent le mieux votre niveau et votre polyvalence.</div>
+        </div>
+      
+        <button class="tip-btn" data-tip="op-15" aria-label="Comment faire" aria-expanded="false">?</button>
+      </label>
+
+      <label class="checklist-item" data-key="op-16">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Chaque dépôt épinglé a un README clair : description, installation, captures d'écran" data-en="Each pinned repo has a clear README: description, installation, screenshots">Chaque dépôt épinglé a un README clair : description, installation, captures d'écran</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Un dépôt sans README est un projet sans contexte. Le recruteur doit comprendre ce que fait le projet en 30 secondes sans lire le code." data-en="A repo without a README is a project without context. The recruiter must understand what the project does in 30 seconds without reading the code.">Un dépôt sans README est un projet sans contexte. Le recruteur doit comprendre ce que fait le projet en 30 secondes sans lire le code.</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="op-17">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Activité visible : commits réguliers, pas seulement un dépôt créé il y a 2 ans" data-en="Visible activity: regular commits, not just a repo created 2 years ago">Activité visible : commits réguliers, pas seulement un dépôt créé il y a 2 ans</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
+          <div class="item-hint" data-fr="Le graphe de contribution (les cases vertes) est visible sur votre profil. Une activité récente et régulière signale un·e développeur·se actif·ve. Même de petites contributions comptent." data-en="The contribution graph (green squares) is visible on your profile. Recent and regular activity signals an active developer. Even small contributions count.">Le graphe de contribution (les cases vertes) est visible sur votre profil. Une activité récente et régulière signale un·e développeur·se actif·ve. Même de petites contributions comptent.</div>
+        </div>
+      </label>
+    </div>
+      </div>
+    </div>
+
+    <div class="platform-section" id="plat-itch">
+      <button class="platform-toggle" aria-expanded="false" aria-controls="plat-itch-body" onclick="togglePlatform(this, \'plat-itch-body\')">
+        <div class="platform-toggle__label">
+          <span class="platform-toggle__name"><span class="tag tag-itch" style="margin:0 0.8rem 0 0;">itch.io</span><span data-fr="Profil itch.io" data-en="itch.io Profile">Profil itch.io</span></span>
+          <span class="platform-toggle__audience" data-fr="Jeux, expériences interactives, design génératif" data-en="Games, interactive experiences, generative design">Jeux, expériences interactives, design génératif</span>
+        </div>
+        <span class="platform-toggle__count" id="itch-count-label"></span>
+        <svg class="platform-toggle__chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="4,6 8,10 12,6"/></svg>
+      </button>
+      <div class="platform-body" id="plat-itch-body">
+        <!-- ── itch.io ── -->
+    <div class="checklist-section">
+      <div class="section-label">
+        <span class="tag tag-itch" style="margin-left:0;margin-right:0.8rem;">itch.io</span>
+        <span data-fr="Profil itch.io (jeux, expériences interactives, design génératif)" data-en="itch.io Profile (games, interactive experiences, generative design)">Profil itch.io (jeux, expériences interactives, design génératif)</span>
+      </div>
+
+      <label class="checklist-item" data-key="op-18">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Nom d'utilisateur court et professionnel — cohérent avec LinkedIn et GitHub" data-en="Short and professional username — consistent with LinkedIn and GitHub">Nom d'utilisateur court et professionnel — cohérent avec LinkedIn et GitHub</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="itch.io/marie-leblanc s'inclut dans un CV ou un portfolio. Un pseudo créatif est acceptable dans la communauté game dev, mais gardez la cohérence si vous visez un emploi en studio." data-en="itch.io/marie-leblanc can go on a CV or portfolio. A creative handle is acceptable in the game dev community, but stay consistent if you are targeting studio employment.">itch.io/marie-leblanc s'inclut dans un CV ou un portfolio. Un pseudo créatif est acceptable dans la communauté game dev, mais gardez la cohérence si vous visez un emploi en studio.</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="op-19">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Page de profil complétée : bio, liens, description de votre approche créative" data-en="Profile page completed: bio, links, description of your creative approach">Page de profil complétée : bio, liens, description de votre approche créative</span></div>
+          <div class="item-hint" data-fr="Beaucoup d'utilisateurs d'itch.io laissent leur page de profil vide. Complétez-la comme vous le feriez pour n'importe quelle plateforme professionnelle." data-en="Many itch.io users leave their profile page blank. Complete it as you would any professional platform.">Beaucoup d'utilisateurs d'itch.io laissent leur page de profil vide. Complétez-la comme vous le feriez pour n'importe quelle plateforme professionnelle.</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="op-20">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Chaque jeu ou projet a une page soignée : description, captures, crédits, instructions" data-en="Each game or project has a polished page: description, screenshots, credits, instructions">Chaque jeu ou projet a une page soignée : description, captures, crédits, instructions</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="La page d'un projet sur itch.io est son portfolio. Une page soignée avec de bonnes captures d'écran et une description claire fait toute la différence pour qu'un recruteur comprenne votre travail sans jouer." data-en="A project's itch.io page is its portfolio entry. A polished page with good screenshots and a clear description makes all the difference for a recruiter to understand your work without playing.">La page d'un projet sur itch.io est son portfolio. Une page soignée avec de bonnes captures d'écran et une description claire fait toute la différence pour qu'un recruteur comprenne votre travail sans jouer.</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="op-21">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Rôle individuel clairement indiqué dans chaque projet (code, art, design, son…)" data-en="Individual role clearly stated in each project (code, art, design, sound…)">Rôle individuel clairement indiqué dans chaque projet (code, art, design, son…)</span></div>
+          <div class="item-hint" data-fr="Les jeux sont souvent des projets d'équipe. Un recruteur veut savoir ce que vous avez fait spécifiquement — pas seulement que vous avez participé." data-en="Games are often team projects. A recruiter wants to know specifically what you did — not just that you participated.">Les jeux sont souvent des projets d'équipe. Un recruteur veut savoir ce que vous avez fait spécifiquement — pas seulement que vous avez participé.</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="op-22">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Version jouable en ligne incluse si possible (WebGL, HTML5)" data-en="Playable web version included if possible (WebGL, HTML5)">Version jouable en ligne incluse si possible (WebGL, HTML5)</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
+          <div class="item-hint" data-fr="Un jeu jouable directement dans le navigateur est infiniment plus accessible pour un recruteur qu'un téléchargement. Si votre moteur le permet (Unity WebGL, Godot HTML5, Twine…), exportez en web." data-en="A game playable directly in the browser is infinitely more accessible for a recruiter than a download. If your engine supports it (Unity WebGL, Godot HTML5, Twine…), export to web.">Un jeu jouable directement dans le navigateur est infiniment plus accessible pour un recruteur qu'un téléchargement. Si votre moteur le permet (Unity WebGL, Godot HTML5, Twine…), exportez en web.</div>
+        </div>
+      
+        <button class="tip-btn" data-tip="op-22" aria-label="Comment faire" aria-expanded="false">?</button>
+      </label>
+
+      <label class="checklist-item" data-key="op-23">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Participation à des game jams documentée (Global Game Jam, Ludum Dare, GTMFS…)" data-en="Game jam participation documented (Global Game Jam, Ludum Dare, GTMFS…)">Participation à des game jams documentée (Global Game Jam, Ludum Dare, GTMFS…)</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
+          <div class="item-hint" data-fr="Les game jams démontrent votre capacité à livrer sous contrainte de temps — une compétence très valorisée en studio. Documentez la jam, le thème, le délai, et ce que vous avez livré." data-en="Game jams demonstrate your ability to ship under time constraints — a highly valued skill in studios. Document the jam, theme, deadline, and what you shipped.">Les game jams démontrent votre capacité à livrer sous contrainte de temps — une compétence très valorisée en studio. Documentez la jam, le thème, le délai, et ce que vous avez livré.</div>
+        </div>
+      </label>
+
+      <label class="checklist-item" data-key="op-24">
+        <input type="checkbox"><div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Tags itch.io bien choisis pour la découvrabilité (genre, moteur, plateforme)" data-en="itch.io tags well chosen for discoverability (genre, engine, platform)">Tags itch.io bien choisis pour la découvrabilité (genre, moteur, plateforme)</span></div>
+          <div class="item-hint" data-fr="Les tags influencent la découverte organique sur itch.io. Utilisez le genre (platformer, puzzle, RPG), le moteur (Unity, Godot, GameMaker), la plateforme (HTML5, Windows) et le thème." data-en="Tags influence organic discovery on itch.io. Use genre (platformer, puzzle, RPG), engine (Unity, Godot, GameMaker), platform (HTML5, Windows), and theme.">Les tags influencent la découverte organique sur itch.io. Utilisez le genre, le moteur, la plateforme et le thème.</div>
+        </div>
+      </label>
+    </div>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /page-wrap -->
+
+<script>
+// ================================================================
+// CONFIG
+// ================================================================
+const TABS   = ['cv', 'portfolio', 'cl', 'op'];
+const TOTALS = { cv: 19, portfolio: 20, cl: 12, op: 24 };
+const COOKIE_KEY = 'lci_career_checklist_v3';
+let currentLang = 'fr';
+let profileValue = 50; // 0=tech … 100=design
+
+// ================================================================
+// COOKIE
+// ================================================================
+function saveState(state) {
+  const exp = new Date(Date.now() + 365 * 864e5).toUTCString();
+  document.cookie = `${COOKIE_KEY}=${encodeURIComponent(JSON.stringify(state))};expires=${exp};path=/;SameSite=Lax`;
+}
+function loadState() {
+  const m = document.cookie.match(new RegExp(`(?:^|; )${COOKIE_KEY}=([^;]*)`));
+  if (!m) return null;
+  try { return JSON.parse(decodeURIComponent(m[1])); } catch { return null; }
+}
+function getState() {
+  return loadState() || { checked: {}, lang: 'fr', activeTab: 'cv', profile: 50 };
+}
+
+// ================================================================
+// LANGUAGE
+// ================================================================
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('lang-fr').classList.toggle('active', lang === 'fr');
+  document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+  document.getElementById('lang-fr').setAttribute('aria-pressed', lang === 'fr');
+  document.getElementById('lang-en').setAttribute('aria-pressed', lang === 'en');
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll('[data-fr]').forEach(el => {
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') return;
+    // Skip elements that need innerHTML (handled separately below)
+    if (el.classList.contains('lang-advisory__card-body')) return;
+    if (el.closest('.generic-tips__list')) return;
+    el.textContent = el.getAttribute('data-' + lang) || el.textContent;
+  });
+  document.querySelectorAll('[data-fr-ph]').forEach(el => {
+    el.placeholder = el.getAttribute('data-' + lang + '-ph') || '';
+  });
+  document.querySelectorAll('select option[data-fr]').forEach(opt => {
+    opt.textContent = opt.getAttribute('data-' + lang) || opt.textContent;
+  });
+
+  // Advisory card bodies contain HTML — must use innerHTML
+  document.querySelectorAll('.lang-advisory__card-body').forEach(el => {
+    const val = el.getAttribute('data-' + lang);
+    if (val) el.innerHTML = val;
+  });
+
+  // Generic tips list items contain HTML — must use innerHTML
+  document.querySelectorAll('.generic-tips__list li[data-fr]').forEach(el => {
+    const val = el.getAttribute('data-' + lang);
+    if (val) el.innerHTML = val;
+  });
+
+  // Re-apply dynamic hints and profile label
+  applySliderEffects(profileValue);
+  updateAllProgress();
+
+  const s = getState(); s.lang = lang; saveState(s);
+}
+
+// ================================================================
+// TABS
+// ================================================================
+function switchTab(tab) {
+  TABS.forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+    document.getElementById('tab-' + t).setAttribute('aria-selected', t === tab);
+    document.getElementById('panel-' + t).classList.toggle('active', t === tab);
+  });
+  // Show/hide slider bar (portfolio only)
+  document.getElementById('profile-slider-bar').classList.toggle('visible', tab === 'portfolio');
+
+  // Close any open tooltip when switching tabs
+  closeTip();
+
+  const s = getState(); s.activeTab = tab; saveState(s);
+}
+
+// ================================================================
+// SLIDER
+// ================================================================
+
+// Profile label strings
+const PROFILE_LABELS = {
+  tech: {
+    fr: 'Développement / Tech',
+    en: 'Development / Tech'
+  },
+  tech_lean: {
+    fr: 'Principalement tech',
+    en: 'Mostly tech'
+  },
+  balanced: {
+    fr: 'Profil hybride',
+    en: 'Hybrid profile'
+  },
+  design_lean: {
+    fr: 'Principalement design',
+    en: 'Mostly design'
+  },
+  design: {
+    fr: 'Design / Créatif',
+    en: 'Design / Creative'
+  }
+};
+
+function getProfileBucket(v) {
+  if (v <= 15)  return 'tech';
+  if (v <= 38)  return 'tech_lean';
+  if (v <= 62)  return 'balanced';
+  if (v <= 85)  return 'design_lean';
+  return 'design';
+}
+
+function getHintKey(v) {
+  if (v <= 30) return 'tech';
+  if (v <= 70) return 'mid';
+  return 'design';
+}
+
+function onSliderMove(v) {
+  profileValue = parseInt(v);
+  applySliderEffects(profileValue);
+  const s = getState(); s.profile = profileValue; saveState(s);
+}
+
+function applySliderEffects(v) {
+  const bucket  = getProfileBucket(v);
+  const hintKey = getHintKey(v);
+  const lang    = currentLang;
+
+  // Update profile label
+  const labelEl = document.getElementById('slider-profile-label');
+  if (labelEl) labelEl.textContent = PROFILE_LABELS[bucket][lang];
+
+  // For each portfolio item: compute relevance + update hint
+  document.querySelectorAll('#panel-portfolio .checklist-item[data-tech]').forEach(item => {
+    const techScore   = parseInt(item.getAttribute('data-tech'));
+    const designScore = parseInt(item.getAttribute('data-design'));
+
+    // Interpolate score: v=0 → pure tech score, v=100 → pure design score
+    const t = v / 100;
+    const score = Math.round(techScore * (1 - t) + designScore * t);
+
+    // Map score 1–3 to relevance class
+    let rel;
+    if (score >= 3)      rel = 'high';
+    else if (score >= 2) rel = 'medium';
+    else                 rel = 'low';
+
+    item.setAttribute('data-relevance', rel);
+
+    // Accent bar colour: interpolate between cobalt and taupe
+    const bar = item.querySelector('.item-relevance-bar');
+    if (bar) {
+      // cobalt #685ef7 → taupe #cdc19e
+      const r = Math.round(104 + (205 - 104) * t);
+      const g = Math.round(94  + (193 - 94)  * t);
+      const b = Math.round(247 + (158 - 247) * t);
+      bar.style.background = `rgb(${r},${g},${b})`;
+    }
+
+    // Update hint text
+    const hint = item.querySelector('.item-hint');
+    if (hint) {
+      const key = `data-hint-${hintKey}-${lang}`;
+      const text = item.getAttribute(key);
+      if (text) hint.textContent = text;
+    }
+  });
+}
+
+// ================================================================
+// CHECKLIST
+// ================================================================
+function getTabForKey(key) {
+  if (key.startsWith('cv-')) return 'cv';
+  if (key.startsWith('pf-')) return 'portfolio';
+  if (key.startsWith('cl-')) return 'cl';
+  if (key.startsWith('op-')) return 'op';
+  return null;
+}
+
+function updateProgress(tab) {
+  const state = getState();
+  const done  = Object.keys(state.checked).filter(k => getTabForKey(k) === tab && state.checked[k]).length;
+  const total = TOTALS[tab];
+  const pct   = total ? Math.round(done / total * 100) : 0;
+
+  const barId  = tab === 'portfolio' ? 'portfolio-bar'           : tab + '-bar';
+  const textId = tab === 'portfolio' ? 'portfolio-progress-text' : tab + '-progress-text';
+  const cntId  = tab === 'portfolio' ? 'count-portfolio'         : 'count-' + tab;
+  const banId  = tab === 'portfolio' ? 'complete-portfolio'      : 'complete-' + tab;
+  // guard: elements may not exist for all tabs
+  if (!document.getElementById(barId)) return;
+
+  document.getElementById(barId).style.width = pct + '%';
+
+  const el = document.getElementById(textId);
+  if (el) {
+    const tmpl = el.getAttribute('data-' + currentLang + '-template') || `0 / ${total}`;
+    el.textContent = tmpl.replace('0', done);
+  }
+  document.getElementById(cntId).textContent = done;
+
+  const banner = document.getElementById(banId);
+  if (banner) banner.classList.toggle('visible', done === total && total > 0);
+}
+
+function updateAllProgress() { TABS.forEach(updateProgress); }
+
+document.querySelectorAll('.checklist-item').forEach(item => {
+  item.addEventListener('click', function(e) {
+    if (e.target.tagName === 'A') return;
+    const key   = this.getAttribute('data-key');
+    const state = getState();
+    state.checked[key] = !state.checked[key];
+    saveState(state);
+    this.classList.toggle('checked', state.checked[key]);
+    const tab = getTabForKey(key);
+    if (tab) updateProgress(tab);
+  });
+});
+
+function resetTab(tab) {
+  const prefix = tab === 'cv' ? 'cv-' : tab === 'portfolio' ? 'pf-' : tab === 'cl' ? 'cl-' : 'op-';
+  const msg = currentLang === 'fr' ? 'Réinitialiser toute cette section?' : 'Reset this entire section?';
+  if (!confirm(msg)) return;
+
+  const state = getState();
+  Object.keys(state.checked).forEach(k => { if (k.startsWith(prefix)) delete state.checked[k]; });
+  saveState(state);
+
+  document.querySelectorAll('.checklist-item').forEach(item => {
+    const key = item.getAttribute('data-key');
+    if (key && key.startsWith(prefix)) item.classList.remove('checked');
+  });
+  updateProgress(tab);
+
+  if (tab === 'cl') {
+    ['cl-jobtitle','cl-company','cl-why','cl-skills','cl-example'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('cl-outline').classList.remove('visible');
+  }
+}
+
+// ================================================================
+// COVER LETTER GENERATOR
+// ================================================================
+function generateOutline() {
+  const jobtitle = document.getElementById('cl-jobtitle').value.trim();
+  const company  = document.getElementById('cl-company').value.trim();
+  const why      = document.getElementById('cl-why').value.trim();
+  const skills   = document.getElementById('cl-skills').value.trim();
+  const example  = document.getElementById('cl-example').value.trim();
+  const tone     = document.getElementById('cl-tone').value;
+
+  if (!jobtitle || !company) {
+    alert(currentLang === 'fr'
+      ? 'Veuillez indiquer au minimum le titre du poste et l\'entreprise.'
+      : 'Please provide at least the job title and company.');
+    return;
+  }
+
+  const fr = currentLang === 'fr';
+  const toneLabels = {
+    professionnel: fr ? 'professionnel et direct'  : 'professional and direct',
+    enthousiaste:  fr ? 'enthousiaste et dynamique' : 'enthusiastic and dynamic',
+    academique:    fr ? 'formel et académique'       : 'formal and academic',
+    creatif:       fr ? 'créatif et personnel'       : 'creative and personal',
+  };
+
+  let html = fr ? `
+    <p><strong>Ton :</strong> ${toneLabels[tone] || tone}</p>
+    <p><strong>§1 — Accroche</strong><br>Entrez directement dans le vif : mentionnez le poste de <em>${jobtitle}</em> chez <em>${company}</em> et ce qui vous a immédiatement attiré. Évitez les formules génériques — commencez par une observation spécifique ou une conviction.</p>
+    <p><strong>§2 — Votre valeur</strong><br>Présentez vos compétences clés (${skills || 'à compléter'}) en les ancrant dans un exemple concret : ${example || 'décrivez une réalisation mesurable'}. Montrez comment ce que vous avez fait répond directement à ce que le poste demande.</p>
+    <p><strong>§3 — Pourquoi ${company}</strong><br>Démontrez que vous connaissez l'organisation au-delà de sa réputation : ${why || 'précisez ce qui vous attire spécifiquement'}. Faites le lien entre leurs enjeux et ce que vous apportez.</p>
+    <p><strong>§4 — Clôture</strong><br>Exprimez votre enthousiasme et invitez à une rencontre. Remerciez brièvement. Signature formelle.</p>
+    <p style="margin-top:1.4rem;font-size:1.25rem;color:var(--c400);"><em>Ce plan est un point de départ. Adaptez l'ordre et le contenu à votre voix et au contexte spécifique de l'offre.</em></p>
+  ` : `
+    <p><strong>Tone:</strong> ${toneLabels[tone] || tone}</p>
+    <p><strong>§1 — Hook</strong><br>Get straight to the point: mention the <em>${jobtitle}</em> role at <em>${company}</em> and what immediately drew you to it. Avoid generic openers — start with a specific observation or conviction.</p>
+    <p><strong>§2 — Your value</strong><br>Present your key skills (${skills || 'to complete'}) anchored in a concrete example: ${example || 'describe a measurable achievement'}. Show how what you have done directly addresses what the role requires.</p>
+    <p><strong>§3 — Why ${company}</strong><br>Demonstrate that you know the organization beyond its reputation: ${why || 'specify what specifically draws you to them'}. Connect their challenges to what you bring.</p>
+    <p><strong>§4 — Close</strong><br>Express your enthusiasm and invite a meeting. Brief thank you. Formal sign-off.</p>
+    <p style="margin-top:1.4rem;font-size:1.25rem;color:var(--c400);"><em>This outline is a starting point. Adapt the order and content to your voice and the specific context of the posting.</em></p>
+  `;
+
+  const outlineEl = document.getElementById('cl-outline');
+  document.getElementById('cl-outline-body').innerHTML = html;
+  outlineEl.classList.add('visible');
+  outlineEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+
+// ================================================================
+// TOOLTIP SYSTEM
+// ================================================================
+
+// ================================================================
+// COLLAPSIBLE PLATFORM SECTIONS
+// ================================================================
+function togglePlatform(btn, bodyId) {
+  const body    = document.getElementById(bodyId);
+  const isOpen  = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  btn.setAttribute('aria-expanded', !isOpen);
+}
+
+const TIP_DATA = {
+  'cv-2': {
+    title_fr: 'Comment exporter un PDF lisible',
+    title_en: 'How to export a readable PDF',
+    body_fr:  'Dans Word : Fichier → Enregistrer sous → PDF. Dans Google Docs : Fichier → Télécharger → PDF. <strong>Ne pas</strong> imprimer en PDF via une imprimante virtuelle — le texte peut devenir une image.',
+    body_en:  'In Word: File → Save As → PDF. In Google Docs: File → Download → PDF. <strong>Do not</strong> print to PDF via a virtual printer — text may become an image.',
+    link_fr:  'https://support.microsoft.com/fr-fr/office/enregistrer-ou-convertir-au-format-pdf-ou-xps-d85416c5-7d77-4fd6-a216-6f4bf7c7c110',
+    link_en:  'https://support.microsoft.com/en-us/office/save-or-convert-to-pdf-or-xps-format-d85416c5-7d77-4fd6-a216-6f4bf7c7c110',
+    link_label_fr: 'Guide Microsoft : enregistrer en PDF',
+    link_label_en: 'Microsoft guide: save as PDF',
+  },
+  'cv-15': {
+    title_fr: 'Comment repérer les mots-clés ATS',
+    title_en: 'How to spot ATS keywords',
+    body_fr:  'Copiez le texte de l’annonce dans un outil de nuage de mots (ex. wordclouds.com). Les termes les plus grands sont ceux que votre CV doit contenir — nommément, pas en paraphrase.',
+    body_en:  'Paste the job posting text into a word cloud tool (e.g. wordclouds.com). The biggest terms are the ones your CV must contain — exactly, not paraphrased.',
+    link_fr:  'https://wordclouds.com',
+    link_en:  'https://wordclouds.com',
+    link_label_fr: 'Essayer wordclouds.com',
+    link_label_en: 'Try wordclouds.com',
+  },
+  'cv-19': {
+    title_fr: 'Où trouver des opportunités de bénévolat',
+    title_en: 'Where to find volunteering opportunities',
+    body_fr:  'Essayez Beévérole.com (Québec), Bénévoles Canada, ou les centres d’action bénévole locaux. Les associations étudiantes, festivals, événements culturels et organismes communautaires cherchent régulièrement des bénévoles.',
+    body_en:  'Try Bénévoles Canada (Volunteer Canada), local volunteer centres, or sector-specific organisations. Student associations, festivals, cultural events, and community groups regularly seek volunteers.',
+    link_fr:  'https://benevoles.ca',
+    link_en:  'https://volunteer.ca',
+    link_label_fr: 'Bénévoles Canada',
+    link_label_en: 'Volunteer Canada',
+  },
+  'pf-11': {
+    title_fr: 'Comment optimiser les images',
+    title_en: 'How to optimise images',
+    body_fr:  'Utilisez Squoosh (squoosh.app) — gratuit, dans le navigateur. Ciblez WebP, qualité 75–85 %, et redimensionnez à la largeur d’affichage réelle (inutile de mettre une image 4000 px pour un conteneur de 800 px).',
+    body_en:  'Use Squoosh (squoosh.app) — free, browser-based. Target WebP, quality 75–85 %, and resize to the actual display width (no need for a 4000 px image in an 800 px container).',
+    link_fr:  'https://squoosh.app',
+    link_en:  'https://squoosh.app',
+    link_label_fr: 'Ouvrir Squoosh',
+    link_label_en: 'Open Squoosh',
+  },
+  'pf-14': {
+    title_fr: 'Comment choisir et acheter un nom de domaine',
+    title_en: 'How to choose and buy a domain name',
+    body_fr:  'Namecheap et Porkbun offrent des domaines .com à ~12 $/an. Cherchez d’abord prenom-nom.com, puis .ca ou .dev. Évitez les domaines gratuits fournis par les constructeurs de sites (wix.com/monsite).',
+    body_en:  'Namecheap and Porkbun offer .com domains for ~$12/year. Search for firstname-lastname.com first, then .ca or .dev. Avoid free domains provided by site builders (wix.com/mysite).',
+    link_fr:  'https://www.namecheap.com',
+    link_en:  'https://www.namecheap.com',
+    link_label_fr: 'Namecheap — domaines abordables',
+    link_label_en: 'Namecheap — affordable domains',
+  },
+  'cl-3': {
+    title_fr: 'Comment trouver le nom du gestionnaire',
+    title_en: "How to find the hiring manager's name",
+    body_fr:  '1. Cherchez l’entreprise sur LinkedIn → onglet Employés → filtrez par « Ressources humaines » ou le département concerné. 2. Google : « [entreprise] directeur recrutement LinkedIn ». 3. Appelez la réception et demandez poliment le nom de la personne responsable des embauches.',
+    body_en:  '1. Search the company on LinkedIn → People tab → filter by “Human Resources” or the relevant department. 2. Google: “[company] hiring manager LinkedIn”. 3. Call the front desk and politely ask for the name of the person responsible for hiring.',
+    link_fr:  'https://www.linkedin.com/search/results/people/',
+    link_en:  'https://www.linkedin.com/search/results/people/',
+    link_label_fr: 'Recherche de personnes sur LinkedIn',
+    link_label_en: 'LinkedIn people search',
+  },
+  'op-2': {
+    title_fr: 'Comment personnaliser votre URL LinkedIn',
+    title_en: 'How to customise your LinkedIn URL',
+    body_fr:  'Allez sur votre profil → cliquez « Modifier le profil public et l’URL » (en haut à droite) → section « Modifier votre URL publique » → supprimez les chiffres et gardez seulement prenom-nom.',
+    body_en:  'Go to your profile → click “Edit public profile & URL” (top right) → “Edit your custom URL” section → remove the numbers and keep only firstname-lastname.',
+    link_fr:  'https://www.linkedin.com/help/linkedin/answer/a542685',
+    link_en:  'https://www.linkedin.com/help/linkedin/answer/a542685',
+    link_label_fr: 'Guide LinkedIn : URL personnalisée',
+    link_label_en: 'LinkedIn guide: custom URL',
+  },
+  'op-4': {
+    title_fr: 'Comment personnaliser votre URL LinkedIn',
+    title_en: 'How to customise your LinkedIn URL',
+    body_fr:  'Allez sur votre profil → cliquez « Modifier le profil public et l’URL » (en haut à droite) → section « Modifier votre URL publique » → supprimez les chiffres et gardez seulement prenom-nom.',
+    body_en:  'Go to your profile → click “Edit public profile & URL” (top right) → “Edit your custom URL” section → remove the numbers and keep only firstname-lastname.',
+    link_fr:  'https://www.linkedin.com/help/linkedin/answer/a542685',
+    link_en:  'https://www.linkedin.com/help/linkedin/answer/a542685',
+    link_label_fr: 'Guide LinkedIn : URL personnalisée',
+    link_label_en: 'LinkedIn guide: custom URL',
+  },
+  'op-5': {
+    title_fr: 'Comment rédiger un bon titre LinkedIn',
+    title_en: 'How to write a strong LinkedIn headline',
+    body_fr:  'Cliquez l’icône crayon sur votre profil → champ « Titre ». Format recommandé : [Discipline] | [Spécialité ou stack] | [Statut]. Ex. : « Développeur full-stack | React · Node.js | Disponible mai 2025 ».',
+    body_en:  'Click the pencil icon on your profile → “Headline” field. Recommended format: [Discipline] | [Specialty or stack] | [Status]. E.g. “Full-stack developer | React · Node.js | Available May 2025”.',
+    link_fr:  'https://www.linkedin.com/help/linkedin/answer/a522735',
+    link_en:  'https://www.linkedin.com/help/linkedin/answer/a522735',
+    link_label_fr: 'Guide LinkedIn : modifier votre titre',
+    link_label_en: 'LinkedIn guide: edit your headline',
+  },
+  'op-7': {
+    title_fr: 'Comment ajouter une image de bannière',
+    title_en: 'How to add a banner image',
+    body_fr:  'Sur votre profil → icône appareil photo sur la zone de bannière → Modifier. Taille recommandée : 1584 × 396 px. Canva propose des modèles LinkedIn gratuits. Gardez un fond sobre et votre discipline lisible.',
+    body_en:  'On your profile → camera icon on the banner area → Edit. Recommended size: 1584 × 396 px. Canva offers free LinkedIn templates. Keep a clean background with your discipline legible.',
+    link_fr:  'https://www.canva.com/create/linkedin-banners/',
+    link_en:  'https://www.canva.com/create/linkedin-banners/',
+    link_label_fr: 'Modèles de bannières LinkedIn sur Canva',
+    link_label_en: 'LinkedIn banner templates on Canva',
+  },
+  'op-10': {
+    title_fr: "Comment activer Open to Work",
+    title_en: "How to enable Open to Work",
+    body_fr:  'Sur votre profil → bouton « Disponible pour » → « Trouver un emploi » → remplissez les types de poste, lieux, date de début et type de contrat. Choisissez « Tous les membres LinkedIn » pour la visibilité maximale.',
+    body_en:  'On your profile → “Open to” button → “Finding a new job” → fill in job types, locations, start date, and employment type. Choose “All LinkedIn members” for maximum visibility.',
+    link_fr:  'https://www.linkedin.com/help/linkedin/answer/a507508',
+    link_en:  'https://www.linkedin.com/help/linkedin/answer/a507508',
+    link_label_fr: 'Guide LinkedIn : Open to Work',
+    link_label_en: 'LinkedIn guide: Open to Work',
+  },
+  'op-14': {
+    title_fr: 'Comment créer un README de profil GitHub',
+    title_en: 'How to create a GitHub profile README',
+    body_fr:  'Créez un nouveau dépôt portant exactement votre nom d’utilisateur (ex. : marie-leblanc). Cochez « Ajouter un README ». Le contenu de ce fichier s’affichera sur votre page de profil GitHub.',
+    body_en:  'Create a new repository with exactly your username (e.g. marie-leblanc). Check “Add a README”. The content of that file will display on your GitHub profile page.',
+    link_fr:  'https://docs.github.com/fr/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/managing-your-profile-readme',
+    link_en:  'https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/managing-your-profile-readme',
+    link_label_fr: 'Docs GitHub : README de profil',
+    link_label_en: 'GitHub docs: profile README',
+  },
+  'op-15': {
+    title_fr: 'Comment épingler des dépôts sur GitHub',
+    title_en: 'How to pin repositories on GitHub',
+    body_fr:  'Sur votre profil GitHub → cliquez « Personnaliser votre profil » → « Épingler les dépôts ». Vous pouvez épingler jusqu’à 6 dépôts, y compris ceux d’autres organisations auxquels vous avez contribué.',
+    body_en:  'On your GitHub profile → click “Customize your profile” → “Pin repositories”. You can pin up to 6 repos, including those from other organisations you contributed to.',
+    link_fr:  'https://docs.github.com/fr/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/pinning-items-to-your-profile',
+    link_en:  'https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/pinning-items-to-your-profile',
+    link_label_fr: 'Docs GitHub : épingler des éléments',
+    link_label_en: 'GitHub docs: pin items to profile',
+  },
+  'op-22': {
+    title_fr: 'Comment exporter en WebGL avec Unity',
+    title_en: 'How to export WebGL with Unity',
+    body_fr:  'File → Build Settings → sélectionnez WebGL → Switch Platform → Build. Téléversez le dossier résultant sur itch.io.',
+    body_en:  'File → Build Settings → select WebGL → Switch Platform → Build. Upload the resulting folder to itch.io.',
+    link_fr:  'https://docs.unity3d.com/Manual/webgl-building.html',
+    link_en:  'https://docs.unity3d.com/Manual/webgl-building.html',
+    link_label_fr: 'Docs Unity : build WebGL',
+    link_label_en: 'Unity docs: WebGL build',
+  },
+};
+
+let activeTipBtn  = null;
+let activeBubble  = null;
+
+function buildBubble() {
+  const el = document.createElement('div');
+  el.className = 'tip-bubble';
+  el.setAttribute('role', 'tooltip');
+  el.innerHTML = `
+    <div class="tip-bubble__title" id="tb-title"></div>
+    <div class="tip-bubble__body"  id="tb-body"></div>
+    <div class="tip-bubble__dismiss" id="tb-dismiss"></div>
+  `;
+  document.body.appendChild(el);
+  return el;
+}
+
+function positionBubble(bubble, btn) {
+  const br  = btn.getBoundingClientRect();
+  const bw  = bubble.offsetWidth  || 320;
+  const bh  = bubble.offsetHeight || 160;
+  const vw  = window.innerWidth;
+  const vh  = window.innerHeight;
+  const gap = 10;
+
+  // Prefer below
+  let top  = br.bottom + gap;
+  let left = br.left;
+  let flipUp = false;
+
+  if (top + bh > vh - 16) { top = br.top - bh - gap; flipUp = true; }
+  if (left + bw > vw - 16) { left = vw - bw - 16; }
+  if (left < 8) left = 8;
+
+  // Arrow horizontal offset relative to bubble left
+  const arrowLeft = Math.max(16, Math.min(br.left + br.width/2 - left - 6, bw - 28));
+  bubble.style.setProperty('--arrow-left', arrowLeft + 'px');
+  bubble.style.top  = top  + 'px';
+  bubble.style.left = left + 'px';
+  bubble.classList.toggle('flip-up', flipUp);
+}
+
+function openTip(btn, key) {
+  const data = TIP_DATA[key];
+  if (!data) return;
+  const lang = currentLang;
+
+  closeTip();
+
+  const bubble = activeBubble || (activeBubble = buildBubble());
+  bubble.querySelector('#tb-title').textContent = data['title_' + lang] || data.title_fr;
+
+  const bodyEl = bubble.querySelector('#tb-body');
+  bodyEl.innerHTML = '<p>' + (data['body_' + lang] || data.body_fr) + '</p>';
+
+  const linkHref  = data['link_'       + lang] || data.link_fr;
+  const linkLabel = data['link_label_' + lang] || data.link_label_fr;
+  if (linkHref) {
+    const a = document.createElement('a');
+    a.href = linkHref; a.target = '_blank'; a.rel = 'noopener noreferrer';
+    a.className = 'tip-bubble__link';
+    a.textContent = linkLabel || linkHref;
+    bodyEl.appendChild(a);
+  }
+
+  const dismiss = bubble.querySelector('#tb-dismiss');
+  dismiss.textContent = lang === 'fr' ? 'Cliquez n\'importe où pour fermer' : 'Click anywhere to close';
+
+  // Show bubble, position it
+  bubble.classList.add('visible');
+  // Force reflow so offsetWidth/Height are valid for positioning
+  void bubble.offsetWidth;
+  positionBubble(bubble, btn);
+  activeTipBtn = btn;
+  btn.setAttribute('aria-expanded', 'true');
+}
+
+function closeTip() {
+  if (activeBubble) activeBubble.classList.remove('visible');
+  if (activeTipBtn) activeTipBtn.setAttribute('aria-expanded', 'false');
+  activeTipBtn = null;
+}
+
+// Wire up tip buttons
+document.querySelectorAll('.tip-btn').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const key = this.getAttribute('data-tip');
+    if (activeTipBtn === this) { closeTip(); return; }
+    openTip(this, key);
+  });
+});
+
+// Close on outside click or Escape
+document.addEventListener('click', function(e) {
+  if (activeBubble && !activeBubble.contains(e.target)) closeTip();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeTip();
+});
+window.addEventListener('scroll', function() {
+  if (activeTipBtn && activeBubble && activeBubble.classList.contains('visible')) {
+    positionBubble(activeBubble, activeTipBtn);
+  }
+}, { passive: true });
+
+// ================================================================
+// INIT
+// ================================================================
+function init() {
+  const state = getState();
+
+  // Restore checked items
+  document.querySelectorAll('.checklist-item').forEach(item => {
+    const key = item.getAttribute('data-key');
+    if (key && state.checked[key]) item.classList.add('checked');
+  });
+
+  // Restore slider
+  profileValue = state.profile ?? 50;
+  const sliderEl = document.getElementById('profile-slider');
+  if (sliderEl) sliderEl.value = profileValue;
+
+  // Restore language (also triggers applySliderEffects via setLang)
+  setLang(state.lang || 'fr');
+
+  // Restore active tab
+  switchTab(state.activeTab || 'cv');
+
+  updateAllProgress();
+}
+
+init();
+</script>
+</body>
+</html>
