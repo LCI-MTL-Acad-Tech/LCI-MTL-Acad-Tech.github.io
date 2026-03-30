@@ -580,6 +580,121 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 }
 .generic-tips__list li strong { color: var(--charcoal); font-weight: 500; }
 
+
+/* === FOOTER === */
+.site-footer {
+  margin-top: 6rem;
+  border-top: 1.5px solid var(--c50);
+  padding: 3.2rem 2.4rem 4rem;
+  background: var(--white);
+}
+
+.site-footer__inner {
+  max-width: 860px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3.2rem;
+}
+@media (max-width: 620px) {
+  .site-footer__inner { grid-template-columns: 1fr; gap: 2.4rem; }
+}
+
+.site-footer__block-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c300);
+  margin-bottom: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--c50);
+}
+
+.site-footer__text {
+  font-size: 1.35rem;
+  color: var(--c500);
+  line-height: 1.65;
+}
+.site-footer__text p { margin-bottom: 0.9rem; }
+.site-footer__text p:last-child { margin-bottom: 0; }
+.site-footer__text strong { color: var(--charcoal); font-weight: 500; }
+.site-footer__text a {
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.site-footer__text a:hover { color: var(--blue-dark); }
+
+.site-footer__byline {
+  margin-top: 2.4rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--c50);
+  font-size: 1.25rem;
+  color: var(--c300);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  max-width: 860px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.site-footer__byline-name { color: var(--c500); font-weight: 500; }
+
+
+/* === PLATFORM INTRO CARDS === */
+.platform-intro {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  margin: 2rem 0 2.8rem;
+}
+@media (max-width: 640px) {
+  .platform-intro { grid-template-columns: 1fr; }
+}
+
+.platform-intro__card {
+  border: 1.5px solid var(--c50);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.6rem;
+  background: var(--white);
+}
+.platform-intro__card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+.platform-intro__card-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+.platform-intro__card-type {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--c400);
+  font-style: italic;
+  margin-bottom: 0.6rem;
+}
+.platform-intro__card-body {
+  font-size: 1.3rem;
+  color: var(--c500);
+  line-height: 1.55;
+}
+.platform-intro__card-audience {
+  display: inline-block;
+  margin-top: 0.8rem;
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--c400);
+  background: var(--cream);
+  border-radius: 3px;
+  padding: 0.25rem 0.7rem;
+}
+
 </style>
 </head>
 <body>
@@ -1436,7 +1551,39 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
     <div class="panel-header">
       <div>
         <h2 class="panel-title" data-fr="Présence en ligne" data-en="Online Presence">Présence en ligne</h2>
-        <p class="panel-desc" data-fr="LinkedIn, GitHub et itch.io sont des vitrines actives — pas de simples annuaires. Trois principes transversaux s'appliquent à toutes les plateformes : URL courte et propre, nom d'utilisateur cohérent partout, photo de profil professionnelle et uniforme." data-en="LinkedIn, GitHub, and itch.io are active showcases — not mere directories. Three principles apply across all platforms: short and clean URL, consistent username everywhere, professional and uniform profile picture.">LinkedIn, GitHub et itch.io sont des vitrines actives — pas de simples annuaires. Trois principes transversaux s'appliquent à toutes les plateformes : URL courte et propre, nom d'utilisateur cohérent partout, photo de profil professionnelle et uniforme.</p>
+        <p class="panel-desc" data-fr="Votre présence en ligne professionnelle se construit sur plusieurs plateformes complémentaires. Cette section couvre trois exemples courants dans les domaines technologiques et créatifs — mais les principes s'appliquent à n'importe quelle plateforme de votre secteur." data-en="Your professional online presence is built across several complementary platforms. This section covers three common examples in technology and creative fields — but the principles apply to any platform in your sector.">Votre présence en ligne professionnelle se construit sur plusieurs plateformes complémentaires. Cette section couvre trois exemples courants dans les domaines technologiques et créatifs — mais les principes s'appliquent à n'importe quelle plateforme de votre secteur.</p>
+
+        <!-- Platform intro cards -->
+        <div class="platform-intro">
+
+          <div class="platform-intro__card">
+            <div class="platform-intro__card-header">
+              <span class="tag tag-li" style="margin:0;">LinkedIn</span>
+            </div>
+            <div class="platform-intro__card-type" data-fr="Réseau social professionnel" data-en="Professional social network">Réseau social professionnel</div>
+            <div class="platform-intro__card-body" data-fr="La plateforme de référence pour le réseautage professionnel et la recherche d'emploi. Les recruteurs l'utilisent activement pour trouver des candidats. Votre profil est votre carte de visite numérique permanente — visible même quand vous ne cherchez pas activement." data-en="The standard platform for professional networking and job searching. Recruiters actively use it to find candidates. Your profile is your permanent digital business card — visible even when you are not actively job-hunting.">La plateforme de référence pour le réseautage professionnel et la recherche d'emploi. Les recruteurs l'utilisent activement pour trouver des candidats. Votre profil est votre carte de visite numérique permanente — visible même quand vous ne cherchez pas activement.</div>
+            <span class="platform-intro__card-audience" data-fr="Toutes disciplines" data-en="All disciplines">Toutes disciplines</span>
+          </div>
+
+          <div class="platform-intro__card">
+            <div class="platform-intro__card-header">
+              <span class="tag tag-gh" style="margin:0;">GitHub</span>
+            </div>
+            <div class="platform-intro__card-type" data-fr="Hébergement de code et portfolio technique" data-en="Code hosting and technical portfolio">Hébergement de code et portfolio technique</div>
+            <div class="platform-intro__card-body" data-fr="Plateforme où les développeurs et développeuses stockent, partagent et collaborent sur du code. Pour un profil tech, c'est souvent le premier endroit qu'un recruteur consulte après le CV — votre activité y est visible publiquement sous forme de contributions et de projets." data-en="The platform where developers store, share, and collaborate on code. For a tech profile, it is often the first place a recruiter looks after the CV — your activity is publicly visible as contributions and projects.">Plateforme où les développeurs et développeuses stockent, partagent et collaborent sur du code. Pour un profil tech, c'est souvent le premier endroit qu'un recruteur consulte après le CV — votre activité y est visible publiquement sous forme de contributions et de projets.</div>
+            <span class="platform-intro__card-audience" data-fr="Développement, IT, data, sécurité" data-en="Development, IT, data, security">Développement, IT, data, sécurité</span>
+          </div>
+
+          <div class="platform-intro__card">
+            <div class="platform-intro__card-header">
+              <span class="tag tag-itch" style="margin:0;">itch.io</span>
+            </div>
+            <div class="platform-intro__card-type" data-fr="Plateforme de publication de jeux indépendants" data-en="Independent game publishing platform">Plateforme de publication de jeux indépendants</div>
+            <div class="platform-intro__card-body" data-fr="Marketplace ouverte dédiée aux jeux indépendants, expériences interactives et outils créatifs. Très utilisée dans la communauté game dev pour partager des prototypes, des jams et des projets étudiants. Permet de publier gratuitement et de rendre vos jeux jouables directement dans le navigateur." data-en="An open marketplace for independent games, interactive experiences, and creative tools. Widely used in the game dev community to share prototypes, jam entries, and student projects. Free to publish, and lets players run your games directly in the browser.">Marketplace ouverte dédiée aux jeux indépendants, expériences interactives et outils créatifs. Très utilisée dans la communauté game dev pour partager des prototypes, des jams et des projets étudiants. Permet de publier gratuitement et de rendre vos jeux jouables directement dans le navigateur.</div>
+            <span class="platform-intro__card-audience" data-fr="Jeux, design interactif, animation" data-en="Games, interactive design, animation">Jeux, design interactif, animation</span>
+          </div>
+
+        </div>
       </div>
       <button class="btn-reset" onclick="resetTab('op')">
         <span data-fr="Réinitialiser" data-en="Reset">Réinitialiser</span>
@@ -2347,5 +2494,36 @@ function init() {
 
 init();
 </script>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="site-footer__inner">
+
+    <div>
+      <div class="site-footer__block-title" data-fr="Comment cet outil a été créé" data-en="How this tool was made">Comment cet outil a été créé</div>
+      <div class="site-footer__text">
+        <p data-fr="Ce site a été construit en collaboration itérative entre <strong>Elisa Schaeffer</strong>, doyenne de la Technologie et du Design, et <strong>Claude</strong> (Anthropic), un assistant IA. Le contenu pédagogique, la structure, les priorités et les choix éditoriaux ont été définis, questionnés et affinés par Elisa à chaque étape. Claude a généré le code, proposé des formulations et signalé des incohérences — mais chaque décision substantielle a été prise par un être humain." data-en="This tool was built through iterative collaboration between <strong>Elisa Schaeffer</strong>, Dean of Technology and Design, and <strong>Claude</strong> (Anthropic), an AI assistant. The educational content, structure, priorities, and editorial choices were defined, questioned, and refined by Elisa at every step. Claude generated the code, proposed wording, and flagged inconsistencies — but every substantive decision was made by a human.">Ce site a été construit en collaboration itérative entre <strong>Elisa Schaeffer</strong>, doyenne de la Technologie et du Design, et <strong>Claude</strong> (Anthropic), un assistant IA. Le contenu pédagogique, la structure, les priorités et les choix éditoriaux ont été définis, questionnés et affinés par Elisa à chaque étape. Claude a généré le code, proposé des formulations et signalé des incohérences — mais chaque décision substantielle a été prise par un être humain.</p>
+        <p data-fr="Ce n'est pas un contenu IA à usage unique. C'est le résultat d'un dialogue de révision prolongé : chaque section a été lue, critiquée et corrigée. L'outil évolue; les suggestions d'amélioration sont les bienvenues." data-en="This is not single-use AI-generated content. It is the result of an extended review dialogue: every section was read, questioned, and corrected. The tool evolves; suggestions for improvement are welcome.">Ce n'est pas un contenu IA à usage unique. C'est le résultat d'un dialogue de révision prolongé : chaque section a été lue, critiquée et corrigée. L'outil évolue; les suggestions d'amélioration sont les bienvenues.</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="site-footer__block-title" data-fr="Utilisation réfléchie de l'IA" data-en="Thoughtful use of AI">Utilisation réfléchie de l'IA</div>
+      <div class="site-footer__text">
+        <p data-fr="L'IA générative est un outil de travail, pas un substitut au jugement professionnel. Ce projet illustre une approche où <strong>l'humain reste auteur</strong> : l'IA amplifie la capacité de production, mais la responsabilité éditoriale, pédagogique et éthique demeure entièrement humaine." data-en="Generative AI is a work tool, not a substitute for professional judgment. This project illustrates an approach where <strong>the human remains the author</strong>: AI amplifies production capacity, but editorial, pedagogical, and ethical responsibility remains entirely human.">L'IA générative est un outil de travail, pas un substitut au jugement professionnel. Ce projet illustre une approche où <strong>l'humain reste auteur</strong> : l'IA amplifie la capacité de production, mais la responsabilité éditoriale, pédagogique et éthique demeure entièrement humaine.</p>
+        <p data-fr="Le contenu de cet outil a été vérifié et validé manuellement. Aucun texte n'a été publié sans relecture critique. Les erreurs éventuelles restantes sont la responsabilité de l'auteure humaine — ce qui est précisément le point." data-en="The content of this tool has been manually reviewed and validated. No text was published without critical review. Any remaining errors are the responsibility of the human author — which is precisely the point.">Le contenu de cet outil a été vérifié et validé manuellement. Aucun texte n'a été publié sans relecture critique. Les erreurs éventuelles restantes sont la responsabilité de l'auteure humaine — ce qui est précisément le point.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="site-footer__byline">
+    <span>
+      <span class="site-footer__byline-name">Elisa Schaeffer</span>
+      <span data-fr=" · Doyenne, Technologie et Design" data-en=" · Dean, Technology and Design"> · Doyenne, Technologie et Design</span>
+    </span>
+    <span data-fr="Dernière mise à jour : mars 2026" data-en="Last updated: March 2026">Dernière mise à jour : mars 2026</span>
+  </div>
+</footer>
+
 </body>
 </html>
