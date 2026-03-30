@@ -754,6 +754,74 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 .interaction-tips__list li.caution::before { background: var(--red); }
 .interaction-tips__list li strong { color: var(--charcoal); font-weight: 500; }
 
+
+/* === PORTFOLIO TIPS BOXES === */
+.pf-tips-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+@media (max-width: 600px) { .pf-tips-grid { grid-template-columns: 1fr; } }
+
+.pf-tip-card {
+  background: var(--white);
+  border: 1.5px solid var(--c50);
+  border-radius: var(--radius);
+  padding: 1.2rem 1.4rem;
+}
+.pf-tip-card__name {
+  font-size: 1.3rem; font-weight: 700; color: var(--charcoal);
+  margin-bottom: 0.4rem;
+}
+.pf-tip-card__body {
+  font-size: 1.25rem; color: var(--c500); line-height: 1.55;
+}
+.pf-tip-card__body a {
+  color: var(--blue); text-decoration: underline; text-underline-offset: 2px;
+}
+.pf-tip-card__body strong { color: var(--charcoal); font-weight: 500; }
+
+
+/* === PORTFOLIO HOSTING / CONTENT TIPS === */
+.pf-tips-box {
+  background: var(--cream);
+  border: 1.5px solid var(--c50);
+  border-radius: var(--radius);
+  padding: 1.6rem 2rem;
+  margin-bottom: 2.4rem;
+}
+.pf-tips-box__title {
+  font-size: 1.1rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--c300);
+  margin-bottom: 1.2rem; padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--c50);
+}
+.pf-tips-box__list {
+  list-style: none; display: flex; flex-direction: column; gap: 1rem;
+}
+.pf-tips-box__list li {
+  font-size: 1.4rem; color: var(--c500); line-height: 1.55;
+  padding-left: 1.6rem; position: relative;
+}
+.pf-tips-box__list li::before {
+  content: ''; position: absolute; left: 0; top: 0.7rem;
+  width: 0.5rem; height: 0.5rem; border-radius: 50%;
+  background: var(--blue);
+}
+.pf-tips-box__list li strong { color: var(--charcoal); font-weight: 500; }
+.pf-tips-box__list li a {
+  color: var(--blue); text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.pf-tips-box__list li a:hover { color: var(--blue-dark); }
+.pf-tips-box__list li code {
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 1.25rem; background: var(--white);
+  border: 1px solid var(--c50); border-radius: 3px;
+  padding: 0.1rem 0.5rem; color: var(--c700);
+}
+
 </style>
 </head>
 <body>
@@ -828,7 +896,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
     <div class="panel-header">
       <div>
         <h2 class="panel-title" data-fr="Checklist CV" data-en="CV Checklist">Checklist CV</h2>
-        <p class="panel-desc" data-fr="Un CV efficace est concis, structuré et lisible par les systèmes ATS autant que par les recruteurs humains." data-en="An effective CV is concise, structured, and readable by ATS systems as well as human recruiters.">Un CV efficace est concis, structuré et lisible par les systèmes ATS autant que par les recruteurs humains.</p>
+        <p class="panel-desc" data-fr="Un CV efficace est concis, structuré et lisible à la fois par les recruteurs humains et par les logiciels de tri automatisé (ATS). L’encadré ci-dessous explique ce que cela signifie concrètement." data-en="An effective CV is concise, structured, and readable by both human recruiters and automated screening software (ATS). The box below explains what this means in practice.">Un CV efficace est concis, structuré et lisible à la fois par les recruteurs humains et par les logiciels de tri automatisé (ATS).</p>
       </div>
       <button class="btn-reset" onclick="resetTab('cv')">
         <span data-fr="Réinitialiser" data-en="Reset">Réinitialiser</span>
@@ -840,6 +908,30 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
       <div class="completion-banner__sub" data-fr="Toutes les bonnes pratiques sont en place. Votre CV est prêt." data-en="All best practices are in place. Your CV is ready.">Toutes les bonnes pratiques sont en place. Votre CV est prêt.</div>
     </div>
 
+
+
+    <!-- ATS explainer -->
+    <div class="lang-advisory" id="cv-ats-explainer">
+      <div class="lang-advisory__title" data-fr="Qu'est-ce qu'un ATS (Applicant Tracking System)?" data-en="What is an ATS (Applicant Tracking System)?">Qu'est-ce qu'un ATS (Applicant Tracking System)?</div>
+      <div class="lang-advisory__grid">
+        <div class="lang-advisory__card">
+          <div class="lang-advisory__card-title" data-fr="Le problème que ça résout" data-en="The problem it solves">Le problème que ça résout</div>
+          <div class="lang-advisory__card-body" data-fr="Les grandes entreprises et les agences de recrutement reçoivent des centaines de CV par offre. Aucun humain ne peut tous les lire en premier. Un ATS est un logiciel qui <strong>filtre automatiquement les candidatures</strong> avant qu'un recruteur humain les voie — en cherchant des mots-clés, en analysant la structure du document et en attribuant un score à chaque CV." data-en="Large companies and recruitment agencies receive hundreds of CVs per posting. No human can read them all first. An ATS is software that <strong>automatically filters applications</strong> before a human recruiter sees them — by searching for keywords, analysing document structure, and scoring each CV."><strong>Les grandes entreprises reçoivent des centaines de CV par offre.</strong> Un ATS filtre automatiquement les candidatures avant qu'un humain les voie — en cherchant des mots-clés et en analysant la structure du document.</div>
+        </div>
+        <div class="lang-advisory__card">
+          <div class="lang-advisory__card-title" data-fr="Comment ça lit votre CV" data-en="How it reads your CV">Comment ça lit votre CV</div>
+          <div class="lang-advisory__card-body" data-fr="Un ATS ne voit pas votre CV comme vous : il <strong>extrait du texte brut</strong>. Les tableaux, colonnes, zones de texte, en-têtes de page et polices non-standard désorganisent cette extraction. Un CV visuellement beau mais mal structuré peut être illisible pour un ATS — et donc éliminé avant même qu'un humain le voie." data-en="An ATS does not see your CV the way you do: it <strong>extracts plain text</strong>. Tables, columns, text boxes, page headers, and non-standard fonts disrupt this extraction. A visually beautiful but poorly structured CV may be unreadable to an ATS — and therefore eliminated before any human sees it.">Un ATS <strong>extrait du texte brut</strong> de votre fichier. Les tableaux, colonnes, zones de texte et polices non-standard désorganisent cette extraction. Un CV beau mais mal structuré peut être éliminé avant qu'un humain le voie.</div>
+        </div>
+        <div class="lang-advisory__card">
+          <div class="lang-advisory__card-title" data-fr="Le rôle des mots-clés" data-en="The role of keywords">Le rôle des mots-clés</div>
+          <div class="lang-advisory__card-body" data-fr="Un ATS compare votre CV au texte de l'offre d'emploi et cherche des <strong>correspondances exactes</strong> : titres de poste, compétences, logiciels, certifications. Si l'offre dit « Figma » et que votre CV dit « outil de design », l'ATS peut ne pas faire le lien. Utilisez exactement le vocabulaire de l'offre lorsque c'est précis et honnête." data-en="An ATS compares your CV to the job posting and looks for <strong>exact matches</strong>: job titles, skills, software, certifications. If the posting says 'Figma' and your CV says 'design tool', the ATS may not make the connection. Use the exact vocabulary of the posting where it is accurate and honest.">Un ATS cherche des <strong>correspondances exactes</strong> avec l'offre. Si l'offre dit « Figma » et votre CV dit « outil de design », l'ATS peut ne pas faire le lien. Utilisez le vocabulaire exact de l'offre.</div>
+        </div>
+        <div class="lang-advisory__card">
+          <div class="lang-advisory__card-title" data-fr="Ce que ça change pour vous" data-en="What this means for you">Ce que ça change pour vous</div>
+          <div class="lang-advisory__card-body" data-fr="Plusieurs items de cette checklist existent spécifiquement à cause des ATS : format PDF avec texte sélectionnable, pas de tableaux ni colonnes multiples, polices standard, mots-clés nommément listés. Ces choix peuvent sembler contraignants visuellement — mais ils font la différence entre un CV lu et un CV éliminé automatiquement. L'objectif est de passer le filtre <em>et</em> d'impressionner le recruteur humain." data-en="Several items in this checklist exist specifically because of ATS: PDF format with selectable text, no tables or multiple columns, standard fonts, keywords listed by name. These choices may feel visually constraining — but they make the difference between a CV that gets read and one that is automatically eliminated. The goal is to pass the filter <em>and</em> impress the human recruiter.">Plusieurs items de cette checklist existent à cause des ATS : PDF sélectionnable, pas de tableaux, polices standard, mots-clés nommément listés. L'objectif est de passer le filtre <em>et</em> d'impressionner le recruteur humain.</div>
+        </div>
+      </div>
+    </div>
 
     <!-- Language advisory: CV -->
     <div class="lang-advisory" id="cv-lang-advisory">
@@ -1058,10 +1150,130 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
       <div class="completion-banner__sub" data-fr="Votre portfolio est prêt à être partagé." data-en="Your portfolio is ready to share.">Votre portfolio est prêt à être partagé.</div>
     </div>
 
+
+    <!-- Portfolio: self-hosting tips -->
+    <div class="generic-tips" id="pf-hosting-tips">
+      <div class="generic-tips__title" data-fr="Héberger son portfolio gratuitement" data-en="Free portfolio hosting options">Héberger son portfolio gratuitement</div>
+      <ul class="generic-tips__list">
+
+        <li data-fr="<strong>GitHub Pages</strong> — gratuit, idéal si votre site est statique (HTML/CSS/JS pur ou générateur de site). Déposez votre code dans un dépôt public, activez Pages dans les paramètres, et votre site est en ligne à <em>username.github.io/repo</em>. Vous pouvez connecter votre propre nom de domaine. Aucun serveur à gérer. <a href='https://pages.github.com' target='_blank' rel='noopener'>pages.github.com</a>" data-en="<strong>GitHub Pages</strong> — free, ideal if your site is static (pure HTML/CSS/JS or a site generator). Push your code to a public repo, enable Pages in settings, and your site is live at <em>username.github.io/repo</em>. You can connect a custom domain. No server to manage. <a href='https://pages.github.com' target='_blank' rel='noopener'>pages.github.com</a>"><strong>GitHub Pages</strong> — gratuit pour les sites statiques. Activez Pages dans les paramètres du dépôt. Site en ligne à <em>username.github.io/repo</em>, domaine personnalisé supporté. <a href="https://pages.github.com" target="_blank" rel="noopener">pages.github.com</a></li>
+
+        <li data-fr="<strong>Vercel</strong> — gratuit pour les projets personnels, déploiement automatique à chaque push Git. Supporte les frameworks JS modernes (Next.js, Nuxt, SvelteKit, Astro, Vite…) et les sites statiques. Interface simple, HTTPS automatique, aperçus de déploiement par branche. Très utilisé dans l'industrie — le mettre sur votre CV comme outil de déploiement est un signal positif. <a href='https://vercel.com' target='_blank' rel='noopener'>vercel.com</a>" data-en="<strong>Vercel</strong> — free for personal projects, automatic deployment on every Git push. Supports modern JS frameworks (Next.js, Nuxt, SvelteKit, Astro, Vite…) and static sites. Simple interface, automatic HTTPS, per-branch deploy previews. Widely used in industry — listing it on your CV as a deployment tool is a positive signal. <a href='https://vercel.com' target='_blank' rel='noopener'>vercel.com</a>"><strong>Vercel</strong> — gratuit pour les projets personnels, déploiement automatique à chaque push Git. Supporte Next.js, SvelteKit, Astro et les sites statiques. HTTPS automatique, aperçus par branche. Très utilisé en industrie. <a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a></li>
+
+        <li data-fr="<strong>Netlify</strong> — alternative proche de Vercel, également gratuite pour les projets personnels. Points forts : formulaires de contact sans backend, fonctions serverless simples, déploiement par glisser-déposer si vous ne voulez pas utiliser Git. Bon choix pour les profils design ou front-end qui veulent un hébergement sans friction. <a href='https://netlify.com' target='_blank' rel='noopener'>netlify.com</a>" data-en="<strong>Netlify</strong> — close alternative to Vercel, also free for personal projects. Strengths: contact forms without a backend, simple serverless functions, drag-and-drop deployment if you prefer not to use Git. Good choice for design or front-end profiles who want friction-free hosting. <a href='https://netlify.com' target='_blank' rel='noopener'>netlify.com</a>"><strong>Netlify</strong> — alternative à Vercel, gratuite pour les projets personnels. Points forts : formulaires sans backend, déploiement par glisser-déposer possible. Bon choix pour les profils design et front-end. <a href="https://netlify.com" target="_blank" rel="noopener">netlify.com</a></li>
+
+        <li data-fr="<strong>Framer</strong> — outil de design no-code qui génère et héberge directement un site. Idéal pour les profils design qui veulent un portfolio visuellement impressionnant sans coder. Le plan gratuit inclut l'hébergement avec sous-domaine Framer; un domaine personnalisé nécessite un abonnement payant (abordable). <a href='https://framer.com' target='_blank' rel='noopener'>framer.com</a>" data-en="<strong>Framer</strong> — a no-code design tool that generates and hosts a site directly. Ideal for design profiles who want a visually impressive portfolio without coding. The free plan includes hosting with a Framer subdomain; a custom domain requires a paid plan (affordable). <a href='https://framer.com' target='_blank' rel='noopener'>framer.com</a>"><strong>Framer</strong> — outil no-code qui génère et héberge un site directement. Idéal pour les profils design. Plan gratuit avec sous-domaine Framer; domaine personnalisé payant (abordable). <a href="https://framer.com" target="_blank" rel="noopener">framer.com</a></li>
+
+        <li data-fr="<strong>Trouver d'autres options gratuites</strong> — le paysage évolue vite. Pour découvrir des alternatives, cherchez « free static site hosting » ou « free frontend hosting [année en cours] » sur GitHub Awesome lists, Reddit (r/webdev, r/selfhosted) ou dev.to. Critères à évaluer : bande passante, limite de requêtes, HTTPS inclus, domaine personnalisé, déploiement automatique depuis Git." data-en="<strong>Finding other free options</strong> — the landscape changes fast. To discover alternatives, search 'free static site hosting' or 'free frontend hosting [current year]' on GitHub Awesome lists, Reddit (r/webdev, r/selfhosted), or dev.to. Criteria to evaluate: bandwidth, request limits, HTTPS included, custom domain support, automatic Git deployment."><strong>Trouver d'autres options</strong> — cherchez « free static site hosting » sur les GitHub Awesome lists, r/webdev ou dev.to. Évaluez : bande passante, HTTPS, domaine personnalisé, déploiement Git automatique.</li>
+
+        <li data-fr="<strong>Héberger depuis son propre serveur — pour les profils back-end et full-stack</strong> — si vous visez un poste en développement back-end ou full-stack, héberger votre portfolio depuis votre propre machine (ou un VPS bas de gamme) est une façon concrète de démontrer vos compétences : configuration de serveur web (Nginx, Caddy), gestion des certificats SSL, DNS, reverse proxy, déploiement continu. Un Raspberry Pi ou un VPS à ~5 $/mois suffisent. C'est une ligne de CV à part entière — et une conversation intéressante en entrevue." data-en="<strong>Self-hosting from your own server — for back-end and full-stack profiles</strong> — if you are targeting a back-end or full-stack role, hosting your portfolio from your own machine (or a cheap VPS) is a concrete way to demonstrate your skills: web server configuration (Nginx, Caddy), SSL certificate management, DNS, reverse proxy, continuous deployment. A Raspberry Pi or a ~$5/month VPS is sufficient. It is a CV line in its own right — and an interesting conversation starter in an interview."><strong>Héberger depuis son propre serveur (back-end / full-stack)</strong> — configurer Nginx ou Caddy, gérer les certificats SSL, le DNS et un reverse proxy sur un Raspberry Pi ou un VPS à ~5 $/mois démontre concrètement vos compétences. C'est une ligne de CV à part entière et un excellent sujet d'entrevue.</li>
+
+      </ul>
+    </div>
+
+    <!-- Portfolio: content type tips -->
+    <div class="generic-tips" id="pf-content-tips">
+      <div class="generic-tips__title" data-fr="Présenter différents types de contenu" data-en="Showcasing different content types">Présenter différents types de contenu</div>
+      <div class="pf-tips-grid">
+
+        <div class="pf-tip-card">
+          <div class="pf-tip-card__name" data-fr="Images, maquettes et photographie" data-en="Images, mockups and photography">Images, maquettes et photographie</div>
+          <div class="pf-tip-card__body" data-fr="Exportez en WebP ou JPEG compressé (utilisez <a href='https://squoosh.app' target='_blank' rel='noopener'>Squoosh</a>). Affichez les maquettes dans un contexte réaliste — un mockup dans un cadre de navigateur ou sur un écran de téléphone communique mieux qu'une image isolée sur fond blanc. Lightbox pour les détails (Photoswipe, GLightbox — gratuits). Toujours un <code>alt</code> descriptif." data-en="Export as WebP or compressed JPEG (use <a href='https://squoosh.app' target='_blank' rel='noopener'>Squoosh</a>). Display mockups in realistic context — a design in a browser frame or on a phone screen communicates better than an isolated image on white. Lightbox for details (Photoswipe, GLightbox — free). Always a descriptive <code>alt</code>.">Exportez en WebP (<a href="https://squoosh.app" target="_blank" rel="noopener">Squoosh</a>). Affichez les maquettes dans un contexte réaliste (frame de navigateur, écran de téléphone). Lightbox pour les détails. Toujours un <code>alt</code> descriptif.</div>
+        </div>
+
+        <div class="pf-tip-card">
+          <div class="pf-tip-card__name" data-fr="Vidéo (showreels, démos)" data-en="Video (showreels, demos)">Vidéo (showreels, démos)</div>
+          <div class="pf-tip-card__body" data-fr="Ne pas héberger les vidéos soi-même — elles alourdissent massivement le site. Utilisez YouTube (non listé si vous ne voulez pas de visibilité publique) ou Vimeo (meilleur rendu, plan gratuit suffisant). Intégrez via <code>&lt;iframe&gt;</code> avec <code>loading=&quot;lazy&quot;</code>. Ajoutez des sous-titres : accessibilité et SEO. Durée recommandée pour un showreel : 60–90 secondes maximum." data-en="Do not self-host videos — they will massively slow your site. Use YouTube (unlisted if you do not want public visibility) or Vimeo (better rendering, free plan sufficient). Embed via <code>&lt;iframe&gt;</code> with <code>loading=&quot;lazy&quot;</code>. Add subtitles: accessibility and SEO. Recommended showreel length: 60–90 seconds maximum.">Hébergez sur YouTube (non listé) ou Vimeo, pas en direct sur votre site. Intégrez avec <code>&lt;iframe loading="lazy"&gt;</code>. Ajoutez des sous-titres. Showreel : 60–90 secondes maximum.</div>
+        </div>
+
+        <div class="pf-tip-card">
+          <div class="pf-tip-card__name" data-fr="Code et démos en direct" data-en="Code and live demos">Code et démos en direct</div>
+          <div class="pf-tip-card__body" data-fr="Liez directement au dépôt GitHub avec un README soigné. Pour des démos interactives légères, <a href='https://codepen.io' target='_blank' rel='noopener'>CodePen</a> et <a href='https://codesandbox.io' target='_blank' rel='noopener'>CodeSandbox</a> s'intègrent par iframe. Pour des apps complètes, déployez sur Vercel ou Netlify et liez la démo en direct. Montrez le code ET le résultat : les deux ensemble valent plus que chacun séparément." data-en="Link directly to the GitHub repo with a polished README. For lightweight interactive demos, <a href='https://codepen.io' target='_blank' rel='noopener'>CodePen</a> and <a href='https://codesandbox.io' target='_blank' rel='noopener'>CodeSandbox</a> embed via iframe. For full apps, deploy on Vercel or Netlify and link the live demo. Show the code AND the result: both together are worth more than either alone.">Liez au dépôt GitHub (README soigné). Démos légères : <a href="https://codepen.io" target="_blank" rel="noopener">CodePen</a> ou <a href="https://codesandbox.io" target="_blank" rel="noopener">CodeSandbox</a> en iframe. Apps complètes : déployez sur Vercel/Netlify. Montrez le code ET le résultat.</div>
+        </div>
+
+        <div class="pf-tip-card">
+          <div class="pf-tip-card__name" data-fr="3D, interactif et WebGL" data-en="3D, interactive and WebGL">3D, interactif et WebGL</div>
+          <div class="pf-tip-card__body" data-fr="Les expériences WebGL peuvent être lourdes — toujours proposer une image de substitution ou une version allégée pour mobile. Three.js et Babylon.js s'hébergent comme n'importe quel site statique (GitHub Pages, Vercel). Les exports Unity WebGL et Godot HTML5 s'hébergent directement sur itch.io ou sur votre propre site. Indiquez clairement les contrôles et les prérequis techniques (WebGL2 requis, pas compatible mobile…)." data-en="WebGL experiences can be heavy — always provide a fallback image or a lighter mobile version. Three.js and Babylon.js host like any static site (GitHub Pages, Vercel). Unity WebGL and Godot HTML5 exports host directly on itch.io or your own site. Clearly state controls and technical requirements (WebGL2 required, not mobile-compatible…).">Proposez toujours une image de substitution pour mobile. Three.js et Babylon.js s'hébergent sur GitHub Pages ou Vercel. Unity WebGL et Godot HTML5 sur itch.io ou votre propre site. Indiquez clairement les prérequis (WebGL2, pas mobile…).</div>
+        </div>
+
+      </div>
+    </div>
+
     <div class="progress-label">
       <span id="portfolio-progress-text" data-fr-template="0 / 20 complété" data-en-template="0 / 20 completed">0 / 20 complété</span>
     </div>
     <div class="progress-bar-wrap"><div class="progress-bar" id="portfolio-bar" style="width:0%"></div></div>
+
+    <!-- Hosting tips box -->
+    <div class="pf-tips-box" id="pf-hosting-tips">
+      <div class="pf-tips-box__title"
+           data-fr="Héberger votre portfolio gratuitement"
+           data-en="Hosting your portfolio for free">Héberger votre portfolio gratuitement</div>
+      <ul class="pf-tips-box__list">
+
+        <li data-fr="<strong>GitHub Pages</strong> — Gratuit, intégré à GitHub. Idéal si votre site est un projet HTML/CSS/JS statique. Activez-le depuis Settings → Pages de votre dépôt. URL par défaut : <code>prenom-nom.github.io</code>. Connectez un domaine personnalisé en quelques minutes via un fichier <code>CNAME</code>. Parfait pour les profils tech et les portfolios codés à la main. <a href='https://pages.github.com' target='_blank' rel='noopener'>pages.github.com</a>"
+            data-en="<strong>GitHub Pages</strong> — Free, built into GitHub. Ideal if your site is a static HTML/CSS/JS project. Enable it from your repo's Settings → Pages. Default URL: <code>prenom-nom.github.io</code>. Connect a custom domain in minutes via a <code>CNAME</code> file. Perfect for tech profiles and hand-coded portfolios. <a href='https://pages.github.com' target='_blank' rel='noopener'>pages.github.com</a>">
+          <strong>GitHub Pages</strong> — Gratuit, intégré à GitHub. Idéal pour les sites HTML/CSS/JS statiques. URL : <code>prenom-nom.github.io</code>. <a href="https://pages.github.com" target="_blank" rel="noopener">pages.github.com</a>
+        </li>
+
+        <li data-fr="<strong>Vercel</strong> — Gratuit pour les projets personnels. Déploiement en quelques secondes depuis un dépôt GitHub : connectez votre repo, Vercel détecte le framework (React, Next.js, Vue, Svelte…) et déploie automatiquement à chaque <code>git push</code>. Excellente option pour les portfolios React ou Next.js. URL gratuite : <code>monsite.vercel.app</code>. <a href='https://vercel.com' target='_blank' rel='noopener'>vercel.com</a>"
+            data-en="<strong>Vercel</strong> — Free for personal projects. Deploy in seconds from a GitHub repo: connect your repo, Vercel detects the framework (React, Next.js, Vue, Svelte…) and deploys automatically on every <code>git push</code>. Excellent option for React or Next.js portfolios. Free URL: <code>mysite.vercel.app</code>. <a href='https://vercel.com' target='_blank' rel='noopener'>vercel.com</a>">
+          <strong>Vercel</strong> — Gratuit pour les projets personnels. Connectez votre repo GitHub, déploiement automatique à chaque <code>git push</code>. Idéal pour React et Next.js. <a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a>
+        </li>
+
+        <li data-fr="<strong>Netlify</strong> — Similaire à Vercel, gratuit pour les projets personnels. Supporte les sites statiques et les frameworks JavaScript. Offre en plus des fonctionnalités pratiques : formulaires de contact sans backend, redirections, et déploiements de prévisualisation par branche. <a href='https://netlify.com' target='_blank' rel='noopener'>netlify.com</a>"
+            data-en="<strong>Netlify</strong> — Similar to Vercel, free for personal projects. Supports static sites and JavaScript frameworks. Also offers useful features: contact forms without a backend, redirects, and branch preview deployments. <a href='https://netlify.com' target='_blank' rel='noopener'>netlify.com</a>">
+          <strong>Netlify</strong> — Similaire à Vercel. Points forts : formulaires de contact sans backend, redirections, et déploiements de prévisualisation par branche. <a href="https://netlify.com" target="_blank" rel="noopener">netlify.com</a>
+        </li>
+
+        <li data-fr="<strong>Framer</strong> — Outil de design et publication web tout-en-un. Interface visuelle, pas de code requis, mais le résultat est un site professionnel de qualité. Plan gratuit disponible avec sous-domaine <code>.framer.website</code>. Particulièrement adapté aux profils design (UX, motion, branding) qui veulent un portfolio visuellement fort sans coder. <a href='https://framer.com' target='_blank' rel='noopener'>framer.com</a>"
+            data-en="<strong>Framer</strong> — All-in-one design and web publishing tool. Visual interface, no code required, but the result is a professional-quality site. Free plan available with a <code>.framer.website</code> subdomain. Particularly suited to design profiles (UX, motion, branding) who want a visually strong portfolio without coding. <a href='https://framer.com' target='_blank' rel='noopener'>framer.com</a>">
+          <strong>Framer</strong> — Design et publication web tout-en-un, sans code. Plan gratuit avec <code>.framer.website</code>. Idéal pour les profils UX, motion et branding. <a href="https://framer.com" target="_blank" rel="noopener">framer.com</a>
+        </li>
+
+        <li data-fr="<strong>Trouver d'autres options gratuites</strong> — Le paysage de l'hébergement gratuit évolue vite. Pour découvrir de nouvelles options, cherchez « free static site hosting » ou « free frontend hosting » sur GitHub Awesome Lists (<a href='https://github.com/search?q=awesome+hosting' target='_blank' rel='noopener'>github.com/search</a>) ou sur des fils Reddit comme r/webdev et r/Frontend. Criteria à évaluer : généreux en bande passante, HTTPS inclus, domaine personnalisé supporté, pas de publicités sur les pages."
+            data-en="<strong>Finding other free options</strong> — The free hosting landscape evolves quickly. To discover new options, search 'free static site hosting' or 'free frontend hosting' on GitHub Awesome Lists (<a href='https://github.com/search?q=awesome+hosting' target='_blank' rel='noopener'>github.com/search</a>) or Reddit threads like r/webdev and r/Frontend. Criteria to evaluate: generous bandwidth, HTTPS included, custom domain support, no ads on pages.">
+          <strong>Trouver d'autres options</strong> — Cherchez « free static site hosting » sur GitHub Awesome Lists ou r/webdev. Critères clés : bande passante généreuse, HTTPS inclus, domaine personnalisé supporté, pas de publicités.
+        </li>
+
+        <li data-fr="<strong>Héberger depuis son propre ordinateur (profils back-end et full-stack)</strong> — Pour un·e ingénieur·e back-end ou full-stack, héberger son portfolio depuis un serveur maison ou un VPS configuré manuellement est un signal de compétence fort. Configurer Nginx ou Caddy, gérer un certificat SSL avec Let's Encrypt, exposer le serveur via un nom de domaine — tout cela démontre des compétences concrètes en déploiement et en administration système. C'est plus complexe, mais c'est précisément le point."
+            data-en="<strong>Self-hosting from your own machine (back-end and full-stack profiles)</strong> — For a back-end or full-stack engineer, hosting your portfolio from a home server or a manually configured VPS is a strong competence signal. Setting up Nginx or Caddy, managing an SSL certificate with Let's Encrypt, exposing the server via a domain name — all of this demonstrates concrete deployment and sysadmin skills. It is more complex, but that is precisely the point.">
+          <strong>Héberger depuis son propre ordinateur (back-end / full-stack)</strong> — Configurer Nginx ou Caddy, gérer un certificat SSL avec Let's Encrypt, exposer via un nom de domaine : c'est plus complexe, mais ça démontre des compétences concrètes en déploiement et en administration système — et c'est précisément le point.
+        </li>
+
+      </ul>
+    </div>
+
+    <!-- Content type tips box -->
+    <div class="pf-tips-box" id="pf-content-tips">
+      <div class="pf-tips-box__title"
+           data-fr="Présenter différents types de contenu"
+           data-en="Showcasing different content types">Présenter différents types de contenu</div>
+      <ul class="pf-tips-box__list">
+
+        <li data-fr="<strong>Images, photographie et mockups design</strong> — Privilégiez WebP ou JPEG optimisé (Squoosh). Pour les mockups, présentez à la fois le fichier final et des captures du processus (esquisses, wireframes, itérations). Utilisez un fond neutre pour les rendus de produit. Un zoom sur les détails importants (typographie, états d'interaction) vaut souvent plus qu'une vue d'ensemble flottant dans le vide."
+            data-en="<strong>Images, photography and design mockups</strong> — Use WebP or optimised JPEG (Squoosh). For mockups, show both the final file and process screenshots (sketches, wireframes, iterations). Use a neutral background for product renders. A zoom on important details (typography, interaction states) is often worth more than an overview floating in a void.">
+          <strong>Images, photographie et mockups design</strong> — WebP ou JPEG optimisé. Pour les mockups : montrez le résultat final <em>et</em> le processus (esquisses, wireframes, itérations). Un zoom sur les détails compte autant qu'une vue d'ensemble.
+        </li>
+
+        <li data-fr="<strong>Vidéo (showreels, démos, walkthroughs)</strong> — N'hébergez pas vos vidéos vous-même : elles sont lourdes et ralentissent le site. Hébergez sur YouTube (non listé si vous préférez) ou Vimeo, puis intégrez avec un <code>&lt;iframe&gt;</code>. Soignez les 5 premières secondes — c'est là que se jouent l'attention et la décision de continuer. Pour les démos techniques, un screencast de 60–90 secondes est souvent plus efficace qu'un long tutoriel."
+            data-en="<strong>Video (showreels, demos, walkthroughs)</strong> — Do not self-host videos: they are heavy and slow the site. Host on YouTube (unlisted if you prefer) or Vimeo, then embed with an <code>&lt;iframe&gt;</code>. Polish the first 5 seconds — that is where attention and the decision to keep watching are decided. For technical demos, a 60–90 second screencast is often more effective than a long walkthrough.">
+          <strong>Vidéo (showreels, démos)</strong> — Hébergez sur YouTube (non listé) ou Vimeo, intégrez avec <code>&lt;iframe&gt;</code> — ne stockez jamais vos vidéos vous-même. Soignez les 5 premières secondes. Un screencast de 60–90 s est souvent plus efficace qu'un long tutoriel.
+        </li>
+
+        <li data-fr="<strong>Code, dépôts GitHub et démos en ligne</strong> — Liez directement le dépôt GitHub avec un README soigné. Si le projet est une application web, incluez une démo en ligne (Vercel, Netlify, GitHub Pages). Pour les projets CLI ou backend, un GIF ou un screencast terminal dans le README suffit souvent. Précisez toujours le rôle de chaque technologie : ne listez pas juste « React, Node, PostgreSQL » — expliquez brièvement pourquoi ces choix."
+            data-en="<strong>Code, GitHub repos and live demos</strong> — Link directly to the GitHub repo with a polished README. If the project is a web app, include a live demo (Vercel, Netlify, GitHub Pages). For CLI or backend projects, a GIF or terminal screencast in the README is often sufficient. Always specify the role of each technology: do not just list 'React, Node, PostgreSQL' — briefly explain why those choices.">
+          <strong>Code, dépôts GitHub et démos en ligne</strong> — Liez le repo GitHub avec un README soigné. Incluez une démo en ligne si possible. Pour les projets CLI ou backend, un GIF terminal dans le README suffit souvent. Expliquez pourquoi vous avez choisi chaque technologie — pas juste quoi.
+        </li>
+
+        <li data-fr="<strong>3D, interactif et WebGL</strong> — Ce type de contenu se distingue immédiatement si bien exécuté. Exportez en WebGL (Unity, Three.js, Babylon.js, Godot) et intégrez directement dans la page pour une expérience interactive sans clic. Prévoyez toujours une image de secours et un message clair si WebGL n'est pas supporté. Attention aux performances : un canvas WebGL lourd peut rendre la page inutilisable sur mobile — testez systématiquement. Pour les scènes 3D complexes, un aperçu vidéo en boucle (autoplay, muted, loop) est souvent le meilleur compromis entre impact et performance."
+            data-en="<strong>3D, interactive and WebGL</strong> — This type of content stands out immediately if well executed. Export to WebGL (Unity, Three.js, Babylon.js, Godot) and embed directly in the page for an interactive experience without clicking. Always provide a fallback image and a clear message if WebGL is not supported. Watch performance: a heavy WebGL canvas can make the page unusable on mobile — test systematically. For complex 3D scenes, a looping video preview (autoplay, muted, loop) is often the best trade-off between impact and performance.">
+          <strong>3D, interactif et WebGL</strong> — Intégrez directement dans la page pour une expérience sans clic. Prévoyez une image de secours si WebGL n'est pas supporté. Testez sur mobile — un canvas lourd peut bloquer la page. Pour les scènes complexes, un aperçu vidéo en boucle (<code>autoplay muted loop</code>) est souvent le meilleur compromis.
+        </li>
+
+      </ul>
+    </div>
+
 
     <!-- SECTION: Identité -->
     <div class="checklist-section">
@@ -1304,7 +1516,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <div class="item-relevance-bar"></div>
         <input type="checkbox"><div class="check-box"></div>
         <div class="item-text">
-          <div class="item-label"><span data-fr="Nom de domaine personnalisé (fortement recommandé)" data-en="Custom domain name (strongly recommended)">Nom de domaine personnalisé (fortement recommandé)</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
+          <div class="item-label"><span data-fr="Nom de domaine personnalisé, URL réfléchie" data-en="Custom domain name, thoughtful URL">Nom de domaine personnalisé, URL réfléchie</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
           <div class="item-hint"
             data-hint-tech-fr="prenom-nom.dev ou prenom-nom.io — les extensions tech signalent l'appartenance à la communauté."
             data-hint-tech-en="firstname-lastname.dev or firstname-lastname.io — tech extensions signal community membership."
@@ -1323,7 +1535,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <div class="item-relevance-bar"></div>
         <input type="checkbox"><div class="check-box"></div>
         <div class="item-text">
-          <div class="item-label"><span data-fr="HTTPS actif (certificat SSL)" data-en="HTTPS active (SSL certificate)">HTTPS actif (certificat SSL)</span></div>
+          <div class="item-label"><span data-fr="HTTPS actif (certificat SSL)" data-en="HTTPS active (SSL certificate)">HTTPS actif (certificat SSL)</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
           <div class="item-hint"
             data-hint-tech-fr="Indispensable et trivial à configurer — un site HTTP en 2025 est un signal de négligence technique rédhibitoire."
             data-hint-tech-en="Indispensable and trivial to set up — an HTTP site in 2025 is an unacceptable signal of technical negligence."
@@ -1674,11 +1886,9 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
     <div class="generic-tips">
       <div class="generic-tips__title" data-fr="Principes généraux — toute plateforme professionnelle" data-en="General principles — every professional platform">Principes généraux — toute plateforme professionnelle</div>
       <ul class="generic-tips__list">
-        <li data-fr="<strong>Cohérence du nom d’utilisateur</strong> — le même pseudo partout, ou aussi proche que possible. Un recruteur qui vous trouve sur une plateforme doit vous retrouver sur les autres sans effort." data-en="<strong>Consistent username</strong> — the same handle everywhere, or as close as possible. A recruiter who finds you on one platform must find you on others without effort."><strong>Cohérence du nom d’utilisateur</strong> — le même pseudo partout, ou aussi proche que possible.</li>
-        <li data-fr="<strong>URL courte et propre</strong> — personnalisez chaque URL dès la création du compte. Une URL avec des chiffres aléatoires signale un profil non soigné." data-en="<strong>Short, clean URL</strong> — customise every URL at account creation. A URL with random numbers signals an unpolished profile."><strong>URL courte et propre</strong> — personnalisez chaque URL dès la création du compte.</li>
-        <li data-fr="<strong>Photo de profil professionnelle et uniforme</strong> — même photo (ou même style) sur toutes les plateformes. Fond neutre, visage visible, expression professionnelle." data-en="<strong>Professional and consistent profile picture</strong> — same photo (or same style) across all platforms. Neutral background, face visible, professional expression."><strong>Photo de profil professionnelle et uniforme</strong> — même photo sur toutes les plateformes.</li>
-        <li data-fr="<strong>Bio complète</strong> — ne laissez jamais une bio vide. Même une seule phrase avec votre discipline et votre statut vaut mieux que rien." data-en="<strong>Complete bio</strong> — never leave a bio empty. Even one sentence with your discipline and status is better than nothing."><strong>Bio complète</strong> — ne laissez jamais une bio vide.</li>
-        <li data-fr="<strong>Liens croisés</strong> — chaque profil doit pointer vers les autres. LinkedIn → GitHub → portfolio → itch.io, et inversement." data-en="<strong>Cross-linking</strong> — every profile should link to the others. LinkedIn → GitHub → portfolio → itch.io, and back."><strong>Liens croisés</strong> — chaque profil doit pointer vers les autres.</li>
+        <li data-fr="<strong>Cohérence du nom d’utilisateur, de l’URL et de la photo</strong> — ces trois éléments forment votre identité numérique. Choisissez-les une fois et tenez-vous-y sur toutes les plateformes. La checklist ci-dessous vous guidera pour les configurer sur chaque plateforme spécifique." data-en="<strong>Consistent username, URL and profile picture</strong> — these three elements form your digital identity. Choose them once and stick with them across all platforms. The checklist below will guide you through setting them up on each specific platform."><strong>Cohérence du nom d’utilisateur, de l’URL et de la photo</strong> — ces trois éléments forment votre identité numérique. Choisissez-les une fois et tenez-vous-y. La checklist ci-dessous vous guidera pour les configurer.</li>
+        <li data-fr="<strong>Bio complète</strong> — ne laissez jamais une bio vide. Même une seule phrase avec votre discipline et votre statut vaut mieux que rien. Une bio vide signale un profil abandonné." data-en="<strong>Complete bio</strong> — never leave a bio empty. Even one sentence with your discipline and status is better than nothing. An empty bio signals an abandoned profile."><strong>Bio complète</strong> — ne laissez jamais une bio vide. Une bio vide signale un profil abandonné.</li>
+        <li data-fr="<strong>Liens croisés</strong> — chaque profil doit pointer vers les autres. LinkedIn → GitHub → portfolio → itch.io, et inversement. Un recruteur qui arrive sur n’importe lequel de vos profils doit pouvoir naviguer vers les autres en un clic." data-en="<strong>Cross-linking</strong> — every profile should link to the others. LinkedIn → GitHub → portfolio → itch.io, and back. A recruiter landing on any of your profiles should be able to navigate to the others in one click."><strong>Liens croisés</strong> — chaque profil doit pointer vers les autres en un clic.</li>
         <li data-fr="<strong>Activité régulière</strong> — les algorithmes favorisent les profils actifs. Même une contribution par semaine maintient votre visibilité." data-en="<strong>Regular activity</strong> — algorithms favour active profiles. Even one contribution per week maintains your visibility."><strong>Activité régulière</strong> — les algorithmes favorisent les profils actifs.</li>
         <li data-fr="<strong>Cohérence entre plateformes et CV</strong> — les informations de votre CV (titre, expériences, compétences) doivent correspondre à ce qui figure sur vos profils en ligne." data-en="<strong>Consistency with your CV</strong> — the information on your CV (title, experiences, skills) must match what appears on your online profiles."><strong>Cohérence entre plateformes et CV</strong> — votre CV et vos profils doivent concorder.</li>
       </ul>
@@ -2155,6 +2365,9 @@ function setLang(lang) {
     if (el.classList.contains('lang-advisory__card-body')) return;
     if (el.classList.contains('footer-html-text')) return;
     if (el.classList.contains('net-tip__body')) return;
+    if (el.closest('.pf-tips-box__list')) return;
+    if (el.classList.contains('pf-tip-card__body')) return;
+    if (el.classList.contains('pf-tip-card__name')) return;
     if (el.closest('.generic-tips__list')) return;
     el.textContent = el.getAttribute('data-' + lang) || el.textContent;
   });
@@ -2185,6 +2398,18 @@ function setLang(lang) {
 
   // Networking tip bodies and interaction tips contain HTML
   document.querySelectorAll('.net-tip__body[data-fr], .interaction-tips__list li[data-fr]').forEach(el => {
+    const val = el.getAttribute('data-' + lang);
+    if (val) el.innerHTML = val;
+  });
+
+  // Portfolio hosting/content tip boxes contain HTML
+  document.querySelectorAll('.pf-tips-box__list li[data-fr]').forEach(el => {
+    const val = el.getAttribute('data-' + lang);
+    if (val) el.innerHTML = val;
+  });
+
+  // Portfolio tip cards contain HTML
+  document.querySelectorAll('.pf-tip-card__body[data-fr], .pf-tip-card__name[data-fr]').forEach(el => {
     const val = el.getAttribute('data-' + lang);
     if (val) el.innerHTML = val;
   });
@@ -2478,20 +2703,20 @@ const TIP_DATA = {
     link_label_en: 'Volunteer Canada',
   },
   'pf-11': {
-    title_fr: 'Comment optimiser les images',
-    title_en: 'How to optimise images',
-    body_fr:  'Utilisez Squoosh (squoosh.app) — gratuit, dans le navigateur. Ciblez WebP, qualité 75–85 %, et redimensionnez à la largeur d’affichage réelle (inutile de mettre une image 4000 px pour un conteneur de 800 px).',
-    body_en:  'Use Squoosh (squoosh.app) — free, browser-based. Target WebP, quality 75–85 %, and resize to the actual display width (no need for a 4000 px image in an 800 px container).',
-    link_fr:  'https://squoosh.app',
-    link_en:  'https://squoosh.app',
-    link_label_fr: 'Ouvrir Squoosh',
-    link_label_en: 'Open Squoosh',
+    title_fr: 'Comment optimiser les images pour le web',
+    title_en: 'How to optimise images for the web',
+    body_fr:  'Deux règles : format et dimensions. WebP est plus léger que JPEG à qualité égale et supporté par tous les navigateurs modernes. Redimensionnez toujours à la largeur réelle d’affichage avant d’exporter : une image de 4000 px dans un conteneur de 800 px charge 25× plus de données que nécessaire. Des outils gratuits sont listés dans la section « Présenter différents types de contenu » ci-dessous.',
+    body_en:  'Two rules: format and dimensions. WebP is lighter than JPEG at equivalent quality and supported by all modern browsers. Always resize to the actual display width before exporting: a 4000 px image in an 800 px container loads 25× more data than needed. Free tools are listed in the “Showcasing different content types” section below.',
+    link_fr:  'https://developer.mozilla.org/fr/docs/Web/Media/Formats/Image_types',
+    link_en:  'https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Image_types',
+    link_label_fr: 'MDN : formats d’images pour le web',
+    link_label_en: 'MDN: image formats for the web',
   },
   'pf-14': {
-    title_fr: 'Comment choisir et acheter un nom de domaine',
-    title_en: 'How to choose and buy a domain name',
-    body_fr:  'Namecheap et Porkbun offrent des domaines .com à ~12 $/an. Cherchez d’abord prenom-nom.com, puis .ca ou .dev. Évitez les domaines gratuits fournis par les constructeurs de sites (wix.com/monsite).',
-    body_en:  'Namecheap and Porkbun offer .com domains for ~$12/year. Search for firstname-lastname.com first, then .ca or .dev. Avoid free domains provided by site builders (wix.com/mysite).',
+    title_fr: 'Comment choisir un nom de domaine et une URL professionnels',
+    title_en: 'How to choose a professional domain name and URL',
+    body_fr:  'Deux décisions distinctes. <strong>Le nom de domaine</strong> : Namecheap et Porkbun offrent des .com à ~12 $/an. Préférez prenom-nom.com, puis .ca ou .dev. Évitez les sous-domaines gratuits. <strong>La structure de l’URL</strong> : choisissez quelque chose de court, mémorable et sans ambiguïté — pas de chiffres aléatoires, pas de tirets bas, pas d’abréviations obscures. Une URL que vous n’avez pas envie de dicter à voix haute est une URL à revoir.',
+    body_en:  'Two distinct decisions. <strong>The domain name</strong>: Namecheap and Porkbun offer .com domains for ~$12/year. Prefer firstname-lastname.com, then .ca or .dev. Avoid free subdomains. <strong>The URL structure</strong>: choose something short, memorable, and unambiguous — no random numbers, no underscores, no obscure abbreviations. A URL you would not want to read aloud is a URL worth reconsidering.',
     link_fr:  'https://www.namecheap.com',
     link_en:  'https://www.namecheap.com',
     link_label_fr: 'Namecheap — domaines abordables',
@@ -2739,6 +2964,7 @@ init();
       <div class="site-footer__text">
         <p class="footer-html-text" data-fr="L'IA générative est un outil de travail, pas un substitut au jugement professionnel. Ce projet illustre une approche où <strong>l'humain reste auteur</strong> : l'IA amplifie la capacité de production, mais la responsabilité éditoriale, pédagogique et éthique demeure entièrement humaine." data-en="Generative AI is a work tool, not a substitute for professional judgment. This project illustrates an approach where <strong>the human remains the author</strong>: AI amplifies production capacity, but editorial, pedagogical, and ethical responsibility remains entirely human.">L'IA générative est un outil de travail, pas un substitut au jugement professionnel. Ce projet illustre une approche où <strong>l'humain reste auteur</strong> : l'IA amplifie la capacité de production, mais la responsabilité éditoriale, pédagogique et éthique demeure entièrement humaine.</p>
         <p class="footer-html-text" data-fr="Le contenu de cet outil a été vérifié et validé manuellement. Aucun texte n'a été publié sans relecture critique. Les erreurs éventuelles restantes sont la responsabilité de l'auteure humaine — ce qui est précisément le point." data-en="The content of this tool has been manually reviewed and validated. No text was published without critical review. Any remaining errors are the responsibility of the human author — which is precisely the point.">Le contenu de cet outil a été vérifié et validé manuellement. Aucun texte n'a été publié sans relecture critique. Les erreurs éventuelles restantes sont la responsabilité de l'auteure humaine — ce qui est précisément le point.</p>
+        <p class="footer-html-text" data-fr="Si vous utilisez l’IA dans votre propre travail — pour votre CV, votre portfolio, vos candidatures, ou dans votre pratique professionnelle — quelques principes valent la peine d’être gardés en tête. <strong>Privilégiez le contenu réutilisable :</strong> une lettre générée et jetée ne vous apprend rien; un modèle que vous affinez, comprenez et adaptez vous appartient vraiment. <strong>Pratiquez la relecture critique :</strong> l’IA produit du texte fluide et confiant même quand il est inexact — votre rôle est de vérifier, questionner et corriger, pas d’approuver par défaut. <strong>Restez auteur·e :</strong> si vous ne pouvez pas défendre ou expliquer ce que vous avez soumis, c’est un signal que la collaboration a été trop passive. L’IA peut amplifier votre travail — elle ne peut pas le remplacer." data-en="If you use AI in your own work — for your CV, portfolio, job applications, or in your professional practice — a few principles are worth keeping in mind. <strong>Favour reusable content:</strong> a generated letter that gets discarded teaches you nothing; a template you refine, understand, and adapt truly belongs to you. <strong>Practise critical review:</strong> AI produces fluent, confident text even when it is inaccurate — your role is to verify, question, and correct, not to approve by default. <strong>Remain the author:</strong> if you cannot defend or explain what you submitted, that is a signal the collaboration was too passive. AI can amplify your work — it cannot replace it.">Si vous utilisez l’IA dans votre propre travail, quelques principes valent la peine d’être gardés en tête. <strong>Privilégiez le contenu réutilisable.</strong> <strong>Pratiquez la relecture critique.</strong> <strong>Restez auteur·e.</strong></p>
       </div>
     </div>
 
