@@ -847,13 +847,13 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 <div class="page-wrap">
 
   <section class="hero">
-    <p class="hero__eyebrow" data-fr="Développement professionnel" data-en="Professional Development">Développement professionnel</p>
+    <p <p class="hero__eyebrow" data-fr="Développement professionnel · Étudiant·e·s de niveau collégial au Québec" data-en="Professional Development · College students in Québec">Développement professionnel · Étudiant·e·s de niveau collégial au Québec</p>
     <h1 class="hero__title">
       <span data-fr="Prêt·e pour le" data-en="Ready for the">Prêt·e pour le</span>
       <em data-fr=" marché du travail" data-en=" job market"> marché du travail</em>
     </h1>
-    <p class="hero__sub" data-fr="Outils de base pour construire votre candidature : CV lisible par humains et par IA, portfolio qui impressionne, et lettre de motivation adaptée à chaque offre." data-en="Basic tools to build your application: a CV readable by humans and AI, a portfolio that impresses, and a cover letter tailored to each posting.">
-      Outils de base pour construire votre candidature : CV lisible par humains et par IA, portfolio qui impressionne, et lettre de motivation adaptée à chaque offre.
+    <p <p class="hero__sub" data-fr="Un guide complet pour les étudiant·e·s de niveau collégial au Québec : documents de candidature professionnels, présentation en entretien, réseautage, droits, et vigilance face aux pièges du marché du travail. Comprend des points spécifiques au contexte québécois et canadien, et des informations adaptées aux étudiant·e·s internationaux·ales." data-en="A comprehensive guide for college-level students in Québec: professional application documents, interview preparation, networking, rights, and vigilance against job market pitfalls. Includes points specific to the Québec and Canadian context, and information adapted for international students.">
+      Un guide complet pour les étudiant·e·s de niveau collégial au Québec : candidature, entretien, réseautage, droits et vigilance.
     </p>
   </section>
 
@@ -878,6 +878,13 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
     <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-net" onclick="switchTab('net')" id="tab-net">
       <span data-fr="Réseautage" data-en="Networking">Réseautage</span>
       <span class="tab-count" id="count-net"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-iv" onclick="switchTab('iv')" id="tab-iv">
+      <span data-fr="Entretien" data-en="Interview">Entretien</span>
+      <span class="tab-count" id="count-iv"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-vg" onclick="switchTab('vg')" id="tab-vg">
+      <span data-fr="Vigilance" data-en="Vigilance">Vigilance</span>
     </button>
   </div>
 
@@ -1149,6 +1156,13 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
           <div class="item-hint" data-fr="Le bénévolat démontre l’engagement, les compétences transversales et la proactivité — particulièrement valorisé quand l’expérience professionnelle est limitée. Incluez l’organisation, votre rôle et ce que vous avez accompli." data-en="Volunteering demonstrates engagement, transferable skills, and proactivity — especially valued when professional experience is limited. Include the organisation, your role, and what you accomplished.">Le bénévolat démontre l’engagement, les compétences transversales et la proactivité.</div>
         </div>
         <button class="tip-btn" data-tip="cv-19" aria-label="Comment faire" aria-expanded="false">?</button>
+      </div>
+      <div class="checklist-item" data-key="cv-22">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Toutes les informations sont exactes et honnêtes — pas de mensonge ni d’exagération grossière" data-en="All information is accurate and honest — no lying or gross exaggeration">Toutes les informations sont exactes et honnêtes — pas de mensonge ni d’exagération grossière</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Les employeurs vérifient : appels aux anciens employeurs, vérification LinkedIn, vérification d’antécédents pour de nombreux postes en tech, finance et éducation. Un mensonge découvert à n’importe quelle étape — y compris après embauche — est un motif de renvoi immédiat et peut mettre fin définitivement à la relation professionnelle dans un secteur. La frontière acceptable est entre la <strong>mise en valeur</strong> (formuler honnêtement vos réalisations de façon avantageuse) et la <strong>fabrication</strong> (inventer des expériences, gonfler des chiffres, s’attribuer des réalisations qui ne sont pas les vôtres). Les réalisations quantifiées doivent être réelles ; elles peuvent être contextualisées généreusement." data-en="Employers verify: calls to former employers, LinkedIn checks, background checks for many tech, finance, and education roles. A lie discovered at any stage — including after hiring — is grounds for immediate dismissal and can permanently damage a professional relationship in a sector. The acceptable line is between <strong>framing</strong> (honestly presenting your achievements in the best light) and <strong>fabrication</strong> (inventing experiences, inflating numbers, claiming achievements that are not yours). Quantified achievements must be real; they can be contextualised generously.">Les employeurs vérifient. Un mensonge découvert — même après embauche — est un motif de renvoi immédiat. La limite : entre <strong>mise en valeur</strong> (honnête, avantageux) et <strong>fabrication</strong> (inventer, gonfler, s’attribuer).</div>
+        </div>
       </div>
     </div>
   </div>
@@ -2355,14 +2369,307 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 
   </div>
 
+
+  <!-- ==================== TAB 6: INTERVIEW PREP ==================== -->
+  <div class="tab-panel" id="panel-iv" role="tabpanel" aria-labelledby="tab-iv">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title" data-fr="Préparation à l’entretien" data-en="Interview Preparation">Préparation à l’entretien</h2>
+        <p class="panel-desc" data-fr="L’entretien commence bien avant d’entrer dans la salle. Cette section couvre la préparation, les attentes culturelles canadiennes, le comportement pendant l’entretien, et le suivi après." data-en="The interview begins well before you walk in the room. This section covers preparation, Canadian cultural norms, behaviour during the interview, and follow-up.">L’entretien commence bien avant d’entrer dans la salle.</p>
+      </div>
+      <button class="btn-reset" onclick="resetTab('iv')">
+        <span data-fr="Réinitialiser" data-en="Reset">Réinitialiser</span>
+      </button>
+    </div>
+
+    <div class="completion-banner" id="complete-iv">
+      <div class="completion-banner__title" data-fr="Entretien préparé ✓" data-en="Interview Ready ✓">Entretien préparé ✓</div>
+      <div class="completion-banner__sub" data-fr="Toutes les étapes de préparation sont en place." data-en="All preparation steps are in place.">Toutes les étapes de préparation sont en place.</div>
+    </div>
+
+    <div class="progress-label">
+      <span id="iv-progress-text" data-fr-template="0 / 18 complété" data-en-template="0 / 18 completed">0 / 18 complété</span>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="iv-bar" style="width:0%"></div></div>
+
+    <!-- Cultural context explainer -->
+    <div class="lang-advisory" id="iv-cultural-context">
+      <div class="lang-advisory__title" data-fr="Pourquoi cette section aborde-t-elle des choses qui semblent évidentes ?" data-en="Why does this section cover things that seem obvious?">Pourquoi cette section aborde-t-elle des choses qui semblent évidentes ?</div>
+      <div class="lang-advisory__grid">
+
+        <div class="lang-advisory__card">
+          <div class="lang-advisory__card-title" data-fr="Les normes culturelles sont invisibles pour ceux qui y sont nés" data-en="Cultural norms are invisible to those who grew up with them">Les normes culturelles sont invisibles pour ceux qui y sont nés</div>
+          <div class="lang-advisory__card-body" data-fr="Ce qui semble « évident» dans un contexte professionnel canadien — la poignée de main, le contact visuel direct, l’usage du prénom, l’hygiène quotidienne, la franchise dans les réponses — ne l’est pas du tout dans de nombreuses cultures. Ces attentes ne sont <strong>jamais expliquées</strong> précisément parce qu’elles sont considérées comme allant de soi par ceux qui les ont intériorisées depuis l’enfance." data-en="What seems ‘obvious’ in a Canadian professional context — the handshake, direct eye contact, use of first names, daily hygiene, frankness in answers — is not at all obvious in many cultures. These expectations are <strong>never explained</strong> precisely because they are taken for granted by those who internalised them from childhood."><strong>Ce qui semble évident pour certains ne l’est pas pour tous.</strong> Les attentes canadiennes en entretien ne sont jamais expliquées parce qu’elles sont considérées comme acquises par ceux qui y ont grandi.</div>
+        </div>
+
+        <div class="lang-advisory__card">
+          <div class="lang-advisory__card-title" data-fr="Des différences concrètes selon les cultures" data-en="Concrete differences across cultures">Des différences concrètes selon les cultures</div>
+          <div class="lang-advisory__card-body" data-fr="Dans certaines cultures, <strong>baisser les yeux</strong> est un signe de respect envers une personne en autorité — au Canada, c’est interprété comme un manque de confiance. Dans d’autres cultures, <strong>se doucher tous les jours</strong> n’est pas la norme ou est lié à des contraintes matérielles — en contexte professionnel canadien, c’est une attente systématique. La <strong>franchise directe</strong> est perque comme impoli dans certaines cultures, valorisée au Canada. Aucune de ces différences n’est un jugement de valeur." data-en="In some cultures, <strong>averting your gaze</strong> is a sign of respect toward someone in authority — in Canada, it reads as a lack of confidence. In others, <strong>showering daily</strong> is not the norm or is tied to material constraints — in Canadian professional contexts, it is a systematic expectation. <strong>Direct frankness</strong> is perceived as rude in some cultures, valued in Canada. None of these differences are value judgements.">Dans certaines cultures, baisser les yeux = respect. Au Canada : manque de confiance. Se doucher quotidiennement n’est pas universel ; en entretien canadien, c’est attendu. Aucune de ces différences n’est un jugement de valeur.</div>
+        </div>
+
+        <div class="lang-advisory__card">
+          <div class="lang-advisory__card-title" data-fr="Savoir, c’est pouvoir s’adapter" data-en="Knowing is the first step to adapting">Savoir, c’est pouvoir s’adapter</div>
+          <div class="lang-advisory__card-body" data-fr="Le marché du travail canadien est ouvert aux personnes de toutes origines — mais il a ses propres codes, comme tous les marchés du travail. L’objectif de cette section n’est pas de vous demander de renoncer à votre identité ; c’est de vous donner accès à des informations que les autres candidats ont souvent reçues implicitement par leur environnement familial ou scolaire. Il n’y a aucune honte à apprendre les règles d’un nouveau contexte." data-en="The Canadian job market is open to people of all backgrounds — but it has its own codes, like every job market. The goal of this section is not to ask you to give up your identity; it is to give you access to information that other candidates often received implicitly through their family or school environment. There is no shame in learning the rules of a new context."><strong>Le marché canadien a ses propres codes, comme tout marché.</strong> Cette section vous donne accès à des informations que d’autres ont reçues implicitement. Il n’y a aucune honte à apprendre les règles d’un nouveau contexte.</div>
+        </div>
+
+        <div class="lang-advisory__card">
+          <div class="lang-advisory__card-title" data-fr="Un investissement qui profite à tout le monde" data-en="An investment that benefits everyone">Un investissement qui profite à tout le monde</div>
+          <div class="lang-advisory__card-body" data-fr="Ces informations sont utiles <strong>quelle que soit votre origine</strong>. Beaucoup d’étudiants canadiens de naissance n’ont jamais appris explicitement ce qu’on attend d’eux en entretien. Si certains items de cette liste vous semblent acquis, tant mieux — cochez-les et passez au suivant. Si d’autres vous apprennent quelque chose, c’est exactement à quoi sert cet outil." data-en="This information is useful <strong>regardless of your background</strong>. Many Canadian-born students have never explicitly learned what is expected of them in an interview. If some items on this list seem obvious to you, great — tick them and move on. If others teach you something, that is exactly what this tool is for.">Ces informations sont utiles <strong>quelle que soit votre origine</strong>. Si certains items semblent acquis, cochez-les et passez au suivant. Si d’autres vous apprennent quelque chose, c’est exactement à quoi sert cet outil.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="checklist-section">
+      <div class="section-label" data-fr="Avant et pendant l’entretien" data-en="Before and during the interview">Avant et pendant l’entretien</div>
+      <div class="checklist-item" data-key="iv-1">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Recherche sur l’entreprise effectuée avant l’entretien" data-en="Company research done before the interview">Recherche sur l’entreprise effectuée avant l’entretien</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Visez au minimum : mission et valeurs, produits ou services principaux, actualités récentes, et si possible le parcours de l’intervieweur. Les recruteurs posent souvent « Que savez-vous de nous ?» — une réponse vague signale un manque d’intérêt réel." data-en="Aim for at minimum: mission and values, main products or services, recent news, and if possible your interviewer’s background. Recruiters often ask ‘What do you know about us?’ — a vague answer signals a lack of genuine interest.">Mission, produits, actualités récentes, et si possible le parcours de l’intervieweur.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-2">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="2–3 questions préparées à poser à l’intervieweur" data-en="2–3 questions prepared to ask the interviewer">2–3 questions préparées à poser à l’intervieweur</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Terminer avec « Je n’ai pas de questions» est interprété comme un désengagement. Bons exemples : « À quoi ressemble une première année réussie ?», « Quels sont les défis de l’équipe ?». Évitez les questions sur le salaire au premier entretien." data-en="Ending with ‘I have no questions’ reads as disengagement. Good examples: ‘What does a successful first year look like?’, ‘What are the current team challenges?’. Avoid salary questions in a first interview.">Terminer sans questions = désengagement. Préparez : réussir une première année, défis de l’équipe, culture.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-3">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Tenue vestimentaire adaptée au secteur, légèrement plus formelle que la norme du bureau" data-en="Dress code appropriate to the sector, slightly more formal than the office norm">Tenue vestimentaire adaptée au secteur, légèrement plus formelle que la norme du bureau</span></div>
+          <div class="item-hint" data-fr="En tech et design, le décontracté soigné est généralement suffisant. En cas de doute, habillez-vous un cran au-dessus. Vérifiez les photos LinkedIn de l’entreprise ou demandez explicitement au recruteur. Maquillage : la tendance en contexte professionnel canadien est la discrétion — ce n’est pas une obligation, mais un maquillage très marqué peut distraire dans certains secteurs. Vérifiez les photos de l’entreprise pour vous faire une idée du style ambiant." data-en="In tech and design, smart casual is generally sufficient. When in doubt, dress one level above. Check the company’s LinkedIn photos or explicitly ask the recruiter. Makeup: the general tendency in Canadian professional contexts is understatement — it is not a requirement, but heavy makeup can be distracting in some sectors. Check company photos to get a sense of the ambient style.">Décontracté soigné en tech/design, un cran au-dessus si vous doutez. Maquillage : discrétion privilégiée — pas une obligation, mais regardez les photos de l’entreprise.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-4">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Hygiène professionnelle : douche le jour même, cheveux propres, haleine fraîche, parfum neutre ou absent" data-en="Professional hygiene: shower the same day, clean hair, fresh breath, neutral or no fragrance">Hygiène professionnelle : douche le jour même, cheveux propres, haleine fraîche, parfum neutre ou absent</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Au Canada, les normes professionnelles incluent systématiquement une hygiène irréprochable le jour d’un entretien : douche, déodorant, dents brossées, vêtements propres et sans odeur. Le parfum doit être absent ou très discret — certains espaces sont sans parfum. Ces attentes sont rarement expliquées parce qu’elles sont considérées comme acquises — elles ne le sont pas dans tous les contextes culturels, et il n’y a aucune honte à l’apprendre." data-en="In Canada, professional standards systematically include impeccable hygiene on the day of an interview: shower, deodorant, brushed teeth, clean odour-free clothes. Fragrance should be absent or very subtle — some workplaces are fragrance-free. These expectations are rarely explained because they are considered self-evident: they are not in all cultural contexts, and there is no shame in learning this.">Douche le jour même, déodorant, dents brossées, vêtements propres. Parfum absent ou très discret. Ces attentes sont considérées comme acquises au Canada.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-5">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Pas de gomme, de nourriture ni de boisson (sauf eau) pendant l’entretien" data-en="No gum, food, or drink (except water) during the interview">Pas de gomme, de nourriture ni de boisson (sauf eau) pendant l’entretien</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Mâcher de la gomme pendant un entretien est considéré comme extrêmement impoli au Canada, même si vous pensez que personne ne le remarque. Évitez aussi de manger dans la salle d’attente juste avant. Une bouteille d’eau est acceptable." data-en="Chewing gum during an interview is considered extremely rude in Canada, even if you think no one notices. Also avoid eating in the waiting room just before. A water bottle is acceptable.">Mâcher de la gomme : très impoli au Canada. Pas de nourriture non plus. Une bouteille d’eau est acceptable.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-6">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Ce qu’il faut apporter : CV imprimé (×2), carnet de notes, stylo, références disponibles" data-en="What to bring: printed CV (×2), notebook, pen, references available">Ce qu’il faut apporter : CV imprimé (×2), carnet de notes, stylo, références disponibles</span></div>
+          <div class="item-hint" data-fr="Deux exemplaires imprimés de votre CV (un pour vous, un si demandé). Un carnet pour prendre des notes sans sortir votre téléphone. Votre liste de références (2–3 personnes avec coordonnées) prête en format imprimé ou numérique. <strong>Manteaux, sacs volumineux, casques de vélo :</strong> arrêvez-vous dans l’entrée ou la réception avant d’entrer dans la salle. Regardez s’il y a un vestiaire ou des crochets visibles ; si vous n’en voyez pas, vous pouvez demander discrètement à la réceptionniste : « Y a-t-il un endroit où je pourrais laisser mon manteau ?». Arriver avec un casque de vélo à la main ou un sac à dos encombrant posé sur la table crée une impression d’improvisation ; le gérer avant d’entrer dans la salle montre de la préparation." data-en="Two printed copies of your CV (one for you, one if requested). A notebook to take notes without taking out your phone. Your reference list (2–3 people with contact details) ready in print or digital form. <strong>Winter coats, bulky bags, bike helmets:</strong> stop at the entrance or reception before entering the interview room. Look for a coat check or visible hooks ; if you do not see any, you can discreetly ask the receptionist: ‘Is there somewhere I could leave my coat?’. Arriving with a bike helmet in hand or a bulky backpack on the table creates an impression of improvisation ; handling it before entering the room signals preparation.">Deux CV imprimés, carnet, stylo. Liste de références prête. <strong>Manteau, sac volumineux, casque de vélo :</strong> cherchez un vestiaire à la réception ; sinon, demandez discrètement. Gérer ces éléments avant d’entrer dans la salle montre de la préparation.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-7">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Ponctualité : arriver 10 min avant, prévenir immédiatement si retard inévitable" data-en="Punctuality: arrive 10 min early, notify immediately if unavoidable delay">Ponctualité : arriver 10 min avant, prévenir immédiatement si retard inévitable</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="10 minutes avant montre du respect sans encombrer. 30 minutes en avance est aussi problématique — la personne a d’autres tâches. Testez l’itinéraire la veille si nécessaire, incluez le temps de stationnement. Retard inévitable : appelez ou écrivez immédiatement, ne prévenez pas par WhatsApp." data-en="10 minutes early shows respect without being intrusive. 30 minutes early is also problematic — the person has other tasks. Test your route the day before if needed, include parking time. Unavoidable delay: call or email immediately, do not notify by WhatsApp.">10 min avant : respectueux. 30 min avant : encombrant. Testez l’itinéraire la veille. Retard : prévenez par appel ou courriel, pas WhatsApp.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-8">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Téléphone en mode silencieux ou éteint avant d’entrer" data-en="Phone on silent or off before entering">Téléphone en mode silencieux ou éteint avant d’entrer</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Un téléphone qui sonne ou vibre est l’une des erreurs les plus fréquentes et les plus mémorables. Le mode silencieux ne suffit pas toujours — les vibrations sur une table s’entendent. Rangez-le dans votre sac avant d’entrer." data-en="A ringing or vibrating phone is one of the most frequent and memorable mistakes. Silent mode is not always enough — vibrations on a table are audible. Put it in your bag before entering.">Mode silencieux ne suffit pas : les vibrations s’entendent. Rangez le téléphone dans votre sac avant d’entrer.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-9">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Première impression : poignée de main ferme, contact visuel, sourire naturel" data-en="First impression: firm handshake, eye contact, natural smile">Première impression : poignée de main ferme, contact visuel, sourire naturel</span></div>
+          <div class="item-hint" data-fr="Les premières secondes comptent de façon disproportionnée. Poignée de main ferme (ni écrasante ni molle), contact visuel, sourire naturel. Si vous êtes assis·e quand la personne arrive, levez-vous pour la saluer." data-en="The first few seconds matter disproportionately. Firm handshake (neither crushing nor limp), eye contact, natural smile. If you are seated when the person arrives, stand up to greet them.">Poignée ferme, contact visuel, sourire. Levez-vous pour saluer si vous êtes assis·e.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-10">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Attentes canadiennes : contact visuel direct, poignée de main avec tous, usage du prénom" data-en="Canadian norms: direct eye contact, handshake with everyone, use of first names">Attentes canadiennes : contact visuel direct, poignée de main avec tous, usage du prénom</span></div>
+          <div class="item-hint" data-fr="Au Canada, le contact visuel direct est un signe de confiance — pas d’impolitesse comme dans certaines cultures. La poignée de main est attendue avec chaque personne présente, y compris en partant. L’usage du prénom est fréquent dès le début. Le tutoiement est courant en tech et design ; attendez que l’autre le propose. La franchise directe est valorisée." data-en="In Canada, direct eye contact signals confidence — not rudeness as in some cultures. A handshake is expected with each person present, including when leaving. First names are commonly used from the start. Informal address is common in tech and design; wait for the other person to initiate it. Direct frankness is valued.">Contact visuel direct = confiance. Poignée de main avec chaque personne. Usage du prénom courant. Franchise directe valorisée.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-11">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Posture ouverte, écoute active, méthode STAR pour les questions comportementales" data-en="Open posture, active listening, STAR method for behavioural questions">Posture ouverte, écoute active, méthode STAR pour les questions comportementales</span></div>
+          <div class="item-hint" data-fr="Posture : dos droit, bras ouverts, légèrement penché vers l’avant. Évitez de vous agiter ou de regarder ailleurs. Méthode STAR pour les questions « Parlez-moi d’une fois où…» : <strong>S</strong>ituation, <strong>T</strong>âche, <strong>A</strong>ction, <strong>R</strong>ésultat. Préparez 3–4 exemples tirés de vos expériences réelles." data-en="Posture: straight back, open arms, slightly leaning forward. Avoid fidgeting or looking away. STAR method for ‘Tell me about a time when…’: <strong>S</strong>ituation, <strong>T</strong>ask, <strong>A</strong>ction, <strong>R</strong>esult. Prepare 3–4 examples from your real experiences.">Dos droit, bras ouverts. STAR : Situation, Tâche, Action, Résultat. Préparez 3–4 exemples réels.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-12">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Réponses concises : répondre à la question posée, ne pas monopoliser la conversation" data-en="Concise answers: answer the question asked, do not monopolise the conversation">Réponses concises : répondre à la question posée, ne pas monopoliser la conversation</span></div>
+          <div class="item-hint" data-fr="Réponse idéale : 1–2 minutes pour les questions générales, 2–3 minutes pour STAR. Demandez une clarification si vous ne comprenez pas la question. Les silences de quelques secondes pour réfléchir sont acceptables — voire appréciés." data-en="Ideal answer: 1–2 minutes for general questions, 2–3 minutes for STAR. Ask for clarification if you do not understand the question. A few seconds of silence to think is acceptable — even appreciated.">1–2 min général, 2–3 min STAR. Demandez une clarification si nécessaire. Les silences de réflexion sont acceptés.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-13">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Clôture : remercier par nom, poser vos questions, demander les prochaines étapes" data-en="Closing: thank by name, ask your questions, confirm next steps">Clôture : remercier par nom, poser vos questions, demander les prochaines étapes</span></div>
+          <div class="item-hint" data-fr="Avant de partir : posez vos questions préparées (iv-2), remerciez chaque personne par son nom, demandez « Quelles sont les prochaines étapes et dans quel délai peut-on s’attendre à avoir des nouvelles ?». Serrez la main de chaque personne. Notez immédiatement les points clés." data-en="Before leaving: ask your prepared questions (iv-2), thank each person by name, ask ‘What are the next steps and when can we expect to hear back?’. Shake hands with each person. Note key points immediately. In Québec, it is acceptable to ask about the salary range at the end of a first interview if the employer has not raised it: ‘Could you give me an idea of the salary range for this role?’ is a direct and respectful phrasing.">Posez vos questions, remerciez par nom, demandez les prochaines étapes. Serrez la main. Notez les points clés immédiatement. Au Québec, la fourchette salariale peut être demandée en fin de premier entretien si non abordée : « Pourriez-vous me donner une idée de la fourchette salariale ?»</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-14">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Courriel de remerciement dans les 24 h — offre, refus ou silence" data-en="Thank-you email within 24 h — offer, rejection, or silence">Courriel de remerciement dans les 24 h — offre, refus ou silence</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
+          <div class="item-hint" data-fr="Le courriel post-entretien est standard au Canada et peu de candidats le font : cela vous distingue. Mentionnez un élément spécifique de la conversation. Refus : remerciez et demandez un retour sur votre candidature — souvent accordé et très utile. Offre : remerciez et confirmez que vous étudiez l’offre avant de répondre formellement." data-en="The post-interview email is standard in Canada and few candidates do it: it sets you apart. Mention a specific element from the conversation. Rejection: thank them and ask for feedback on your application — often granted and very useful. Offer: thank them and confirm you are reviewing the offer before responding formally.">Peu de candidats le font : cela vous distingue. Refus : demandez un retour. Offre : remerciez et confirmez que vous étudiez.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-15">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Langue de l’entretien : répondre dans la langue de l’offre, même si l’intervieweur change" data-en="Interview language: respond in the language of the posting, even if the interviewer switches">Langue de l’entretien : répondre dans la langue de l’offre, même si l’intervieweur change</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Au Québec, si le poste était affiché en français, conduisez l’entretien en français et maintenez-le même si l’intervieweur glisse vers l’anglais — changer de langue sans invitation peut suggérer que vous n’êtes pas à l’aise en français professionnel. Si le poste est bilingue, demandez la langue préférée dès le début de l’entretien." data-en="In Québec, if the position was posted in French, conduct the interview in French and maintain it even if the interviewer shifts to English — switching without being invited may suggest you are not comfortable in professional French. If the position is bilingual, ask about the preferred language at the start of the interview.">Offre en français : conduisez et maintenez l’entretien en français, même si l’intervieweur glisse vers l’anglais. Poste bilingue : demandez la langue préférée dès le début.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-16">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Vouvoiement vs tutoiement : « vous» par défaut, tutoyer seulement si invité" data-en="Vouvoiement vs tutoiement: ‘vous’ by default, switch to ‘tu’ only if invited">Vouvoiement vs tutoiement : « vous» par défaut, tutoyer seulement si invité</span></div>
+          <div class="item-hint" data-fr="Au Québec, le tutoiement est très répandu au travail — même avec des supérieurs — mais en entretien, commencez toujours par « vous». Si l’intervieweur vous tutoie ou vous dit « on peut se tutoyer», adaptez-vous. Tutoyer d’emblée peut être perçu comme présomptueux ; maintenir « vous» après une invitation à tutoyer peut sembler rigide. Hors Québec, « vous» est toujours le choix le plus sûr." data-en="In Québec, ‘tu’ is very common in the workplace — even with superiors — but in an interview, always start with ‘vous’. If the interviewer uses ‘tu’ with you or says ‘on peut se tutoyer’, adapt accordingly. Using ‘tu’ immediately can seem presumptuous; maintaining ‘vous’ after being invited to switch can seem stiff. Outside Québec, ‘vous’ is always the safer default.">Commencez par « vous». Si l’intervieweur vous y invite, adaptez-vous. Tutoyer d’emblée peut paraître présomptueux. Hors Québec : « vous» toujours.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-17">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Ne jamais critiquer un ancien employeur, collègue ou expérience de travail" data-en="Never criticise a former employer, colleague, or work experience">Ne jamais critiquer un ancien employeur, collègue ou expérience de travail</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-hint" data-fr="Même si une expérience passée était génuinement mauvaise, la critiquer en entretien se retourne presque toujours contre vous. L’intervieweur ne peut pas vérifier votre version — mais peut se demander ce que vous diriez de son entreprise dans le même cas. Reformulez en termes de ce que vous cherchez : « Je cherchais un environnement avec plus de responsabilités» plutôt que « mon responsable était incompétent»." data-en="Even if a past experience was genuinely bad, criticising it in an interview almost always backfires. The interviewer cannot verify your account — but may wonder what you would say about their company. Reframe in terms of what you are looking for: ‘I was looking for an environment with more responsibility’ rather than ‘my manager was incompetent’.">Critiquer un ancien employeur se retourne presque toujours contre vous. Reformulez : « Je cherchais plus de responsabilités» plutôt que critiquer.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-18">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Salaire : fourchette du marché recherchée avant l’entretien, plancher personnel décidé" data-en="Salary: market range researched before the interview, personal floor decided">Salaire : fourchette du marché recherchée avant l’entretien, plancher personnel décidé</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
+          <div class="item-hint" data-fr="Connaître la fourchette de marché avant l’entretien vous place en position de force. Sources : Glassdoor, LinkedIn Salary, Indeed, l’offre d’emploi elle-même si le salaire y est affiché (de plus en plus courant au Québec). Décidez à l’avance votre plancher : le salaire minimum en dessous duquel vous ne prendrez pas le poste. En entretien, si l’employeur demande vos attentes salariales : donnez une fourchette ancrée sur le marché plutôt qu’un chiffre exact. Ne donnez jamais votre plancher comme point de départ — c’est votre réserve, pas votre offre d’ouverture. Un premier salaire se négocie ; ne pas négocier du tout est la norme pour beaucoup d’étudiants, mais c’est souvent de l’argent laissé sur la table." data-en="Knowing the market range before the interview puts you in a stronger position. Sources: Glassdoor, LinkedIn Salary, Indeed, the job posting itself if salary is listed (increasingly common in Québec). Decide your floor in advance: the minimum salary below which you will not take the role. In the interview, if the employer asks about your salary expectations: give a market-anchored range rather than a single number. Never give your floor as your starting point — it is your reserve, not your opening offer. A first salary is negotiable; not negotiating at all is the norm for many students, but it often means leaving money on the table.">Recherchez la fourchette de marché (Glassdoor, LinkedIn Salary, l’offre elle-même). Décidez votre plancher à l’avance. En entretien : donnez une fourchette ancrée sur le marché, jamais votre plancher comme point de départ.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ==================== TAB 7: VIGILANCE ==================== -->
+  <div class="tab-panel" id="panel-vg" role="tabpanel" aria-labelledby="tab-vg">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title" data-fr="Vigilance : arnaques, droits et intégrité" data-en="Vigilance: scams, rights, and integrity">Vigilance : arnaques, droits et intégrité</h2>
+        <p <p class="panel-desc" data-fr="Le marché de l’emploi comporte des risques réels : arnaques, exploitation, et tentations de prendre des raccourcis qui peuvent avoir des conséquences graves. Cette section couvre aussi les droits des étudiant·e·s selon leur statut (stages, emplois à temps partiel, permis de travail) afin que vous puissiez naviguer le marché du travail québécois en connaissance de cause." data-en="The job market carries real risks: scams, exploitation, and temptations to take shortcuts that can have serious consequences. This section also covers student rights by status (internships, part-time work, work permits) so you can navigate the Québec job market with full information.">Le marché de l’emploi comporte des risques réels. Cette section couvre aussi vos droits selon votre statut.</p>
+      </div>
+    </div>
+
+    <div class="net-section">
+      <div class="net-section-title" data-fr="Offres d’emploi suspectes" data-en="Suspicious job offers">Offres d’emploi suspectes</div>
+      <div class="net-tips">
+        <div class="net-tip net-tip--caution">
+          <div class="net-tip__title" data-fr="Offres trop belles pour être vraies" data-en="Offers too good to be true">Offres trop belles pour être vraies</div>
+          <div class="net-tip__body" data-fr="Salaire exceptionnellement élevé pour un poste d’entrée, aucune exigence de compétence, processus de sélection quasi inexistant. Si une offre ressemble à une opportunité en or sans aucune raison apparente, c’est presque toujours un signal d’alarme. Vérifiez l’entreprise sur Google, CIDREQ (registre des entreprises du Québec) et LinkedIn avant de répondre." data-en="Exceptionally high salary for an entry-level role, no skill requirements, near-nonexistent selection process. If an offer looks like a golden opportunity with no apparent reason, it is almost always a red flag. Verify the company on Google, CIDREQ (Québec business registry), and LinkedIn before responding.">Salaire exceptionnellement élevé pour un poste d’entrée, aucune exigence de compétence, processus de sélection quasi ine…</div>
+        </div>
+        <div class="net-tip net-tip--caution">
+          <div class="net-tip__title" data-fr="Recrutement par canaux non officiels" data-en="Recruitment through unofficial channels">Recrutement par canaux non officiels</div>
+          <div class="net-tip__body" data-fr="Un vrai recruteur vous contacte par courriel professionnel ou via LinkedIn, pas par WhatsApp, SMS ou message Instagram. Les offres envoyées par des adresses Gmail génériques (ex. : rh.entreprise2024@gmail.com) ou provenant d’un domaine different du site officiel sont suspectes. Vérifiez toujours l’offre sur le site officiel de l’entreprise." data-en="A real recruiter contacts you by professional email or via LinkedIn, not by WhatsApp, SMS, or Instagram message. Offers sent from generic Gmail addresses (e.g. rh.company2024@gmail.com) or from a domain different from the official website are suspicious. Always verify the offer on the company’s official website.">Un vrai recruteur vous contacte par courriel professionnel ou via LinkedIn, pas par WhatsApp, SMS ou message Instagram. …</div>
+        </div>
+        <div class="net-tip net-tip--caution">
+          <div class="net-tip__title" data-fr="Demandes d’argent — jamais légitimes" data-en="Requests for money — never legitimate">Demandes d’argent — jamais légitimes</div>
+          <div class="net-tip__body" data-fr="Aucun employeur légitime ne vous demande de payer pour traiter votre candidature, pour des frais de dossier, un dépôt pour de l’équipement, ou une vérification d’antécédents que vous devez payer vous-même à un fournisseur qu’ils désignent. Si on vous demande de l’argent à n’importe quel stade du processus d’embauche, c’est une arnaque." data-en="No legitimate employer asks you to pay to process your application, for file fees, an equipment deposit, or a background check you must pay yourself to a provider they designate. If you are asked for money at any stage of the hiring process, it is a scam.">Aucun employeur légitime ne vous demande de payer pour traiter votre candidature, pour des frais de dossier, un dépôt po…</div>
+        </div>
+        <div class="net-tip net-tip--caution">
+          <div class="net-tip__title" data-fr="Collecte d’informations sensibles avant une offre" data-en="Collection of sensitive information before an offer">Collecte d’informations sensibles avant une offre</div>
+          <div class="net-tip__body" data-fr="Un employeur légitime ne vous demandera jamais votre NAS (numéro d’assurance sociale), votre numéro de passeport, vos informations bancaires ou une copie de vos pièces d’identité avant de vous avoir remis une offre d’emploi officielle signée. Ces informations sont collectées après acceptation de l’offre, dans le cadre légal de l’embauche. Avant : c’est du vol d’identité." data-en="A legitimate employer will never ask for your SIN (social insurance number), passport number, banking information, or copies of your identity documents before providing you with a signed official job offer. This information is collected after offer acceptance, within the legal framework of onboarding. Before that: it is identity theft.">Un employeur légitime ne vous demandera jamais votre NAS (numéro d’assurance sociale), votre numéro de passeport, vos in…</div>
+        </div>
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Pression à décider immédiatement" data-en="Pressure to decide immediately">Pression à décider immédiatement</div>
+          <div class="net-tip__body" data-fr="Les offres légitimes vous donnent un délai raisonnable pour réfléchir — typiquement 3 à 5 jours ouvrables pour un premier poste. Si on vous dit que l’offre expire dans les prochaines heures ou qu’il faut signer ce soir, c’est une tactique de pression. Un employeur qui respecte ses futurs employés vous donne le temps de lire et de comprendre ce que vous signez." data-en="Legitimate offers give you a reasonable time to reflect — typically 3 to 5 business days for an entry-level role. If you are told the offer expires within hours or that you must sign tonight, it is a pressure tactic. An employer who respects future employees gives you time to read and understand what you are signing.">Les offres légitimes vous donnent un délai raisonnable pour réfléchir — typiquement 3 à 5 jours ouvrables pour un premie…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="net-section">
+      <div class="net-section-title" data-fr="Travail non rémunéré et stages" data-en="Unpaid work and internships">Travail non rémunéré et stages</div>
+      <div class="net-tips">
+        <div class="net-tip net-tip--caution">
+          <div class="net-tip__title" data-fr="Le « stage non rémunéré» illégal" data-en="The illegal ‘unpaid internship’">Le « stage non rémunéré» illégal</div>
+          <div class="net-tip__body" data-fr="Au Québec, faire travailler quelqu’un sans le payer est illégal dans la quasi-totalité des situations sous la <em>Loi sur les normes du travail</em>. Un « projet d’essai», une « période de formation non rémunérée» ou un « travail bénévole» dans le cadre d’un emploi régulier sont des contournements illégaux. Si vous faites un travail qui profite à l’entreprise, vous devez être payé." data-en="In Québec, having someone work without paying them is illegal in nearly all situations under the <em>Loi sur les normes du travail</em>. A ‘trial project’, ‘unpaid training period’, or ‘volunteer work’ in the context of regular employment are illegal workarounds. If you are doing work that benefits the company, you must be paid.">Au Québec, faire travailler quelqu’un sans le payer est illégal dans la quasi-totalité des situations sous la <em>Loi sur les normes du travail</em>. Si vous faites un travail qui profite à l’entreprise, vous devez être payé.</div>
+        </div>
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Les stages non rémunérés légitimes" data-en="Legitimate unpaid internships">Les stages non rémunérés légitimes</div>
+          <div class="net-tip__body" data-fr="Un stage non rémunéré est légal au Québec <strong>uniquement</strong> s’il fait partie d’un programme de formation reconnu, s’il est supervisé par l’établissement d’enseignement, s’il vise l’acquisition de compétences (pas à remplacer un employé), et s’il est effectué dans le cadre du cursus académique. Les stages curriculaires des collèges québécois rentrent dans ce cadre. Un stage « non rémunéré» proposé par une entreprise externe en dehors de ce cadre n’est généralement pas légal." data-en="An unpaid internship is legal in Québec <strong>only</strong> if it is part of a recognised training programme, supervised by the educational institution, aimed at skill acquisition (not replacing an employee), and carried out within the academic curriculum. Curricular internships at Québec colleges fit this framework. An ‘unpaid internship’ offered by an external company outside this framework is generally not legal.">Un stage non rémunéré est légal au Québec <strong>uniquement</strong> s’il fait partie d’un programme de formation recon…</div>
+        </div>
+        <div class="net-tip net-tip--caution">
+          <div class="net-tip__title" data-fr="Permis de travail et permis co-op — étudiants internationaux" data-en="Work permits and co-op permits — international students">Permis de travail et permis co-op — étudiants internationaux</div>
+          <div class="net-tip__body" data-fr="Si vous êtes étudiant·e international·e, <strong>vérifiez dès maintenant</strong> la date d’expiration de votre permis de travail ou co-op et les conditions qui y sont associées (employeur désigné, heures autorisées, type de travail). Un permis expiré ou du mauvais type vous empêche légalement de travailler et peut compromettre votre statut au Canada. Entamez le renouvellement <strong>au moins 3 mois avant</strong> la date de début prévue de votre stage ou emploi — les délais de traitement sont longs. Contactez le bureau des affaires internationales du collège si vous avez des doutes." data-en="If you are an international student, <strong>check right now</strong> the expiry date of your work or co-op permit and the conditions attached to it (designated employer, authorised hours, type of work). An expired or wrong-type permit legally prevents you from working and can jeopardise your status in Canada. Begin the renewal process <strong>at least 3 months before</strong> your planned start date for an internship or job — processing times are long. Contact the college’s international affairs office if you have any doubts.">Si vous êtes étudiant·e international·e, <strong>vérifiez dès maintenant</strong> la date d’expiration de votre permis d…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="net-section">
+      <div class="net-section-title" data-fr="Types de travail et droits selon votre statut" data-en="Types of work and rights by status">Types de travail et droits selon votre statut</div>
+      <div class="net-tips">
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Stages curriculaires" data-en="Curricular internships">Stages curriculaires</div>
+          <div class="net-tip__body" data-fr="Le stage curriculaire fait partie intégrante de votre programme : les dates, la durée et les exigences sont définies par l’établissement. Il est supervisé par un·e enseignant·e et donne lieu à une évaluation académique. Le stage peut être rémunéré ou non selon l’entente avec l’employeur et les normes du secteur — les deux sont légaux dans le cadre d’un programme collégial reconnu au Québec. Étudiant·e·s internationaux·ales : un permis co-op distinct du permis d’études est généralement requis pour effectuer un stage rémunéré. Vérifiez vos conditions et entamez les démarches bien à l’avance." data-en="A curricular internship is an integral part of your programme: dates, duration, and requirements are set by the institution. It is supervised by a teacher and results in an academic evaluation. The internship may be paid or unpaid depending on the agreement with the employer and sector norms — both are legal within a recognised Québec college programme. International students: a co-op permit separate from the study permit is generally required for a paid internship. Verify your conditions and start the process well in advance.">Le stage curriculaire fait partie intégrante de votre programme : les dates, la durée et les exigences sont définies par l’établissement. Il…</div>
+        </div>
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Emplois d’été et emplois à temps partiel pendant les études" data-en="Summer jobs and part-time work during studies">Emplois d’été et emplois à temps partiel pendant les études</div>
+          <div class="net-tip__body" data-fr="Au Canada, les étudiant·e·s à temps plein titulaires d’un permis d’études valide sont généralement autorisé·e·s à travailler : jusqu’à 24 heures par semaine pendant les sessions académiques, et sans limite d’heures pendant les congés officiels (été, relâche hivernale, relâche de mars) à condition d’être inscrit·e et de reprendre les études à la session suivante. Ce droit est inclus dans les conditions du permis d’études ordinaire — aucun permis de travail séparé n’est nécessaire pour les étudiant·e·s admissibles. Certains permis comportent des restrictions spécifiques : vérifiez les conditions exactes de votre permis sur le site d’IRCC (Immigration, Réfugiés et Citoyenneté Canada)." data-en="In Canada, full-time students with a valid study permit are generally authorised to work: up to 24 hours per week during academic sessions, and without hour limits during official breaks (summer, winter break, spring break) provided they are enrolled and will resume studies the following session. This right is included in the conditions of a standard study permit — no separate work permit is required for eligible students. Some permits include specific restrictions: verify the exact conditions of your permit on the IRCC website (Immigration, Refugees and Citizenship Canada).">Au Canada, les étudiant·e·s à temps plein titulaires d’un permis d’études valide sont généralement autorisé·e·s à travailler : jusqu’à 24 he…</div>
+        </div>
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Emploi à temps plein après les études" data-en="Full-time employment after graduation">Emploi à temps plein après les études</div>
+          <div class="net-tip__body" data-fr="Un permis d’études ne permet pas le travail à temps plein pendant les sessions académiques actives. Après l’obtention du diplôme, les diplômé·e·s internationaux·ales admissibles peuvent demander un Permis de travail postdiplôme (PTPD / PGWP), qui autorise le travail à temps plein pour une durée correspondant au programme complété (jusqu’à 3 ans). La demande doit être soumise dans un délai strict après la fin des études — ne pas respecter ce délai entraîne la perte du droit. Informez-vous auprès d’IRCC ou du bureau des affaires internationales de votre établissement." data-en="A study permit does not allow full-time work during active academic sessions. After graduation, eligible international graduates can apply for a Post-Graduation Work Permit (PGWP / PTPD), which authorises full-time work for a duration matching the completed programme (up to 3 years). The application must be submitted within a strict deadline after completing studies — missing this deadline results in losing the right. Check with IRCC or your institution’s international affairs office.">Un permis d’études ne permet pas le travail à temps plein pendant les sessions académiques actives. Après l’obtention du diplôme, les diplôm…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="net-section">
+      <div class="net-section-title" data-fr="Falsification de stage et fraude académique" data-en="Fake internships and academic fraud">Falsification de stage et fraude académique</div>
+      <div class="net-tips">
+        <div class="net-tip net-tip--caution">
+          <div class="net-tip__title" data-fr="Les fausses entreprises de stage" data-en="Fake internship companies">Les fausses entreprises de stage</div>
+          <div class="net-tip__body" data-fr="Des entreprises frauduleuses proposent aux étudiants de « valider» un stage contre paiement : faux documents, fausses évaluations, fausses coordonnées de superviseur. Ces arnaques circulent dans les réseaux étudiants. Les étudiants qui y ont recours sont invariablement découverts — et les conséquences sont sévères, tant sur le plan académique que légal." data-en="Fraudulent companies offer students to ‘validate’ an internship for payment: fake documents, fake evaluations, fake supervisor contact details. These scams circulate in student networks. Students who use them are invariably discovered — and the consequences are severe, both academically and legally.">Des entreprises frauduleuses proposent aux étudiants de « valider» un stage contre paiement : faux documents, fausses év…</div>
+        </div>
+        <div class="net-tip net-tip--caution">
+          <div class="net-tip__title" data-fr="Fabrication avec l’aide de proches ou de l’IA générative" data-en="Fabrication with help from relatives or generative AI">Fabrication avec l’aide de proches ou de l’IA générative</div>
+          <div class="net-tip__body" data-fr="Demander à un·e ami·e, un membre de la famille ou un·e connaissance de signer de faux documents de stage, de jouer le rôle de superviseur ou de rédiger de fausses évaluations est une fraude académique, quelle que soit la relation. L’utilisation de l’IA générative pour produire de faux documents, fausses lettres de confirmation ou faux rapports d’évaluation est également une fraude. Ces documents sont vérifiés systématiquement." data-en="Asking a friend, family member, or acquaintance to sign fake internship documents, play the role of supervisor, or write fake evaluations is academic fraud, regardless of the relationship. Using generative AI to produce fake documents, fake confirmation letters, or fake evaluation reports is also fraud. These documents are verified systematically.">Demander à un·e ami·e, un membre de la famille ou un·e connaissance de signer de faux documents de stage, de jouer le rô…</div>
+        </div>
+        <div class="net-tip net-tip--caution">
+          <div class="net-tip__title" data-fr="Conséquences — violation d’intégrité académique" data-en="Consequences — academic integrity violation">Conséquences — violation d’intégrité académique</div>
+          <div class="net-tip__body" data-fr="Fournir des informations fausses ou trompeuses concernant votre stage constitue une violation de l’intégrité académique de votre établissement. Les conséquences peuvent inclure l’échec du cours de stage, l’invalidation du stage, et des délais importants avant l’obtention de votre diplôme. Le Collège vérifie tous les stages : les superviseurs sont contactés directement, les lieux de travail sont confirmés, et les documents sont examinés. Les étudiants qui ont tenté de falsifier un stage ont été découverts sans exception. <strong>Si vous vous sentez sous pression ou dans une impasse concernant votre stage : parlez-en d’abord à votre enseignant·e de stage, puis à votre coordonnateur·trice, puis à votre doyen·ne — dans cet ordre. Ils sont là pour vous aider à trouver une solution, et il peut exister des options que vous n’avez pas envisagées. Aucune de ces conversations ne vous mettra en danger ; la fraude, oui.</strong>" data-en="Providing false or misleading information regarding your internship constitutes an academic integrity violation at your institution. Consequences may include failure of the internship course, invalidation of the internship, and significant delays to your graduation. The College verifies all internships: supervisors are contacted directly, workplaces are confirmed, and documents are reviewed. Students who have attempted to falsify an internship have been discovered without exception. <strong>If you feel pressured or stuck regarding your internship: speak first to your internship teacher, then to your coordinator, then to your dean — in that order. They are there to help you find a solution, and there may be options you have not considered. None of these conversations will put you at risk; fraud will.</strong>">Fournir des informations fausses ou trompeuses concernant votre stage constitue une violation de l’intégrité académique … <strong>Si vous vous sentez sous pression : parlez-en à votre enseignant·e de stage, votre coordonnateur·trice, puis votre doyen·ne — dans cet ordre. Des solutions existent. La fraude, non.</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="net-section">
+      <div class="net-section-title" data-fr="Que faire si quelque chose semble suspect" data-en="What to do if something seems off">Que faire si quelque chose semble suspect</div>
+      <div class="net-tips">
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Vérifier une entreprise avant d’accepter" data-en="Verifying a company before accepting">Vérifier une entreprise avant d’accepter</div>
+          <div class="net-tip__body" data-fr="CIDREQ (registre officiel des entreprises du Québec, accessible gratuitement en ligne) vous permet de vérifier qu’une entreprise est bien enregistrée et active. Vérifiez aussi l’adresse sur Google Maps, le site web (date de création, qualité du contenu), et les avis sur Glassdoor ou Indeed. Une entreprise légitime a une présence vérifiable." data-en="CIDREQ (official Québec business registry, freely accessible online) lets you verify that a company is registered and active. Also check the address on Google Maps, the website (creation date, content quality), and reviews on Glassdoor or Indeed. A legitimate company has a verifiable presence.">CIDREQ (registre officiel des entreprises du Québec, accessible gratuitement en ligne) vous permet de vérifier qu’une en…</div>
+        </div>
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Ressources en cas de problème" data-en="Resources if something goes wrong">Ressources en cas de problème</div>
+          <div class="net-tip__body" data-fr="<strong>CNESST</strong> (Commission des normes, de l’équité, de la santé et de la sécurité du travail) — pour les violations de vos droits au travail (non-paiement, conditions illégales) : cnesst.gouv.qc.ca. <strong>Services carrières du collège</strong> — si vous avez des doutes sur une offre ou un stage : ils peuvent vous aider à évaluer la situation. <strong>Police</strong> — si vous avez été victime de vol d’identité ou d’arnaque financière. En cas de doute, parlez-en à quelqu’un avant d’agir." data-en="<strong>CNESST</strong> (Commission des normes, de l’équité, de la santé et de la sécurité du travail) — for violations of your work rights (non-payment, illegal conditions): cnesst.gouv.qc.ca. <strong>College career services</strong> — if you have doubts about an offer or internship: they can help you assess the situation. <strong>Police</strong> — if you have been a victim of identity theft or financial fraud. When in doubt, talk to someone before acting."><strong>CNESST</strong> (Commission des normes, de l’équité, de la santé et de la sécurité du travail) — pour les violat…</div>
+        </div>
+        <div class="net-tip">
+          <div class="net-tip__title" data-fr="Faites confiance à votre instinct" data-en="Trust your instincts">Faites confiance à votre instinct</div>
+          <div class="net-tip__body" data-fr="Si quelque chose vous semble anormal dans un processus de recrutement — une demande inhabituelle, une pression inexpliquée, un manque de transparence sur le rôle ou l’entreprise — c’est une information. Vous n’êtes pas obligé·e d’accepter une offre sous pression. Un bon employeur comprend que vous ayez besoin de temps pour vérifier et réfléchir. Discutez-en avec les services carrières du collège avant de vous engager." data-en="If something seems off in a recruitment process — an unusual request, unexplained pressure, a lack of transparency about the role or company — that is information. You are not obligated to accept an offer under pressure. A good employer understands that you need time to verify and reflect. Discuss it with the college’s career services before committing.">Si quelque chose vous semble anormal dans un processus de recrutement — une demande inhabituelle, une pression inexpliqu…</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
 </div><!-- /page-wrap -->
 
 <script>
 // ================================================================
 // CONFIG
 // ================================================================
-const TABS   = ['cv', 'portfolio', 'cl', 'op', 'net'];
-const TOTALS = { cv: 21, portfolio: 21, cl: 13, op: 24, net: 9 };
+const TABS   = ['cv', 'portfolio', 'cl', 'op', 'net', 'iv', 'vg'];
+const TOTALS = { cv: 22, portfolio: 21, cl: 13, op: 24, net: 9, iv: 18 };
 const COOKIE_KEY = 'lci_career_checklist_v3';
 let currentLang = 'fr';
 let profileValue = 50; // 0=tech … 100=design
@@ -2415,6 +2722,7 @@ function setLang(lang) {
     if (el.closest('.pf-tips-box__list')) return;
     if (el.classList.contains('pf-tip-card__body')) return;
     if (el.classList.contains('pf-tip-card__name')) return;
+    if (el.classList.contains('item-hint')) return;
     if (el.closest('.generic-tips__list')) return;
     el.textContent = el.getAttribute('data-' + lang) || el.textContent;
   });
@@ -2457,6 +2765,12 @@ function setLang(lang) {
 
   // Portfolio tip cards contain HTML
   document.querySelectorAll('.pf-tip-card__body[data-fr], .pf-tip-card__name[data-fr]').forEach(el => {
+    const val = el.getAttribute('data-' + lang);
+    if (val) el.innerHTML = val;
+  });
+
+  // Item hints may contain HTML (e.g. <strong> in STAR method)
+  document.querySelectorAll('.item-hint[data-fr]').forEach(el => {
     const val = el.getAttribute('data-' + lang);
     if (val) el.innerHTML = val;
   });
@@ -2589,7 +2903,8 @@ function getTabForKey(key) {
   if (key.startsWith('cl-')) return 'cl';
   if (key.startsWith('op-')) return 'op';
   if (key.startsWith('nw-')) return 'net';
-  return null;
+  if (key.startsWith('iv-')) return 'iv';
+  return null; // vg tab has no checklist items
 }
 
 function updateProgress(tab) {
@@ -2624,6 +2939,7 @@ function updateProgress(tab) {
         cl:        [1, 2,  4,  7, 10],
         op:        [1, 3,  6,  9, 12],
         net:       [1, 2,  3,  5,  7],
+        iv:        [1, 2,  5,  9, 12],
       };
       const thresholds = STAR_THRESHOLDS[tab] || [1, Math.round(total*0.2), Math.round(total*0.4), Math.round(total*0.6), total-1];
       stars.forEach((s, i) => s.classList.toggle('filled', done >= thresholds[i]));
@@ -2652,7 +2968,7 @@ document.querySelectorAll('.checklist-item').forEach(item => {
 });
 
 function resetTab(tab) {
-  const prefix = tab === 'cv' ? 'cv-' : tab === 'portfolio' ? 'pf-' : tab === 'cl' ? 'cl-' : tab === 'op' ? 'op-' : 'nw-';
+  const prefix = tab === 'cv' ? 'cv-' : tab === 'portfolio' ? 'pf-' : tab === 'cl' ? 'cl-' : tab === 'op' ? 'op-' : tab === 'net' ? 'nw-' : 'iv-';
   const msg = currentLang === 'fr' ? 'Réinitialiser toute cette section?' : 'Reset this entire section?';
   if (!confirm(msg)) return;
 
