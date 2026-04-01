@@ -117,39 +117,37 @@ body {
 
 /* === TABS === */
 .tab-bar {
-  display: flex; border-bottom: 2px solid var(--c50);
+  display: flex; align-items: stretch; border-bottom: 2px solid var(--c50);
   margin: 3.2rem 0 0; background: var(--white);
   border-radius: var(--radius) var(--radius) 0 0; overflow: hidden;
+  position: sticky; top: 65px; z-index: 90;
+  box-shadow: 0 2px 8px rgba(7,24,30,0.06);
 }
 .tab-btn {
-  flex: 1; padding: 1.4rem 1.6rem; font-family: inherit;
+  flex: 1; padding: 1.2rem 0.8rem 0.8rem; font-family: inherit;
   font-size: 1.4rem; font-weight: 500; letter-spacing: 0.01em;
   background: none; border: none; border-bottom: 3px solid transparent;
   margin-bottom: -2px; color: var(--c400); cursor: pointer;
   transition: all var(--duration) var(--ease); text-align: center;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: space-between; gap: 0.6rem;
 }
 .tab-btn .tab-count {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 2rem; height: 2rem; border-radius: 10px;
-  font-size: 1.1rem; font-weight: 700; background: var(--c50);
-  color: var(--c400); margin-left: 0.6rem; transition: all var(--duration) var(--ease);
+  display: flex; align-items: center; justify-content: center; gap: 0.15rem;
+  line-height: 1; width: 100%; padding-bottom: 0.2rem;
 }
-.tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
-.tab-btn.active .tab-count { background: var(--blue); color: var(--white); }
-.tab-btn:hover:not(.active) { color: var(--charcoal); background: var(--cream); }
+/* Star badges */
+.tab-count .star {
+  font-size: 0.95rem;
+  color: var(--c200);
+  transition: color var(--duration) var(--ease);
+}
+.tab-count .star.filled {
+  color: #cc9f11;
+}
 
-/* === PROFILE SLIDER BAR (sticky, portfolio only) === */
-.profile-slider-bar {
-  display: none; /* shown via JS when portfolio tab active */
-  position: sticky;
-  top: 65px; /* height of site-header */
-  z-index: 100;
-  background: var(--white);
-  border-bottom: 1.5px solid var(--c50);
-  padding: 1.4rem 3.2rem;
-  animation: fadeIn 0.2s ease;
-  box-shadow: 0 2px 12px rgba(7,24,30,0.06);
-}
+
+
 .profile-slider-bar.visible { display: block; }
 
 .slider-header {
@@ -240,7 +238,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 .tab-panel {
   display: none; background: var(--white);
   border-radius: 0 0 var(--radius) var(--radius);
-  padding: 3.2rem; animation: fadeIn 0.2s ease;
+  padding: 3.2rem 3.2rem 4rem; padding-top: 4.8rem; animation: fadeIn 0.2s ease;
 }
 .tab-panel.active { display: block; }
 
@@ -612,9 +610,9 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 }
 
 .site-footer__text {
-  font-size: 1.35rem;
-  color: var(--c500);
-  line-height: 1.65;
+  font-size: 1.25rem;
+  color: var(--c400);
+  line-height: 1.6;
 }
 .site-footer__text p { margin-bottom: 0.9rem; }
 .site-footer__text p:last-child { margin-bottom: 0; }
@@ -822,6 +820,16 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
   padding: 0.1rem 0.5rem; color: var(--c700);
 }
 
+
+.tab-count .star.filled { color: #cc9f11; }
+
+/* === TAB ACTIVE INDICATOR === */
+.tab-btn.active {
+  color: var(--charcoal);
+  font-weight: 700;
+  border-bottom-color: var(--blue);
+}
+
 </style>
 </head>
 <body>
@@ -853,22 +861,23 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
   <div class="tab-bar" role="tablist">
     <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="panel-cv" onclick="switchTab('cv')" id="tab-cv">
       <span data-fr="CV" data-en="CV">CV</span>
-      <span class="tab-count" id="count-cv">0</span>
+      <span class="tab-count" id="count-cv"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
     </button>
     <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-portfolio" onclick="switchTab('portfolio')" id="tab-portfolio">
       <span data-fr="Portfolio" data-en="Portfolio">Portfolio</span>
-      <span class="tab-count" id="count-portfolio">0</span>
+      <span class="tab-count" id="count-portfolio"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
     </button>
     <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-cl" onclick="switchTab('cl')" id="tab-cl">
       <span data-fr="Lettre de motivation" data-en="Cover Letter">Lettre de motivation</span>
-      <span class="tab-count" id="count-cl">0</span>
+      <span class="tab-count" id="count-cl"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
     </button>
     <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-op" onclick="switchTab('op')" id="tab-op">
       <span data-fr="Présence en ligne" data-en="Online Presence">Présence en ligne</span>
-      <span class="tab-count" id="count-op">0</span>
+      <span class="tab-count" id="count-op"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
     </button>
     <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-net" onclick="switchTab('net')" id="tab-net">
       <span data-fr="Réseautage" data-en="Networking">Réseautage</span>
+      <span class="tab-count" id="count-net"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
     </button>
   </div>
 
@@ -912,7 +921,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 
     <!-- ATS explainer -->
     <div class="lang-advisory" id="cv-ats-explainer">
-      <div class="lang-advisory__title" data-fr="Qu'est-ce qu'un ATS (Applicant Tracking System)?" data-en="What is an ATS (Applicant Tracking System)?">Qu'est-ce qu'un ATS (Applicant Tracking System)?</div>
+      <div class="lang-advisory__title" data-fr="Qu'est-ce qu'un ATS (Applicant Tracking System) ?" data-en="What is an ATS (Applicant Tracking System) ?">Qu'est-ce qu'un ATS (Applicant Tracking System) ?</div>
       <div class="lang-advisory__grid">
         <div class="lang-advisory__card">
           <div class="lang-advisory__card-title" data-fr="Le problème que ça résout" data-en="The problem it solves">Le problème que ça résout</div>
@@ -935,7 +944,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 
     <!-- Language advisory: CV -->
     <div class="lang-advisory" id="cv-lang-advisory">
-      <div class="lang-advisory__title" data-fr="Dans quelle langue rédiger votre CV?" data-en="What language should your CV be in?">Dans quelle langue rédiger votre CV?</div>
+      <div class="lang-advisory__title" data-fr="Dans quelle langue rédiger votre CV ?" data-en="What language should your CV be in?">Dans quelle langue rédiger votre CV ?</div>
       <div class="lang-advisory__grid">
         <div class="lang-advisory__card">
           <div class="lang-advisory__card-title" data-fr="Étudiant·e local·e (Québec)" data-en="Local student (Québec)">Étudiant·e local·e (Québec)</div>
@@ -1002,6 +1011,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Nom du fichier professionnel : Prenom-Nom-CV.pdf" data-en="Professional file name: FirstName-LastName-CV.pdf">Nom du fichier professionnel : Prenom-Nom-CV.pdf</span></div>
+          <div class="item-hint" data-fr="Pas d’espaces ni de caractères spéciaux (%&amp;@#, accents, parenthèses...) dans le nom de fichier. Les espaces se transforment en %20 dans les URLs et peuvent rompre les liens envoyés par courriel ou dans un ATS. Les caractères spéciaux peuvent causer des erreurs selon le système d’exploitation du recruteur. Utilisez uniquement des lettres, chiffres et tirets : Marie-Dupont-CV.pdf" data-en="No spaces or special characters (%&amp;@#, accents, parentheses...) in the file name. Spaces become %20 in URLs and can break links sent by email or through an ATS. Special characters can cause errors depending on the recruiter’s operating system. Use only letters, numbers, and hyphens: Marie-Dupont-CV.pdf">Pas d’espaces ni de caractères spéciaux. Les espaces deviennent %20 dans les URLs et peuvent rompre les liens. Utilisez uniquement lettres, chiffres et tirets.</div>
         </div>
       </div>
     </div>
@@ -1013,7 +1023,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="En-tête : nom complet, ville, courriel professionnel, téléphone, LinkedIn" data-en="Header: full name, city, professional email, phone, LinkedIn">En-tête : nom complet, ville, courriel professionnel, téléphone, LinkedIn</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
-          <div class="item-hint" data-fr="Pas d'adresse complète ni de date de naissance. Inclure l'URL du portfolio si pertinent." data-en="No full address or date of birth. Include portfolio URL if relevant.">Pas d'adresse complète ni de date de naissance. Inclure l'URL du portfolio si pertinent.</div>
+          <div class="item-hint" data-fr="Pas d'adresse complète ni de date de naissance. Incluez vos URLs (LinkedIn, portfolio, GitHub) sous forme de texte brut court — pas seulement comme hyperlien cliquable. Les systèmes ATS et les logiciels de conversion peuvent supprimer ou ne pas transmettre les hyperliens ; le texte brut reste toujours lisible et copier-coller. Préférez les URLs courtes et personnalisées (ex. : linkedin.com/in/marie-dupont) plutôt que les URLs longues avec paramètres : elles doivent être mémorisables et saisissables." data-en="No full address or date of birth. Include your URLs (LinkedIn, portfolio, GitHub) as short plain text — not only as a clickable hyperlink. ATS systems and document conversion tools may strip or fail to pass through hyperlinks; plain text always remains readable and copy-paste ready. Prefer short, customised URLs (e.g. linkedin.com/in/marie-dupont) over long URLs with parameters: they must be memorable and typeable.">Pas d'adresse complète ni de date de naissance. URLs (LinkedIn, portfolio) en texte brut court — pas seulement en hyperlien : les ATS peuvent supprimer les liens. Courte, mémorable, copier-coller.</div>
         </div>
       </div>
 
@@ -1021,7 +1031,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Résumé professionnel ou objectif (2–4 phrases, adapté au poste)" data-en="Professional summary or objective (2–4 sentences, tailored to the role)">Résumé professionnel ou objectif (2–4 phrases, adapté au poste)</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
-          <div class="item-hint" data-fr="Répondre à : Qui suis-je? Quelle valeur j'apporte? Quel type de poste je cherche?" data-en="Answer: Who am I? What value do I bring? What kind of role am I seeking?">Répondre à : Qui suis-je? Quelle valeur j'apporte? Quel type de poste je cherche?</div>
+          <div class="item-hint" data-fr="Répondre à : Qui suis-je ? Quelle valeur j'apporte ? Quel type de poste je cherche ?" data-en="Answer: Who am I? What value do I bring? What kind of role am I seeking?">Répondre à : Qui suis-je ? Quelle valeur j'apporte ? Quel type de poste je cherche ?</div>
         </div>
       </div>
 
@@ -1162,7 +1172,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 
         <li data-fr="<strong>Netlify</strong> — alternative proche de Vercel, également gratuite pour les projets personnels. Points forts : formulaires de contact sans backend, fonctions serverless simples, déploiement par glisser-déposer si vous ne voulez pas utiliser Git. Bon choix pour les profils design ou front-end qui veulent un hébergement sans friction. <a href='https://netlify.com' target='_blank' rel='noopener'>netlify.com</a>" data-en="<strong>Netlify</strong> — close alternative to Vercel, also free for personal projects. Strengths: contact forms without a backend, simple serverless functions, drag-and-drop deployment if you prefer not to use Git. Good choice for design or front-end profiles who want friction-free hosting. <a href='https://netlify.com' target='_blank' rel='noopener'>netlify.com</a>"><strong>Netlify</strong> — alternative à Vercel, gratuite pour les projets personnels. Points forts : formulaires sans backend, déploiement par glisser-déposer possible. Bon choix pour les profils design et front-end. <a href="https://netlify.com" target="_blank" rel="noopener">netlify.com</a></li>
 
-        <li data-fr="<strong>Framer</strong> — outil de design no-code qui génère et héberge directement un site. Idéal pour les profils design qui veulent un portfolio visuellement impressionnant sans coder. Le plan gratuit inclut l'hébergement avec sous-domaine Framer; un domaine personnalisé nécessite un abonnement payant (abordable). <a href='https://framer.com' target='_blank' rel='noopener'>framer.com</a>" data-en="<strong>Framer</strong> — a no-code design tool that generates and hosts a site directly. Ideal for design profiles who want a visually impressive portfolio without coding. The free plan includes hosting with a Framer subdomain; a custom domain requires a paid plan (affordable). <a href='https://framer.com' target='_blank' rel='noopener'>framer.com</a>"><strong>Framer</strong> — outil no-code qui génère et héberge un site directement. Idéal pour les profils design. Plan gratuit avec sous-domaine Framer; domaine personnalisé payant (abordable). <a href="https://framer.com" target="_blank" rel="noopener">framer.com</a></li>
+        <li data-fr="<strong>Framer</strong> — outil de design no-code qui génère et héberge directement un site. Idéal pour les profils design qui veulent un portfolio visuellement impressionnant sans coder. Le plan gratuit inclut l'hébergement avec sous-domaine Framer ; un domaine personnalisé nécessite un abonnement payant (abordable). <a href='https://framer.com' target='_blank' rel='noopener'>framer.com</a>" data-en="<strong>Framer</strong> — a no-code design tool that generates and hosts a site directly. Ideal for design profiles who want a visually impressive portfolio without coding. The free plan includes hosting with a Framer subdomain; a custom domain requires a paid plan (affordable). <a href='https://framer.com' target='_blank' rel='noopener'>framer.com</a>"><strong>Framer</strong> — outil no-code qui génère et héberge un site directement. Idéal pour les profils design. Plan gratuit avec sous-domaine Framer; domaine personnalisé payant (abordable). <a href="https://framer.com" target="_blank" rel="noopener">framer.com</a></li>
 
         <li data-fr="<strong>Trouver d'autres options gratuites</strong> — le paysage évolue vite. Pour découvrir des alternatives, cherchez « free static site hosting » ou « free frontend hosting [année en cours] » sur GitHub Awesome lists, Reddit (r/webdev, r/selfhosted) ou dev.to. Critères à évaluer : bande passante, limite de requêtes, HTTPS inclus, domaine personnalisé, déploiement automatique depuis Git." data-en="<strong>Finding other free options</strong> — the landscape changes fast. To discover alternatives, search 'free static site hosting' or 'free frontend hosting [current year]' on GitHub Awesome lists, Reddit (r/webdev, r/selfhosted), or dev.to. Criteria to evaluate: bandwidth, request limits, HTTPS included, custom domain support, automatic Git deployment."><strong>Trouver d'autres options</strong> — cherchez « free static site hosting » sur les GitHub Awesome lists, r/webdev ou dev.to. Évaluez : bande passante, HTTPS, domaine personnalisé, déploiement Git automatique.</li>
 
@@ -1183,7 +1193,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 
         <div class="pf-tip-card">
           <div class="pf-tip-card__name" data-fr="Vidéo (showreels, démos)" data-en="Video (showreels, demos)">Vidéo (showreels, démos)</div>
-          <div class="pf-tip-card__body" data-fr="Ne pas héberger les vidéos soi-même — elles alourdissent massivement le site. Utilisez YouTube (non listé si vous ne voulez pas de visibilité publique) ou Vimeo (meilleur rendu, plan gratuit suffisant). Intégrez via <code>&lt;iframe&gt;</code> avec <code>loading=&quot;lazy&quot;</code>. Ajoutez des sous-titres : accessibilité et SEO. Durée recommandée pour un showreel : 60–90 secondes maximum." data-en="Do not self-host videos — they will massively slow your site. Use YouTube (unlisted if you do not want public visibility) or Vimeo (better rendering, free plan sufficient). Embed via <code>&lt;iframe&gt;</code> with <code>loading=&quot;lazy&quot;</code>. Add subtitles: accessibility and SEO. Recommended showreel length: 60–90 seconds maximum.">Hébergez sur YouTube (non listé) ou Vimeo, pas en direct sur votre site. Intégrez avec <code>&lt;iframe loading="lazy"&gt;</code>. Ajoutez des sous-titres. Showreel : 60–90 secondes maximum.</div>
+          <div class="pf-tip-card__body" data-fr="Ne pas héberger les vidéos soi-même — elles alourdissent massivement le site. Utilisez YouTube (non listé si vous ne voulez pas de visibilité publique) ou Vimeo (meilleur rendu, plan gratuit suffisant). Intégrez via une balise iframe avec loading=&#34;lazy&#34;. Ajoutez des sous-titres : accessibilité et SEO. Durée recommandée pour un showreel : 60–90 secondes maximum." data-en="Do not self-host videos — they will massively slow your site. Use YouTube (unlisted if you do not want public visibility) or Vimeo (better rendering, free plan sufficient). Embed via an iframe tag with loading=&#34;lazy&#34;. Add subtitles: accessibility and SEO. Recommended showreel length: 60–90 seconds maximum.">Hébergez sur YouTube (non listé) ou Vimeo, pas en direct sur votre site. Intégrez via une balise iframe avec loading="lazy". Ajoutez des sous-titres. Showreel : 60–90 secondes maximum.</div>
         </div>
 
         <div class="pf-tip-card">
@@ -1200,79 +1210,10 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
     </div>
 
     <div class="progress-label">
-      <span id="portfolio-progress-text" data-fr-template="0 / 20 complété" data-en-template="0 / 20 completed">0 / 20 complété</span>
+      <span id="portfolio-progress-text" data-fr-template="0 / 21 complété" data-en-template="0 / 21 completed">0 / 20 complété</span>
     </div>
     <div class="progress-bar-wrap"><div class="progress-bar" id="portfolio-bar" style="width:0%"></div></div>
 
-    <!-- Hosting tips box -->
-    <div class="pf-tips-box" id="pf-hosting-tips">
-      <div class="pf-tips-box__title"
-           data-fr="Héberger votre portfolio gratuitement"
-           data-en="Hosting your portfolio for free">Héberger votre portfolio gratuitement</div>
-      <ul class="pf-tips-box__list">
-
-        <li data-fr="<strong>GitHub Pages</strong> — Gratuit, intégré à GitHub. Idéal si votre site est un projet HTML/CSS/JS statique. Activez-le depuis Settings → Pages de votre dépôt. URL par défaut : <code>prenom-nom.github.io</code>. Connectez un domaine personnalisé en quelques minutes via un fichier <code>CNAME</code>. Parfait pour les profils tech et les portfolios codés à la main. <a href='https://pages.github.com' target='_blank' rel='noopener'>pages.github.com</a>"
-            data-en="<strong>GitHub Pages</strong> — Free, built into GitHub. Ideal if your site is a static HTML/CSS/JS project. Enable it from your repo's Settings → Pages. Default URL: <code>prenom-nom.github.io</code>. Connect a custom domain in minutes via a <code>CNAME</code> file. Perfect for tech profiles and hand-coded portfolios. <a href='https://pages.github.com' target='_blank' rel='noopener'>pages.github.com</a>">
-          <strong>GitHub Pages</strong> — Gratuit, intégré à GitHub. Idéal pour les sites HTML/CSS/JS statiques. URL : <code>prenom-nom.github.io</code>. <a href="https://pages.github.com" target="_blank" rel="noopener">pages.github.com</a>
-        </li>
-
-        <li data-fr="<strong>Vercel</strong> — Gratuit pour les projets personnels. Déploiement en quelques secondes depuis un dépôt GitHub : connectez votre repo, Vercel détecte le framework (React, Next.js, Vue, Svelte…) et déploie automatiquement à chaque <code>git push</code>. Excellente option pour les portfolios React ou Next.js. URL gratuite : <code>monsite.vercel.app</code>. <a href='https://vercel.com' target='_blank' rel='noopener'>vercel.com</a>"
-            data-en="<strong>Vercel</strong> — Free for personal projects. Deploy in seconds from a GitHub repo: connect your repo, Vercel detects the framework (React, Next.js, Vue, Svelte…) and deploys automatically on every <code>git push</code>. Excellent option for React or Next.js portfolios. Free URL: <code>mysite.vercel.app</code>. <a href='https://vercel.com' target='_blank' rel='noopener'>vercel.com</a>">
-          <strong>Vercel</strong> — Gratuit pour les projets personnels. Connectez votre repo GitHub, déploiement automatique à chaque <code>git push</code>. Idéal pour React et Next.js. <a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a>
-        </li>
-
-        <li data-fr="<strong>Netlify</strong> — Similaire à Vercel, gratuit pour les projets personnels. Supporte les sites statiques et les frameworks JavaScript. Offre en plus des fonctionnalités pratiques : formulaires de contact sans backend, redirections, et déploiements de prévisualisation par branche. <a href='https://netlify.com' target='_blank' rel='noopener'>netlify.com</a>"
-            data-en="<strong>Netlify</strong> — Similar to Vercel, free for personal projects. Supports static sites and JavaScript frameworks. Also offers useful features: contact forms without a backend, redirects, and branch preview deployments. <a href='https://netlify.com' target='_blank' rel='noopener'>netlify.com</a>">
-          <strong>Netlify</strong> — Similaire à Vercel. Points forts : formulaires de contact sans backend, redirections, et déploiements de prévisualisation par branche. <a href="https://netlify.com" target="_blank" rel="noopener">netlify.com</a>
-        </li>
-
-        <li data-fr="<strong>Framer</strong> — Outil de design et publication web tout-en-un. Interface visuelle, pas de code requis, mais le résultat est un site professionnel de qualité. Plan gratuit disponible avec sous-domaine <code>.framer.website</code>. Particulièrement adapté aux profils design (UX, motion, branding) qui veulent un portfolio visuellement fort sans coder. <a href='https://framer.com' target='_blank' rel='noopener'>framer.com</a>"
-            data-en="<strong>Framer</strong> — All-in-one design and web publishing tool. Visual interface, no code required, but the result is a professional-quality site. Free plan available with a <code>.framer.website</code> subdomain. Particularly suited to design profiles (UX, motion, branding) who want a visually strong portfolio without coding. <a href='https://framer.com' target='_blank' rel='noopener'>framer.com</a>">
-          <strong>Framer</strong> — Design et publication web tout-en-un, sans code. Plan gratuit avec <code>.framer.website</code>. Idéal pour les profils UX, motion et branding. <a href="https://framer.com" target="_blank" rel="noopener">framer.com</a>
-        </li>
-
-        <li data-fr="<strong>Trouver d'autres options gratuites</strong> — Le paysage de l'hébergement gratuit évolue vite. Pour découvrir de nouvelles options, cherchez « free static site hosting » ou « free frontend hosting » sur GitHub Awesome Lists (<a href='https://github.com/search?q=awesome+hosting' target='_blank' rel='noopener'>github.com/search</a>) ou sur des fils Reddit comme r/webdev et r/Frontend. Criteria à évaluer : généreux en bande passante, HTTPS inclus, domaine personnalisé supporté, pas de publicités sur les pages."
-            data-en="<strong>Finding other free options</strong> — The free hosting landscape evolves quickly. To discover new options, search 'free static site hosting' or 'free frontend hosting' on GitHub Awesome Lists (<a href='https://github.com/search?q=awesome+hosting' target='_blank' rel='noopener'>github.com/search</a>) or Reddit threads like r/webdev and r/Frontend. Criteria to evaluate: generous bandwidth, HTTPS included, custom domain support, no ads on pages.">
-          <strong>Trouver d'autres options</strong> — Cherchez « free static site hosting » sur GitHub Awesome Lists ou r/webdev. Critères clés : bande passante généreuse, HTTPS inclus, domaine personnalisé supporté, pas de publicités.
-        </li>
-
-        <li data-fr="<strong>Héberger depuis son propre ordinateur (profils back-end et full-stack)</strong> — Pour un·e ingénieur·e back-end ou full-stack, héberger son portfolio depuis un serveur maison ou un VPS configuré manuellement est un signal de compétence fort. Configurer Nginx ou Caddy, gérer un certificat SSL avec Let's Encrypt, exposer le serveur via un nom de domaine — tout cela démontre des compétences concrètes en déploiement et en administration système. C'est plus complexe, mais c'est précisément le point."
-            data-en="<strong>Self-hosting from your own machine (back-end and full-stack profiles)</strong> — For a back-end or full-stack engineer, hosting your portfolio from a home server or a manually configured VPS is a strong competence signal. Setting up Nginx or Caddy, managing an SSL certificate with Let's Encrypt, exposing the server via a domain name — all of this demonstrates concrete deployment and sysadmin skills. It is more complex, but that is precisely the point.">
-          <strong>Héberger depuis son propre ordinateur (back-end / full-stack)</strong> — Configurer Nginx ou Caddy, gérer un certificat SSL avec Let's Encrypt, exposer via un nom de domaine : c'est plus complexe, mais ça démontre des compétences concrètes en déploiement et en administration système — et c'est précisément le point.
-        </li>
-
-      </ul>
-    </div>
-
-    <!-- Content type tips box -->
-    <div class="pf-tips-box" id="pf-content-tips">
-      <div class="pf-tips-box__title"
-           data-fr="Présenter différents types de contenu"
-           data-en="Showcasing different content types">Présenter différents types de contenu</div>
-      <ul class="pf-tips-box__list">
-
-        <li data-fr="<strong>Images, photographie et mockups design</strong> — Privilégiez WebP ou JPEG optimisé (Squoosh). Pour les mockups, présentez à la fois le fichier final et des captures du processus (esquisses, wireframes, itérations). Utilisez un fond neutre pour les rendus de produit. Un zoom sur les détails importants (typographie, états d'interaction) vaut souvent plus qu'une vue d'ensemble flottant dans le vide."
-            data-en="<strong>Images, photography and design mockups</strong> — Use WebP or optimised JPEG (Squoosh). For mockups, show both the final file and process screenshots (sketches, wireframes, iterations). Use a neutral background for product renders. A zoom on important details (typography, interaction states) is often worth more than an overview floating in a void.">
-          <strong>Images, photographie et mockups design</strong> — WebP ou JPEG optimisé. Pour les mockups : montrez le résultat final <em>et</em> le processus (esquisses, wireframes, itérations). Un zoom sur les détails compte autant qu'une vue d'ensemble.
-        </li>
-
-        <li data-fr="<strong>Vidéo (showreels, démos, walkthroughs)</strong> — N'hébergez pas vos vidéos vous-même : elles sont lourdes et ralentissent le site. Hébergez sur YouTube (non listé si vous préférez) ou Vimeo, puis intégrez avec un <code>&lt;iframe&gt;</code>. Soignez les 5 premières secondes — c'est là que se jouent l'attention et la décision de continuer. Pour les démos techniques, un screencast de 60–90 secondes est souvent plus efficace qu'un long tutoriel."
-            data-en="<strong>Video (showreels, demos, walkthroughs)</strong> — Do not self-host videos: they are heavy and slow the site. Host on YouTube (unlisted if you prefer) or Vimeo, then embed with an <code>&lt;iframe&gt;</code>. Polish the first 5 seconds — that is where attention and the decision to keep watching are decided. For technical demos, a 60–90 second screencast is often more effective than a long walkthrough.">
-          <strong>Vidéo (showreels, démos)</strong> — Hébergez sur YouTube (non listé) ou Vimeo, intégrez avec <code>&lt;iframe&gt;</code> — ne stockez jamais vos vidéos vous-même. Soignez les 5 premières secondes. Un screencast de 60–90 s est souvent plus efficace qu'un long tutoriel.
-        </li>
-
-        <li data-fr="<strong>Code, dépôts GitHub et démos en ligne</strong> — Liez directement le dépôt GitHub avec un README soigné. Si le projet est une application web, incluez une démo en ligne (Vercel, Netlify, GitHub Pages). Pour les projets CLI ou backend, un GIF ou un screencast terminal dans le README suffit souvent. Précisez toujours le rôle de chaque technologie : ne listez pas juste « React, Node, PostgreSQL » — expliquez brièvement pourquoi ces choix."
-            data-en="<strong>Code, GitHub repos and live demos</strong> — Link directly to the GitHub repo with a polished README. If the project is a web app, include a live demo (Vercel, Netlify, GitHub Pages). For CLI or backend projects, a GIF or terminal screencast in the README is often sufficient. Always specify the role of each technology: do not just list 'React, Node, PostgreSQL' — briefly explain why those choices.">
-          <strong>Code, dépôts GitHub et démos en ligne</strong> — Liez le repo GitHub avec un README soigné. Incluez une démo en ligne si possible. Pour les projets CLI ou backend, un GIF terminal dans le README suffit souvent. Expliquez pourquoi vous avez choisi chaque technologie — pas juste quoi.
-        </li>
-
-        <li data-fr="<strong>3D, interactif et WebGL</strong> — Ce type de contenu se distingue immédiatement si bien exécuté. Exportez en WebGL (Unity, Three.js, Babylon.js, Godot) et intégrez directement dans la page pour une expérience interactive sans clic. Prévoyez toujours une image de secours et un message clair si WebGL n'est pas supporté. Attention aux performances : un canvas WebGL lourd peut rendre la page inutilisable sur mobile — testez systématiquement. Pour les scènes 3D complexes, un aperçu vidéo en boucle (autoplay, muted, loop) est souvent le meilleur compromis entre impact et performance."
-            data-en="<strong>3D, interactive and WebGL</strong> — This type of content stands out immediately if well executed. Export to WebGL (Unity, Three.js, Babylon.js, Godot) and embed directly in the page for an interactive experience without clicking. Always provide a fallback image and a clear message if WebGL is not supported. Watch performance: a heavy WebGL canvas can make the page unusable on mobile — test systematically. For complex 3D scenes, a looping video preview (autoplay, muted, loop) is often the best trade-off between impact and performance.">
-          <strong>3D, interactif et WebGL</strong> — Intégrez directement dans la page pour une expérience sans clic. Prévoyez une image de secours si WebGL n'est pas supporté. Testez sur mobile — un canvas lourd peut bloquer la page. Pour les scènes complexes, un aperçu vidéo en boucle (<code>autoplay muted loop</code>) est souvent le meilleur compromis.
-        </li>
-
-      </ul>
-    </div>
 
 
     <!-- SECTION: Identité -->
@@ -1637,6 +1578,23 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
           </div>
         </div>
       </div>
+
+      <div class="checklist-item" data-key="pf-21" data-tech="3" data-design="3">
+        <div class="item-relevance-bar"></div>
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Testé sur mobile et bureau — y compris avec les outils de développement" data-en="Tested on mobile and desktop — including with developer tools">Testé sur mobile et bureau — y compris avec les outils de développement</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
+          <div class="item-hint"
+            data-hint-tech-fr="Dans Chrome ou Edge : F12 → icône de téléphone/tablette (Device Toolbar) → sélectionnez un appareil ou entrez une résolution. Dans Firefox : F12 → icône de design adaptatif. Dans Safari : Développement → Saisir le mode adaptatif. Testez aussi en vrai sur un téléphone — les DevTools simulent, mais ne reproduisent pas parfaitement le comportement tactile."
+            data-hint-tech-en="In Chrome or Edge: F12 → phone/tablet icon (Device Toolbar) → select a device or enter a resolution. In Firefox: F12 → responsive design icon. In Safari: Develop → Enter Responsive Design Mode. Also test on a real phone — DevTools simulate, but do not perfectly reproduce touch behaviour."
+            data-hint-mid-fr="Dans Chrome ou Edge : F12 → icône de téléphone (Device Toolbar). Dans Firefox : F12 → icône de design adaptatif. Testez aussi sur un vrai téléphone si possible — les DevTools ne reproduisent pas parfaitement les interactions tactiles."
+            data-hint-mid-en="In Chrome or Edge: F12 → phone icon (Device Toolbar). In Firefox: F12 → responsive design icon. Also test on a real phone if possible — DevTools do not perfectly reproduce touch interactions."
+            data-hint-design-fr="Dans Chrome ou Edge : F12 → icône de téléphone (Device Toolbar). Dans Firefox : F12 → icône de design adaptatif. Dans Safari : Développement → Saisir le mode adaptatif. Vérifiez aussi que les images et animations restent lisibles sur petit écran."
+            data-hint-design-en="In Chrome or Edge: F12 → phone icon (Device Toolbar). In Firefox: F12 → responsive design icon. In Safari: Develop → Enter Responsive Design Mode. Also check that images and animations remain legible on small screens.">
+            F12 → Device Toolbar (Chrome/Edge) ou icône de design adaptatif (Firefox). Testez aussi sur un vrai téléphone.
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1655,7 +1613,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 
     <!-- Language advisory: Cover Letter -->
     <div class="lang-advisory" id="cl-lang-advisory" style="margin-top:2rem;">
-      <div class="lang-advisory__title" data-fr="Dans quelle langue rédiger votre lettre?" data-en="What language should your cover letter be in?">Dans quelle langue rédiger votre lettre?</div>
+      <div class="lang-advisory__title" data-fr="Dans quelle langue rédiger votre lettre ?" data-en="What language should your cover letter be in?">Dans quelle langue rédiger votre lettre ?</div>
       <div class="lang-advisory__grid">
         <div class="lang-advisory__card">
           <div class="lang-advisory__card-title" data-fr="Règle d'or" data-en="Golden rule">Règle d'or</div>
@@ -1683,7 +1641,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
       </div>
 
       <div class="field-group">
-        <label class="field-label" for="cl-why" data-fr="Pourquoi cette entreprise? (2–3 raisons spécifiques)" data-en="Why this company? (2–3 specific reasons)">Pourquoi cette entreprise? (2–3 raisons spécifiques)</label>
+        <label class="field-label" for="cl-why" data-fr="Pourquoi cette entreprise ? (2–3 raisons spécifiques)" data-en="Why this company? (2–3 specific reasons)">Pourquoi cette entreprise ? (2–3 raisons spécifiques)</label>
         <textarea id="cl-why" class="field-textarea" data-fr-ph="ex. : Culture d'innovation, projets à impact social, technologies utilisées…" data-en-ph="e.g. Innovation culture, social impact projects, technologies used…"></textarea>
       </div>
 
@@ -1796,7 +1754,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
       <div class="checklist-item" data-key="cl-8">
         <div class="check-box"></div>
         <div class="item-text">
-          <div class="item-label"><span data-fr="La lettre répond à « Pourquoi vous? » et « Pourquoi eux? »" data-en="The letter answers 'Why you?' and 'Why them?'">La lettre répond à « Pourquoi vous? » et « Pourquoi eux? »</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
+          <div class="item-label"><span data-fr="La lettre répond à « Pourquoi vous ? » et « Pourquoi eux ? »" data-en="The letter answers 'Why you?' and 'Why them?'">La lettre répond à « Pourquoi vous ? » et « Pourquoi eux ? »</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
         </div>
       </div>
       <div class="checklist-item" data-key="cl-9">
@@ -1835,37 +1793,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <h2 class="panel-title" data-fr="Présence en ligne" data-en="Online Presence">Présence en ligne</h2>
         <p class="panel-desc" data-fr="Votre présence en ligne professionnelle se construit sur plusieurs plateformes complémentaires. Cette section couvre trois exemples courants dans les domaines technologiques et créatifs — mais les principes s'appliquent à n'importe quelle plateforme de votre secteur." data-en="Your professional online presence is built across several complementary platforms. This section covers three common examples in technology and creative fields — but the principles apply to any platform in your sector.">Votre présence en ligne professionnelle se construit sur plusieurs plateformes complémentaires. Cette section couvre trois exemples courants dans les domaines technologiques et créatifs — mais les principes s'appliquent à n'importe quelle plateforme de votre secteur.</p>
 
-        <!-- Platform intro cards -->
-        <div class="platform-intro">
 
-          <div class="platform-intro__card">
-            <div class="platform-intro__card-header">
-              <span class="tag tag-li" style="margin:0;">LinkedIn</span>
-            </div>
-            <div class="platform-intro__card-type" data-fr="Réseau social professionnel" data-en="Professional social network">Réseau social professionnel</div>
-            <div class="platform-intro__card-body" data-fr="La plateforme de référence pour le réseautage professionnel et la recherche d'emploi. Les recruteurs l'utilisent activement pour trouver des candidats. Votre profil est votre carte de visite numérique permanente — visible même quand vous ne cherchez pas activement." data-en="The standard platform for professional networking and job searching. Recruiters actively use it to find candidates. Your profile is your permanent digital business card — visible even when you are not actively job-hunting.">La plateforme de référence pour le réseautage professionnel et la recherche d'emploi. Les recruteurs l'utilisent activement pour trouver des candidats. Votre profil est votre carte de visite numérique permanente — visible même quand vous ne cherchez pas activement.</div>
-            <span class="platform-intro__card-audience" data-fr="Toutes disciplines" data-en="All disciplines">Toutes disciplines</span>
-          </div>
-
-          <div class="platform-intro__card">
-            <div class="platform-intro__card-header">
-              <span class="tag tag-gh" style="margin:0;">GitHub</span>
-            </div>
-            <div class="platform-intro__card-type" data-fr="Hébergement de code et portfolio technique" data-en="Code hosting and technical portfolio">Hébergement de code et portfolio technique</div>
-            <div class="platform-intro__card-body" data-fr="Plateforme où les développeurs et développeuses stockent, partagent et collaborent sur du code. Pour un profil tech, c'est souvent le premier endroit qu'un recruteur consulte après le CV — votre activité y est visible publiquement sous forme de contributions et de projets." data-en="The platform where developers store, share, and collaborate on code. For a tech profile, it is often the first place a recruiter looks after the CV — your activity is publicly visible as contributions and projects.">Plateforme où les développeurs et développeuses stockent, partagent et collaborent sur du code. Pour un profil tech, c'est souvent le premier endroit qu'un recruteur consulte après le CV — votre activité y est visible publiquement sous forme de contributions et de projets.</div>
-            <span class="platform-intro__card-audience" data-fr="Développement, IT, data, sécurité" data-en="Development, IT, data, security">Développement, IT, data, sécurité</span>
-          </div>
-
-          <div class="platform-intro__card">
-            <div class="platform-intro__card-header">
-              <span class="tag tag-itch" style="margin:0;">itch.io</span>
-            </div>
-            <div class="platform-intro__card-type" data-fr="Plateforme de publication de jeux indépendants" data-en="Independent game publishing platform">Plateforme de publication de jeux indépendants</div>
-            <div class="platform-intro__card-body" data-fr="Marketplace ouverte dédiée aux jeux indépendants, expériences interactives et outils créatifs. Très utilisée dans la communauté game dev pour partager des prototypes, des jams et des projets étudiants. Permet de publier gratuitement et de rendre vos jeux jouables directement dans le navigateur." data-en="An open marketplace for independent games, interactive experiences, and creative tools. Widely used in the game dev community to share prototypes, jam entries, and student projects. Free to publish, and lets players run your games directly in the browser.">Marketplace ouverte dédiée aux jeux indépendants, expériences interactives et outils créatifs. Très utilisée dans la communauté game dev pour partager des prototypes, des jams et des projets étudiants. Permet de publier gratuitement et de rendre vos jeux jouables directement dans le navigateur.</div>
-            <span class="platform-intro__card-audience" data-fr="Jeux, design interactif, animation" data-en="Games, interactive design, animation">Jeux, design interactif, animation</span>
-          </div>
-
-        </div>
       </div>
       <button class="btn-reset" onclick="resetTab('op')">
         <span data-fr="Réinitialiser" data-en="Reset">Réinitialiser</span>
@@ -1942,6 +1870,35 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
     </div>
 
     
+
+
+    <!-- Platform intro cards -->
+    <div class="platform-intro">
+      <div class="platform-intro__card">
+            <div class="platform-intro__card-header">
+              <span class="tag tag-li" style="margin:0;">LinkedIn</span>
+            </div>
+            <div class="platform-intro__card-type" data-fr="Réseau social professionnel" data-en="Professional social network">Réseau social professionnel</div>
+            <div class="platform-intro__card-body" data-fr="La plateforme de référence pour le réseautage professionnel et la recherche d'emploi. Les recruteurs l'utilisent activement pour trouver des candidats. Votre profil est votre carte de visite numérique permanente — visible même quand vous ne cherchez pas activement." data-en="The standard platform for professional networking and job searching. Recruiters actively use it to find candidates. Your profile is your permanent digital business card — visible even when you are not actively job-hunting.">La plateforme de référence pour le réseautage professionnel et la recherche d'emploi. Les recruteurs l'utilisent activement pour trouver des candidats. Votre profil est votre carte de visite numérique permanente — visible même quand vous ne cherchez pas activement.</div>
+            <span class="platform-intro__card-audience" data-fr="Toutes disciplines" data-en="All disciplines">Toutes disciplines</span>
+          </div>
+      <div class="platform-intro__card">
+            <div class="platform-intro__card-header">
+              <span class="tag tag-gh" style="margin:0;">GitHub</span>
+            </div>
+            <div class="platform-intro__card-type" data-fr="Hébergement de code et portfolio technique" data-en="Code hosting and technical portfolio">Hébergement de code et portfolio technique</div>
+            <div class="platform-intro__card-body" data-fr="Plateforme où les développeurs et développeuses stockent, partagent et collaborent sur du code. Pour un profil tech, c'est souvent le premier endroit qu'un recruteur consulte après le CV — votre activité y est visible publiquement sous forme de contributions et de projets." data-en="The platform where developers store, share, and collaborate on code. For a tech profile, it is often the first place a recruiter looks after the CV — your activity is publicly visible as contributions and projects.">Plateforme où les développeurs et développeuses stockent, partagent et collaborent sur du code. Pour un profil tech, c'est souvent le premier endroit qu'un recruteur consulte après le CV — votre activité y est visible publiquement sous forme de contributions et de projets.</div>
+            <span class="platform-intro__card-audience" data-fr="Développement, IT, data, sécurité" data-en="Development, IT, data, security">Développement, IT, data, sécurité</span>
+          </div>
+      <div class="platform-intro__card">
+            <div class="platform-intro__card-header">
+              <span class="tag tag-itch" style="margin:0;">itch.io</span>
+            </div>
+            <div class="platform-intro__card-type" data-fr="Plateforme de publication de jeux indépendants" data-en="Independent game publishing platform">Plateforme de publication de jeux indépendants</div>
+            <div class="platform-intro__card-body" data-fr="Marketplace ouverte dédiée aux jeux indépendants, expériences interactives et outils créatifs. Très utilisée dans la communauté game dev pour partager des prototypes, des jams et des projets étudiants. Permet de publier gratuitement et de rendre vos jeux jouables directement dans le navigateur." data-en="An open marketplace for independent games, interactive experiences, and creative tools. Widely used in the game dev community to share prototypes, jam entries, and student projects. Free to publish, and lets players run your games directly in the browser.">Marketplace ouverte dédiée aux jeux indépendants, expériences interactives et outils créatifs. Très utilisée dans la communauté game dev pour partager des prototypes, des jams et des projets étudiants. Permet de publier gratuitement et de rendre vos jeux jouables directement dans le navigateur.</div>
+            <span class="platform-intro__card-audience" data-fr="Jeux, design interactif, animation" data-en="Games, interactive design, animation">Jeux, design interactif, animation</span>
+          </div>
+    </div>
     <div class="platform-section" id="plat-li">
       <button class="platform-toggle" aria-expanded="false" aria-controls="plat-li-body" onclick="togglePlatform(this, 'plat-li-body')">
         <div class="platform-toggle__label">
@@ -2039,6 +1996,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
       </div>
     </div>
 
+
     <div class="platform-section" id="plat-gh">
       <button class="platform-toggle" aria-expanded="false" aria-controls="plat-gh-body" onclick="togglePlatform(this, 'plat-gh-body')">
         <div class="platform-toggle__label">
@@ -2110,6 +2068,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
     </div>
       </div>
     </div>
+
 
     <div class="platform-section" id="plat-itch">
       <button class="platform-toggle" aria-expanded="false" aria-controls="plat-itch-body" onclick="togglePlatform(this, 'plat-itch-body')">
@@ -2201,6 +2160,16 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
       </div>
     </div>
 
+    <div class="completion-banner" id="complete-net">
+      <div class="completion-banner__title" data-fr="Réseautage en bonne voie ✓" data-en="Networking On Track ✓">Réseautage en bonne voie ✓</div>
+      <div class="completion-banner__sub" data-fr="Toutes les étapes actionnables cochées." data-en="All actionable steps checked.">Toutes les étapes actionnables cochées.</div>
+    </div>
+
+    <div class="progress-label">
+      <span id="net-progress-text" data-fr-template="0 / 9 complété" data-en-template="0 / 9 completed">0 / 9 complété</span>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="net-bar" style="width:0%"></div></div>
+
     <!-- ── Finding events ── -->
     <div class="net-section">
       <div class="net-section-title" data-fr="Trouver des événements (gratuitement)" data-en="Finding events (for free)">Trouver des événements (gratuitement)</div>
@@ -2257,14 +2226,47 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
       <div class="net-section-title" data-fr="Se comporter à un événement" data-en="Behaviour at events">Se comporter à un événement</div>
       <div class="net-tips">
 
-        <div class="net-tip">
-          <div class="net-tip__title" data-fr="Avant d'arriver : préparez votre pitch de 30 secondes" data-en="Before arriving: prepare your 30-second pitch">Avant d'arriver : préparez votre pitch de 30 secondes</div>
-          <div class="net-tip__body" data-fr="Vous allez répondre des dizaines de fois à « Qu'est-ce que vous faites? ». Préparez une réponse courte et mémorable : discipline + spécialité + ce que vous cherchez en ce moment. Ex. : « Je termine un programme en développement web, je me spécialise en interfaces accessibles, et je cherche un stage pour l'automne. »" data-en="You will answer 'What do you do?' dozens of times. Prepare a short, memorable answer: discipline + specialty + what you are currently looking for. E.g. 'I am finishing a web development programme, specialising in accessible interfaces, and looking for an internship this autumn.'">Préparez une réponse courte à « Qu'est-ce que vous faites? » : discipline + spécialité + ce que vous cherchez. Ex. : « Je termine un programme en développement web, je me spécialise en interfaces accessibles, et je cherche un stage pour l'automne. »</div>
+
+      <div class="checklist-item" data-key="nw-1">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Pitch de 30 secondes préparé : discipline + spécialité + ce que vous cherchez" data-en="30-second pitch prepared: discipline + specialty + what you are looking for">Pitch de 30 secondes préparé : discipline + spécialité + ce que vous cherchez</span></div>
+          <div class="item-hint" data-fr="Vous allez répondre des dizaines de fois à « Qu'est-ce que vous faites ? ». Ex. : « Je termine un programme en développement web, je me spécialise en interfaces accessibles, et je cherche un stage pour l'automne. »" data-en="You will answer 'What do you do?' dozens of times. E.g. 'I am finishing a web development programme, specialising in accessible interfaces, and looking for an internship this autumn.'">Préparez une réponse courte : discipline + spécialité + ce que vous cherchez.</div>
         </div>
+      </div>
+
+      <div class="checklist-item" data-key="nw-6">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Tenue vestimentaire adaptée au secteur et au niveau de formalité de l’événement" data-en="Dress code appropriate to the sector and formality level of the event">Tenue vestimentaire adaptée au secteur et au niveau de formalité de l’événement</span></div>
+          <div class="item-hint" data-fr="En tech et design, la tenue décontractée soignée est généralement la norme — évitez les extrêmes dans les deux sens. En cas de doute, regardez les photos des éditions précédentes sur les réseaux sociaux de l’événement." data-en="In tech and design, smart casual is generally the norm — avoid extremes in either direction. If in doubt, look at photos from previous editions on the event's social media.">En tech et design, la tenue décontractée soignée est généralement la norme — évitez les extrêmes dans les deux…</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="nw-7">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Badge de nom rempli lisiblement et porté à un endroit visible (épaule droite)" data-en="Name badge filled in legibly and worn in a visible spot (right shoulder)">Badge de nom rempli lisiblement et porté à un endroit visible (épaule droite)</span></div>
+          <div class="item-hint" data-fr="Si un badge est fourni, portez-le à hauteur de la poitrine côté droit — là où le regard tombe naturellement lors d’une poignée de main. Écrivez votre prénom en gros, votre discipline en dessous." data-en="If a badge is provided, wear it at chest height on the right side — where the eye naturally falls during a handshake. Write your first name large, your discipline below.">Si un badge est fourni, portez-le à hauteur de la poitrine côté droit — là où le regard tombe naturellement lo…</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="nw-8">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="QR code vers votre LinkedIn ou portfolio prêt sur votre téléphone" data-en="QR code to your LinkedIn or portfolio ready on your phone">QR code vers votre LinkedIn ou portfolio prêt sur votre téléphone</span></div>
+          <div class="item-hint" data-fr="Un QR code évite les erreurs de saisie et est plus rapide qu’un échange de cartes. Générez-le à l’avance (LinkedIn → profil → icône QR) et gardez-le accessible sans déverrouiller votre téléphone si possible." data-en="A QR code avoids typing errors and is faster than exchanging cards. Generate it in advance (LinkedIn → profile → QR icon) and keep it accessible without unlocking your phone if possible.">Un QR code évite les erreurs de saisie et est plus rapide qu’un échange de cartes. Générez-le à l’avance (Link…</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="nw-9">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Version courte ou facile de votre prénom proposée si nécessaire" data-en="Short or easy version of your name offered if needed">Version courte ou facile de votre prénom proposée si nécessaire</span></div>
+          <div class="item-hint" data-fr="Si votre prénom est difficile à prononcer pour la plupart des gens, proposez d’emblée une version courte ou phonétique : « Je m’appelle Thiruvenkatam, mais appelez-moi Thiru. » C’est un geste de courtoisie qui facilite la mémorisation et évite l’inconfort." data-en="If your name is difficult for most people to pronounce, proactively offer a shorter or phonetic version: "My name is Thiruvenkatam, but you can call me Thiru." It is a courtesy that aids memorability and avoids discomfort.">Si votre prénom est difficile à prononcer pour la plupart des gens, proposez d’emblée une version courte ou ph…</div>
+        </div>
+      </div>
 
         <div class="net-tip">
           <div class="net-tip__title" data-fr="Approcher quelqu'un : commencer par écouter" data-en="Approaching someone: start by listening">Approcher quelqu'un : commencer par écouter</div>
-          <div class="net-tip__body" data-fr="La règle d'or du réseautage : poser des questions sur l'autre avant de parler de soi. « Sur quoi travaillez-vous en ce moment? », « Qu'est-ce qui vous a amené à cet événement? », « Qu'est-ce que vous pensez de [thème de l'événement]? ». Les gens aiment parler de leur travail — et une bonne écoute vous démarque immédiatement. <strong>L'objectif d'une première conversation n'est pas d'obtenir quelque chose</strong> — c'est d'établir un contact humain mémorable. Demander un emploi ou une connexion LinkedIn dans les premières minutes d'une conversation coupe court à toute relation possible." data-en="The golden rule of networking: ask about the other person before talking about yourself. 'What are you working on right now?', 'What brought you to this event?', 'What do you think of [event theme]?'. People enjoy talking about their work — and good listening immediately sets you apart. <strong>The goal of a first conversation is not to get something</strong> — it is to make a memorable human connection. Asking for a job or a LinkedIn connection within the first few minutes of a conversation shuts down any possible relationship.">Posez des questions sur l'autre avant de parler de vous. « Sur quoi travaillez-vous? », « Qu'est-ce qui vous a amené ici? ». Les gens aiment parler de leur travail — une bonne écoute vous démarque. <strong>L'objectif n'est pas d'obtenir quelque chose</strong> — c'est d'établir un contact humain mémorable.</div>
+          <div class="net-tip__body" data-fr="La règle d'or du réseautage : poser des questions sur l'autre avant de parler de soi. « Sur quoi travaillez-vous en ce moment? », « Qu'est-ce qui vous a amené à cet événement? », « Qu'est-ce que vous pensez de [thème de l'événement]? ». Les gens aiment parler de leur travail — et une bonne écoute vous démarque immédiatement. <strong>L'objectif d'une première conversation n'est pas d'obtenir quelque chose</strong> — c'est d'établir un contact humain mémorable. Demander un emploi ou une connexion LinkedIn dans les premières minutes d'une conversation coupe court à toute relation possible." data-en="The golden rule of networking: ask about the other person before talking about yourself. 'What are you working on right now?', 'What brought you to this event?', 'What do you think of [event theme]?'. People enjoy talking about their work — and good listening immediately sets you apart. <strong>The goal of a first conversation is not to get something</strong> — it is to make a memorable human connection. Asking for a job or a LinkedIn connection within the first few minutes of a conversation shuts down any possible relationship.">Posez des questions sur l'autre avant de parler de vous. « Sur quoi travaillez-vous ? », « Qu'est-ce qui vous a amené ici? ». Les gens aiment parler de leur travail — une bonne écoute vous démarque. <strong>L'objectif n'est pas d'obtenir quelque chose</strong> — c'est d'établir un contact humain mémorable.</div>
         </div>
 
         <div class="net-tip">
@@ -2279,7 +2281,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 
         <div class="net-tip">
           <div class="net-tip__title" data-fr="Cartes de visite et alternatives numériques" data-en="Business cards and digital alternatives">Cartes de visite et alternatives numériques</div>
-          <div class="net-tip__body" data-fr="En 2025, l'URL LinkedIn ou un QR code vers votre portfolio remplace avantageusement la carte de visite papier. Si vous souhaitez quand même des cartes, gardez-les sobres : nom, discipline, courriel, LinkedIn, portfolio. N'attendez pas que l'autre sorte la sienne — proposez l'échange vous-même." data-en="In 2025, a LinkedIn URL or QR code to your portfolio effectively replaces a paper business card. If you still want cards, keep them simple: name, discipline, email, LinkedIn, portfolio. Do not wait for the other person to offer theirs — propose the exchange yourself.">En 2025, l'URL LinkedIn ou un QR code vers votre portfolio remplace avantageusement la carte papier. Si vous en faites, gardez-les sobres. N'attendez pas que l'autre sorte la sienne — proposez l'échange vous-même.</div>
+          <div class="net-tip__body" data-fr="De nos jours, l'URL LinkedIn ou un QR code vers votre portfolio remplace avantageusement la carte de visite papier. Si vous souhaitez quand même des cartes, gardez-les sobres : nom, discipline, courriel, LinkedIn, portfolio. N'attendez pas que l'autre sorte la sienne — proposez l'échange vous-même." data-en="These days, a LinkedIn URL or QR code to your portfolio effectively replaces a paper business card. If you still want cards, keep them simple: name, discipline, email, LinkedIn, portfolio. Do not wait for the other person to offer theirs — propose the exchange yourself.">De nos jours, l'URL LinkedIn ou un QR code vers votre portfolio remplace avantageusement la carte papier. Si vous en faites, gardez-les sobres. N'attendez pas que l'autre sorte la sienne — proposez l'échange vous-même.</div>
         </div>
 
         <div class="net-tip net-tip--caution">
@@ -2295,25 +2297,41 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
       <div class="net-section-title" data-fr="Réseautage en ligne : approche et messages" data-en="Online networking: outreach and messages">Réseautage en ligne : approche et messages</div>
       <div class="net-tips">
 
-        <div class="net-tip">
-          <div class="net-tip__title" data-fr="Le message de connexion LinkedIn" data-en="The LinkedIn connection message">Le message de connexion LinkedIn</div>
-          <div class="net-tip__body" data-fr="Personnalisez toujours — les messages génériques sont presque toujours ignorés. Structure efficace : (1) qui vous êtes en une phrase, (2) pourquoi vous contactez cette personne spécifiquement (leur travail, un article, un projet commun, un événement partagé), (3) ce que vous souhaitez — rester en contact, poser une question, suivre leur travail. Exemple : « Bonjour [prénom], je suis étudiant·e en design d'interaction et j'ai lu votre article sur l'accessibilité des formulaires — très éclairant. Je serais ravi·e de vous avoir dans mon réseau. »" data-en="Always personalise — generic messages are almost always ignored. Effective structure: (1) who you are in one sentence, (2) why you are contacting this specific person (their work, an article, a shared event), (3) what you are hoping for — to stay in touch, ask a question, follow their work. Example: 'Hi [first name], I am a student in interaction design and read your article on form accessibility — very insightful. I would love to have you in my network.'">Personnalisez toujours. Structure : (1) qui vous êtes, (2) pourquoi cette personne spécifiquement, (3) ce que vous souhaitez. Ex. : « Bonjour [prénom], je suis étudiant·e en design d'interaction et j'ai lu votre article sur l'accessibilité — très éclairant. Je serais ravi·e de vous avoir dans mon réseau. »</div>
-        </div>
 
-        <div class="net-tip">
-          <div class="net-tip__title" data-fr="Le suivi après un événement" data-en="Following up after an event">Le suivi après un événement</div>
-          <div class="net-tip__body" data-fr="Envoyez un message dans les 24–48 heures. Rappelez le contexte (où vous vous êtes rencontrés, de quoi vous avez parlé), exprimez un intérêt réel, et proposez une prochaine étape légère si pertinent (un article à partager, une question, une invitation à un prochain événement). Ne demandez pas de faveur dans ce premier message de suivi." data-en="Send a message within 24–48 hours. Remind them of the context (where you met, what you discussed), express genuine interest, and suggest a light next step if relevant (an article to share, a question, an invitation to a future event). Do not ask for a favour in this first follow-up message.">Envoyez un message dans les 24–48h. Rappelez le contexte, exprimez un intérêt réel, proposez une étape légère si pertinent. Ne demandez pas de faveur dans ce premier message.</div>
+      <div class="checklist-item" data-key="nw-3">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Message de connexion LinkedIn personnalisé rédigé" data-en="Personalised LinkedIn connection message drafted">Message de connexion LinkedIn personnalisé rédigé</span></div>
+          <div class="item-hint" data-fr="Structure : (1) qui vous êtes, (2) pourquoi cette personne spécifiquement, (3) ce que vous souhaitez. Ne demandez rien d’exigeant dans ce premier message." data-en="Structure: (1) who you are, (2) why this specific person, (3) what you are hoping for. Do not ask for anything demanding in this first message.">Structure : (1) qui vous êtes, (2) pourquoi cette personne spécifiquement, (3) ce que vous souhaitez…</div>
         </div>
+      </div>
 
-        <div class="net-tip">
-          <div class="net-tip__title" data-fr="Les messages à froid (cold outreach)" data-en="Cold outreach messages">Les messages à froid (cold outreach)</div>
-          <div class="net-tip__body" data-fr="Contacter quelqu'un que vous ne connaissez pas du tout est délicat mais tout à fait légitime si c'est bien fait. Règles : soyez bref (5–7 lignes maximum), montrez que vous connaissez leur travail spécifiquement, n'exigez rien — proposez plutôt une question précise ou une courte rencontre de 15–20 minutes. Le piège le plus fréquent : un message qui commence par parler de soi et se termine par une demande. <strong>Commencez par eux</strong> — ce qui vous a frappé dans leur travail, pourquoi leur parcours spécifiquement. Acceptez gracieusement si la personne ne répond pas ou décline. Taux de réponse typique : 20–30% avec un bon message." data-en="Contacting someone you do not know at all is delicate but entirely legitimate if done well. Rules: be brief (5–7 lines maximum), show you know their specific work, demand nothing — instead propose a precise question or a short 15–20 minute meeting. The most common trap: a message that opens by talking about yourself and ends with a request. <strong>Start with them</strong> — what struck you about their work, why their specific path. Accept gracefully if the person does not respond or declines. Typical response rate: 20–30% with a good message.">Soyez bref (5–7 lignes max), montrez que vous connaissez leur travail. Le piège fréquent : parler de soi et terminer par une demande. <strong>Commencez par eux.</strong> Acceptez gracieusement un refus. Taux de réponse : ~20–30% avec un bon message.</div>
-        </div>
 
-        <div class="net-tip">
-          <div class="net-tip__title" data-fr="Entretiens d'information (informational interviews)" data-en="Informational interviews">Entretiens d'information (informational interviews)</div>
-          <div class="net-tip__body" data-fr="Un entretien d'information est une rencontre de 20–30 minutes avec un·e professionnel·le pour en apprendre davantage sur un secteur, un poste ou une entreprise — ce n'est pas une entrevue d'embauche. C'est l'une des façons les plus efficaces d'explorer une carrière et d'élargir son réseau. Demandez-le explicitement : « Seriez-vous disponible pour un entretien d'information de 20 minutes? Je souhaite en apprendre davantage sur votre parcours en [domaine]. »" data-en="An informational interview is a 20–30 minute meeting with a professional to learn more about a sector, a role, or a company — it is not a job interview. It is one of the most effective ways to explore a career path and expand your network. Ask explicitly: 'Would you be available for a 20-minute informational interview? I would love to learn more about your path in [field].'">Une rencontre de 20–30 minutes avec un·e professionnel·le pour en apprendre sur un secteur ou un poste — pas une entrevue d'embauche. Demandez explicitement : « Seriez-vous disponible pour un entretien d'information de 20 minutes? »</div>
+      <div class="checklist-item" data-key="nw-2">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Suivi envoyé dans les 24 – 48 h après chaque rencontre pertinente" data-en="Follow-up sent within 24–48 h after each relevant encounter">Suivi envoyé dans les 24 – 48 h après chaque rencontre pertinente</span></div>
+          <div class="item-hint" data-fr="Rappelez le contexte (où vous vous êtes rencontrés, de quoi vous avez parlé), exprimez un intérêt réel, et proposez une étape légère. Ne demandez pas de faveur dans ce premier message." data-en="Remind them of the context (where you met, what you discussed), express genuine interest, and suggest a light next step. Do not ask for a favour in this first follow-up message.">Rappelez le contexte (où vous vous êtes rencontrés, de quoi vous avez parlé), exprimez un intérêt ré…</div>
         </div>
+      </div>
+
+
+      <div class="checklist-item" data-key="nw-4">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Message à froid envoyé à au moins un·e professionnel·le pertinent·e" data-en="Cold outreach message sent to at least one relevant professional">Message à froid envoyé à au moins un·e professionnel·le pertinent·e</span></div>
+          <div class="item-hint" data-fr="5 – 7 lignes max, commencez par eux (leur travail, pas vous), proposez une question précise ou 15 minutes. Acceptez gracieusement un refus ou un silence." data-en="5–7 lines max, start with them (their work, not you), propose a precise question or 15 minutes. Accept gracefully if declined or ignored.">5 – 7 lignes max, commencez par eux (leur travail, pas vous), proposez une question précise ou 15 mi…</div>
+        </div>
+      </div>
+
+
+      <div class="checklist-item" data-key="nw-5">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Demande d'entretien d'information envoyée à un·e professionnel·le du secteur" data-en="Informational interview request sent to a professional in your field">Demande d'entretien d'information envoyée à un·e professionnel·le du secteur</span></div>
+          <div class="item-hint" data-fr="20 – 30 minutes, pas une entrevue d’embauche. Demandez explicitement : « Seriez-vous disponible pour un entretien d’information de 20 minutes ? »" data-en="Would you be available for a 20-minute informational interview? 20–30 minutes, not a job interview.">20 – 30 minutes, pas une entrevue d’embauche. Demandez explicitement : « Seriez-vous disponible pour…</div>
+        </div>
+      </div>
 
       </div>
     </div>
@@ -2327,7 +2345,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 // CONFIG
 // ================================================================
 const TABS   = ['cv', 'portfolio', 'cl', 'op', 'net'];
-const TOTALS = { cv: 19, portfolio: 20, cl: 13, op: 24 };
+const TOTALS = { cv: 19, portfolio: 21, cl: 13, op: 24, net: 9 };
 const COOKIE_KEY = 'lci_career_checklist_v3';
 let currentLang = 'fr';
 let profileValue = 50; // 0=tech … 100=design
@@ -2336,13 +2354,25 @@ let profileValue = 50; // 0=tech … 100=design
 // COOKIE
 // ================================================================
 function saveState(state) {
-  const exp = new Date(Date.now() + 365 * 864e5).toUTCString();
-  document.cookie = `${COOKIE_KEY}=${encodeURIComponent(JSON.stringify(state))};expires=${exp};path=/;SameSite=Lax`;
+  const s = JSON.stringify(state);
+  try { localStorage.setItem(COOKIE_KEY, s); } catch(e) {}
+  try {
+    const exp = new Date(Date.now() + 365 * 864e5).toUTCString();
+    document.cookie = `${COOKIE_KEY}=${encodeURIComponent(s)};expires=${exp};path=/;SameSite=Lax`;
+  } catch(e) {}
 }
 function loadState() {
-  const m = document.cookie.match(new RegExp(`(?:^|; )${COOKIE_KEY}=([^;]*)`));
-  if (!m) return null;
-  try { return JSON.parse(decodeURIComponent(m[1])); } catch { return null; }
+  // Try localStorage first (works in sandboxed iframes where cookies are blocked)
+  try {
+    const ls = localStorage.getItem(COOKIE_KEY);
+    if (ls) return JSON.parse(ls);
+  } catch(e) {}
+  // Fallback to cookie
+  try {
+    const m = document.cookie.match(new RegExp(`(?:^|; )${COOKIE_KEY}=([^;]*)`));
+    if (m) return JSON.parse(decodeURIComponent(m[1]));
+  } catch(e) {}
+  return null;
 }
 function getState() {
   return loadState() || { checked: {}, lang: 'fr', activeTab: 'cv', profile: 50 };
@@ -2541,6 +2571,7 @@ function getTabForKey(key) {
   if (key.startsWith('pf-')) return 'portfolio';
   if (key.startsWith('cl-')) return 'cl';
   if (key.startsWith('op-')) return 'op';
+  if (key.startsWith('nw-')) return 'net';
   return null;
 }
 
@@ -2552,7 +2583,7 @@ function updateProgress(tab) {
 
   const barId  = tab === 'portfolio' ? 'portfolio-bar'           : tab + '-bar';
   const textId = tab === 'portfolio' ? 'portfolio-progress-text' : tab + '-progress-text';
-  const cntId  = tab === 'portfolio' ? 'count-portfolio'         : 'count-' + tab;
+  const cntId  = 'count-' + tab;
   const banId  = tab === 'portfolio' ? 'complete-portfolio'      : 'complete-' + tab;
   // guard: elements may not exist for all tabs
   if (!document.getElementById(barId)) return;
@@ -2564,7 +2595,25 @@ function updateProgress(tab) {
     const tmpl = el.getAttribute('data-' + currentLang + '-template') || `0 / ${total}`;
     el.textContent = tmpl.replace('0', done);
   }
-  document.getElementById(cntId).textContent = done;
+  const cntEl = document.getElementById(cntId);
+  if (cntEl) {
+    const stars = cntEl.querySelectorAll('.star');
+    if (stars.length === 5) {
+      // 1★ = 1 item done; 5★ = total-1 items done (one short of everything)
+      // Stars 2-4 are evenly spaced between those two extremes
+      const STAR_THRESHOLDS = {
+        cv:        [1, 3,  6, 11, 15],
+        portfolio: [1, 3,  7, 12, 17],
+        cl:        [1, 2,  4,  7, 10],
+        op:        [1, 3,  6,  9, 12],
+        net:       [1, 2,  3,  5,  7],
+      };
+      const thresholds = STAR_THRESHOLDS[tab] || [1, Math.round(total*0.2), Math.round(total*0.4), Math.round(total*0.6), total-1];
+      stars.forEach((s, i) => s.classList.toggle('filled', done >= thresholds[i]));
+    } else {
+      cntEl.textContent = done;
+    }
+  }
 
   const banner = document.getElementById(banId);
   if (banner) banner.classList.toggle('visible', done === total && total > 0);
@@ -2586,7 +2635,7 @@ document.querySelectorAll('.checklist-item').forEach(item => {
 });
 
 function resetTab(tab) {
-  const prefix = tab === 'cv' ? 'cv-' : tab === 'portfolio' ? 'pf-' : tab === 'cl' ? 'cl-' : 'op-';
+  const prefix = tab === 'cv' ? 'cv-' : tab === 'portfolio' ? 'pf-' : tab === 'cl' ? 'cl-' : tab === 'op' ? 'op-' : 'nw-';
   const msg = currentLang === 'fr' ? 'Réinitialiser toute cette section?' : 'Reset this entire section?';
   if (!confirm(msg)) return;
 
@@ -2975,7 +3024,7 @@ init();
       <span class="site-footer__byline-name">Elisa Schaeffer</span>
       <span data-fr=" · Doyenne, Technologie et Design" data-en=" · Dean, Technology and Design"> · Doyenne, Technologie et Design</span>
     </span>
-    <span data-fr="Dernière mise à jour : mars 2026" data-en="Last updated: March 2026">Dernière mise à jour : mars 2026</span>
+    <span data-fr="Dernière mise à jour : avril 2026" data-en="Last updated: April 2026">Dernière mise à jour : avril 2026</span>
   </div>
 </footer>
 
