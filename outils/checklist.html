@@ -29,27 +29,94 @@
 
 /* === CSS VARIABLES === */
 :root {
+  /* Fixed colours — never change with theme */
   --blue:       #00587c;
   --blue-dark:  #00435e;
-  --blue-dim:   #e0ebef;
+  --blue-dim:   #c8dde6;
   --red:        #eb2d37;
-  --cream:      #f8f5e9;
-  --cream-alt:  #ede9d8;
-  --charcoal:   #07181e;
-  --c700:       #2a3438;
-  --c500:       #424f54;
-  --c400:       #576266;
-  --c300:       #6d7478;
-  --c200:       #9ca3a5;
-  --c100:       #babfc0;
-  --c50:        #e1e3e4;
-  --white:      #ffffff;
-  --success:    #5b8000;
-  --cobalt:     #685ef7;   /* tech accent */
-  --taupe:      #cdc19e;   /* design accent */
+  --cobalt:     #685ef7;
+  --taupe:      #cdc19e;
+  --success:    #4a7000;
   --radius:     6px;
   --duration:   0.25s;
   --ease:       cubic-bezier(0.4, 0.14, 0.3, 1);
+
+  /* Light theme (default) */
+  --bg:         #ffffff;
+  --bg-alt:     #f8f5e9;
+  --bg-alt2:    #ede9d8;
+  --surface:    #ffffff;
+  --border:     #e1e3e4;
+  --text:       #07181e;
+  --text-2:     #424f54;
+  --text-3:     #576266;
+  --text-4:     #6d7478;
+  --text-5:     #9ca3a5;
+  --text-6:     #babfc0;
+
+  /* Legacy aliases (keep for backward compat) */
+  --cream:      var(--bg-alt);
+  --cream-alt:  var(--bg-alt2);
+  --charcoal:   var(--text);
+  --c700:       #2a3438;
+  --c500:       var(--text-2);
+  --c400:       var(--text-3);
+  --c300:       var(--text-4);
+  --c200:       var(--text-5);
+  --c100:       var(--text-6);
+  --c50:        var(--border);
+  --white:      var(--bg);
+}
+
+/* ── Light theme explicit ── */
+[data-theme="light"] {
+  --bg:         #ffffff;
+  --bg-alt:     #f8f5e9;
+  --bg-alt2:    #ede9d8;
+  --surface:    #ffffff;
+  --border:     #e1e3e4;
+  --text:       #07181e;
+  --text-2:     #424f54;
+  --text-3:     #576266;
+  --text-4:     #6d7478;
+  --text-5:     #9ca3a5;
+  --text-6:     #babfc0;
+}
+
+/* ── Dark theme ── */
+[data-theme="dark"] {
+  --bg:         #0e1a1f;
+  --bg-alt:     #152028;
+  --bg-alt2:    #1c2d36;
+  --surface:    #1a2c35;
+  --border:     #2a3d47;
+  --text:       #dce8ec;
+  --text-2:     #b0c4cc;
+  --text-3:     #8fa8b2;
+  --text-4:     #6e8c96;
+  --text-5:     #4e6870;
+  --text-6:     #3a5058;
+  --blue-dim:   #1a3a4a;
+  --success:    #7ab830;
+}
+
+/* ── Respect browser preference when no explicit choice made ── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) {
+    --bg:         #0e1a1f;
+    --bg-alt:     #152028;
+    --bg-alt2:    #1c2d36;
+    --surface:    #1a2c35;
+    --border:     #2a3d47;
+    --text:       #dce8ec;
+    --text-2:     #b0c4cc;
+    --text-3:     #8fa8b2;
+    --text-4:     #6e8c96;
+    --text-5:     #4e6870;
+    --text-6:     #3a5058;
+    --blue-dim:   #1a3a4a;
+    --success:    #7ab830;
+  }
 }
 
 /* === RESET & BASE === */
@@ -66,7 +133,20 @@ body {
 }
 
 /* === LAYOUT === */
-.page-wrap { max-width: 860px; margin: 0 auto; padding: 0 2.4rem 6rem; }
+.page-wrap { max-width: 1100px; margin: 0 auto; padding: 0; display: flex; align-items: flex-start; }
+.sidebar {
+  width: 140px; flex-shrink: 0;
+  position: sticky; top: 65px; height: calc(100vh - 65px);
+  overflow-y: auto; background: var(--bg);
+  border-right: 1.5px solid var(--border);
+  padding: 1.6rem 0;
+  z-index: 90;
+}
+.panel-area {
+  flex: 1; min-width: 0;
+  padding: 0;
+  overflow: hidden;
+}
 
 /* === HEADER === */
 .site-header {
@@ -79,6 +159,13 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 1.6rem;
+}
+.site-header__wordmark { flex: 1; }
+.site-header__controls {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-shrink: 0;
 }
 .site-header__wordmark {
   font-size: 1.3rem; font-weight: 500;
@@ -117,28 +204,26 @@ body {
 
 /* === TABS === */
 .tab-bar {
-  display: flex; align-items: stretch; border-bottom: 2px solid var(--c50);
-  margin: 3.2rem 0 0; background: var(--white);
-  border-radius: var(--radius) var(--radius) 0 0; overflow: hidden;
-  position: sticky; top: 65px; z-index: 90;
-  box-shadow: 0 2px 8px rgba(7,24,30,0.06);
+  display: flex; flex-direction: column;
+  background: var(--bg);
+  width: 100%;
 }
 .tab-btn {
-  flex: 1; padding: 1.2rem 0.8rem 0.8rem; font-family: inherit;
-  font-size: 1.4rem; font-weight: 500; letter-spacing: 0.01em;
-  background: none; border: none; border-bottom: 3px solid transparent;
-  margin-bottom: -2px; color: var(--c400); cursor: pointer;
-  transition: all var(--duration) var(--ease); text-align: center;
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: space-between; gap: 0.6rem;
+  width: 100%; padding: 0.8rem 1rem; font-family: inherit;
+  font-size: 1.2rem; font-weight: 500;
+  background: none; border: none; border-left: 3px solid transparent;
+  color: var(--c400); cursor: pointer;
+  transition: all var(--duration) var(--ease); text-align: left;
+  display: flex; flex-direction: column; align-items: flex-start;
+  justify-content: flex-start; gap: 0.3rem;
 }
 .tab-btn .tab-count {
-  display: flex; align-items: center; justify-content: center; gap: 0.15rem;
-  line-height: 1; width: 100%; padding-bottom: 0.2rem;
+  display: flex; align-items: center; justify-content: flex-start; gap: 0.15rem;
+  line-height: 1; width: 100%;
 }
 /* Star badges */
 .tab-count .star {
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   color: var(--c200);
   transition: color var(--duration) var(--ease);
 }
@@ -148,6 +233,18 @@ body {
 
 
 
+.profile-slider-bar {
+  display: none;
+  position: sticky;
+  top: 0;
+  z-index: 80;
+  background: var(--bg);
+  border-bottom: 1.5px solid var(--border);
+  padding: 2rem 2.4rem;
+  box-shadow: 0 2px 8px rgba(7,24,30,0.05);
+  width: 100%;
+  box-sizing: border-box;
+}
 .profile-slider-bar.visible { display: block; }
 
 .slider-header {
@@ -238,7 +335,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 .tab-panel {
   display: none; background: var(--white);
   border-radius: 0 0 var(--radius) var(--radius);
-  padding: 3.2rem 3.2rem 4rem; padding-top: 4.8rem; animation: fadeIn 0.2s ease;
+  padding: 3.2rem 2.4rem 4rem; animation: fadeIn 0.2s ease;
 }
 .tab-panel.active { display: block; }
 
@@ -267,7 +364,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 
 /* === PROGRESS === */
 .progress-bar-wrap {
-  background: var(--c50); border-radius: 3px; height: 4px;
+  background: var(--border); border-radius: 3px; height: 4px;
   margin-bottom: 2.8rem; overflow: hidden;
 }
 .progress-bar {
@@ -519,9 +616,9 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 .completion-banner__sub { font-size: 1.4rem; color: rgba(255,255,255,0.8); }
 
 @media (max-width: 600px) {
-  .tab-panel { padding: 2rem 1.6rem; }
+  .tab-panel { padding: 2rem 1.6rem 3rem; }
   .tab-btn { font-size: 1.25rem; padding: 1.2rem 0.8rem; }
-  .profile-slider-bar { padding: 1.2rem 1.6rem; top: 61px; }
+  .profile-slider-bar { padding: 1.6rem; top: 61px; }
 }
 
 /* === COLLAPSIBLE PLATFORM SECTIONS === */
@@ -533,7 +630,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
   cursor: pointer; text-align: left; font-family: inherit;
   transition: background var(--duration) var(--ease);
 }
-.platform-toggle:hover { background: var(--cream-alt); }
+.platform-toggle:hover { background: var(--bg-alt2); }
 .platform-toggle[aria-expanded="true"] { background: var(--white); }
 
 .platform-toggle__label {
@@ -827,9 +924,191 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 .tab-btn.active {
   color: var(--charcoal);
   font-weight: 700;
-  border-bottom-color: var(--blue);
+  border-left-color: var(--blue);
+  background: var(--bg-alt);
 }
 
+
+/* === HAMBURGER / MOBILE SIDEBAR === */
+.sidebar-toggle {
+  display: none;
+  align-items: center; gap: 0.8rem;
+  padding: 1rem 1.6rem;
+  background: var(--bg);
+  border: none; border-bottom: 1.5px solid var(--border);
+  width: 100%; cursor: pointer;
+  font-family: inherit; font-size: 1.4rem; font-weight: 600;
+  color: var(--charcoal); text-align: left;
+}
+.sidebar-toggle__icon { font-size: 1.8rem; line-height: 1; }
+.sidebar-toggle__label { flex: 1; }
+.sidebar-toggle__chevron { transition: transform 0.2s ease; font-size: 1.2rem; color: var(--c300); }
+.sidebar-toggle.open .sidebar-toggle__chevron { transform: rotate(180deg); }
+.sidebar-dropdown {
+  display: none;
+  position: absolute; left: 0; right: 0;
+  background: var(--white);
+  border-bottom: 1.5px solid var(--c50);
+  box-shadow: 0 4px 16px rgba(7,24,30,0.12);
+  z-index: 150;
+}
+.sidebar-dropdown.open { display: block; }
+.sidebar-dropdown .tab-btn {
+  border-left: none;
+  border-bottom: 1px solid var(--c50);
+  flex-direction: row; justify-content: space-between;
+  align-items: center; padding: 1.2rem 1.6rem;
+}
+.sidebar-dropdown .tab-btn.active {
+  background: var(--cream); border-left: none;
+}
+.sidebar-dropdown .tab-count { width: auto; }
+.tool-wrap {
+  display: flex; width: 100%; align-items: flex-start;
+}
+.tool-wrap > .sidebar {
+  display: flex; flex-direction: column; flex-shrink: 0;
+}
+.tool-wrap > .sidebar-toggle { display: none; }
+
+@media (max-width: 900px) {
+  .tool-wrap { flex-direction: column; }
+  .tool-wrap > .sidebar { display: none; }
+  .tool-wrap > .sidebar-toggle {
+    display: flex; position: sticky; top: 65px; z-index: 90;
+  }
+  .panel-area { width: 100%; }
+  .tab-panel { padding: 2.4rem 1.6rem 3rem; }
+  .profile-slider-bar { padding: 1.4rem 1.6rem; }
+}
+
+/* === LANDING PAGE === */
+.landing {
+  width: 100%; padding: 0;
+}
+.landing__hero {
+  background: var(--blue);
+  padding: 4.8rem 3.2rem 4rem;
+  color: var(--white);
+}
+.landing__eyebrow {
+  font-size: 1.2rem; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 0.8rem;
+}
+.landing__title {
+  font-size: clamp(3rem, 5vw, 4.8rem); font-weight: 400;
+  letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 1.6rem;
+}
+.landing__title em { color: #7dd3f0; font-style: normal; }
+.landing__sub {
+  font-size: 1.6rem; color: rgba(255,255,255,0.75);
+  max-width: 52ch; line-height: 1.5;
+}
+.landing__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.6rem;
+  padding: 3.2rem;
+  background: var(--cream);
+}
+.landing-card {
+  display: flex; flex-direction: column; align-items: flex-start;
+  gap: 0.6rem; padding: 1.8rem;
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: var(--radius); cursor: pointer;
+  font-family: inherit; text-align: left;
+  transition: all var(--duration) var(--ease);
+  box-shadow: 0 1px 4px rgba(7,24,30,0.04);
+}
+.landing-card:hover {
+  border-color: var(--blue);
+  box-shadow: 0 4px 16px rgba(0,88,124,0.12);
+  transform: translateY(-2px);
+}
+.landing-card--warning {
+  border-color: #7a3030;
+  background: var(--bg-alt);
+}
+.landing-card--warning:hover {
+  border-color: var(--red);
+  box-shadow: 0 4px 16px rgba(235,45,55,0.12);
+}
+.landing-card__icon { font-size: 2rem; line-height: 1; }
+.landing-card--warning .landing-card__icon { color: var(--red); }
+.landing-card__label {
+  font-size: 1.5rem; font-weight: 700; color: var(--charcoal);
+}
+.landing-card--warning .landing-card__label { color: var(--red); }
+.landing-card__desc {
+  font-size: 1.3rem; color: var(--c400); line-height: 1.45;
+}
+
+/* Back to home button */
+.btn-home {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.8rem 1.4rem;
+  background: none; border: 1.5px solid rgba(255,255,255,0.3);
+  border-radius: 6px; color: rgba(255,255,255,0.85);
+  font-family: inherit; font-size: 1.3rem; cursor: pointer;
+  transition: all var(--duration) var(--ease);
+}
+.btn-home:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.6); }
+
+/* Sidebar vigilance icon */
+.tab-warning-icon { font-size: 0.9em; }
+
+/* Hide old hero section when using landing */
+.hero { display: none; }
+
+/* tool-wrap takes full width in the flex layout */
+
+
+@media (max-width: 900px) {
+  .landing__grid { grid-template-columns: 1fr 1fr; padding: 2rem 1.6rem; gap: 1.2rem; }
+  .landing__hero { padding: 3.2rem 1.6rem 2.4rem; }
+}
+@media (max-width: 480px) {
+  .landing__grid { grid-template-columns: 1fr; }
+}
+
+/* === THEME TOGGLE === */
+.theme-toggle {
+  display: flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1.5px solid rgba(255,255,255,0.3);
+  border-radius: 20px; padding: 0.3rem 0.4rem;
+  cursor: pointer; font-size: 1.5rem; line-height: 1;
+  transition: border-color var(--duration) var(--ease);
+}
+.theme-toggle:hover { border-color: rgba(255,255,255,0.7); }
+.theme-toggle__icon { transition: transform 0.3s ease; }
+
+/* === VIGILANCE ACK CHECKBOXES === */
+.vg-ack {
+  margin: 1.2rem 1.6rem 0.4rem;
+  padding: 1rem 1.4rem;
+  background: var(--bg-alt);
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+}
+.vg-ack.checked {
+  border-color: var(--success);
+  background: color-mix(in srgb, var(--success) 8%, var(--bg));
+}
+.vg-ack .check-box {
+  border-color: var(--text-4);
+}
+.vg-ack.checked .check-box {
+  background: var(--success);
+  border-color: var(--success);
+}
+.vg-ack__label {
+  font-style: italic;
+  color: var(--text-3);
+  font-size: 1.35rem;
+}
+.vg-ack.checked .vg-ack__label {
+  color: var(--success);
+}
 </style>
 </head>
 <body>
@@ -838,55 +1117,155 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
   <div class="site-header__wordmark">
     <strong>Outils carrière</strong> &nbsp;·&nbsp; Career Tools
   </div>
-  <div class="lang-toggle" role="group" aria-label="Language / Langue">
-    <button class="lang-btn active" onclick="setLang('fr')" id="lang-fr" aria-pressed="true">FR</button>
-    <button class="lang-btn" onclick="setLang('en')" id="lang-en" aria-pressed="false">EN</button>
+  <div class="site-header__controls">
+    <div class="lang-toggle" role="group" aria-label="Language / Langue">
+      <button class="lang-btn active" onclick="setLang('fr')" id="lang-fr" aria-pressed="true">FR</button>
+      <button class="lang-btn" onclick="setLang('en')" id="lang-en" aria-pressed="false">EN</button>
+    </div>
+    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode" title="Mode clair / sombre">
+      <span class="theme-toggle__icon" id="theme-icon">🌙</span>
+    </button>
+    <button class="btn-home" onclick="goHome()" id="btn-home" style="display:none">
+      <span>←</span>
+      <span data-fr="Accueil" data-en="Home">Accueil</span>
+    </button>
   </div>
 </header>
 
 <div class="page-wrap">
 
+  <!-- LANDING PAGE -->
+  <div class="landing" id="landing">
+    <div class="landing__hero">
+      <p class="landing__eyebrow" data-fr="Développement professionnel · Étudiant·e·s de niveau collégial au Québec" data-en="Professional Development · College students in Québec">Développement professionnel · Étudiant·e·s de niveau collégial au Québec</p>
+      <h1 class="landing__title">
+        <span data-fr="Prêt·e pour le" data-en="Ready for the">Prêt·e pour le</span> <em data-fr="marché du travail" data-en="job market">marché du travail</em>
+      </h1>
+      <p class="landing__sub" data-fr="Un guide complet pour naviguer le marché du travail québécois : candidature, entretien, réseautage, droits et vigilance." data-en="A comprehensive guide for navigating the Québec job market: applications, interviews, networking, rights and vigilance.">Un guide complet pour naviguer le marché du travail québécois.</p>
+    </div>
+    <div class="landing__grid">
+      <button class="landing-card" onclick="startSection('cv')" aria-label="Curriculum Vitae">
+        <span class="landing-card__label" data-fr="Curriculum Vitae" data-en="Curriculum Vitae">Curriculum Vitae</span>
+        <span class="landing-card__desc" data-fr="Un CV clair, lisible par les humains et par les ATS." data-en="A clear CV, readable by humans and ATS.">Un CV clair, lisible par les humains et par les ATS.</span>
+      </button>
+      <button class="landing-card" onclick="startSection('portfolio')" aria-label="Portfolio">
+        <span class="landing-card__label" data-fr="Portfolio" data-en="Portfolio">Portfolio</span>
+        <span class="landing-card__desc" data-fr="Un site qui met votre travail en valeur selon votre profil." data-en="A site that showcases your work, tailored to your profile.">Un site qui met votre travail en valeur selon votre profil.</span>
+      </button>
+      <button class="landing-card" onclick="startSection('cl')" aria-label="Lettre de motivation">
+        <span class="landing-card__label" data-fr="Lettre de motivation" data-en="Cover Letter">Lettre de motivation</span>
+        <span class="landing-card__desc" data-fr="Une lettre adaptée à chaque offre, pas un modèle générique." data-en="A letter tailored to each posting, not a generic template.">Une lettre adaptée à chaque offre, pas un modèle générique.</span>
+      </button>
+      <button class="landing-card" onclick="startSection('op')" aria-label="Online Presence">
+        <span class="landing-card__label" data-fr="Présence en ligne" data-en="Online Presence">Présence en ligne</span>
+        <span class="landing-card__desc" data-fr="LinkedIn, GitHub, itch.io — ce qui compte selon votre domaine." data-en="LinkedIn, GitHub, itch.io — what matters for your field.">LinkedIn, GitHub, itch.io — ce qui compte selon votre domaine.</span>
+      </button>
+      <button class="landing-card" onclick="startSection('net')" aria-label="Réseautage / Networking">
+        <span class="landing-card__label" data-fr="Réseautage" data-en="Networking">Réseautage</span>
+        <span class="landing-card__desc" data-fr="Trouver des événements, approcher des gens, faire un suivi." data-en="Finding events, meeting people, following up.">Trouver des événements, approcher des gens, faire un suivi.</span>
+      </button>
+      <button class="landing-card" onclick="startSection('iv')" aria-label="Entretien">
+        <span class="landing-card__label" data-fr="Entretien" data-en="Interview">Entretien</span>
+        <span class="landing-card__desc" data-fr="Préparation, attentes canadiennes, langue, suivi." data-en="Preparation, Canadian norms, language, follow-up.">Préparation, attentes canadiennes, langue, suivi.</span>
+      </button>
+      <button class="landing-card landing-card--warning" onclick="startSection('vg')" aria-label="Vigilance">
+        <span class="landing-card__label" data-fr="Vigilance ⚠️" data-en="Vigilance ⚠️">Vigilance ⚠️</span>
+        <span class="landing-card__desc" data-fr="Arnaques, droits, stages et intégrité académique." data-en="Scams, rights, internships and academic integrity.">Arnaques, droits, stages et intégrité académique.</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- TOOL (hidden until section selected) -->
+  <div class="tool-wrap" id="tool-wrap" style="display:none">
+
   <section class="hero">
-    <p <p class="hero__eyebrow" data-fr="Développement professionnel · Étudiant·e·s de niveau collégial au Québec" data-en="Professional Development · College students in Québec">Développement professionnel · Étudiant·e·s de niveau collégial au Québec</p>
+    <p class="hero__eyebrow" data-fr="Développement professionnel · Étudiant·e·s de niveau collégial au Québec" data-en="Professional Development · College students in Québec">Développement professionnel · Étudiant·e·s de niveau collégial au Québec</p>
     <h1 class="hero__title">
       <span data-fr="Prêt·e pour le" data-en="Ready for the">Prêt·e pour le</span>
       <em data-fr=" marché du travail" data-en=" job market"> marché du travail</em>
     </h1>
-    <p <p class="hero__sub" data-fr="Un guide complet pour les étudiant·e·s de niveau collégial au Québec : documents de candidature professionnels, présentation en entretien, réseautage, droits, et vigilance face aux pièges du marché du travail. Comprend des points spécifiques au contexte québécois et canadien, et des informations adaptées aux étudiant·e·s internationaux·ales." data-en="A comprehensive guide for college-level students in Québec: professional application documents, interview preparation, networking, rights, and vigilance against job market pitfalls. Includes points specific to the Québec and Canadian context, and information adapted for international students.">
+    <p class="hero__sub" data-fr="Un guide complet pour les étudiant·e·s de niveau collégial au Québec : documents de candidature professionnels, présentation en entretien, réseautage, droits, et vigilance face aux pièges du marché du travail. Comprend des points spécifiques au contexte québécois et canadien, et des informations adaptées aux étudiant·e·s internationaux·ales." data-en="A comprehensive guide for college-level students in Québec: professional application documents, interview preparation, networking, rights, and vigilance against job market pitfalls. Includes points specific to the Québec and Canadian context, and information adapted for international students.">
       Un guide complet pour les étudiant·e·s de niveau collégial au Québec : candidature, entretien, réseautage, droits et vigilance.
     </p>
   </section>
 
   <!-- TAB BAR -->
-  <div class="tab-bar" role="tablist">
-    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="panel-cv" onclick="switchTab('cv')" id="tab-cv">
-      <span data-fr="CV" data-en="CV">CV</span>
+
+
+  <!-- SIDEBAR (desktop) -->
+  <nav class="sidebar" role="navigation" aria-label="Navigation des sections">
+    <div class="tab-bar" role="tablist">
+      <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="panel-cv" onclick="switchTab('cv')" id="tab-cv">
+      <span data-fr="Curriculum Vitae" data-en="Curriculum Vitae">Curriculum Vitae</span>
       <span class="tab-count" id="count-cv"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
-    </button>
-    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-portfolio" onclick="switchTab('portfolio')" id="tab-portfolio">
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-portfolio" onclick="switchTab('portfolio')" id="tab-portfolio">
       <span data-fr="Portfolio" data-en="Portfolio">Portfolio</span>
       <span class="tab-count" id="count-portfolio"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
-    </button>
-    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-cl" onclick="switchTab('cl')" id="tab-cl">
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-cl" onclick="switchTab('cl')" id="tab-cl">
       <span data-fr="Lettre de motivation" data-en="Cover Letter">Lettre de motivation</span>
       <span class="tab-count" id="count-cl"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
-    </button>
-    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-op" onclick="switchTab('op')" id="tab-op">
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-op" onclick="switchTab('op')" id="tab-op">
       <span data-fr="Présence en ligne" data-en="Online Presence">Présence en ligne</span>
       <span class="tab-count" id="count-op"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
-    </button>
-    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-net" onclick="switchTab('net')" id="tab-net">
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-net" onclick="switchTab('net')" id="tab-net">
       <span data-fr="Réseautage" data-en="Networking">Réseautage</span>
       <span class="tab-count" id="count-net"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
-    </button>
-    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-iv" onclick="switchTab('iv')" id="tab-iv">
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-iv" onclick="switchTab('iv')" id="tab-iv">
       <span data-fr="Entretien" data-en="Interview">Entretien</span>
       <span class="tab-count" id="count-iv"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
-    </button>
-    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-vg" onclick="switchTab('vg')" id="tab-vg">
-      <span data-fr="Vigilance" data-en="Vigilance">Vigilance</span>
-    </button>
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-vg" onclick="switchTab('vg')" id="tab-vg">
+      <span data-fr="Vigilance" data-en="Vigilance">Vigilance</span><span class="tab-warning-icon" aria-hidden="true"> ⚠️</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HAMBURGER (mobile) -->
+  <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()" aria-expanded="false">
+    <span class="sidebar-toggle__icon">☰</span>
+    <span class="sidebar-toggle__label" id="sidebar-toggle-label" data-fr="Navigation" data-en="Navigation">Navigation</span>
+    <span class="sidebar-toggle__chevron">▾</span>
+  </button>
+  <div class="sidebar-dropdown" id="sidebar-dropdown">
+    <div class="tab-bar" role="tablist">
+      <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="panel-cv" onclick="switchTab('cv')" id="tab-cv">
+      <span data-fr="Curriculum Vitae" data-en="Curriculum Vitae">Curriculum Vitae</span>
+      <span class="tab-count" id="count-cv"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-portfolio" onclick="switchTab('portfolio')" id="tab-portfolio">
+      <span data-fr="Portfolio" data-en="Portfolio">Portfolio</span>
+      <span class="tab-count" id="count-portfolio"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-cl" onclick="switchTab('cl')" id="tab-cl">
+      <span data-fr="Lettre de motivation" data-en="Cover Letter">Lettre de motivation</span>
+      <span class="tab-count" id="count-cl"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-op" onclick="switchTab('op')" id="tab-op">
+      <span data-fr="Présence en ligne" data-en="Online Presence">Présence en ligne</span>
+      <span class="tab-count" id="count-op"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-net" onclick="switchTab('net')" id="tab-net">
+      <span data-fr="Réseautage" data-en="Networking">Réseautage</span>
+      <span class="tab-count" id="count-net"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-iv" onclick="switchTab('iv')" id="tab-iv">
+      <span data-fr="Entretien" data-en="Interview">Entretien</span>
+      <span class="tab-count" id="count-iv"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-vg" onclick="switchTab('vg')" id="tab-vg">
+      <span data-fr="Vigilance" data-en="Vigilance">Vigilance</span><span class="tab-warning-icon" aria-hidden="true"> ⚠️</span>
+      </button>
+    </div>
   </div>
+
+  <!-- PANEL AREA -->
+  <div class="panel-area">
+
 
   <!-- PROFILE SLIDER BAR — sticky, portfolio only -->
   <div class="profile-slider-bar" id="profile-slider-bar" role="region" aria-label="Profil">
@@ -895,6 +1274,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <span class="slider-title" data-fr="Mon profil" data-en="My profile">Mon profil</span>
         <span class="slider-profile-name" id="slider-profile-label">—</span>
       </div>
+      <button class="tip-btn" data-tip="slider" aria-label="Explication du curseur de profil"> ? </button>
     </div>
     <div class="slider-track-wrap">
       <div class="slider-gradient"></div>
@@ -1357,7 +1737,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         </div>
       </div>
 
-      <div class="checklist-item" data-key="pf-7" data-tech="1" data-design="3">
+      <div class="checklist-item" data-key="pf-7" data-tech="2" data-design="3">
         <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
@@ -1466,7 +1846,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         </div>
       </div>
 
-      <div class="checklist-item" data-key="pf-13" data-tech="2" data-design="1">
+      <div class="checklist-item" data-key="pf-13" data-tech="2" data-design="2">
         <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
@@ -1502,7 +1882,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <button class="tip-btn" data-tip="pf-14" aria-label="Comment faire" aria-expanded="false">?</button>
       </div>
 
-      <div class="checklist-item" data-key="pf-15" data-tech="3" data-design="2">
+      <div class="checklist-item" data-key="pf-15" data-tech="3" data-design="3">
         <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
@@ -1541,7 +1921,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         </div>
       </div>
 
-      <div class="checklist-item" data-key="pf-17" data-tech="2" data-design="3">
+      <div class="checklist-item" data-key="pf-17" data-tech="3" data-design="3">
         <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
@@ -1873,7 +2253,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
     <div class="checklist-section">
       <div class="section-label" data-fr="Principes transversaux — toutes plateformes" data-en="Cross-platform principles — all platforms">Principes transversaux — toutes plateformes</div>
 
-      <div class="checklist-item" data-key="op-1">
+      <div class="checklist-item" data-key="op-1" data-tech="2" data-design="2">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Nom d'utilisateur identique sur toutes les plateformes (ou aussi proche que possible)" data-en="Identical username across all platforms (or as close as possible)">Nom d'utilisateur identique sur toutes les plateformes (ou aussi proche que possible)</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
@@ -1881,7 +2262,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         </div>
       </div>
 
-      <div class="checklist-item" data-key="op-2">
+      <div class="checklist-item" data-key="op-2" data-tech="2" data-design="2">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="URL de profil courte et propre, sans chiffres aléatoires ni caractères inutiles" data-en="Short and clean profile URL, free of random numbers or unnecessary characters">URL de profil courte et propre, sans chiffres aléatoires ni caractères inutiles</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
@@ -1891,7 +2273,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <button class="tip-btn" data-tip="op-2" aria-label="Comment faire" aria-expanded="false">?</button>
       </div>
 
-      <div class="checklist-item" data-key="op-3">
+      <div class="checklist-item" data-key="op-3" data-tech="2" data-design="2">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Photo de profil professionnelle, identique (ou cohérente) sur toutes les plateformes" data-en="Professional profile picture, identical (or consistent) across all platforms">Photo de profil professionnelle, identique (ou cohérente) sur toutes les plateformes</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
@@ -1947,7 +2330,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <span data-fr="Profil LinkedIn" data-en="LinkedIn Profile">Profil LinkedIn</span>
       </div>
 
-      <div class="checklist-item" data-key="op-4">
+      <div class="checklist-item" data-key="op-4" data-tech="2" data-design="2">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="URL personnalisée : linkedin.com/in/prenom-nom" data-en="Custom URL: linkedin.com/in/firstname-lastname">URL personnalisée : linkedin.com/in/prenom-nom</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
@@ -1957,7 +2341,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <button class="tip-btn" data-tip="op-4" aria-label="Comment faire" aria-expanded="false">?</button>
       </div>
 
-      <div class="checklist-item" data-key="op-5">
+      <div class="checklist-item" data-key="op-5" data-tech="2" data-design="2">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Titre (headline) : discipline + spécialité + statut (ex. : « Développeuse full-stack | Diplômée 2025 »)" data-en="Headline: discipline + specialty + status (e.g. 'Full-stack developer | Graduating 2025')">Titre (headline) : discipline + spécialité + statut (ex. : « Développeuse full-stack | Diplômée 2025 »)</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
@@ -1967,7 +2352,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <button class="tip-btn" data-tip="op-5" aria-label="Comment faire" aria-expanded="false">?</button>
       </div>
 
-      <div class="checklist-item" data-key="op-6">
+      <div class="checklist-item" data-key="op-6" data-tech="2" data-design="2">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Résumé (section À propos) rédigé : 3–5 phrases, mots-clés du secteur, appel à l'action" data-en="About section written: 3–5 sentences, industry keywords, call to action">Résumé (section À propos) rédigé : 3–5 phrases, mots-clés du secteur, appel à l'action</span></div>
@@ -1975,7 +2361,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         </div>
       </div>
 
-      <div class="checklist-item" data-key="op-7">
+      <div class="checklist-item" data-key="op-7" data-tech="2" data-design="3">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Image de bannière personnalisée (pas le fond gris par défaut)" data-en="Custom banner image (not the default grey background)">Image de bannière personnalisée (pas le fond gris par défaut)</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
@@ -1985,7 +2372,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <button class="tip-btn" data-tip="op-7" aria-label="Comment faire" aria-expanded="false">?</button>
       </div>
 
-      <div class="checklist-item" data-key="op-8">
+      <div class="checklist-item" data-key="op-8" data-tech="3" data-design="2">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Section compétences remplie avec les outils et technologies nommément" data-en="Skills section filled with tools and technologies listed by name">Section compétences remplie avec les outils et technologies nommément</span></div>
@@ -1993,7 +2381,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         </div>
       </div>
 
-      <div class="checklist-item" data-key="op-9">
+      <div class="checklist-item" data-key="op-9" data-tech="3" data-design="2">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Lien vers portfolio, GitHub ou itch.io ajouté dans les coordonnées" data-en="Link to portfolio, GitHub or itch.io added in contact info">Lien vers portfolio, GitHub ou itch.io ajouté dans les coordonnées</span></div>
@@ -2001,7 +2390,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         </div>
       </div>
 
-      <div class="checklist-item" data-key="op-10">
+      <div class="checklist-item" data-key="op-10" data-tech="2" data-design="2">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Mode « Open to Work » activé avec les types de postes ciblés" data-en="'Open to Work' mode enabled with target role types specified">'Open to Work' activé avec les types de postes ciblés</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
@@ -2011,7 +2401,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <button class="tip-btn" data-tip="op-10" aria-label="Comment faire" aria-expanded="false">?</button>
       </div>
 
-      <div class="checklist-item" data-key="op-11">
+      <div class="checklist-item" data-key="op-11" data-tech="2" data-design="2">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Profil actif : partage ou commentaire dans votre domaine au moins 1× par semaine" data-en="Active profile: share or comment in your field at least 1× per week">Profil actif : partage ou commentaire dans votre domaine au moins 1× par semaine</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
@@ -2045,7 +2436,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <span data-fr="Profil GitHub" data-en="GitHub Profile">Profil GitHub</span>
       </div>
 
-      <div class="checklist-item" data-key="op-12">
+      <div class="checklist-item" data-key="op-12" data-tech="3" data-design="1">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Nom d'utilisateur professionnel — le même que LinkedIn si possible" data-en="Professional username — same as LinkedIn if possible">Nom d'utilisateur professionnel — le même que LinkedIn si possible</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
@@ -2053,7 +2445,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         </div>
       </div>
 
-      <div class="checklist-item" data-key="op-13">
+      <div class="checklist-item" data-key="op-13" data-tech="3" data-design="1">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Profil GitHub complété : nom, bio, lieu, lien vers portfolio ou LinkedIn" data-en="GitHub profile completed: name, bio, location, link to portfolio or LinkedIn">Profil GitHub complété : nom, bio, lieu, lien vers portfolio ou LinkedIn</span></div>
@@ -2061,7 +2454,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         </div>
       </div>
 
-      <div class="checklist-item" data-key="op-14">
+      <div class="checklist-item" data-key="op-14" data-tech="3" data-design="1">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="README de profil (fichier README.md dans un dépôt du même nom) créé et soigné" data-en="Profile README (README.md in a repo matching your username) created and polished">README de profil créé et soigné</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
@@ -2071,7 +2465,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <button class="tip-btn" data-tip="op-14" aria-label="Comment faire" aria-expanded="false">?</button>
       </div>
 
-      <div class="checklist-item" data-key="op-15">
+      <div class="checklist-item" data-key="op-15" data-tech="3" data-design="1">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Projets épinglés (pinned repositories) : 4–6 meilleurs projets mis en avant" data-en="Pinned repositories: 4–6 best projects highlighted">Projets épinglés : 4–6 meilleurs projets mis en avant</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
@@ -2081,7 +2476,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <button class="tip-btn" data-tip="op-15" aria-label="Comment faire" aria-expanded="false">?</button>
       </div>
 
-      <div class="checklist-item" data-key="op-16">
+      <div class="checklist-item" data-key="op-16" data-tech="3" data-design="1">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Chaque dépôt épinglé a un README clair : description, installation, captures d'écran" data-en="Each pinned repo has a clear README: description, installation, screenshots">Chaque dépôt épinglé a un README clair : description, installation, captures d'écran</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
@@ -2089,7 +2485,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         </div>
       </div>
 
-      <div class="checklist-item" data-key="op-17">
+      <div class="checklist-item" data-key="op-17" data-tech="3" data-design="2">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Activité visible : commits réguliers, pas seulement un dépôt créé il y a 2 ans" data-en="Visible activity: regular commits, not just a repo created 2 years ago">Activité visible : commits réguliers, pas seulement un dépôt créé il y a 2 ans</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
@@ -2118,7 +2515,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <span data-fr="Profil itch.io (jeux, expériences interactives, design génératif)" data-en="itch.io Profile (games, interactive experiences, generative design)">Profil itch.io (jeux, expériences interactives, design génératif)</span>
       </div>
 
-      <div class="checklist-item" data-key="op-18">
+      <div class="checklist-item" data-key="op-18" data-tech="1" data-design="3">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Nom d'utilisateur court et professionnel — cohérent avec LinkedIn et GitHub" data-en="Short and professional username — consistent with LinkedIn and GitHub">Nom d'utilisateur court et professionnel — cohérent avec LinkedIn et GitHub</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
@@ -2126,7 +2524,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         </div>
       </div>
 
-      <div class="checklist-item" data-key="op-19">
+      <div class="checklist-item" data-key="op-19" data-tech="1" data-design="3">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Page de profil complétée : bio, liens, description de votre approche créative" data-en="Profile page completed: bio, links, description of your creative approach">Page de profil complétée : bio, liens, description de votre approche créative</span></div>
@@ -2134,7 +2533,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         </div>
       </div>
 
-      <div class="checklist-item" data-key="op-20">
+      <div class="checklist-item" data-key="op-20" data-tech="2" data-design="3">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Chaque jeu ou projet a une page soignée : description, captures, crédits, instructions" data-en="Each game or project has a polished page: description, screenshots, credits, instructions">Chaque jeu ou projet a une page soignée : description, captures, crédits, instructions</span><span class="tag tag-must" data-fr="Essentiel" data-en="Must">Essentiel</span></div>
@@ -2142,7 +2542,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         </div>
       </div>
 
-      <div class="checklist-item" data-key="op-21">
+      <div class="checklist-item" data-key="op-21" data-tech="2" data-design="3">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Rôle individuel clairement indiqué dans chaque projet (code, art, design, son…)" data-en="Individual role clearly stated in each project (code, art, design, sound…)">Rôle individuel clairement indiqué dans chaque projet (code, art, design, son…)</span></div>
@@ -2150,7 +2551,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         </div>
       </div>
 
-      <div class="checklist-item" data-key="op-22">
+      <div class="checklist-item" data-key="op-22" data-tech="3" data-design="2">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Version jouable en ligne incluse si possible (WebGL, HTML5)" data-en="Playable web version included if possible (WebGL, HTML5)">Version jouable en ligne incluse si possible (WebGL, HTML5)</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
@@ -2160,7 +2562,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <button class="tip-btn" data-tip="op-22" aria-label="Comment faire" aria-expanded="false">?</button>
       </div>
 
-      <div class="checklist-item" data-key="op-23">
+      <div class="checklist-item" data-key="op-23" data-tech="2" data-design="3">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Participation à des game jams documentée (Global Game Jam, Ludum Dare, GTMFS…)" data-en="Game jam participation documented (Global Game Jam, Ludum Dare, GTMFS…)">Participation à des game jams documentée (Global Game Jam, Ludum Dare, GTMFS…)</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
@@ -2168,7 +2571,8 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         </div>
       </div>
 
-      <div class="checklist-item" data-key="op-24">
+      <div class="checklist-item" data-key="op-24" data-tech="2" data-design="3">
+        <div class="item-relevance-bar"></div>
         <div class="check-box"></div>
         <div class="item-text">
           <div class="item-label"><span data-fr="Tags itch.io bien choisis pour la découvrabilité (genre, moteur, plateforme)" data-en="itch.io tags well chosen for discoverability (genre, engine, platform)">Tags itch.io bien choisis pour la découvrabilité (genre, moteur, plateforme)</span></div>
@@ -2558,7 +2962,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
     <div class="panel-header">
       <div>
         <h2 class="panel-title" data-fr="Vigilance : arnaques, droits et intégrité" data-en="Vigilance: scams, rights, and integrity">Vigilance : arnaques, droits et intégrité</h2>
-        <p <p class="panel-desc" data-fr="Le marché de l’emploi comporte des risques réels : arnaques, exploitation, et tentations de prendre des raccourcis qui peuvent avoir des conséquences graves. Cette section couvre aussi les droits des étudiant·e·s selon leur statut (stages, emplois à temps partiel, permis de travail) afin que vous puissiez naviguer le marché du travail québécois en connaissance de cause." data-en="The job market carries real risks: scams, exploitation, and temptations to take shortcuts that can have serious consequences. This section also covers student rights by status (internships, part-time work, work permits) so you can navigate the Québec job market with full information.">Le marché de l’emploi comporte des risques réels. Cette section couvre aussi vos droits selon votre statut.</p>
+        <p class="panel-desc" data-fr="Le marché de l’emploi comporte des risques réels : arnaques, exploitation, et tentations de prendre des raccourcis qui peuvent avoir des conséquences graves. Cette section couvre aussi les droits des étudiant·e·s selon leur statut (stages, emplois à temps partiel, permis de travail) afin que vous puissiez naviguer le marché du travail québécois en connaissance de cause." data-en="The job market carries real risks: scams, exploitation, and temptations to take shortcuts that can have serious consequences. This section also covers student rights by status (internships, part-time work, work permits) so you can navigate the Québec job market with full information.">Le marché de l’emploi comporte des risques réels. Cette section couvre aussi vos droits selon votre statut.</p>
       </div>
     </div>
 
@@ -2586,6 +2990,13 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
           <div class="net-tip__body" data-fr="Les offres légitimes vous donnent un délai raisonnable pour réfléchir — typiquement 3 à 5 jours ouvrables pour un premier poste. Si on vous dit que l’offre expire dans les prochaines heures ou qu’il faut signer ce soir, c’est une tactique de pression. Un employeur qui respecte ses futurs employés vous donne le temps de lire et de comprendre ce que vous signez." data-en="Legitimate offers give you a reasonable time to reflect — typically 3 to 5 business days for an entry-level role. If you are told the offer expires within hours or that you must sign tonight, it is a pressure tactic. An employer who respects future employees gives you time to read and understand what you are signing.">Les offres légitimes vous donnent un délai raisonnable pour réfléchir — typiquement 3 à 5 jours ouvrables pour un premie…</div>
         </div>
       </div>
+      <div class="checklist-item vg-ack" data-key="vg-1">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label vg-ack__label"><span data-fr="Je comprends comment reconnaître une offre suspecte." data-en="I understand how to recognise a suspicious offer.">Je comprends comment reconnaître une offre suspecte.</span></div>
+        </div>
+      </div>
+
     </div>
 
     <div class="net-section">
@@ -2604,6 +3015,13 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
           <div class="net-tip__body" data-fr="Si vous êtes étudiant·e international·e, <strong>vérifiez dès maintenant</strong> la date d’expiration de votre permis de travail ou co-op et les conditions qui y sont associées (employeur désigné, heures autorisées, type de travail). Un permis expiré ou du mauvais type vous empêche légalement de travailler et peut compromettre votre statut au Canada. Entamez le renouvellement <strong>au moins 3 mois avant</strong> la date de début prévue de votre stage ou emploi — les délais de traitement sont longs. Contactez le bureau des affaires internationales du collège si vous avez des doutes." data-en="If you are an international student, <strong>check right now</strong> the expiry date of your work or co-op permit and the conditions attached to it (designated employer, authorised hours, type of work). An expired or wrong-type permit legally prevents you from working and can jeopardise your status in Canada. Begin the renewal process <strong>at least 3 months before</strong> your planned start date for an internship or job — processing times are long. Contact the college’s international affairs office if you have any doubts.">Si vous êtes étudiant·e international·e, <strong>vérifiez dès maintenant</strong> la date d’expiration de votre permis d…</div>
         </div>
       </div>
+      <div class="checklist-item vg-ack" data-key="vg-2">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label vg-ack__label"><span data-fr="Je comprends mes droits concernant le travail non rémunéré et les stages." data-en="I understand my rights regarding unpaid work and internships.">Je comprends mes droits concernant le travail non rémunéré et les stages.</span></div>
+        </div>
+      </div>
+
     </div>
 
     <div class="net-section">
@@ -2622,6 +3040,13 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
           <div class="net-tip__body" data-fr="Un permis d’études ne permet pas le travail à temps plein pendant les sessions académiques actives. Après l’obtention du diplôme, les diplômé·e·s internationaux·ales admissibles peuvent demander un Permis de travail postdiplôme (PTPD / PGWP), qui autorise le travail à temps plein pour une durée correspondant au programme complété (jusqu’à 3 ans). La demande doit être soumise dans un délai strict après la fin des études — ne pas respecter ce délai entraîne la perte du droit. Informez-vous auprès d’IRCC ou du bureau des affaires internationales de votre établissement." data-en="A study permit does not allow full-time work during active academic sessions. After graduation, eligible international graduates can apply for a Post-Graduation Work Permit (PGWP / PTPD), which authorises full-time work for a duration matching the completed programme (up to 3 years). The application must be submitted within a strict deadline after completing studies — missing this deadline results in losing the right. Check with IRCC or your institution’s international affairs office.">Un permis d’études ne permet pas le travail à temps plein pendant les sessions académiques actives. Après l’obtention du diplôme, les diplôm…</div>
         </div>
       </div>
+      <div class="checklist-item vg-ack" data-key="vg-3">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label vg-ack__label"><span data-fr="Je comprends les types de travail autorisés selon mon statut." data-en="I understand the types of work permitted based on my status.">Je comprends les types de travail autorisés selon mon statut.</span></div>
+        </div>
+      </div>
+
     </div>
 
     <div class="net-section">
@@ -2640,6 +3065,13 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
           <div class="net-tip__body" data-fr="Fournir des informations fausses ou trompeuses concernant votre stage constitue une violation de l’intégrité académique de votre établissement. Les conséquences peuvent inclure l’échec du cours de stage, l’invalidation du stage, et des délais importants avant l’obtention de votre diplôme. Le Collège vérifie tous les stages : les superviseurs sont contactés directement, les lieux de travail sont confirmés, et les documents sont examinés. Les étudiants qui ont tenté de falsifier un stage ont été découverts sans exception. <strong>Si vous vous sentez sous pression ou dans une impasse concernant votre stage : parlez-en d’abord à votre enseignant·e de stage, puis à votre coordonnateur·trice, puis à votre doyen·ne — dans cet ordre. Ils sont là pour vous aider à trouver une solution, et il peut exister des options que vous n’avez pas envisagées. Aucune de ces conversations ne vous mettra en danger ; la fraude, oui.</strong>" data-en="Providing false or misleading information regarding your internship constitutes an academic integrity violation at your institution. Consequences may include failure of the internship course, invalidation of the internship, and significant delays to your graduation. The College verifies all internships: supervisors are contacted directly, workplaces are confirmed, and documents are reviewed. Students who have attempted to falsify an internship have been discovered without exception. <strong>If you feel pressured or stuck regarding your internship: speak first to your internship teacher, then to your coordinator, then to your dean — in that order. They are there to help you find a solution, and there may be options you have not considered. None of these conversations will put you at risk; fraud will.</strong>">Fournir des informations fausses ou trompeuses concernant votre stage constitue une violation de l’intégrité académique … <strong>Si vous vous sentez sous pression : parlez-en à votre enseignant·e de stage, votre coordonnateur·trice, puis votre doyen·ne — dans cet ordre. Des solutions existent. La fraude, non.</strong></div>
         </div>
       </div>
+      <div class="checklist-item vg-ack" data-key="vg-4">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label vg-ack__label"><span data-fr="Je comprends que falsifier un stage est une violation d’intégrité académique aux conséquences sérieuses." data-en="I understand that falsifying an internship is an academic integrity violation with serious consequences.">Je comprends que falsifier un stage est une violation d’intégrité académique aux conséquences sérieuses.</span></div>
+        </div>
+      </div>
+
     </div>
 
     <div class="net-section">
@@ -2658,10 +3090,19 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
           <div class="net-tip__body" data-fr="Si quelque chose vous semble anormal dans un processus de recrutement — une demande inhabituelle, une pression inexpliquée, un manque de transparence sur le rôle ou l’entreprise — c’est une information. Vous n’êtes pas obligé·e d’accepter une offre sous pression. Un bon employeur comprend que vous ayez besoin de temps pour vérifier et réfléchir. Discutez-en avec les services carrières du collège avant de vous engager." data-en="If something seems off in a recruitment process — an unusual request, unexplained pressure, a lack of transparency about the role or company — that is information. You are not obligated to accept an offer under pressure. A good employer understands that you need time to verify and reflect. Discuss it with the college’s career services before committing.">Si quelque chose vous semble anormal dans un processus de recrutement — une demande inhabituelle, une pression inexpliqu…</div>
         </div>
       </div>
+      <div class="checklist-item vg-ack" data-key="vg-5">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label vg-ack__label"><span data-fr="Je sais quoi faire si quelque chose me semble suspect." data-en="I know what to do if something seems suspicious.">Je sais quoi faire si quelque chose me semble suspect.</span></div>
+        </div>
+      </div>
+
     </div>
 
   </div>
 
+  </div><!-- /panel-area -->
+  </div><!-- /tool-wrap -->
 </div><!-- /page-wrap -->
 
 <script>
@@ -2669,7 +3110,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 // CONFIG
 // ================================================================
 const TABS   = ['cv', 'portfolio', 'cl', 'op', 'net', 'iv', 'vg'];
-const TOTALS = { cv: 22, portfolio: 21, cl: 13, op: 24, net: 9, iv: 18 };
+const TOTALS = { cv: 22, portfolio: 21, cl: 13, op: 24, net: 9, iv: 18, vg: 5 };
 const COOKIE_KEY = 'lci_career_checklist_v3';
 let currentLang = 'fr';
 let profileValue = 50; // 0=tech … 100=design
@@ -2786,18 +3227,25 @@ function setLang(lang) {
 // TABS
 // ================================================================
 function switchTab(tab) {
+  closeSidebar();
   TABS.forEach(t => {
-    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
-    document.getElementById('tab-' + t).setAttribute('aria-selected', t === tab);
+    document.querySelectorAll('#tab-' + t).forEach(btn => {
+      btn.classList.toggle('active', t === tab);
+      btn.setAttribute('aria-selected', t === tab);
+    });
     document.getElementById('panel-' + t).classList.toggle('active', t === tab);
   });
   // Show/hide slider bar (portfolio only)
-  document.getElementById('profile-slider-bar').classList.toggle('visible', tab === 'portfolio');
+  document.getElementById('profile-slider-bar').classList.toggle('visible', tab === 'portfolio' || tab === 'op');
 
   // Close any open tooltip when switching tabs
   closeTip();
 
   const s = getState(); s.activeTab = tab; saveState(s);
+  // Update mobile toggle label to active tab name
+  const activeBtn = document.querySelector('.sidebar .tab-btn.active > span:first-child');
+  const toggleLabel = document.getElementById('sidebar-toggle-label');
+  if (activeBtn && toggleLabel) toggleLabel.textContent = activeBtn.textContent;
 }
 
 // ================================================================
@@ -2858,7 +3306,7 @@ function applySliderEffects(v) {
   if (labelEl) labelEl.textContent = PROFILE_LABELS[bucket][lang];
 
   // For each portfolio item: compute relevance + update hint
-  document.querySelectorAll('#panel-portfolio .checklist-item[data-tech]').forEach(item => {
+  document.querySelectorAll('#panel-portfolio .checklist-item[data-tech], #panel-op .checklist-item[data-tech]').forEach(item => {
     const techScore   = parseInt(item.getAttribute('data-tech'));
     const designScore = parseInt(item.getAttribute('data-design'));
 
@@ -2904,7 +3352,8 @@ function getTabForKey(key) {
   if (key.startsWith('op-')) return 'op';
   if (key.startsWith('nw-')) return 'net';
   if (key.startsWith('iv-')) return 'iv';
-  return null; // vg tab has no checklist items
+  if (key.startsWith('vg-')) return 'vg';
+  return null;
 }
 
 function updateProgress(tab) {
@@ -2968,7 +3417,7 @@ document.querySelectorAll('.checklist-item').forEach(item => {
 });
 
 function resetTab(tab) {
-  const prefix = tab === 'cv' ? 'cv-' : tab === 'portfolio' ? 'pf-' : tab === 'cl' ? 'cl-' : tab === 'op' ? 'op-' : tab === 'net' ? 'nw-' : 'iv-';
+  const prefix = tab === 'cv' ? 'cv-' : tab === 'portfolio' ? 'pf-' : tab === 'cl' ? 'cl-' : tab === 'op' ? 'op-' : tab === 'net' ? 'nw-' : tab === 'iv' ? 'iv-' : 'vg-';
   const msg = currentLang === 'fr' ? 'Réinitialiser toute cette section?' : 'Reset this entire section?';
   if (!confirm(msg)) return;
 
@@ -3054,6 +3503,16 @@ function togglePlatform(btn, bodyId) {
 }
 
 const TIP_DATA = {
+  'slider': {
+    title_fr: 'À quoi sert ce curseur ?',
+    title_en: 'What does this slider do?',
+    body_fr:  'Ce curseur ajuste la <strong>pertinence affichée de chaque item</strong> selon votre profil. Glissez vers la gauche si vous visez principalement des postes en développement ou tech ; vers la droite pour les postes en design, créatif ou UX ; au centre pour un profil polyvalent. Les items les plus pertinents pour votre profil apparaissent avec une barre colorée plus intense. Cela ne change pas la liste des items — tous restent visibles et cochables. C’est un outil d’orientation, pas une préscription.',
+    body_en:  'This slider adjusts the <strong>displayed relevance of each item</strong> based on your profile. Slide left if you are targeting development or tech roles; right for design, creative, or UX roles; centre for a generalist profile. The most relevant items for your profile appear with a more intense coloured bar. It does not change the list of items — all remain visible and checkable. It is a guidance tool, not a prescription.',
+    link_fr:  null,
+    link_en:  null,
+    link_label_fr: null,
+    link_label_en: null,
+  },
   'cv-2': {
     title_fr: 'Comment exporter un PDF lisible',
     title_en: 'How to export a readable PDF',
@@ -3302,9 +3761,83 @@ window.addEventListener('scroll', function() {
 }, { passive: true });
 
 // ================================================================
+// SIDEBAR TOGGLE (mobile)
+// ================================================================
+function toggleSidebar() {
+  const btn = document.getElementById('sidebar-toggle');
+  const dd  = document.getElementById('sidebar-dropdown');
+  const open = dd.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  btn.setAttribute('aria-expanded', open);
+}
+function closeSidebar() {
+  const btn = document.getElementById('sidebar-toggle');
+  const dd  = document.getElementById('sidebar-dropdown');
+  dd.classList.remove('open');
+  btn && btn.classList.remove('open');
+  btn && btn.setAttribute('aria-expanded', 'false');
+}
+
+// ================================================================
+// THEME
+// ================================================================
+const THEME_KEY = 'lci_theme';
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const icon = document.getElementById('theme-icon');
+  if (icon) icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+  try { localStorage.setItem(THEME_KEY, theme); } catch(e) {}
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  // If no explicit theme set yet, read the computed preference
+  const isDark = current === 'dark' ||
+    (!current && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  applyTheme(isDark ? 'light' : 'dark');
+}
+
+function initTheme() {
+  // 1. Check localStorage for explicit user choice
+  try {
+    const stored = localStorage.getItem(THEME_KEY);
+    if (stored === 'light' || stored === 'dark') {
+      applyTheme(stored); return;
+    }
+  } catch(e) {}
+  // 2. No stored preference — let CSS media query handle it,
+  //    just set the icon to match
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const icon = document.getElementById('theme-icon');
+  if (icon) icon.textContent = prefersDark ? '☀️' : '🌙';
+}
+
+// ================================================================
+// LANDING PAGE
+// ================================================================
+function startSection(tab) {
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('tool-wrap').style.display = 'flex';
+  const btnHome = document.getElementById('btn-home');
+  if (btnHome) btnHome.style.display = '';
+  switchTab(tab);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function goHome() {
+  document.getElementById('landing').style.display = '';
+  document.getElementById('tool-wrap').style.display = 'none';
+  const btnHome = document.getElementById('btn-home');
+  if (btnHome) btnHome.style.display = 'none';
+  closeSidebar();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ================================================================
 // INIT
 // ================================================================
 function init() {
+  initTheme();
   const state = getState();
 
   // Restore checked items
@@ -3336,7 +3869,7 @@ init();
     <div>
       <div class="site-footer__block-title" data-fr="Comment cet outil a été créé" data-en="How this tool was made">Comment cet outil a été créé</div>
       <div class="site-footer__text">
-        <p class="footer-html-text" data-fr="Ce site a été construit en collaboration itérative entre <strong>Elisa Schaeffer</strong>, doyenne de la Technologie et du Design, et <strong>Claude</strong> (Anthropic), un assistant IA. Le contenu pédagogique, la structure, les priorités et les choix éditoriaux ont été définis, questionnés et affinés par Elisa à chaque étape. Claude a généré le code, proposé des formulations et signalé des incohérences — mais chaque décision substantielle a été prise par un être humain." data-en="This tool was built through iterative collaboration between <strong>Elisa Schaeffer</strong>, Dean of Technology and Design, and <strong>Claude</strong> (Anthropic), an AI assistant. The educational content, structure, priorities, and editorial choices were defined, questioned, and refined by Elisa at every step. Claude generated the code, proposed wording, and flagged inconsistencies — but every substantive decision was made by a human.">Ce site a été construit en collaboration itérative entre <strong>Elisa Schaeffer</strong>, doyenne de la Technologie et du Design, et <strong>Claude</strong> (Anthropic), un assistant IA. Le contenu pédagogique, la structure, les priorités et les choix éditoriaux ont été définis, questionnés et affinés par Elisa à chaque étape. Claude a généré le code, proposé des formulations et signalé des incohérences — mais chaque décision substantielle a été prise par un être humain.</p>
+        <p class="footer-html-text" data-fr="Ce site a été construit en collaboration itérative entre <strong>Elisa Schaeffer</strong>, doyen·ne de la Technologie et du Design, et <strong>Claude</strong> (Anthropic), un assistant IA. Le contenu pédagogique, la structure, les priorités et les choix éditoriaux ont été définis, questionnés et affinés par Elisa à chaque étape. Claude a généré le code, proposé des formulations et signalé des incohérences — mais chaque décision substantielle a été prise par un être humain." data-en="This tool was built through iterative collaboration between <strong>Elisa Schaeffer</strong>, Dean of Technology and Design, and <strong>Claude</strong> (Anthropic), an AI assistant. The educational content, structure, priorities, and editorial choices were defined, questioned, and refined by Elisa at every step. Claude generated the code, proposed wording, and flagged inconsistencies — but every substantive decision was made by a human.">Ce site a été construit en collaboration itérative entre <strong>Elisa Schaeffer</strong>, doyen·ne de la Technologie et du Design, et <strong>Claude</strong> (Anthropic), un assistant IA. Le contenu pédagogique, la structure, les priorités et les choix éditoriaux ont été définis, questionnés et affinés par Elisa à chaque étape. Claude a généré le code, proposé des formulations et signalé des incohérences — mais chaque décision substantielle a été prise par un être humain.</p>
         <p class="footer-html-text" data-fr="Ce n'est pas un contenu IA à usage unique. C'est le résultat d'un dialogue de révision prolongé : chaque section a été lue, critiquée et corrigée. L'outil évolue; les suggestions d'amélioration sont les bienvenues." data-en="This is not single-use AI-generated content. It is the result of an extended review dialogue: every section was read, questioned, and corrected. The tool evolves; suggestions for improvement are welcome.">Ce n'est pas un contenu IA à usage unique. C'est le résultat d'un dialogue de révision prolongé : chaque section a été lue, critiquée et corrigée. L'outil évolue; les suggestions d'amélioration sont les bienvenues.</p>
       </div>
     </div>
@@ -3353,10 +3886,6 @@ init();
   </div>
 
   <div class="site-footer__byline">
-    <span>
-      <span class="site-footer__byline-name">Elisa Schaeffer</span>
-      <span data-fr=" · Doyenne, Technologie et Design" data-en=" · Dean, Technology and Design"> · Doyenne, Technologie et Design</span>
-    </span>
     <span data-fr="Dernière mise à jour : avril 2026" data-en="Last updated: April 2026">Dernière mise à jour : avril 2026</span>
   </div>
 </footer>
