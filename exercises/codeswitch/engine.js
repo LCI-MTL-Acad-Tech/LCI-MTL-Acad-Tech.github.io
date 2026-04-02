@@ -1240,11 +1240,37 @@ document.addEventListener('click', e=>{
   if(e.target.classList.contains('gloss-btn')){ e.stopPropagation(); showGlossTip(e.target); }
 });
 
+// ── Footer ────────────────────────────────────────────────────
+function injectFooter(){
+  const FOOTER = {
+    fr:`<footer class="site-footer-credits">
+  <div class="footer-inner">
+    <p class="footer-heading">Comment cet outil a été créé</p>
+    <p>Ce site a été construit en collaboration itérative entre <strong>Elisa Schaeffer</strong>, doyen·ne de la Technologie et du Design au Collège LaSalle Montréal, et <strong>Claude</strong> (Anthropic), un assistant IA. Le contenu pédagogique, la structure, les activités, les priorités et les choix éditoriaux ont été définis, questionnés et affinés par Elisa à chaque étape. Claude a généré le code, proposé des formulations et signalé des incohérences — mais chaque décision substantielle a été prise par un être humain.</p>
+    <p>Ce n'est pas du contenu IA à usage unique. C'est le résultat d'un dialogue de révision prolongé : chaque session a été lue, critiquée et corrigée. L'outil évolue.</p>
+    <p class="footer-note">Utilisation réfléchie de l'IA — L'IA générative est un outil de travail, pas un substitut au jugement professionnel. Ce projet illustre une approche où <strong>l'humain reste auteur</strong> : l'IA amplifie la capacité de production, mais la responsabilité éditoriale, pédagogique et éthique demeure entièrement humaine. Dernière mise à jour : avril 2026.</p>
+  </div>
+</footer>`,
+    en:`<footer class="site-footer-credits">
+  <div class="footer-inner">
+    <p class="footer-heading">How this tool was made</p>
+    <p>This site was built through iterative collaboration between <strong>Elisa Schaeffer</strong>, Dean of Technology and Design at Collège LaSalle Montréal, and <strong>Claude</strong> (Anthropic), an AI assistant. The pedagogical content, structure, activities, priorities, and editorial choices were defined, questioned, and refined by Elisa at every step. Claude generated the code, proposed phrasings, and flagged inconsistencies — but every substantive decision was made by a human.</p>
+    <p>This is not one-shot AI content. It is the result of a prolonged review dialogue: every session was read, critiqued, and corrected. The tool evolves.</p>
+    <p class="footer-note">Thoughtful AI use — Generative AI is a work tool, not a substitute for professional judgment. This project illustrates an approach where <strong>the human remains the author</strong>: AI amplifies production capacity, but editorial, pedagogical, and ethical responsibility remains entirely human. Last updated: April 2026.</p>
+  </div>
+</footer>`
+  };
+  const el = document.createElement('div');
+  el.innerHTML = FOOTER[L] || FOOTER.fr;
+  document.body.appendChild(el.firstElementChild);
+}
+
 // ── Auto-init ─────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
   initHeader();
   initGlossaryTip();
   initGlossaryDrawer();
+  injectFooter();
   if(typeof SESSION!=='undefined'&&SESSION.solo) initM0Page();
   else if(typeof SESSION!=='undefined') initSessionPage();
   else if(typeof initHome==='function') initHome();

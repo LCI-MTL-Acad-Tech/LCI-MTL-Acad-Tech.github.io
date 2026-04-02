@@ -777,3 +777,24 @@ pre { overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
 .gloss-lang-cpp  { background: rgba(104,94,247,.2);  color: #b086e8; border: 1px solid rgba(104,94,247,.4); }
 .gloss-lang-cs   { background: rgba(156,246,212,.15); color: var(--aqua); border: 1px solid rgba(156,246,212,.3); }
 .gloss-lang-both { background: rgba(242,245,55,.1);   color: var(--canary); border: 1px solid rgba(242,245,55,.3); }
+
+/* ── Site footer credits ─────────────────────────────────── */
+.site-footer-credits {
+  margin-top: 6rem; border-top: 1px solid var(--ch6);
+  padding: 3rem 0 4rem;
+}
+.footer-inner {
+  max-width: clamp(680px, 90vw, 1600px); margin: 0 auto;
+  padding: 0 2.4rem;
+}
+.footer-heading {
+  font-size: 1.3rem; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--ch4); margin-bottom: 1rem;
+}
+.site-footer-credits p {
+  font-size: 1.3rem; color: var(--ch3); line-height: 1.7; margin-bottom: .8rem;
+}
+.site-footer-credits strong { color: var(--ch2); }
+.footer-note {
+  color: var(--ch4) !important; font-size: 1.2rem !important; margin-top: 1.2rem;
+}
