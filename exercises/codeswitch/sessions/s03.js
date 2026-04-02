@@ -226,5 +226,19 @@ int main() {
       },
     ],
   },
+
+  homework:{
+    core:[
+      {diff:'easy', fr:'Écris un programme qui lit un entier hp (hardcodé) et affiche \'Pleine santé\', \'Blessé\', \'Critique\' ou \'Mort\' selon des seuils de ton choix.', en:'Write a program that reads an integer hp (hardcoded) and prints \'Full health\', \'Wounded\', \'Critical\', or \'Dead\' based on thresholds of your choice.'},
+      {diff:'medium', fr:'Écris une boucle for qui affiche les nombres de 1 à 20, mais remplace les multiples de 3 par \'Fizz\', les multiples de 5 par \'Buzz\', et les deux par \'FizzBuzz\'.', en:'Write a for loop that prints numbers from 1 to 20, but replaces multiples of 3 with \'Fizz\', multiples of 5 with \'Buzz\', and both with \'FizzBuzz\'.'},
+      {diff:'hard', fr:'Écris un switch sur un enum class EnemyState { Idle, Chase, Attack, Flee } avec un break explicite dans chaque case. Ajoute ensuite un case sans break intentionnel et commente le comportement observé.', en:'Write a switch on an enum class EnemyState { Idle, Chase, Attack, Flee } with an explicit break in each case. Then add one case without break intentionally and comment the observed behavior.'},
+    ],
+    ide:[
+      {diff:'hard', fr:'Réécris le FizzBuzz en utilisant uniquement des opérateurs ternaires imbriqués (pas de if/else). Compile et vérifie. C\'est illisible — c\'est le point.', en:'Rewrite FizzBuzz using only nested ternary operators (no if/else). Compile and verify. It\'s unreadable — that\'s the point.'},
+    ],
+    engine:[
+      {diff:'medium', fr:'Dans un Actor Unreal, implémente un switch sur un enum UENUM() EEnemyState. Appelle une fonction différente dans chaque case. Vérifie que l\'enum est visible dans Blueprint.', en:'In a Unreal Actor, implement a switch on a UENUM() EEnemyState. Call a different function in each case. Verify the enum is visible in Blueprint.'},
+    ],
+  },
 };
 document.addEventListener('DOMContentLoaded',()=>{});

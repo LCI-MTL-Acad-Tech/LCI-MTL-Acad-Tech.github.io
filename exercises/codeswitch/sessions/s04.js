@@ -225,5 +225,19 @@ Target<span class="bug-line">-&gt;<span class="fn2">Destroy</span>();</span>`,
       },
     ],
   },
+
+  homework:{
+    core:[
+      {diff:'easy', fr:'Écris une fonction swap(int* a, int* b) qui échange les valeurs de deux entiers via des pointeurs. Vérifie avec cout avant et après.', en:'Write a function swap(int* a, int* b) that swaps two integers via pointers. Verify with cout before and after.'},
+      {diff:'medium', fr:'Écris une fonction qui prend un tableau d\'entiers et sa taille, et retourne le maximum via un pointeur de retour. Teste avec {3, 7, 1, 9, 4}.', en:'Write a function that takes an array of integers and its size, and returns the maximum via a return pointer. Test with {3, 7, 1, 9, 4}.'},
+      {diff:'hard', fr:'Crée une fonction multiReturn(int a, int b, int* sum, int* product) qui retourne void mais écrit la somme et le produit via pointeurs. C\'est le pattern classique avant std::pair.', en:'Create a function multiReturn(int a, int b, int* sum, int* product) that returns void but writes the sum and product via pointers. This is the classic pattern before std::pair.'},
+    ],
+    ide:[
+      {diff:'hard', fr:'Écris intentionnellement un dangling pointer : alloue avec new, libère avec delete, puis essaie de lire la valeur. Note le comportement (indéfini — peut tout faire). Ajoute nullptr après delete.', en:'Intentionally write a dangling pointer: allocate with new, free with delete, then try to read the value. Note the behavior (undefined — can do anything). Add nullptr after delete.'},
+    ],
+    engine:[
+      {diff:'medium', fr:'Dans Unreal, trouve 3 utilisations de -> dans le code du Third Person Template. Pour chacune, identifie quel type de pointeur est déréférencé et pourquoi IsValid() serait utile.', en:'In Unreal, find 3 uses of -> in the Third Person Template code. For each, identify what type of pointer is dereferenced and why IsValid() would be useful.'},
+    ],
+  },
 };
 document.addEventListener('DOMContentLoaded',()=>{});

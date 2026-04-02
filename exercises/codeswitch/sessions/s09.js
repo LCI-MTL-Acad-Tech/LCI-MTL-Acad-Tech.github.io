@@ -271,5 +271,19 @@ int main() {
       },
     ],
   },
+
+  homework:{
+    core:[
+      {diff:'easy', fr:'Écris une classe Timer avec float elapsed = 0 et une méthode update(float dt) { elapsed += dt; }. Simule 10 frames de 16ms dans main() et affiche elapsed.', en:'Write a Timer class with float elapsed = 0 and an update(float dt) { elapsed += dt; } method. Simulate 10 frames of 16ms in main() and print elapsed.'},
+      {diff:'medium', fr:'Étends Timer avec un bool isExpired(float limit) const et un reset(). Simule un cooldown de 0.5s sur 60 frames à 16ms et affiche quand il expire.', en:'Extend Timer with bool isExpired(float limit) const and reset(). Simulate a 0.5s cooldown over 60 frames at 16ms and print when it expires.'},
+      {diff:'hard', fr:'Écris une classe Oscillator qui utilise sin(elapsed * frequency) pour générer une valeur oscillante entre -1 et 1. Teste avec frequency = 1.0f (1 Hz) sur 2 secondes simulées.', en:'Write an Oscillator class that uses sin(elapsed * frequency) to generate a value oscillating between -1 and 1. Test with frequency = 1.0f (1 Hz) over 2 simulated seconds.'},
+    ],
+    ide:[
+      {diff:'medium', fr:'Réécris ta classe Timer en séparant timer.h et timer.cpp. Ajoute bCanEverTick comme membre, et ne mets à jour elapsed que si bCanEverTick est true.', en:'Rewrite your Timer class separating timer.h and timer.cpp. Add bCanEverTick as a member, and only update elapsed if bCanEverTick is true.'},
+    ],
+    engine:[
+      {diff:'medium', fr:'Dans un Actor Unreal, utilise Tick() pour faire osciller la position Y d\'un StaticMeshComponent avec FMath::Sin(). Assure-toi de multiplier par DeltaTime pour un mouvement fluide.', en:'In a Unreal Actor, use Tick() to oscillate the Y position of a StaticMeshComponent with FMath::Sin(). Make sure to multiply by DeltaTime for smooth movement.'},
+    ],
+  },
 };
 document.addEventListener('DOMContentLoaded',()=>{});

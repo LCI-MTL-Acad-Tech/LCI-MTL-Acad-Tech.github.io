@@ -244,5 +244,19 @@ int main() {
       },
     ],
   },
+
+  homework:{
+    core:[
+      {diff:'easy', fr:'Crée une classe Point avec x et y, un constructeur avec liste d\'initialisation, et une méthode print() const. Instancie-la dans main().', en:'Create a Point class with x and y, a constructor with initializer list, and a const print() method. Instantiate it in main().'},
+      {diff:'medium', fr:'Ajoute une méthode distanceTo(const Point& other) const à ta classe Point. Utilise sqrt() de <cmath>. Teste avec deux points connus.', en:'Add a distanceTo(const Point& other) const method to your Point class. Use sqrt() from <cmath>. Test with two known points.'},
+      {diff:'hard', fr:'Crée une classe Shape abstraite avec virtual float area() const = 0. Dérive Circle et Rectangle. Stocke-les dans un vector<Shape*> et appelle area() sur chacun. N\'oublie pas les destructeurs virtuels.', en:'Create an abstract Shape class with virtual float area() const = 0. Derive Circle and Rectangle. Store them in a vector<Shape*> and call area() on each. Don\'t forget virtual destructors.'},
+    ],
+    ide:[
+      {diff:'medium', fr:'Sépare ta classe Shape en shape.h/shape.cpp, circle.h/circle.cpp, rectangle.h/rectangle.cpp. Écris le Makefile ou la commande g++ pour compiler tous ces fichiers ensemble.', en:'Separate your Shape class into shape.h/shape.cpp, circle.h/circle.cpp, rectangle.h/rectangle.cpp. Write the Makefile or g++ command to compile all these files together.'},
+    ],
+    engine:[
+      {diff:'medium', fr:'Crée un Actor C++ vide dans Unreal. Identifie dans le .h généré : UCLASS(), GENERATED_BODY(), BeginPlay(), Tick(). À quoi correspond chacun en Unity ?', en:'Create an empty C++ Actor in Unreal. Identify in the generated .h: UCLASS(), GENERATED_BODY(), BeginPlay(), Tick(). What does each correspond to in Unity?'},
+    ],
+  },
 };
 document.addEventListener('DOMContentLoaded',()=>{});

@@ -256,5 +256,19 @@ Mesh-&gt;<span class="fn2">SetSimulatePhysics</span>(<span class="kw2">true</spa
       },
     ],
   },
+
+  homework:{
+    core:[
+      {diff:'easy', fr:'Crée une classe Animal avec virtual string sound() const = 0, puis Dog et Cat qui l\'implémentent. Appelle sound() via un pointeur Animal*.', en:'Create an Animal class with virtual string sound() const = 0, then Dog and Cat that implement it. Call sound() via an Animal* pointer.'},
+      {diff:'medium', fr:'Ajoute une méthode non-virtuelle describe() dans Animal qui appelle sound() internellement. Observe que la bonne version est appelée selon le type réel — c\'est le polymorphisme.', en:'Add a non-virtual describe() method in Animal that calls sound() internally. Observe that the correct version is called based on the actual type — that\'s polymorphism.'},
+      {diff:'hard', fr:'Crée une hiérarchie Vehicle → Car/Truck/Motorcycle avec des méthodes virtuelles fuel(), seats(), et cargo(). Stocke-les dans vector<Vehicle*> et affiche un résumé de flotte.', en:'Create a Vehicle → Car/Truck/Motorcycle hierarchy with virtual methods fuel(), seats(), and cargo(). Store them in vector<Vehicle*> and print a fleet summary.'},
+    ],
+    ide:[
+      {diff:'hard', fr:'Implémente l\'héritage multiple en C++ : class Flying et class Swimming, puis class Duck : public Animal, public Flying, public Swimming. Résous le diamond problem avec virtual inheritance.', en:'Implement multiple inheritance in C++: class Flying and class Swimming, then class Duck : public Animal, public Flying, public Swimming. Resolve the diamond problem with virtual inheritance.'},
+    ],
+    engine:[
+      {diff:'medium', fr:'Dans Unreal, crée un Actor C++ avec un UStaticMeshComponent et un USphereComponent attaché. Dans le Details panel, attribue un mesh. Vérifie la hiérarchie de composants dans l\'outliner.', en:'In Unreal, create a C++ Actor with a UStaticMeshComponent and an attached USphereComponent. In the Details panel, assign a mesh. Verify the component hierarchy in the outliner.'},
+    ],
+  },
 };
 document.addEventListener('DOMContentLoaded',()=>{});

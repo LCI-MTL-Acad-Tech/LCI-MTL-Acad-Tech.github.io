@@ -10,7 +10,8 @@
 // Home screen: single progress indicator per card
 // ================================================================
 
-let L = getCookie('cs_lang') || 'fr';
+let L = localStorage.getItem('cs_lang') || 'fr';
+console.log('[lang] on load — localStorage cs_lang:', localStorage.getItem('cs_lang'), '— L set to:', L);
 
 const TXT = {
   fr: {
@@ -81,8 +82,11 @@ const TXT = {
 function t(k,...a){ const v=TXT[L][k]; return typeof v==='function'?v(...a):v||k; }
 
 function toggleLang(){
+  console.log('[lang] toggleLang called, current L:', L);
   L=L==='fr'?'en':'fr';
-  setCookie('cs_lang',L,365);
+  localStorage.setItem('cs_lang',L);
+  console.log('[lang] localStorage written — reads back:', localStorage.getItem('cs_lang'));
+  console.log('[lang] reloading...');
   location.reload();
 }
 
@@ -214,6 +218,10 @@ function initSessionPage(){
   // Restore saved path
   const saved=(_lsGet(sessId)?.lastPath)||'ide';
   switchPath(saved);
+
+  // Homework
+  const hwEl=document.getElementById('sess-hw');
+  if(hwEl&&S.homework) hwEl.innerHTML=renderHomework(S);
 
   // Nav
   const prevBtn=document.getElementById('prev-sess-btn');
@@ -546,6 +554,8 @@ function toggleDeep(id){
 // Progress stored under cs_s00 in localStorage, ns='m0'
 // ================================================================
 
+const _m0CodeMap = {};  // frameId → plainCpp, set during render
+
 const TXT_M0 = {
   fr:{
     tryItLabel:'Essaie en direct — C++',
@@ -554,7 +564,7 @@ const TXT_M0 = {
     copyCode:'Copier le code',
     copyDone:'Copié !',
     openEditor:'Ouvrir onecompiler.com/cpp ↗',
-    pasteNote:'✓ Code copié — colle-le dans l\'éditeur avec Ctrl+V, puis clique Run ▶',
+    pasteNote:'✓ Code copié — dans l\'éditeur : Ctrl+A pour tout sélectionner, puis Ctrl+V pour coller, puis Run ▶',
     diffPrompt:'Qu\'est-ce qui a changé entre le C# et le C++ ?',
     actLabel:'Activités — C# ↔ C++',
     diffLabel:'Spot la diff',
@@ -567,7 +577,7 @@ const TXT_M0 = {
     copyCode:'Copy code',
     copyDone:'Copied!',
     openEditor:'Open onecompiler.com/cpp ↗',
-    pasteNote:'✓ Code copied — paste it into the editor with Ctrl+V, then click Run ▶',
+    pasteNote:'✓ Code copied — in the editor: Ctrl+A to select all, then Ctrl+V to paste, then Run ▶',
     diffPrompt:'What changed between C# and C++?',
     actLabel:'Activities — C# ↔ C++',
     diffLabel:'Spot the diff',
@@ -578,28 +588,44 @@ function tm0(k){ return TXT_M0[L][k]||k; }
 
 function launchM0Frame(btn){
   const target = btn.dataset.target;
-  const code   = btn.dataset.code.replace(/&#10;/g,'\n').replace(/&quot;/g,'"');
+  const code   = _m0CodeMap[target] || '';
   const ph     = document.getElementById(target+'-ph');
   const wrap   = document.getElementById(target);
-  if(!wrap) return;
 
-  // Copy the code to clipboard first
-  navigator.clipboard.writeText(code).catch(()=>{
-    // Fallback — silent, user can still copy manually from the code block above
-  });
+  console.log('[M0] launchM0Frame called, target:', target);
+  console.log('[M0] code in _m0CodeMap:', !!code, '— first 80 chars:', code.slice(0,80));
+  console.log('[M0] wrap found:', !!wrap, '  ph found:', !!ph);
 
-  // Inject clean empty iframe (no pre-loaded code — avoids encoding issues)
+  if(!wrap){ console.warn('[M0] wrap element not found — aborting'); return; }
+
+  // Copy the correct code to clipboard
+  if(code){
+    navigator.clipboard.writeText(code).then(()=>{
+      console.log('[M0] clipboard write succeeded');
+    }).catch(err=>{
+      console.warn('[M0] clipboard write failed:', err);
+    });
+  } else {
+    console.warn('[M0] no code found for target:', target);
+  }
+
+  // Inject clean empty iframe
   if(!wrap.querySelector('iframe')){
+    console.log('[M0] injecting iframe');
     const iframe = document.createElement('iframe');
     iframe.src = 'https://onecompiler.com/embed/cpp?theme=dark&hideTitle=true&hideStdin=true';
     iframe.className = 'm0-iframe';
     iframe.setAttribute('sandbox','allow-scripts allow-same-origin allow-forms allow-popups');
     iframe.setAttribute('title','C++ live editor');
     wrap.appendChild(iframe);
+    console.log('[M0] iframe injected');
+  } else {
+    console.log('[M0] iframe already present — skipping inject');
   }
 
-  if(ph) ph.style.display = 'none';
+  if(ph){ ph.style.display = 'none'; console.log('[M0] placeholder hidden'); }
   wrap.style.display = 'block';
+  console.log('[M0] wrap now visible');
 }
 
 function copyM0Code(btn){
@@ -693,10 +719,20 @@ function renderM0Concept(concept,sessId,ns,allActs){
   const conceptIdx = (SESSION.concepts||[]).indexOf(concept);
   const frameId = `m0-frame-${conceptIdx}`;
 
-  // Decode HTML entities via DOM — correctly handles &lt; &gt; &amp; etc.
+  // Decode HTML entities via DOM
   const _d = document.createElement('div');
   _d.innerHTML = concept.cpp;
-  const plainCpp = (_d.innerText || _d.textContent || '').trim();
+  let plainCpp = (_d.innerText || _d.textContent || '').trim();
+
+  // Clean up visual line-continuations: a line that starts with << or other
+  // operators was split for display only — rejoin it
+  plainCpp = plainCpp.replace(/\n[ \t]*(<<|>>|\+|\|)/g, ' $1');
+
+  // Fix newlines inside string literals — innerText turns \n into a real newline
+  // which breaks C++ string literals. Restore them to \n escape sequences.
+  plainCpp = plainCpp.replace(/"([^"]*)"/g, (match) =>
+    match.replace(/\n/g, '\\n')
+  );
   const encoded  = encodeURIComponent(plainCpp);
   const embedUrl = `https://onecompiler.com/embed/cpp?theme=dark&hideTitle=true&hideStdin=true&code=${encoded}`;
 
@@ -726,18 +762,45 @@ function renderM0Concept(concept,sessId,ns,allActs){
     </div>`;
   }
 
-  // Store embedUrl and plainCpp on the button
-  const safeCode = plainCpp.replace(/"/g,'&quot;').replace(/\n/g,'&#10;');
+  // Wrap plainCpp in runnable boilerplate before storing
+  const includes = [];
+  if(/std::cout|std::cin|std::endl/.test(plainCpp)) includes.push('#include <iostream>');
+  if(/std::string/.test(plainCpp))                  includes.push('#include <string>');
+  if(/std::vector/.test(plainCpp))                  includes.push('#include <vector>');
+  if(/std::map/.test(plainCpp))                     includes.push('#include <map>');
+  if(/std::cout/.test(plainCpp) && !includes.includes('#include <iostream>')) includes.push('#include <iostream>');
+  // Deduplicate
+  const uniqueIncludes = [...new Set(includes)];
+
+  // Detect if code already has main() or is a class/struct definition
+  const needsMain = !/int\s+main\s*\(/.test(plainCpp)
+    && !/^\s*(class|struct)\s/m.test(plainCpp)
+    && !/^\s*\w[\w\s*&:<>]*\s+\w+\s*\([^)]*\)\s*\{/m.test(plainCpp);
+
+  let runnableCpp;
+  if(needsMain){
+    runnableCpp = (uniqueIncludes.length ? uniqueIncludes.join('\n') + '\n\n' : '')
+      + 'int main() {\n'
+      + plainCpp.split('\n').map(l => '    ' + l).join('\n')
+      + '\n    return 0;\n}';
+  } else {
+    runnableCpp = (uniqueIncludes.length ? uniqueIncludes.join('\n') + '\n\n' : '') + plainCpp;
+  }
+
+  _m0CodeMap[frameId] = runnableCpp;
+  console.log('[M0] _m0CodeMap set for', frameId, '— length:', runnableCpp.length, 'first 60:', runnableCpp.slice(0,60));
+
+  const safeCode = plainCpp.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
   h+=`</div>
 
       <div class="m0-concept-right">
         <div class="m0-lang-hdr cpp-hdr" style="margin-bottom:.8rem">${tm0('tryItLabel')}</div>
         <div id="${frameId}-ph" class="m0-frame-placeholder">
           <p class="m0-run-note" style="margin-bottom:.8rem">${tm0('tryItNote')}</p>
-          <div class="code-block" style="white-space:pre;font-size:1.2rem;line-height:1.7;margin-bottom:1rem;overflow-x:auto">${safeCpp}</div>
+          <div class="code-block" style="white-space:pre;font-size:1.2rem;line-height:1.7;margin-bottom:1rem;overflow-x:auto">${safeCode}</div>
           <button class="m0-launch-btn"
             data-target="${frameId}"
-            data-code="${safeCode}"
             onclick="launchM0Frame(this)">▶ ${tm0('launchEditor')}</button>
         </div>
         <div id="${frameId}" class="m0-frame-wrap" style="display:none">
@@ -801,6 +864,47 @@ function completeM0(sessId){
   const btn=document.getElementById('comp-m0');
   if(btn) btn.classList.remove('show');
   showToast(t('xpGain',typeof SESSION!=='undefined'?SESSION.xp:50));
+}
+
+// ── Homework ──────────────────────────────────────────────────
+function renderHomework(S){
+  const hw = S.homework;
+  const label = L==='fr' ? 'Pratique optionnelle' : 'Optional practice';
+  const sublabel = L==='fr'
+    ? 'Exercices à faire chez toi avant la prochaine session — pas obligatoires, pas évalués.'
+    : 'Exercises to do before the next session — not required, not graded.';
+  const coreLbl = L==='fr' ? 'Tronc commun' : 'Shared core';
+  const ideLbl  = L==='fr' ? 'Extension IDE' : 'IDE extension';
+  const engLbl  = L==='fr' ? 'Extension moteur' : 'Engine extension';
+  const diffLabels = {
+    easy:   L==='fr' ? '🟢 Facile'       : '🟢 Easy',
+    medium: L==='fr' ? '🟡 Intermédiaire' : '🟡 Intermediate',
+    hard:   L==='fr' ? '🔴 Difficile'    : '🔴 Hard',
+  };
+  const renderItems = items => items.map(item=>`
+    <div class="hw-item">
+      <span class="hw-diff">${diffLabels[item.diff]||item.diff}</span>
+      <p class="hw-text">${item[L]||item.fr}</p>
+    </div>`).join('');
+
+  return `<div class="hw-section">
+    <button class="hw-toggle" onclick="this.parentElement.classList.toggle('hw-open')">
+      <span class="hw-icon">▸</span>
+      <span class="hw-label">${label}</span>
+      <span class="hw-sub">${sublabel}</span>
+    </button>
+    <div class="hw-body">
+      ${hw.core?.length?`<div class="hw-group">
+        <div class="hw-group-lbl">${coreLbl}</div>
+        ${renderItems(hw.core)}</div>`:''}
+      ${hw.ide?.length?`<div class="hw-group">
+        <div class="hw-group-lbl ide-lbl">${ideLbl}</div>
+        ${renderItems(hw.ide)}</div>`:''}
+      ${hw.engine?.length?`<div class="hw-group">
+        <div class="hw-group-lbl eng-lbl">${engLbl}</div>
+        ${renderItems(hw.engine)}</div>`:''}
+    </div>
+  </div>`;
 }
 
 // ── Copy buttons ──────────────────────────────────────────────
@@ -1067,8 +1171,8 @@ function applyGlossary(rootEl){
     const text = codeEl.textContent;
     for(const term of _GLOSS_TERMS){
       if(_glossUsed.has(term)) continue;
-      const re = new RegExp(`^(${term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})$`, 'i');
-      if(re.test(text.trim())){
+      const re = new RegExp(`\\b(${term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})\\b`, 'i');
+      if(re.test(text)){
         _glossUsed.add(term);
         const btn = document.createElement('button');
         btn.className = 'gloss-btn';

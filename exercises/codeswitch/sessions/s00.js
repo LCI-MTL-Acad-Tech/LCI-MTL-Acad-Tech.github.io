@@ -217,6 +217,12 @@ std::cout &lt;&lt; <span class="str">"Fini !\n"</span>;`,
 <span class="kw2">void</span> <span class="fn2">greet</span>(std::<span class="ty">string</span> name) {
     std::cout &lt;&lt; <span class="str">"Bonjour, "</span>
               &lt;&lt; name &lt;&lt; <span class="str">"\n"</span>;
+}
+
+<span class="kw2">int</span> <span class="fn2">main</span>() {
+    std::cout &lt;&lt; <span class="fn2">add</span>(<span class="num">3</span>, <span class="num">4</span>) &lt;&lt; <span class="str">"\n"</span>;
+    <span class="fn2">greet</span>(<span class="str">"Montréal"</span>);
+    <span class="kw2">return</span> <span class="num">0</span>;
 }`,
       runUrl: _OC,
       diff:{
@@ -272,7 +278,15 @@ std::cout &lt;&lt; <span class="str">"Fini !\n"</span>;`,
     <span class="kw2">bool</span> <span class="fn2">isAlive</span>() {
         <span class="kw2">return</span> health &gt; <span class="num">0</span>;
     }
-};  <span class="cm">// ← point-virgule obligatoire !</span>`,
+};  <span class="cm">// ← point-virgule obligatoire !</span>
+
+<span class="kw2">int</span> <span class="fn2">main</span>() {
+    <span class="ty">Player</span> p(<span class="str">"Héros"</span>);
+    p.<span class="fn2">takeDamage</span>(<span class="num">30</span>);
+    std::cout &lt;&lt; p.name &lt;&lt; <span class="str">" en vie : "</span>
+              &lt;&lt; p.<span class="fn2">isAlive</span>() &lt;&lt; <span class="str">"\n"</span>;
+    <span class="kw2">return</span> <span class="num">0</span>;
+}`,
       runUrl: _OC,
       diff:{
         fr:[

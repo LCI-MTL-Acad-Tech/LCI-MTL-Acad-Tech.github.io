@@ -203,5 +203,19 @@ int main() {
       },
     ],
   },
+
+  homework:{
+    core:[
+      {diff:'easy', fr:'Écris une fonction C++ square(int n) qui retourne n*n, et appelle-la avec 3 valeurs différentes.', en:'Write a C++ function square(int n) that returns n*n, and call it with 3 different values.'},
+      {diff:'medium', fr:'Écris une fonction clamp(float val, float lo, float hi) qui retourne val contraint entre lo et hi. Teste avec des valeurs en dehors des bornes.', en:'Write a function clamp(float val, float lo, float hi) that returns val clamped between lo and hi. Test with values outside the bounds.'},
+      {diff:'hard', fr:'Écris une fonction récursive factorial(int n) qui calcule n!. Ajoute une garde pour n < 0. Teste factorial(0), factorial(1), factorial(5), factorial(12).', en:'Write a recursive function factorial(int n) that computes n!. Add a guard for n < 0. Test factorial(0), factorial(1), factorial(5), factorial(12).'},
+    ],
+    ide:[
+      {diff:'medium', fr:'Écris une fonction dans un fichier mathutils.h et inclus-la dans main.cpp. Compile avec g++ main.cpp -o main et vérifie que ça fonctionne.', en:'Write a function in a mathutils.h file and include it in main.cpp. Compile with g++ main.cpp -o main and verify it works.'},
+    ],
+    engine:[
+      {diff:'medium', fr:'Dans Unreal, crée un Actor C++ avec une UFUNCTION(BlueprintCallable) GetHealth() qui retourne un int32. Expose-la à Blueprint et appelle-la depuis l\'Event Graph.', en:'In Unreal, create a C++ Actor with a UFUNCTION(BlueprintCallable) GetHealth() that returns an int32. Expose it to Blueprint and call it from the Event Graph.'},
+    ],
+  },
 };
 document.addEventListener('DOMContentLoaded',()=>{});

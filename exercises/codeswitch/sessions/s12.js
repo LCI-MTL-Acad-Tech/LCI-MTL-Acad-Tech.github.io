@@ -231,5 +231,19 @@ Sphere-&gt;OnComponentBeginOverlap.<span class="fn2">AddDynamic</span>(
       },
     ],
   },
+
+  homework:{
+    core:[
+      {diff:'easy', fr:'Écris un EventSystem<T> template qui stocke des callbacks std::function<void(T)>. Teste avec T=int (événement de dommage) et T=string (message).', en:'Write a template EventSystem<T> that stores std::function<void(T)> callbacks. Test with T=int (damage event) and T=string (message).'},
+      {diff:'medium', fr:'Implémente un système AABB 2D complet : détection de collision, résolution de direction (de quel côté vient la collision), et un callback OnCollision.', en:'Implement a complete 2D AABB system: collision detection, direction resolution (which side the collision came from), and an OnCollision callback.'},
+      {diff:'hard', fr:'Simule 10 objets en mouvement dans une grille 2D. Pour chaque frame, vérifie toutes les paires de collisions (O(n²)). Discute pourquoi c\'est un problème et comment un quadtree aiderait.', en:'Simulate 10 moving objects in a 2D grid. Each frame, check all collision pairs (O(n²)). Discuss why this is a problem and how a quadtree would help.'},
+    ],
+    ide:[
+      {diff:'medium', fr:'Implémente un Observer pattern avec des lambdas qui capturent par référence [&]. Teste qu\'une lambda qui capture une variable locale qui sort de scope provoque un dangling reference.', en:'Implement an Observer pattern with lambdas that capture by reference [&]. Test that a lambda capturing a local variable that goes out of scope causes a dangling reference.'},
+    ],
+    engine:[
+      {diff:'hard', fr:'Dans Unreal, crée un Collectible Actor avec collision Overlap sur ECC_Pawn uniquement. Place-en 10 dans la scène. Vérifie que seul le Character les collecte, pas d\'autres objets.', en:'In Unreal, create a Collectible Actor with Overlap collision on ECC_Pawn only. Place 10 in the scene. Verify that only the Character collects them, not other objects.'},
+    ],
+  },
 };
 document.addEventListener('DOMContentLoaded',()=>{});

@@ -276,6 +276,20 @@ int main() {
       },
     ],
   },
+
+  homework:{
+    core:[
+      {diff:'easy', fr:'Déclare 5 variables de types différents (int, float, bool, string, auto) et affiche chacune avec cout. Vérifie que le programme compile sans warning.', en:'Declare 5 variables of different types (int, float, bool, string, auto) and print each with cout. Verify the program compiles without warnings.'},
+      {diff:'medium', fr:'Écris un programme qui déclare une variable entière, la modifie trois fois, et affiche sa valeur après chaque modification. Que remarques-tu sur la différence entre = (affectation) et == (comparaison) ?', en:'Write a program that declares an integer variable, modifies it three times, and prints its value after each modification. What do you notice about = (assignment) vs == (comparison)?'},
+      {diff:'hard', fr:'Crée un programme qui démontre la différence de précision entre int, float et double pour le calcul de 1.0/3.0. Affiche 10 décimales avec setprecision(10).', en:'Create a program that demonstrates the precision difference between int, float, and double for computing 1.0/3.0. Print 10 decimal places with setprecision(10).'},
+    ],
+    ide:[
+      {diff:'medium', fr:'Dans ton éditeur, configure l\'extension C/C++ pour souligner les variables non utilisées. Teste-la en déclarant une variable sans l\'utiliser.', en:'In your editor, configure the C/C++ extension to underline unused variables. Test it by declaring a variable without using it.'},
+    ],
+    engine:[
+      {diff:'medium', fr:'Dans Unreal, ouvre un Blueprint existant du Third Person Template. Identifie 3 variables et note leur type Unreal (int32, float, bool, FString). Compare avec leurs équivalents C++.', en:'In Unreal, open an existing Blueprint from the Third Person Template. Identify 3 variables and note their Unreal type (int32, float, bool, FString). Compare with their C++ equivalents.'},
+    ],
+  },
 };
 
 document.addEventListener('DOMContentLoaded', () => {

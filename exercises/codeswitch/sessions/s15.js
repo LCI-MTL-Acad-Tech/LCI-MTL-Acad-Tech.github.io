@@ -229,5 +229,19 @@ T <span class="fn2">square</span>(T v) { <span class="kw2">return</span> v * v; 
       },
     ],
   },
+
+  homework:{
+    core:[
+      {diff:'easy', fr:'Complète le Scoreboard<T> de la session avec une méthode updateScore(string name, T score) : si le joueur existe, met à jour son score ; sinon, l\'ajoute.', en:'Complete the session\'s Scoreboard<T> with an updateScore(string name, T score) method: if the player exists, update their score; otherwise, add them.'},
+      {diff:'medium', fr:'Étends le Scoreboard pour charger et sauvegarder les scores dans un fichier texte avec <fstream>. Format : une ligne par joueur, \'nom score\'.', en:'Extend the Scoreboard to load and save scores to a text file with <fstream>. Format: one line per player, \'name score\'.'},
+      {diff:'hard', fr:'Ajoute un système de rang au Scoreboard : Bronze (< 100), Argent (100–499), Or (≥ 500). Affiche le rang à côté de chaque score. Utilise un enum class Rank.', en:'Add a rank system to the Scoreboard: Bronze (< 100), Silver (100–499), Gold (≥ 500). Display the rank next to each score. Use an enum class Rank.'},
+    ],
+    ide:[
+      {diff:'hard', fr:'Compile ton Scoreboard final avec g++ -Wall -Wextra -std=c++17 -O2. Résous tous les warnings. Mesure le temps d\'exécution avec <chrono> sur 10 000 insertions.', en:'Compile your final Scoreboard with g++ -Wall -Wextra -std=c++17 -O2. Fix all warnings. Measure execution time with <chrono> on 10 000 insertions.'},
+    ],
+    engine:[
+      {diff:'hard', fr:'Étends le Collectible de la session 15 pour signaler le score à un HUD Blueprint via un BlueprintImplementableEvent. Crée un Widget Blueprint minimal qui affiche le score en temps réel.', en:'Extend the Session 15 Collectible to signal the score to a HUD Blueprint via a BlueprintImplementableEvent. Create a minimal Widget Blueprint that displays the score in real time.'},
+    ],
+  },
 };
 document.addEventListener('DOMContentLoaded',()=>{});

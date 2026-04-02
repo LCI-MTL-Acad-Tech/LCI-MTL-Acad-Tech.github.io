@@ -228,5 +228,19 @@ T <span class="fn2">double_it</span>(T val) {
       },
     ],
   },
+
+  homework:{
+    core:[
+      {diff:'easy', fr:'Écris 3 fonctions template : min<T>, max<T>, et clamp<T>. Teste chacune avec int, float, et char.', en:'Write 3 template functions: min<T>, max<T>, and clamp<T>. Test each with int, float, and char.'},
+      {diff:'medium', fr:'Crée une classe template Stack<T> avec push(), pop(), top(), et empty(). Utilise std::vector<T> en interne. Teste avec Stack<int> et Stack<string>.', en:'Create a template Stack<T> class with push(), pop(), top(), and empty(). Use std::vector<T> internally. Test with Stack<int> and Stack<string>.'},
+      {diff:'hard', fr:'Ajoute un static_assert dans ta fonction clamp<T> pour exiger que T soit arithmétique. Teste que l\'erreur de compilation est claire et informative quand on passe une string.', en:'Add a static_assert in your clamp<T> function to require T to be arithmetic. Test that the compilation error is clear and informative when passing a string.'},
+    ],
+    ide:[
+      {diff:'hard', fr:'Explore std::type_traits : utilise std::is_same<T, int>::value, std::is_arithmetic<T>::value, et std::is_pointer<T>::value dans des static_assert pour documenter les attentes de tes templates.', en:'Explore std::type_traits: use std::is_same<T, int>::value, std::is_arithmetic<T>::value, and std::is_pointer<T>::value in static_assert to document your template expectations.'},
+    ],
+    engine:[
+      {diff:'medium', fr:'Crée un Actor Unreal avec UFUNCTION(BlueprintImplementableEvent) void OnScoreChanged(int32 NewScore). Dans le .cpp, appelle-le quand un score est mis à jour. Implémente la réaction en Blueprint (Print String).', en:'Create a Unreal Actor with UFUNCTION(BlueprintImplementableEvent) void OnScoreChanged(int32 NewScore). In the .cpp, call it when a score is updated. Implement the reaction in Blueprint (Print String).'},
+    ],
+  },
 };
 document.addEventListener('DOMContentLoaded',()=>{});

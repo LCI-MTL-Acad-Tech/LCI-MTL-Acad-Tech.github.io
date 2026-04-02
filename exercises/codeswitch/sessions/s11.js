@@ -249,5 +249,19 @@ public:
       },
     ],
   },
+
+  homework:{
+    core:[
+      {diff:'easy', fr:'Crée une interface IMovable en C++ (classe abstraite pure) avec virtual void move(float dx, float dy) = 0. Dérive Player et Enemy avec des comportements différents.', en:'Create an IMovable interface in C++ (pure abstract class) with virtual void move(float dx, float dy) = 0. Derive Player and Enemy with different behaviors.'},
+      {diff:'medium', fr:'Stocke Player et Enemy dans un vector<IMovable*> et appelle move() sur tous avec les mêmes paramètres. Affiche la position de chacun après.', en:'Store Player and Enemy in a vector<IMovable*> and call move() on all with the same parameters. Print each one\'s position afterward.'},
+      {diff:'hard', fr:'Implémente un InputSimulator qui stocke une liste de commandes {dx, dy} et les rejoue en ordre sur un IMovable*. C\'est le pattern Command — utile pour le replay et le undo.', en:'Implement an InputSimulator that stores a list of commands {dx, dy} and replays them in order on an IMovable*. This is the Command pattern — useful for replay and undo.'},
+    ],
+    ide:[
+      {diff:'medium', fr:'Compile ton projet IMovable avec plusieurs fichiers (.h + .cpp par classe). Écris un script shell ou un Makefile minimal pour recompiler en une commande.', en:'Compile your IMovable project with multiple files (.h + .cpp per class). Write a shell script or minimal Makefile to recompile in one command.'},
+    ],
+    engine:[
+      {diff:'hard', fr:'Dans Unreal, crée un InputMappingContext avec des bindings pour WASD, les touches directionnelles, ET un gamepad. Vérifie que les trois fonctionnent sans changer une ligne de C++.', en:'In Unreal, create an InputMappingContext with bindings for WASD, arrow keys, AND a gamepad. Verify all three work without changing a single line of C++.'},
+    ],
+  },
 };
 document.addEventListener('DOMContentLoaded',()=>{});

@@ -242,5 +242,19 @@ public:
       },
     ],
   },
+
+  homework:{
+    core:[
+      {diff:'easy', fr:'Crée une classe Weapon avec int damage en private et une méthode getDamage() const en public. Essaie d\'accéder directement à damage depuis main() et lis l\'erreur du compilateur.', en:'Create a Weapon class with int damage as private and a getDamage() const method as public. Try to access damage directly from main() and read the compiler error.'},
+      {diff:'medium', fr:'Ajoute à Weapon une méthode upgrade() qui augmente damage de 10 et retourne *this par référence pour permettre le chaînage : weapon.upgrade().upgrade().upgrade();', en:'Add to Weapon an upgrade() method that increases damage by 10 and returns *this by reference to enable chaining: weapon.upgrade().upgrade().upgrade();'},
+      {diff:'hard', fr:'Implémente une classe Counter avec un membre static int count qui s\'incrémente dans le constructeur et se décrémente dans le destructeur. Affiche combien d\'instances sont actives à tout moment.', en:'Implement a Counter class with a static int count member that increments in the constructor and decrements in the destructor. Print how many instances are alive at any time.'},
+    ],
+    ide:[
+      {diff:'medium', fr:'Écris une classe avec un getter et un setter. Dans le setter, ajoute une validation (ex : health ne peut pas dépasser 100 ni être négatif). Teste avec des valeurs invalides.', en:'Write a class with a getter and setter. In the setter, add validation (e.g. health can\'t exceed 100 or be negative). Test with invalid values.'},
+    ],
+    engine:[
+      {diff:'hard', fr:'Crée un Actor Unreal avec UPROPERTY(EditAnywhere) float Speed et UFUNCTION(BlueprintCallable) void DoubleSpeed(). Dans Blueprint, appelle DoubleSpeed() au Begin Play et vérifie dans les détails.', en:'Create a Unreal Actor with UPROPERTY(EditAnywhere) float Speed and UFUNCTION(BlueprintCallable) void DoubleSpeed(). In Blueprint, call DoubleSpeed() at Begin Play and verify in the Details.'},
+    ],
+  },
 };
 document.addEventListener('DOMContentLoaded',()=>{});

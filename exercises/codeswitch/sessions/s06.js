@@ -232,5 +232,19 @@ Enemy-&gt;<span class="fn2">Destroy</span>();
       },
     ],
   },
+
+  homework:{
+    core:[
+      {diff:'easy', fr:'Écris un programme qui alloue un tableau de 5 ints avec new[], les remplit, les affiche, puis les libère avec delete[]. Ajoute nullptr après le delete.', en:'Write a program that allocates an array of 5 ints with new[], fills them, prints them, then frees them with delete[]. Add nullptr after delete.'},
+      {diff:'medium', fr:'Crée une classe Resource qui alloue un int* dans son constructeur et le libère dans son destructeur. Teste la durée de vie en imbriquant des blocs {}.', en:'Create a Resource class that allocates an int* in its constructor and frees it in its destructor. Test the lifetime by nesting {} blocks.'},
+      {diff:'hard', fr:'Réécris la classe Resource en utilisant std::unique_ptr<int> au lieu d\'un raw pointer. Compare : qu\'est-ce qui disparaît ? Pourquoi préfère-t-on les smart pointers en C++ moderne ?', en:'Rewrite the Resource class using std::unique_ptr<int> instead of a raw pointer. Compare: what disappears? Why are smart pointers preferred in modern C++?'},
+    ],
+    ide:[
+      {diff:'hard', fr:'Écris un memory leak intentionnel (new sans delete), compile avec g++ -fsanitize=address, et lis le rapport d\'AddressSanitizer. C\'est l\'outil standard pour détecter les leaks.', en:'Write an intentional memory leak (new without delete), compile with g++ -fsanitize=address, and read the AddressSanitizer report. This is the standard tool for detecting leaks.'},
+    ],
+    engine:[
+      {diff:'medium', fr:'Dans Unreal, identifie 3 UPROPERTY() dans le Third Person Character. Pour chacun, explique pourquoi UPROPERTY() est nécessaire pour que le GC ne le supprime pas prématurément.', en:'In Unreal, identify 3 UPROPERTY() in the Third Person Character. For each, explain why UPROPERTY() is necessary so the GC doesn\'t prematurely destroy it.'},
+    ],
+  },
 };
 document.addEventListener('DOMContentLoaded',()=>{});

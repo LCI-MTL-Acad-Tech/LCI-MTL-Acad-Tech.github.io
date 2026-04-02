@@ -234,5 +234,19 @@ std::cout &lt;&lt; above &lt;&lt; " players &gt; 100" &lt;&lt; std::endl;</pre>`
       },
     ],
   },
+
+  homework:{
+    core:[
+      {diff:'easy', fr:'Crée un vector<string> de 5 noms. Trie-les avec std::sort, cherche-en un avec std::find, et supprime-en un avec l\'idiome erase-remove.', en:'Create a vector<string> of 5 names. Sort them with std::sort, search one with std::find, and remove one with the erase-remove idiom.'},
+      {diff:'medium', fr:'Crée un map<string, int> de scores de joueurs. Trouve le joueur avec le score max avec std::max_element. Filtre les scores > 100 avec une lambda dans std::copy_if.', en:'Create a map<string, int> of player scores. Find the player with the max score using std::max_element. Filter scores > 100 with a lambda in std::copy_if.'},
+      {diff:'hard', fr:'Implémente un leaderboard : vector de paires (nom, score), trié par score décroissant. Permets d\'ajouter, de mettre à jour, et de supprimer des entrées. Utilise uniquement les algorithmes STL.', en:'Implement a leaderboard: vector of pairs (name, score), sorted by descending score. Allow adding, updating, and removing entries. Use only STL algorithms.'},
+    ],
+    ide:[
+      {diff:'medium', fr:'Pose un breakpoint dans VS Code dans une boucle sur un vector. Lance en mode Debug. Inspecte le vecteur entier dans le panneau Variables. Avance avec Step Over.', en:'Set a breakpoint in VS Code inside a loop over a vector. Launch in Debug mode. Inspect the full vector in the Variables panel. Step through with Step Over.'},
+    ],
+    engine:[
+      {diff:'medium', fr:'Ajoute des UE_LOG dans ton Collectible de la session 12 à chaque étape : BeginPlay, OnOverlap (avec le nom de l\'actor), Destroy(). Filtre par LogTemp dans l\'Output Log.', en:'Add UE_LOG to your Session 12 Collectible at each step: BeginPlay, OnOverlap (with the actor\'s name), Destroy(). Filter by LogTemp in the Output Log.'},
+    ],
+  },
 };
 document.addEventListener('DOMContentLoaded',()=>{});

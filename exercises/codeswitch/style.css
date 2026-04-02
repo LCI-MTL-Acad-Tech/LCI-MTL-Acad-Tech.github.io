@@ -805,3 +805,40 @@ pre { overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
   background: rgba(156,246,212,.08); border-bottom: 1px solid rgba(156,246,212,.2);
   color: var(--aqua);
 }
+
+/* ── Homework section ────────────────────────────────────── */
+.hw-section {
+  margin: 2.8rem 0 1.6rem;
+  border: 1.5px solid var(--ch6); border-radius: var(--rl); overflow: hidden;
+}
+.hw-toggle {
+  width: 100%; display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap;
+  background: var(--ch7); border: none; padding: 1.4rem 1.8rem;
+  cursor: pointer; text-align: left; font-family: var(--f);
+  transition: background .2s;
+}
+.hw-toggle:hover { background: rgba(255,255,255,.04); }
+.hw-icon { color: var(--ch4); font-size: 1.2rem; transition: transform .2s; flex-shrink:0; }
+.hw-open .hw-icon { transform: rotate(90deg); }
+.hw-label { font-size: 1.55rem; font-weight: 500; color: var(--white); }
+.hw-sub { font-size: 1.3rem; color: var(--ch4); }
+
+.hw-body { display: none; padding: 1.6rem 1.8rem 2rem; }
+.hw-open .hw-body { display: block; }
+
+.hw-group { margin-bottom: 1.8rem; }
+.hw-group:last-child { margin-bottom: 0; }
+.hw-group-lbl {
+  font-size: 1.1rem; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--ch4); margin-bottom: 1rem;
+}
+.hw-group-lbl.ide-lbl { color: var(--cobalt); }
+.hw-group-lbl.eng-lbl { color: var(--aqua); }
+
+.hw-item {
+  display: flex; align-items: baseline; gap: 1rem;
+  padding: .9rem 0; border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.hw-item:last-child { border-bottom: none; }
+.hw-diff { font-size: 1.25rem; flex-shrink: 0; white-space: nowrap; }
+.hw-text { font-size: 1.45rem; color: var(--ch2); line-height: 1.55; margin: 0; }
