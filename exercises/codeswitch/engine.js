@@ -548,14 +548,22 @@ function toggleDeep(id){
 
 const TXT_M0 = {
   fr:{
-    tryItLabel:'Éditeur en direct — C++',
+    tryItLabel:'Essaie en ligne — C++',
+    tryItNote:'Copie le code ci-dessous, colle-le dans l\'éditeur et clique Run :',
+    copyCode:'Copier le code',
+    copyDone:'Copié !',
+    openEditor:'Ouvrir onecompiler.com/cpp ↗',
     diffPrompt:'Qu\'est-ce qui a changé entre le C# et le C++ ?',
     actLabel:'Activités — C# ↔ C++',
     diffLabel:'Spot la diff',
     markDone:'Marquer terminé',
   },
   en:{
-    tryItLabel:'Live editor — C++',
+    tryItLabel:'Try it online — C++',
+    tryItNote:'Copy the code below, paste it into the editor and click Run:',
+    copyCode:'Copy code',
+    copyDone:'Copied!',
+    openEditor:'Open onecompiler.com/cpp ↗',
     diffPrompt:'What changed between C# and C++?',
     actLabel:'Activities — C# ↔ C++',
     diffLabel:'Spot the diff',
@@ -563,6 +571,26 @@ const TXT_M0 = {
   }
 };
 function tm0(k){ return TXT_M0[L][k]||k; }
+
+function copyM0Code(btn){
+  const code = btn.dataset.code.replace(/\\n/g,'\n');
+  const label = btn.querySelector('.m0-copy-label');
+  navigator.clipboard.writeText(code).then(()=>{
+    if(label){ label.textContent=tm0('copyDone'); }
+    btn.classList.add('copied');
+    setTimeout(()=>{
+      if(label){ label.textContent=tm0('copyCode'); }
+      btn.classList.remove('copied');
+    }, 1800);
+  }).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=code; ta.style.cssText='position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    if(label){ label.textContent=tm0('copyDone'); }
+    setTimeout(()=>{ if(label) label.textContent=tm0('copyCode'); }, 1800);
+  });
+}
 
 function initM0Page(){
   if(typeof SESSION==='undefined'||!SESSION.solo) return;
@@ -635,11 +663,10 @@ function renderM0Panel(S){
 }
 
 function renderM0Concept(concept,sessId,ns,allActs){
-  const conceptIdx = (SESSION.concepts||[]).indexOf(concept);
-  const frameId = `m0-frame-${conceptIdx}`;
-  const plainCpp = concept.cpp.replace(/<[^>]+>/g,'').trim();
-  const encoded  = encodeURIComponent(plainCpp);
-  const embedUrl = `https://onecompiler.com/embed/cpp?theme=dark&hideTitle=true&hideStdin=true&code=${encoded}`;
+  // Decode HTML entities using a temp element — handles &lt; &gt; &amp; etc.
+  const _d = document.createElement('div');
+  _d.innerHTML = concept.cpp;
+  const plainCpp = (_d.innerText || _d.textContent || '').trim();
 
   let h=`<div class="m0-concept-block">
     <h3 class="m0-concept-title">${concept.title[L]}</h3>
@@ -665,28 +692,37 @@ function renderM0Concept(concept,sessId,ns,allActs){
     </div>`;
   }
 
+  // Escape plain text for safe display in the right column
+  const safeCpp = plainCpp
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
   h+=`</div><!-- /m0-concept-left -->
 
       <div class="m0-concept-right">
-        <div class="m0-lang-hdr cpp-hdr" style="margin-bottom:.6rem">${tm0('tryItLabel')}</div>
-        <iframe
-          src="${embedUrl}"
-          class="m0-iframe"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-          loading="lazy"
-          title="C++ live editor"
-        ></iframe>
+        <div class="m0-lang-hdr cpp-hdr" style="margin-bottom:.8rem">${tm0('tryItLabel')}</div>
+        <p class="m0-run-note" style="margin-bottom:1rem">${tm0('tryItNote')}</p>
+        <div class="m0-tryit-actions">
+          <button class="m0-copy-btn" data-code="${plainCpp.replace(/"/g,'&quot;').replace(/\n/g,'\\n')}" onclick="copyM0Code(this)">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg" style="width:1.3rem;height:1.3rem;flex-shrink:0">
+              <rect x="5" y="5" width="9" height="10" rx="1.5"/>
+              <path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-7A1.5 1.5 0 0 0 1 3.5v7A1.5 1.5 0 0 0 2.5 12H4"/>
+            </svg>
+            <span class="m0-copy-label">${tm0('copyCode')}</span>
+          </button>
+          <a class="m0-open-btn" href="https://onecompiler.com/cpp" target="_blank">${tm0('openEditor')}</a>
+        </div>
+        <div class="code-block" style="white-space:pre;font-size:1.2rem;line-height:1.7;margin-top:.8rem;flex:1;overflow-x:auto">${safeCpp}</div>
       </div>
 
     </div><!-- /m0-concept-grid -->`;
 
-  // Activities below the full-width grid
   const conceptActs=(concept.actIds||[]).map(id=>allActs.find(a=>a.id===id)).filter(Boolean);
   conceptActs.forEach(act=>{ h+=renderM0Act(act,sessId,ns); });
 
   h+=`</div>`;
   return h;
 }
+
 
 function renderM0Act(act,sessId,ns){
   const isDone=actDone(sessId,act.id,ns);
