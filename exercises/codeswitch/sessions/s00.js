@@ -28,8 +28,8 @@ const SESSION = {
 
   tutor:{
     concept:{
-      fr:`Pas d'installation, pas de moteur. Ce module te montre que tu connais déjà la moitié de C++. Pour chaque concept C# que tu maîtrises, il y a un équivalent C++ — souvent presque identique. Lis les deux colonnes, clique Run pour voir le code s'exécuter, et fais les activités. À la fin, tu seras prêt·e à compiler pour de vrai en S01.`,
-      en:`No install, no engine. This module shows you already know half of C++. For every C# concept you master, there's a C++ equivalent — often almost identical. Read both columns, click Run to see the code execute, and do the activities. By the end, you'll be ready to compile for real in S01.`
+      fr:`Pas d'installation, pas de moteur. Ce module te montre que tu connais déjà une bonne partie de C++. Pour chaque concept C# que tu maîtrises, il y a un équivalent C++ — souvent presque identique. Lis les deux colonnes, clique Run pour voir le code s'exécuter, et fais les activités. À la fin, tu seras prêt·e à compiler pour de vrai en S01.`,
+      en:`No install, no engine. This module shows you already know quite a bit of C++. For every C# concept you master, there's a C++ equivalent — often almost identical. Read both columns, click Run to see the code execute, and do the activities. By the end, you'll be ready to compile for real in S01.`
     },
     deep: null
   },

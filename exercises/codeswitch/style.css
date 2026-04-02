@@ -798,3 +798,10 @@ pre { overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
 .footer-note {
   color: var(--ch4) !important; font-size: 1.2rem !important; margin-top: 1.2rem;
 }
+
+/* Module 0 paste instruction above the live editor */
+.m0-paste-note {
+  padding: .7rem 1.2rem; font-size: 1.35rem;
+  background: rgba(156,246,212,.08); border-bottom: 1px solid rgba(156,246,212,.2);
+  color: var(--aqua);
+}

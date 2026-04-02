@@ -549,11 +549,12 @@ function toggleDeep(id){
 const TXT_M0 = {
   fr:{
     tryItLabel:'Essaie en direct — C++',
-    tryItNote:'Clique pour ouvrir l\'éditeur, ou copie le code ci-dessous :',
-    launchEditor:'Lancer l\'éditeur en direct',
+    tryItNote:'Clique le bouton pour copier le code et ouvrir l\'éditeur, puis colle avec Ctrl+V :',
+    launchEditor:'▶ Copier le code et ouvrir l\'éditeur',
     copyCode:'Copier le code',
     copyDone:'Copié !',
     openEditor:'Ouvrir onecompiler.com/cpp ↗',
+    pasteNote:'✓ Code copié — colle-le dans l\'éditeur avec Ctrl+V, puis clique Run ▶',
     diffPrompt:'Qu\'est-ce qui a changé entre le C# et le C++ ?',
     actLabel:'Activités — C# ↔ C++',
     diffLabel:'Spot la diff',
@@ -561,11 +562,12 @@ const TXT_M0 = {
   },
   en:{
     tryItLabel:'Try it live — C++',
-    tryItNote:'Click to open the editor, or copy the code below:',
-    launchEditor:'Launch live editor',
+    tryItNote:'Click the button to copy the code and open the editor, then paste with Ctrl+V:',
+    launchEditor:'▶ Copy code and open editor',
     copyCode:'Copy code',
     copyDone:'Copied!',
     openEditor:'Open onecompiler.com/cpp ↗',
+    pasteNote:'✓ Code copied — paste it into the editor with Ctrl+V, then click Run ▶',
     diffPrompt:'What changed between C# and C++?',
     actLabel:'Activities — C# ↔ C++',
     diffLabel:'Spot the diff',
@@ -575,20 +577,27 @@ const TXT_M0 = {
 function tm0(k){ return TXT_M0[L][k]||k; }
 
 function launchM0Frame(btn){
-  const url    = btn.dataset.url;
   const target = btn.dataset.target;
+  const code   = btn.dataset.code.replace(/&#10;/g,'\n').replace(/&quot;/g,'"');
   const ph     = document.getElementById(target+'-ph');
   const wrap   = document.getElementById(target);
-  if(!wrap||!url) return;
-  // Inject iframe on first click — never pre-loaded
+  if(!wrap) return;
+
+  // Copy the code to clipboard first
+  navigator.clipboard.writeText(code).catch(()=>{
+    // Fallback — silent, user can still copy manually from the code block above
+  });
+
+  // Inject clean empty iframe (no pre-loaded code — avoids encoding issues)
   if(!wrap.querySelector('iframe')){
     const iframe = document.createElement('iframe');
-    iframe.src = url;
+    iframe.src = 'https://onecompiler.com/embed/cpp?theme=dark&hideTitle=true&hideStdin=true';
     iframe.className = 'm0-iframe';
     iframe.setAttribute('sandbox','allow-scripts allow-same-origin allow-forms allow-popups');
     iframe.setAttribute('title','C++ live editor');
     wrap.appendChild(iframe);
   }
+
   if(ph) ph.style.display = 'none';
   wrap.style.display = 'block';
 }
@@ -717,7 +726,8 @@ function renderM0Concept(concept,sessId,ns,allActs){
     </div>`;
   }
 
-  // Store embedUrl safely as a data attribute to avoid quote escaping issues
+  // Store embedUrl and plainCpp on the button
+  const safeCode = plainCpp.replace(/"/g,'&quot;').replace(/\n/g,'&#10;');
   h+=`</div>
 
       <div class="m0-concept-right">
@@ -726,11 +736,13 @@ function renderM0Concept(concept,sessId,ns,allActs){
           <p class="m0-run-note" style="margin-bottom:.8rem">${tm0('tryItNote')}</p>
           <div class="code-block" style="white-space:pre;font-size:1.2rem;line-height:1.7;margin-bottom:1rem;overflow-x:auto">${safeCpp}</div>
           <button class="m0-launch-btn"
-            data-url="${embedUrl.replace(/"/g,'&quot;')}"
             data-target="${frameId}"
+            data-code="${safeCode}"
             onclick="launchM0Frame(this)">▶ ${tm0('launchEditor')}</button>
         </div>
-        <div id="${frameId}" class="m0-frame-wrap" style="display:none"></div>
+        <div id="${frameId}" class="m0-frame-wrap" style="display:none">
+          <div class="m0-paste-note">${tm0('pasteNote')}</div>
+        </div>
       </div>
 
     </div>`;
@@ -1048,18 +1060,44 @@ const _glossUsed = new Set();
 
 function applyGlossary(rootEl){
   if(!rootEl) return;
-  // Walk text nodes, skip code blocks and existing gloss spans
+
+  // ── Pass 1: badge first use of each term inside <code> elements ──
+  rootEl.querySelectorAll('code').forEach(codeEl=>{
+    if(codeEl.closest('.gloss-term')) return;
+    const text = codeEl.textContent;
+    for(const term of _GLOSS_TERMS){
+      if(_glossUsed.has(term)) continue;
+      const re = new RegExp(`^(${term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})$`, 'i');
+      if(re.test(text.trim())){
+        _glossUsed.add(term);
+        const btn = document.createElement('button');
+        btn.className = 'gloss-btn';
+        btn.dataset.term = term.toLowerCase();
+        btn.setAttribute('aria-label', 'Définition');
+        btn.textContent = '?';
+        const wrap = document.createElement('span');
+        wrap.className = 'gloss-term';
+        codeEl.parentNode.insertBefore(wrap, codeEl);
+        wrap.appendChild(codeEl);
+        wrap.appendChild(btn);
+        break;
+      }
+    }
+  });
+
+  // ── Pass 2: badge first use of each term in prose text nodes ──
   const walker = document.createTreeWalker(
     rootEl,
     NodeFilter.SHOW_TEXT,
     { acceptNode: n => {
         const p = n.parentElement;
         if(!p) return NodeFilter.FILTER_REJECT;
-        // Skip inside code, pre, button, input, gloss-term
         const tag = p.tagName.toLowerCase();
+        // Skip code/script/style/form elements
         if(['code','pre','button','input','textarea','script','style'].includes(tag))
           return NodeFilter.FILTER_REJECT;
-        if(p.closest('.code-block,.code-cmd,.bug-code,.cpanel,.gloss-term,.abadge,.m0-concept-body'))
+        // Skip inside code-block divs, existing gloss spans, badges
+        if(p.closest('.code-block,.code-cmd,.bug-code,.cpanel,.gloss-term,.abadge'))
           return NodeFilter.FILTER_REJECT;
         return NodeFilter.FILTER_ACCEPT;
     }}
@@ -1070,24 +1108,22 @@ function applyGlossary(rootEl){
   while((n=walker.nextNode())) nodes.push(n);
 
   nodes.forEach(node=>{
-    let text = node.textContent;
+    const text = node.textContent;
     let replaced = false;
     let html = '';
     let last = 0;
 
-    // Build a regex from unused terms that appear in this text node
     for(const term of _GLOSS_TERMS){
       if(_glossUsed.has(term)) continue;
       const re = new RegExp(`\\b(${term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})\\b`, 'gi');
-      let m;
-      while((m=re.exec(text))!==null){
-        if(_glossUsed.has(term)) break;
+      const m = re.exec(text);
+      if(m){
         _glossUsed.add(term);
         html += escHtml(text.slice(last, m.index));
         html += `<span class="gloss-term">${escHtml(m[1])}<button class="gloss-btn" data-term="${term.toLowerCase()}" aria-label="Définition">?</button></span>`;
         last = m.index + m[0].length;
         replaced = true;
-        break; // only first occurrence of this term
+        break;
       }
     }
 
