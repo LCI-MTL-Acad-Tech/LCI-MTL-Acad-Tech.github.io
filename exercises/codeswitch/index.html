@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzA3MTgxZSIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIKICAgIGZvbnQtZmFtaWx5PSJ1aS1tb25vc3BhY2UsbW9ub3NwYWNlIiBmb250LXNpemU9IjE4IiBmb250LXdlaWdodD0iNzAwIgogICAgZmlsbD0iI2YyZjUzNyI+Ly88L3RleHQ+Cjwvc3ZnPg==">
 <title>Code//Switch</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -75,6 +77,7 @@
                 <p id="ls2-body"></p>
                 <a class="setup-link" href="https://code.visualstudio.com/Download" target="_blank">code.visualstudio.com/Download</a>
                 <p class="step-note" id="ls2-note"></p>
+                <div class="code-cmd" id="ls2-snap"></div>
                 <div class="code-cmd">sudo apt install ./code_*.deb</div>
               </div>
             </div>
@@ -95,6 +98,13 @@
               <div class="step-body">
                 <strong id="ls4-title"></strong>
                 <p id="ls4-body"></p>
+                <div class="code-cmd">mkdir hello-cpp &amp;&amp; cd hello-cpp &amp;&amp; code .</div>
+                <p class="step-note" id="ls4-note"></p>
+                <div class="code-cmd" style="white-space:pre;line-height:1.7">#include &lt;iostream&gt;
+int main() {
+    std::cout &lt;&lt; "Hello, C++!" &lt;&lt; std::endl;
+    return 0;
+}</div>
                 <div class="code-cmd">g++ main.cpp -o main &amp;&amp; ./main</div>
               </div>
             </div>
@@ -172,6 +182,13 @@
               <div class="step-body">
                 <strong id="ms4-title"></strong>
                 <p id="ms4-body"></p>
+                <div class="code-cmd">mkdir hello-cpp &amp;&amp; cd hello-cpp &amp;&amp; code .</div>
+                <p class="step-note" id="ms4-note"></p>
+                <div class="code-cmd" style="white-space:pre;line-height:1.7">#include &lt;iostream&gt;
+int main() {
+    std::cout &lt;&lt; "Hello, C++!" &lt;&lt; std::endl;
+    return 0;
+}</div>
                 <div class="code-cmd">g++ main.cpp -o main &amp;&amp; ./main</div>
               </div>
             </div>
@@ -256,6 +273,11 @@
               <div class="step-body">
                 <strong id="ws5-title"></strong>
                 <p id="ws5-body"></p>
+                <div class="code-cmd" style="white-space:pre;line-height:1.7">#include &lt;iostream&gt;
+int main() {
+    std::cout &lt;&lt; "Hello, C++!" &lt;&lt; std::endl;
+    return 0;
+}</div>
                 <div class="code-cmd">g++ main.cpp -o main.exe &amp;&amp; ./main.exe</div>
               </div>
             </div>
@@ -355,12 +377,14 @@ const SETUP = {
     ls1_verify:'Vérifie que g++ est installé :',
     ls2_title:'Télécharge VS Code',
     ls2_body:'Télécharge le paquet .deb depuis le site officiel, puis installe-le :',
-    ls2_note:'Ou installe depuis le snap : sudo snap install code --classic',
+    ls2_note:'Ou installe depuis le snap :',
+    ls2_snap:'sudo snap install code --classic',
     ls3_title:'Installe les extensions C++',
     ls3_body:'Dans VS Code : Ctrl+Shift+X, puis cherche et installe ces deux extensions :',
     ls3_note:'Le Extension Pack inclut déjà C/C++ — installe juste le pack si tu préfères.',
-    ls4_title:'Teste la compilation',
-    ls4_body:'Crée un fichier main.cpp avec un simple cout, puis dans le terminal intégré :',
+    ls4_title:'Ouvre VS Code et teste la compilation',
+    ls4_body:'Crée un dossier de test et ouvre VS Code dedans depuis le terminal :',
+    ls4_note:'VS Code s\'ouvre dans le dossier. Crée un nouveau fichier main.cpp, colle le code ci-dessous, sauvegarde, puis compile depuis le terminal intégré (Ctrl+`) :',
     // Linux Engine
     le1_title:'Installe Unreal Engine via Epic Games Launcher',
     le1_body:'Télécharge le launcher, connecte ton compte Epic (gratuit), puis installe Unreal Engine 5.x depuis l\'onglet Unreal Engine.',
@@ -380,12 +404,13 @@ const SETUP = {
     ms2_note:'Glisse l\'app dans ton dossier Applications.',
     ms3_title:'Installe les extensions C++',
     ms3_body:'Dans VS Code : ⌘+Shift+X, puis installe :',
-    ms4_title:'Teste la compilation',
-    ms4_body:'Dans le terminal intégré de VS Code :',
+    ms4_title:'Ouvre VS Code et teste la compilation',
+    ms4_body:'Crée un dossier de test et ouvre VS Code dedans depuis le terminal :',
+    ms4_note:'VS Code s\'ouvre dans le dossier. Crée main.cpp, colle le code, sauvegarde, puis compile depuis le terminal intégré (Ctrl+`) :',
     // macOS Engine
     me1_title:'Installe Unreal Engine',
     me1_body:'Télécharge le launcher depuis le site officiel :',
-    me1_warn_title:'Apple Silicon (M1/M2/M3)',
+    me1_warn_title:'Apple Silicon (M1 et plus récent)',
     me1_warn_body:'Unreal Engine 5.x supporte nativement Apple Silicon. Vérifie que tu télécharges la version Universal ou ARM64.',
     me2_title:'Installe Unity Hub',
     me2_body:'Télécharge Unity Hub depuis le site officiel, crée un compte Unity (gratuit), puis installe Unity 6 LTS ou 2022 LTS depuis l\'onglet Installs.',
@@ -404,7 +429,7 @@ const SETUP = {
     ws4_title:'Installe les extensions C++',
     ws4_body:'Dans VS Code : Ctrl+Shift+X, installe :',
     ws5_title:'Teste la compilation',
-    ws5_body:'Dans le terminal intégré (sélectionne UCRT64 comme shell si demandé) :',
+    ws5_body:'Crée un fichier main.cpp, colle le code ci-dessous, puis dans le terminal intégré (sélectionne UCRT64 comme shell si demandé) :',
     // Windows Engine
     we1_title:'Installe Visual Studio 2022 Community (requis par Unreal)',
     we1_body:'Unreal Engine sous Windows utilise MSVC comme compilateur. Installe Visual Studio 2022 Community avec la charge de travail "Développement Desktop en C++" :',
@@ -430,12 +455,14 @@ const SETUP = {
     ls1_verify:'Verify g++ is installed:',
     ls2_title:'Download VS Code',
     ls2_body:'Download the .deb package from the official site, then install it:',
-    ls2_note:'Or install from snap: sudo snap install code --classic',
+    ls2_note:'Or install from snap:',
+    ls2_snap:'sudo snap install code --classic',
     ls3_title:'Install C++ extensions',
     ls3_body:'In VS Code: Ctrl+Shift+X, then search and install these two extensions:',
     ls3_note:'The Extension Pack already includes C/C++ — just install the pack if you prefer.',
-    ls4_title:'Test compilation',
-    ls4_body:'Create a main.cpp file with a simple cout, then in the integrated terminal:',
+    ls4_title:'Open VS Code and test compilation',
+    ls4_body:'Create a test folder and open VS Code in it from the terminal:',
+    ls4_note:'VS Code opens in the folder. Create a new file main.cpp, paste the code below, save, then compile from the integrated terminal (Ctrl+`):',
     // Linux Engine
     le1_title:'Install Unreal Engine via Epic Games Launcher',
     le1_body:'Download the launcher, connect your Epic account (free), then install Unreal Engine 5.x from the Unreal Engine tab.',
@@ -455,13 +482,13 @@ const SETUP = {
     ms2_note:'Drag the app to your Applications folder.',
     ms3_title:'Install C++ extensions',
     ms3_body:'In VS Code: ⌘+Shift+X, then install:',
-    ms4_title:'Test compilation',
-    ms4_body:'In VS Code\'s integrated terminal:',
+    ms4_title:'Open VS Code and test compilation',
+    ms4_body:'Create a test folder and open VS Code in it from the terminal:',
+    ms4_note:'VS Code opens in the folder. Create main.cpp, paste the code, save, then compile from the integrated terminal (Ctrl+`):',
     // macOS Engine
     me1_title:'Install Unreal Engine',
     me1_body:'Download the launcher from the official site:',
-    me1_warn_title:'Apple Silicon (M1/M2/M3)',
-    me1_warn_body:'Unreal Engine 5.x natively supports Apple Silicon. Make sure you download the Universal or ARM64 version.',
+    me1_warn_title:'Apple Silicon (M1 and later)',
     me2_title:'Install Unity Hub',
     me2_body:'Download Unity Hub from the official site, create a Unity account (free), then install Unity 6 LTS or 2022 LTS from the Installs tab.',
     me3_title:'Code editor for Unreal',
@@ -479,7 +506,7 @@ const SETUP = {
     ws4_title:'Install C++ extensions',
     ws4_body:'In VS Code: Ctrl+Shift+X, install:',
     ws5_title:'Test compilation',
-    ws5_body:'In the integrated terminal (select UCRT64 as shell if prompted):',
+    ws5_body:'Create a main.cpp file, paste the code below, then in the integrated terminal (select UCRT64 as shell if prompted):',
     // Windows Engine
     we1_title:'Install Visual Studio 2022 Community (required by Unreal)',
     we1_body:'Unreal Engine on Windows uses MSVC as compiler. Install Visual Studio 2022 Community with the "Desktop development with C++" workload:',
@@ -540,7 +567,9 @@ function applySetupStrings(){
   });
   setInner('ls1-verify',s.ls1_verify);
   setInner('ls2-note',s.ls2_note);
+  setInner('ls2-snap',s.ls2_snap);
   setInner('ls3-note',s.ls3_note);
+  setInner('ls4-note',s.ls4_note);
   // Linux Engine
   ['le1','le2','le3'].forEach(id=>{
     setInner(id+'-title',s[id+'_title']);
@@ -556,6 +585,7 @@ function applySetupStrings(){
   setInner('ms1-verify',s.ms1_verify);
   setInner('ms1-note',s.ms1_note);
   setInner('ms2-note',s.ms2_note);
+  setInner('ms4-note',s.ms4_note);
   // macOS Engine
   ['me1','me2','me3'].forEach(id=>{
     setInner(id+'-title',s[id+'_title']);

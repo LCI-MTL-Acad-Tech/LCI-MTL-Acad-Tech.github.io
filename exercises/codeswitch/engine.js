@@ -548,16 +548,14 @@ function toggleDeep(id){
 
 const TXT_M0 = {
   fr:{
-    tryItLabel:'Essaie ce code en ligne — aucune installation',
-    tryItNote:'S\'ouvre dans onecompiler.com — clique Run ▶ pour exécuter',
+    tryItLabel:'Éditeur en direct — C++',
     diffPrompt:'Qu\'est-ce qui a changé entre le C# et le C++ ?',
     actLabel:'Activités — C# ↔ C++',
     diffLabel:'Spot la diff',
     markDone:'Marquer terminé',
   },
   en:{
-    tryItLabel:'Try this code online — no install needed',
-    tryItNote:'Opens in onecompiler.com — click Run ▶ to execute',
+    tryItLabel:'Live editor — C++',
     diffPrompt:'What changed between C# and C++?',
     actLabel:'Activities — C# ↔ C++',
     diffLabel:'Spot the diff',
@@ -637,33 +635,29 @@ function renderM0Panel(S){
 }
 
 function renderM0Concept(concept,sessId,ns,allActs){
+  const conceptIdx = (SESSION.concepts||[]).indexOf(concept);
+  const frameId = `m0-frame-${conceptIdx}`;
+  const plainCpp = concept.cpp.replace(/<[^>]+>/g,'').trim();
+  const encoded  = encodeURIComponent(plainCpp);
+  const embedUrl = `https://onecompiler.com/embed/cpp?theme=dark&hideTitle=true&hideStdin=true&code=${encoded}`;
+
   let h=`<div class="m0-concept-block">
     <h3 class="m0-concept-title">${concept.title[L]}</h3>
-    <p class="m0-concept-body">${concept.body[L]}</p>`;
+    <p class="m0-concept-body">${concept.body[L]}</p>
+    <div class="m0-concept-grid">
 
-  // Side-by-side code comparison
-  h+=`<div class="m0-side-by-side">
-    <div class="m0-col">
-      <div class="m0-lang-hdr cs-hdr">C# — Unity / .NET</div>
-      <div class="code-block" style="white-space:pre-wrap">${concept.cs}</div>
-    </div>
-    <div class="m0-col">
-      <div class="m0-lang-hdr cpp-hdr">C++ — équivalent</div>
-      <div class="code-block" style="white-space:pre-wrap">${concept.cpp}</div>
-    </div>
-  </div>`;
+      <div class="m0-concept-left">
+        <div class="m0-side-by-side">
+          <div class="m0-col">
+            <div class="m0-lang-hdr cs-hdr">C# — Unity / .NET</div>
+            <div class="code-block" style="white-space:pre-wrap">${concept.cs}</div>
+          </div>
+          <div class="m0-col">
+            <div class="m0-lang-hdr cpp-hdr">C++ — équivalent</div>
+            <div class="code-block" style="white-space:pre-wrap">${concept.cpp}</div>
+          </div>
+        </div>`;
 
-  // Single web compiler link (OneCompiler, pre-set to C++)
-  if(concept.runUrl){
-    h+=`<div class="m0-run-row">
-      <a class="m0-run-btn" href="${concept.runUrl}" target="_blank">
-        <span>▶</span> ${tm0('tryItLabel')}
-      </a>
-      <span class="m0-run-note">${tm0('tryItNote')}</span>
-    </div>`;
-  }
-
-  // Key differences callout
   if(concept.diff){
     h+=`<div class="m0-diff-callout">
       <strong>${L==='fr'?'Ce qui change :':'What changes:'}</strong>
@@ -671,7 +665,22 @@ function renderM0Concept(concept,sessId,ns,allActs){
     </div>`;
   }
 
-  // Activities for this concept
+  h+=`</div><!-- /m0-concept-left -->
+
+      <div class="m0-concept-right">
+        <div class="m0-lang-hdr cpp-hdr" style="margin-bottom:.6rem">${tm0('tryItLabel')}</div>
+        <iframe
+          src="${embedUrl}"
+          class="m0-iframe"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+          loading="lazy"
+          title="C++ live editor"
+        ></iframe>
+      </div>
+
+    </div><!-- /m0-concept-grid -->`;
+
+  // Activities below the full-width grid
   const conceptActs=(concept.actIds||[]).map(id=>allActs.find(a=>a.id===id)).filter(Boolean);
   conceptActs.forEach(act=>{ h+=renderM0Act(act,sessId,ns); });
 
@@ -728,11 +737,74 @@ function completeM0(sessId){
   showToast(t('xpGain',typeof SESSION!=='undefined'?SESSION.xp:50));
 }
 
+// ── Copy buttons ──────────────────────────────────────────────
+function initCopyButtons(){
+  // Selectors that get a copy button
+  const sel = [
+    '.code-cmd',
+    '.code-block',
+    '.bug-code',
+    '.cpanel pre',
+    '.m0-side-by-side .code-block',
+  ].join(',');
+
+  document.querySelectorAll(sel).forEach(el=>{
+    // Skip if already wrapped
+    if(el.parentElement.classList.contains('copyable')) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'copyable';
+    el.parentNode.insertBefore(wrapper, el);
+    wrapper.appendChild(el);
+
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.title = 'Copier';
+    btn.innerHTML = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"
+      xmlns="http://www.w3.org/2000/svg">
+      <rect x="5" y="5" width="9" height="10" rx="1.5"/>
+      <path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-7A1.5 1.5 0 0 0 1 3.5v7A1.5 1.5 0 0 0 2.5 12H4"/>
+    </svg>`;
+
+    btn.addEventListener('click', ()=>{
+      // Get plain text — strip HTML tags from innerHTML
+      const text = (el.innerText || el.textContent || '').trim();
+      navigator.clipboard.writeText(text).then(()=>{
+        btn.classList.add('copied');
+        btn.title = L==='fr' ? 'Copié !' : 'Copied!';
+        setTimeout(()=>{
+          btn.classList.remove('copied');
+          btn.title = 'Copier';
+        }, 1800);
+      }).catch(()=>{
+        // Fallback for older browsers
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        btn.classList.add('copied');
+        setTimeout(()=>btn.classList.remove('copied'), 1800);
+      });
+    });
+
+    wrapper.appendChild(btn);
+  });
+}
+
 // ── Auto-init ─────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
   initHeader();
   if(typeof SESSION!=='undefined'&&SESSION.solo) initM0Page();
   else if(typeof SESSION!=='undefined') initSessionPage();
   else if(typeof initHome==='function') initHome();
+  // Copy buttons run after content is rendered
+  // For session pages, panels are injected dynamically — use MutationObserver
+  initCopyButtons();
+  // Re-run after dynamic panel injection settles
+  setTimeout(initCopyButtons, 300);
 });
 
