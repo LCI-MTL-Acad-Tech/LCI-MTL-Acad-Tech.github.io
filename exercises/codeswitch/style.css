@@ -130,7 +130,7 @@ pre { overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
 .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 
 /* ── Home ── */
-#page-home { padding: 4rem 2.4rem 8rem; max-width: 1040px; margin: 0 auto; }
+#page-home { padding: 4rem 2.4rem 8rem; max-width: clamp(680px, 90vw, 1600px); margin: 0 auto; }
 
 .home-hero { margin-bottom: 4rem; padding-top: 2rem; }
 .home-hero h1 { font-size: clamp(3.2rem,5vw,5.2rem); margin-bottom: 1.2rem; }
@@ -193,7 +193,7 @@ pre { overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
 .adot.done-eng { background: var(--aqua); }
 
 /* ── Session page ── */
-#page-session { max-width: 860px; margin: 0 auto; padding: 3.2rem 2.4rem 8rem; }
+#page-session { max-width: clamp(680px, 90vw, 1600px); margin: 0 auto; padding: 3.2rem 2.4rem 8rem; }
 
 .sess-hdr { margin-bottom: 3.2rem; }
 .sess-bloc-lbl { font-size: 1.1rem; letter-spacing: .1em; text-transform: uppercase; margin-bottom: .6rem; }
