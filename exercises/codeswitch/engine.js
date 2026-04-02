@@ -974,6 +974,70 @@ const GLOSSARY = {
   'whitespace':     { fr:'Caractères invisibles : espace, tabulation, retour à la ligne. Le compilateur C++ les ignore généralement. Important en Python qui s\'en sert pour la structure.', en:'Invisible characters: space, tab, newline. The C++ compiler generally ignores them. Important in Python where they define structure.' },
   'alphanumeric':   { fr:'Contenant uniquement des lettres (A–Z, a–z) et des chiffres (0–9). Ex : les noms de variables C++ doivent être alphanumériques (plus _).', en:'Containing only letters (A–Z, a–z) and digits (0–9). E.g. C++ variable names must be alphanumeric (plus _).' },
   'regex':          { fr:'Expression régulière — motif de texte pour chercher ou valider des chaînes. Ex : ^[a-z]+$ vérifie que la chaîne ne contient que des minuscules.', en:'Regular expression — text pattern for searching or validating strings. E.g. ^[a-z]+$ checks that a string contains only lowercase letters.' },
+  // ── Reserved words — C++ and C# ──────────────────────────
+  'abstract': { fr:'C# : classe ou méthode qui doit être héritée/implémentée — ne peut pas être instanciée directement. Équivalent d\'une classe avec méthode purement virtuelle en C++.', en:'C#: class or method that must be inherited/implemented — cannot be instantiated directly. Equivalent of a class with purely virtual method in C++.' },
+  'as': { fr:'C# : cast sécurisé — retourne null si le type ne correspond pas, au lieu de lancer une exception. Ex : Boss b = enemy as Boss;', en:'C#: safe cast — returns null if the type doesn\'t match, instead of throwing an exception. E.g. Boss b = enemy as Boss;' },
+  'async': { fr:'C# : marque une méthode comme asynchrone. Permet d\'utiliser await à l\'intérieur. Rarement utilisé en jeu — préférer les coroutines Unity.', en:'C#: marks a method as asynchronous. Allows using await inside. Rarely used in games — prefer Unity coroutines.' },
+  'auto': { fr:'C++ : déduit le type automatiquement à la compilation. Équivalent de var en C#. Ex : auto x = 42; — x est déduit comme int.', en:'C++: deduces type automatically at compile time. Equivalent of var in C#. E.g. auto x = 42; — x is deduced as int.' },
+  'await': { fr:'C# : suspend l\'exécution d\'une méthode async jusqu\'à la fin d\'une tâche. Utilisé avec Task.', en:'C#: suspends an async method until a task completes. Used with Task.' },
+  'base': { fr:'C# : référence vers la classe parente. base.Method() appelle la méthode de la classe parente. Équivalent de Super:: en Unreal C++.', en:'C#: reference to the parent class. base.Method() calls the parent class method. Equivalent of Super:: in Unreal C++.' },
+  'break': { fr:'Sort immédiatement d\'une boucle ou d\'un switch. Identique en C# et C++.', en:'Immediately exits a loop or switch. Identical in C# and C++.' },
+  'catch': { fr:'Bloc qui intercepte et gère une exception lancée par try. Ex : catch (const std::exception& e) { ... }.', en:'Block that catches and handles an exception thrown by try. E.g. catch (const std::exception& e) { ... }.' },
+  'char': { fr:'Type entier 8 bits représentant un caractère ASCII. Ex : char c = \'A\';. En Unreal, le texte utilise FString ou TCHAR plutôt que char.', en:'An 8-bit integer representing an ASCII character. E.g. char c = \'A\';. In Unreal, text uses FString or TCHAR rather than char.' },
+  'checked': { fr:'C# : active la vérification de dépassement arithmétique. checked { int x = int.MaxValue + 1; } lance une OverflowException.', en:'C#: enables arithmetic overflow checking. checked { int x = int.MaxValue + 1; } throws an OverflowException.' },
+  'const': { fr:'Rend une valeur immuable — ne peut pas être modifiée après initialisation. En Unreal : const FString& Name évite une copie inutile.', en:'Makes a value immutable — cannot be modified after initialization. In Unreal: const FString& Name avoids an unnecessary copy.' },
+  'continue': { fr:'Saute le reste du corps de la boucle et passe à l\'itération suivante. Identique en C# et C++.', en:'Skips the rest of the loop body and moves to the next iteration. Identical in C# and C++.' },
+  'delete': { fr:'C++ : libère la mémoire allouée par new. delete ptr; pour un objet, delete[] ptr; pour un tableau. Oublier delete = memory leak.', en:'C++: frees memory allocated by new. delete ptr; for an object, delete[] ptr; for an array. Forgetting delete = memory leak.' },
+  'do': { fr:'Boucle do-while : exécute le bloc au moins une fois avant de tester la condition. Ex : do { ... } while (condition);', en:'do-while loop: executes the block at least once before testing the condition. E.g. do { ... } while (condition);' },
+  'double': { fr:'Nombre décimal 64 bits — deux fois plus précis que float. En jeu, float suffit généralement. Unreal utilise float pour les vecteurs et la physique.', en:'64-bit decimal number — twice the precision of float. In games, float is usually sufficient. Unreal uses float for vectors and physics.' },
+  'else': { fr:'Bloc exécuté quand la condition du if précédent est fausse. Peut être chaîné : else if (...) { ... } else { ... }.', en:'Block executed when the preceding if condition is false. Can be chained: else if (...) { ... } else { ... }.' },
+  'enum': { fr:'Type définissant un ensemble de valeurs nommées. En C++11 : enum class State { Idle, Running }; — préférer enum class à enum pour éviter les collisions.', en:'Type defining a set of named values. In C++11: enum class State { Idle, Running }; — prefer enum class over enum to avoid name collisions.' },
+  'explicit': { fr:'Empêche la conversion implicite d\'un constructeur à un seul paramètre. Évite des bugs subtils dus à des conversions automatiques non souhaitées.', en:'Prevents implicit conversion of a single-parameter constructor. Avoids subtle bugs from unwanted automatic conversions.' },
+  'false': { fr:'Valeur booléenne faux. En C++ et C# : bool done = false;. Identique dans les deux langages.', en:'Boolean value false. In C++ and C#: bool done = false;. Identical in both languages.' },
+  'for': { fr:'Boucle avec initialisation, condition et incrément. Ex : for (int i = 0; i < 5; i++). Identique en C# et C++.', en:'Loop with initialization, condition, and increment. E.g. for (int i = 0; i < 5; i++). Identical in C# and C++.' },
+  'foreach': { fr:'C# : parcourt tous les éléments d\'une collection. foreach (var item in list). En C++ : for (const auto& item : list).', en:'C#: iterates over all elements of a collection. foreach (var item in list). In C++: for (const auto& item : list).' },
+  'if': { fr:'Exécute un bloc seulement si une condition est vraie. Identique en C# et C++. Toujours suivi d\'une condition entre parenthèses.', en:'Executes a block only if a condition is true. Identical in C# and C++. Always followed by a condition in parentheses.' },
+  'in': { fr:'C# : séparateur du foreach. foreach (var x in list). En C++ : remplacé par : dans le range-based for.', en:'C#: foreach separator. foreach (var x in list). In C++: replaced by : in the range-based for.' },
+  'inline': { fr:'Suggestion au compilateur de substituer l\'appel de fonction par son code directement. Peut améliorer les performances pour les petites fonctions fréquemment appelées.', en:'Suggestion to the compiler to substitute the function call with its code directly. Can improve performance for small frequently called functions.' },
+  'interface': { fr:'C# : contrat définissant des méthodes sans implémentation. Une classe peut implémenter plusieurs interfaces. En C++, simulée par une classe abstraite pure.', en:'C#: contract defining methods without implementation. A class can implement multiple interfaces. In C++, simulated by a pure abstract class.' },
+  'is': { fr:'C# : teste si un objet est d\'un certain type. Ex : if (enemy is Boss b) { ... } — combine test et cast en une expression.', en:'C#: tests if an object is of a certain type. E.g. if (enemy is Boss b) { ... } — combines test and cast in one expression.' },
+  'long': { fr:'Entier 32 ou 64 bits selon la plateforme. Préférer int32/int64 en Unreal pour des tailles garanties.', en:'32 or 64-bit integer depending on the platform. Prefer int32/int64 in Unreal for guaranteed sizes.' },
+  'namespace': { fr:'C# : regroupe des types sous un nom pour éviter les conflits. using MonJeu.Gameplay; importe le namespace. En C++ : namespace MonJeu { ... }', en:'C#: groups types under a name to avoid conflicts. using MyGame.Gameplay; imports the namespace. In C++: namespace MyGame { ... }' },
+  'new': { fr:'C++ : alloue de la mémoire sur le heap et retourne un pointeur. Ex : int* p = new int(5);. Doit être suivi d\'un delete correspondant.', en:'C++: allocates memory on the heap and returns a pointer. E.g. int* p = new int(5);. Must be followed by a corresponding delete.' },
+  'null': { fr:'C# : valeur d\'une référence qui ne pointe vers aucun objet. En C++ : nullptr. Toujours vérifier avant d\'accéder — une référence null provoque un crash.', en:'C#: value of a reference pointing to no object. In C++: nullptr. Always check before accessing — a null reference causes a crash.' },
+  'nullptr': { fr:'C++11 : pointeur nul typé. Préféré à NULL ou 0 car évite les ambiguïtés de surcharge. Toujours tester IsValid() ou != nullptr avant de déréférencer.', en:'C++11: typed null pointer. Preferred over NULL or 0 as it avoids overload ambiguities. Always check IsValid() or != nullptr before dereferencing.' },
+  'out': { fr:'C# : paramètre de sortie — doit être assigné dans la fonction. Ex : bool TryParse(string s, out int result). Permet de retourner plusieurs valeurs.', en:'C#: output parameter — must be assigned inside the function. E.g. bool TryParse(string s, out int result). Allows returning multiple values.' },
+  'override': { fr:'C# et C++ : surcharge une méthode virtuelle de la classe parente. En C#, virtual doit être sur la méthode parente. En C++, override est optionnel mais recommandé.', en:'C# and C++: overrides a virtual method from the parent class. In C#, virtual must be on the parent method. In C++, override is optional but recommended.' },
+  'params': { fr:'C# : paramètre tableau de longueur variable. Ex : void Log(params string[] msgs) — peut être appelé avec n\'importe quel nombre d\'arguments.', en:'C#: variable-length array parameter. E.g. void Log(params string[] msgs) — can be called with any number of arguments.' },
+  'private': { fr:'Modificateur d\'accès : membre accessible seulement depuis l\'intérieur de la classe. Par défaut dans les classes C++.', en:'Access modifier: member accessible only from inside the class. Default in C++ classes.' },
+  'protected': { fr:'Modificateur d\'accès : membre accessible depuis la classe et ses classes dérivées, mais pas de l\'extérieur.', en:'Access modifier: member accessible from the class and its derived classes, but not from outside.' },
+  'public': { fr:'Modificateur d\'accès : membre accessible depuis n\'importe quel code. En C++ : étiquette de bloc (public:). En C# : mot-clé par membre.', en:'Access modifier: member accessible from any code. In C++: block label (public:). In C#: per-member keyword.' },
+  'readonly': { fr:'C# : champ qui ne peut être assigné qu\'à la déclaration ou dans le constructeur. Similaire à const mais évalué à l\'exécution.', en:'C#: field that can only be assigned at declaration or in the constructor. Similar to const but evaluated at runtime.' },
+  'ref': { fr:'C# : passe un argument par référence — la fonction peut modifier la variable originale. Ex : void Add(ref int x) { x++; }. Similaire à & en C++.', en:'C#: passes an argument by reference — the function can modify the original variable. E.g. void Add(ref int x) { x++; }. Similar to & in C++.' },
+  'return': { fr:'Termine une fonction et renvoie une valeur à l\'appelant. Ex : return a + b; envoie le résultat. Dans une fonction void, return; seul quitte la fonction.', en:'Ends a function and sends a value back to the caller. E.g. return a + b; sends the result. In a void function, return; alone exits.' },
+  'sealed': { fr:'C# : empêche une classe d\'être héritée, ou une méthode d\'être surchargée. Équivalent de final en C++11.', en:'C#: prevents a class from being inherited, or a method from being overridden. Equivalent of final in C++11.' },
+  'short': { fr:'Entier 16 bits : -32768 à 32767. Utilisé quand la mémoire est critique. Rarement nécessaire dans le code de jeu.', en:'16-bit integer: -32768 to 32767. Used when memory is critical. Rarely needed in game code.' },
+  'sizeof': { fr:'Opérateur qui retourne la taille en octets d\'un type ou d\'une variable. sizeof(int) vaut généralement 4. Évalué à la compilation.', en:'Operator returning the size in bytes of a type or variable. sizeof(int) is usually 4. Evaluated at compile time.' },
+  'static': { fr:'C# : membre appartenant à la classe, pas à une instance. GameManager.Instance est un membre static — un seul existe pour toute l\'application.', en:'C#: member belonging to the class, not an instance. GameManager.Instance is a static member — only one exists for the whole application.' },
+  'string': { fr:'Séquence de caractères. En C# : string (alias de System.String). En C++ : std::string. En Unreal C++ : FString pour le texte Unicode.', en:'Sequence of characters. In C#: string (alias for System.String). In C++: std::string. In Unreal C++: FString for Unicode text.' },
+  'struct': { fr:'Groupe de variables liées sous un nom. En C++, identique à class mais membres publics par défaut. En Unreal : préfixe F (ex : FVector).', en:'Group of related variables under one name. In C++, identical to class but members public by default. In Unreal: F prefix (e.g. FVector).' },
+  'switch': { fr:'Branchement multi-cas sur une valeur. Chaque cas doit se terminer par break; en C++ — sinon l\'exécution tombe dans le cas suivant (fallthrough).', en:'Multi-case branch on a value. Each case must end with break; in C++ — otherwise execution falls into the next case (fallthrough).' },
+  'template': { fr:'Mécanisme C++ pour du code générique. template<typename T> permet d\'écrire une fonction ou classe qui fonctionne pour tout type T.', en:'C++ mechanism for generic code. template<typename T> lets you write a function or class that works for any type T.' },
+  'this': { fr:'Référence vers l\'instance courante à l\'intérieur d\'une méthode. Ex : this.health = 100; en C#. En C++ : this->health = 100;', en:'Reference to the current instance inside a method. E.g. this.health = 100; in C#. In C++: this->health = 100;' },
+  'throw': { fr:'Lance une exception pour signaler une erreur. Ex : throw std::runtime_error("message");. En Unreal, préférer check() ou ensure() aux exceptions.', en:'Throws an exception to signal an error. E.g. throw std::runtime_error("message");. In Unreal, prefer check() or ensure() over exceptions.' },
+  'true': { fr:'Valeur booléenne vrai. En C++ et C# : bool flag = true;. Identique dans les deux langages.', en:'Boolean value true. In C++ and C#: bool flag = true;. Identical in both languages.' },
+  'try': { fr:'Bloc qui surveille les exceptions. Si une exception est lancée à l\'intérieur, le bloc catch correspondant est exécuté.', en:'Block that monitors for exceptions. If an exception is thrown inside, the matching catch block executes.' },
+  'typedef': { fr:'Crée un alias pour un type existant. Ex : typedef unsigned int uint;. Remplacé par using en C++11 mais encore courant dans du code legacy.', en:'Creates an alias for an existing type. E.g. typedef unsigned int uint;. Replaced by using in C++11 but still common in legacy code.' },
+  'typename': { fr:'Introduit un paramètre de type dans un template. template<typename T> — T est un nom de type fourni par l\'appelant.', en:'Introduces a type parameter in a template. template<typename T> — T is a type name provided by the caller.' },
+  'typeof': { fr:'C# : retourne l\'objet Type d\'un type. Ex : typeof(Player). Utilisé avec la réflexion. Ne pas confondre avec GetType() qui s\'appelle sur une instance.', en:'C#: returns the Type object of a type. E.g. typeof(Player). Used with reflection. Not to be confused with GetType() called on an instance.' },
+  'unchecked': { fr:'C# : désactive la vérification de dépassement arithmétique (comportement par défaut). Le dépassement silencieux peut causer des bugs.', en:'C#: disables arithmetic overflow checking (default behavior). Silent overflow can cause bugs.' },
+  'unsigned': { fr:'Modificateur de type entier : pas de valeur négative, donc double la plage positive. Ex : unsigned int stocke 0 à ~4 milliards au lieu de -2G à +2G.', en:'Integer type modifier: no negative values, so double the positive range. E.g. unsigned int stores 0 to ~4 billion instead of -2B to +2B.' },
+  'using': { fr:'C# : importe un namespace (using System;) ou déclare une ressource à fermer automatiquement (using var f = File.Open(...)).', en:'C#: imports a namespace (using System;) or declares a resource to close automatically (using var f = File.Open(...)).' },
+  'var': { fr:'C# : déduit le type de la variable à la compilation. Ex : var score = 0; — score est déduit comme int. Équivalent de auto en C++.', en:'C#: deduces the variable\'s type at compile time. E.g. var score = 0; — score is deduced as int. Equivalent of auto in C++.' },
+  'virtual': { fr:'Marque une méthode comme pouvant être surchargée par une classe dérivée. Active le dispatch dynamique — l\'appel résout la bonne version au runtime selon le type réel.', en:'Marks a method as overridable by a derived class. Enables dynamic dispatch — the call resolves to the correct version at runtime based on the actual type.' },
+  'void': { fr:'Type de retour signifiant "ne retourne rien". Ex : void printScore() { ... } — la fonction affiche mais ne retourne pas de valeur.', en:'Return type meaning "returns nothing". E.g. void printScore() { ... } — the function displays but returns no value.' },
+  'while': { fr:'Boucle qui répète tant qu\'une condition est vraie. Ex : while (hp > 0) { ... }. Identique en C# et C++.', en:'Loop that repeats as long as a condition is true. E.g. while (hp > 0) { ... }. Identical in C# and C++.' },
+  'yield': { fr:'C# : retourne une valeur d\'un énumérateur, ou suspend une coroutine Unity. yield return new WaitForSeconds(1f); attend 1 seconde.', en:'C#: returns a value from an enumerator, or suspends a Unity coroutine. yield return new WaitForSeconds(1f); waits 1 second.' },
 };
 
 // Terms sorted longest-first to avoid partial matches (e.g. "dangling pointer" before "pointer")
@@ -1095,6 +1159,15 @@ function filterGloss(q){
   renderGlossList(q.trim().toLowerCase());
 }
 
+function glossLangPill(def){
+  const hasCpp = /^C\+\+\s*:|identique en C#\s*et\s*C\+\+|identical in C#\s*and\s*C\+\+/i.test(def);
+  const hasCs  = /^C#\s*:|identique en C#\s*et\s*C\+\+|identical in C#\s*and\s*C\+\+/i.test(def);
+  if(hasCpp && hasCs) return `<span class="gloss-lang gloss-lang-both">C# + C++</span>`;
+  if(hasCpp)          return `<span class="gloss-lang gloss-lang-cpp">C++</span>`;
+  if(hasCs)           return `<span class="gloss-lang gloss-lang-cs">C#</span>`;
+  return '';
+}
+
 function renderGlossList(q){
   const list = document.getElementById('gloss-list');
   if(!list) return;
@@ -1105,9 +1178,14 @@ function renderGlossList(q){
     return;
   }
   list.innerHTML = filtered.map(term=>{
-    const def = (GLOSSARY[term][L] || GLOSSARY[term].fr).replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const raw = GLOSSARY[term][L] || GLOSSARY[term].fr;
+    const def = raw.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const pill = glossLangPill(raw);
     return `<div class="gloss-entry">
-      <span class="gloss-entry-term">${term}</span>
+      <div class="gloss-entry-top">
+        <span class="gloss-entry-term">${term}</span>
+        ${pill}
+      </div>
       <span class="gloss-entry-def">${def}</span>
     </div>`;
   }).join('');

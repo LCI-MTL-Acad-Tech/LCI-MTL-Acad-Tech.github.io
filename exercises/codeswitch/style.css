@@ -654,7 +654,7 @@ pre { overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
 .gloss-term { display: inline; white-space: normal; }
 .gloss-btn {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 1.5rem; height: 1.5rem; margin-left: .2rem;
+  width: 1.7rem; height: 1.7rem; margin-left: .35rem; margin-right: .15rem;
   background: rgba(242,245,55,.15); border: 1px solid rgba(242,245,55,.4);
   border-radius: 50%; font-family: var(--f); font-size: 1rem; font-weight: 700;
   color: var(--canary); cursor: pointer; vertical-align: middle;
@@ -765,3 +765,15 @@ pre { overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
   }
   #gloss-drawer.open { transform: translateY(0); }
 }
+
+/* Glossary language pills */
+.gloss-entry-top {
+  display: flex; align-items: center; gap: .6rem; margin-bottom: .3rem;
+}
+.gloss-lang {
+  font-size: 1rem; letter-spacing: .06em; text-transform: uppercase;
+  padding: .15rem .55rem; border-radius: 8px; font-weight: 600; flex-shrink: 0;
+}
+.gloss-lang-cpp  { background: rgba(104,94,247,.2);  color: #b086e8; border: 1px solid rgba(104,94,247,.4); }
+.gloss-lang-cs   { background: rgba(156,246,212,.15); color: var(--aqua); border: 1px solid rgba(156,246,212,.3); }
+.gloss-lang-both { background: rgba(242,245,55,.1);   color: var(--canary); border: 1px solid rgba(242,245,55,.3); }

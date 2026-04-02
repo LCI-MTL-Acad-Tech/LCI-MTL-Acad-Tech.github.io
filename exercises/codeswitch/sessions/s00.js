@@ -41,8 +41,8 @@ const SESSION = {
     {
       title:{ fr:'1 — Types & Variables', en:'1 — Types & Variables' },
       body:{
-        fr:`Les types primitifs que tu utilises en C# Unity existent tous en C++. Regarde les deux colonnes — int, float, bool sont identiques. Seuls string et var changent de nom.`,
-        en:`Every primitive type you use in Unity C# exists in C++. Look at both columns — int, float, bool are identical. Only string and var change names.`
+        fr:`En C#, chaque variable a un type qui détermine ce qu'elle peut stocker : int pour les entiers, bool pour vrai/faux, string pour le texte. Ces types existent aussi en C++ — mais pas tous de la même façon. Regarde les deux colonnes et repère ce qui change.`,
+        en:`In C#, every variable has a type that determines what it can store: int for whole numbers, bool for true/false, string for text. Those types also exist in C++ — but not all in the same way. Look at both columns and spot what changes.`
       },
       cs:`<span class="kw">int</span>    score  = <span class="num">0</span>;
 <span class="kw">float</span>  speed  = <span class="num">5.0f</span>;
@@ -317,10 +317,10 @@ std::cout &lt;&lt; <span class="str">"Fini !\n"</span>;`,
     },
     {
       id:'a00_2', type:'fill', xp:7,
-      instr:{ fr:`En C++, pour utiliser string sans le préfixe std:: partout, on déclare :`, en:`In C++, to use string without the std:: prefix everywhere, you declare:` },
-      template:{ fr:'______ score = 100;  // auto déduit int', en:'______ score = 100;  // auto deduces int' },
+      instr:{ fr:`En C++, le mot-clé qui déduit le type d'une variable automatiquement (équivalent de "var" en C#) est :`, en:`In C++, the keyword that deduces a variable's type automatically (equivalent to "var" in C#) is:` },
+      template:{ fr:'______ score = 100;  // déduit int', en:'______ score = 100;  // deduces int' },
       answer:'auto',
-      hint:{ fr:`Le mot-clé C++ équivalent à "var" en C#`, en:`The C++ keyword equivalent to "var" in C#` }
+      hint:{ fr:`Même idée que var : le compilateur déduit le type`, en:`Same idea as var: the compiler deduces the type` }
     },
 
     // ── Concept 2 — Output ────────────────────────────────────
