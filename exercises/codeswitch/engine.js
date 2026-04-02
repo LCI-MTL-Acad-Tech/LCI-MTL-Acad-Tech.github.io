@@ -1059,7 +1059,7 @@ function applyGlossary(rootEl){
         const tag = p.tagName.toLowerCase();
         if(['code','pre','button','input','textarea','script','style'].includes(tag))
           return NodeFilter.FILTER_REJECT;
-        if(p.closest('.code-block,.code-cmd,.bug-code,.cpanel,.gloss-term,.abadge'))
+        if(p.closest('.code-block,.code-cmd,.bug-code,.cpanel,.gloss-term,.abadge,.m0-concept-body'))
           return NodeFilter.FILTER_REJECT;
         return NodeFilter.FILTER_ACCEPT;
     }}

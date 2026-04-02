@@ -41,8 +41,8 @@ const SESSION = {
     {
       title:{ fr:'1 — Types & Variables', en:'1 — Types & Variables' },
       body:{
-        fr:`En C#, chaque variable a un type qui détermine ce qu'elle peut stocker : int pour les entiers, bool pour vrai/faux, string pour le texte. Ces types existent aussi en C++ — mais pas tous de la même façon. Regarde les deux colonnes et repère ce qui change.`,
-        en:`In C#, every variable has a type that determines what it can store: int for whole numbers, bool for true/false, string for text. Those types also exist in C++ — but not all in the same way. Look at both columns and spot what changes.`
+        fr:`En C#, chaque variable a un type qui détermine ce qu'elle peut stocker. Regarde les deux colonnes — <code>int</code>, <code>float</code>, <code>bool</code> sont identiques ; seuls <code>string</code> et <code>var</code> changent de nom.`,
+        en:`In C#, every variable has a type that determines what it can store. Look at both columns — <code>int</code>, <code>float</code>, <code>bool</code> are identical; only <code>string</code> and <code>var</code> change names.`
       },
       cs:`<span class="kw">int</span>    score  = <span class="num">0</span>;
 <span class="kw">float</span>  speed  = <span class="num">5.0f</span>;
