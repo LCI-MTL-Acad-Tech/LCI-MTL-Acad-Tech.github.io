@@ -10,8 +10,18 @@
 // Home screen: single progress indicator per card
 // ================================================================
 
-let L = localStorage.getItem('cs_lang') || 'fr';
-console.log('[lang] on load — localStorage cs_lang:', localStorage.getItem('cs_lang'), '— L set to:', L);
+// ── Language — localStorage, fallback to browser preference ──
+const _storedLang = localStorage.getItem('cs_lang');
+const _browserFr = (navigator.language || navigator.userLanguage || '').startsWith('fr');
+let L = _storedLang || (_browserFr ? 'fr' : 'en');
+if(L !== 'fr' && L !== 'en') L = 'fr';
+console.log('[lang] on load — localStorage cs_lang:', _storedLang, '— L set to:', L);
+
+// ── Theme — localStorage, fallback to browser preference ────
+const _storedTheme = localStorage.getItem('cs_theme');
+const _prefDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+const _theme = _storedTheme || (_prefDark ? 'dark' : 'light');
+document.documentElement.setAttribute('data-theme', _theme);
 
 const TXT = {
   fr: {
@@ -174,11 +184,23 @@ function showToast(msg){
   _tt=setTimeout(()=>el.classList.remove('show'),3200);
 }
 
+function toggleTheme(){
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('cs_theme', next);
+  const btn = document.getElementById('theme-btn');
+  if(btn) btn.textContent = next === 'dark' ? '🌙' : '☀️';
+}
+
 // ── Header ────────────────────────────────────────────────────
 function initHeader(){
   document.documentElement.lang=L;
   const lb=document.getElementById('lang-btn');
   if(lb){ lb.textContent=t('langBtn'); lb.onclick=toggleLang; }
+  const tb=document.getElementById('theme-btn');
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+  if(tb){ tb.textContent = currentTheme === 'dark' ? '🌙' : '☀️'; tb.onclick=toggleTheme; }
   const bb=document.getElementById('back-btn');
   if(bb){ bb.textContent='← '+t('back'); bb.onclick=()=>{ location.href='../index.html'; }; }
 }

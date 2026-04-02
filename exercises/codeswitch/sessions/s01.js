@@ -177,7 +177,7 @@ int main() {
     demoSteps: [
       {
         label: { fr:'Ouvre Unity et Unreal côte à côte', en:'Open Unity and Unreal side by side' },
-        fr:`Crée un script C# vide dans Unity et un Actor C++ vide dans Unreal. Ouvre les deux dans leurs éditeurs. Montre la similitude structurelle — les deux ont une classe, les deux ont des méthodes. L'étudiant·e voit immédiatement un terrain connu.`,
+        fr:`Crée un script C# vide dans Unity et un Actor C++ vide dans Unreal. Ouvre les deux dans leurs éditeurs. Montre la similitude structurelle — les deux ont une classe, les deux ont des méthodes. Il est facile de repérer les similarités.`,
         en:`Create an empty C# script in Unity and an empty C++ Actor in Unreal. Open both in their editors. Show the structural similarity — both have a class, both have methods. The student immediately sees familiar ground.`
       },
       {

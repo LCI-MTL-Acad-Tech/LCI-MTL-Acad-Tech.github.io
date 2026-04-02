@@ -37,7 +37,7 @@ const SESSION = {
       {
         label:{ fr:'if/else — cherche les différences', en:'if/else — find the differences' },
         fr:`Écris le même if/else dans un fichier .cpp et dans un fichier C# fictif côte à côte. Demande à l'étudiant·e de trouver les différences. Réponse : il n'y en a presque pas. C'est intentionnel pour dédramatiser.`,
-        en:`Write the same if/else in a .cpp file and a fictional C# file side by side. Ask the student to find the differences. Answer: there are almost none. This is intentional to de-dramatize.`
+        en:`Write the same if/else in a .cpp file and a fictional C# file side by side. Spot the differences. Answer: there are almost none. This is intentional to de-dramatize.`
       },
       {
         label:{ fr:'range-based for — le foreach C++', en:'Range-based for — the C++ foreach' },

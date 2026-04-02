@@ -56,6 +56,43 @@
   --rl: 8px;
 }
 
+/* ── Light mode ── */
+[data-theme="light"] {
+  --ch:    #f5f7f8;
+  --ch7:   #e0e6e9;
+  --ch6:   #ccd4d8;
+  --ch5:   #b0bcc1;
+  --ch4:   #4a6068;
+  --ch3:   #2a4a52;
+  --ch2:   #2a3c42;
+  --ch1:   #1a2c32;
+  --white: #0d1f26;
+  --canary: #6b6200;
+  --canary-d: #4f4800;
+  --cobalt: #4a3fd4;
+  --aqua:   #1a8a6a;
+}
+
+[data-theme="light"] body { background: var(--ch); color: var(--white); }
+[data-theme="light"] .code-block,
+[data-theme="light"] .code-cmd,
+[data-theme="light"] .bug-code { background: #e8eef1; border-color: var(--ch6); color: #1a2c32; }
+[data-theme="light"] .cpanel { background: #e8eef1; }
+[data-theme="light"] #gloss-tip { background: #fff; }
+[data-theme="light"] #gloss-drawer { background: #fff; border-color: var(--ch6); }
+[data-theme="light"] .gloss-entry:hover { background: rgba(0,0,0,.04); }
+[data-theme="light"] .hw-section { border-color: var(--ch6); }
+[data-theme="light"] .hw-toggle { background: var(--ch7); }
+
+/* ── Theme toggle button ── */
+#theme-btn {
+  background: transparent; border: 1.5px solid var(--ch5) !important; color: var(--ch2);
+  font-family: var(--f); font-size: 1.3rem;
+  padding: .4rem .8rem; border-radius: 2px; cursor: pointer;
+  transition: all .2s var(--ease);
+}
+#theme-btn:hover { border-color: var(--canary) !important; color: var(--canary); }
+
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 10px; scroll-behavior: smooth; }
