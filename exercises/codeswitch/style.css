@@ -637,23 +637,131 @@ pre { overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
 }
 
 /* ── Module 0 try-it panel ────────────────────────────────── */
-.m0-tryit-actions {
-  display: flex; gap: .8rem; flex-wrap: wrap; margin-bottom: 1rem;
-}
-.m0-copy-btn {
-  display: inline-flex; align-items: center; gap: .6rem;
+.m0-frame-placeholder { display: flex; flex-direction: column; }
+.m0-launch-btn {
+  display: inline-flex; align-items: center; gap: .6rem; align-self: flex-start;
   background: rgba(242,245,55,.1); border: 1.5px solid rgba(242,245,55,.35);
-  border-radius: var(--r); padding: .6rem 1.2rem;
+  border-radius: var(--r); padding: .7rem 1.4rem;
   font-family: var(--f); font-size: 1.4rem; color: var(--canary);
   cursor: pointer; transition: all .2s var(--ease);
 }
-.m0-copy-btn:hover { background: rgba(242,245,55,.18); border-color: var(--canary); }
-.m0-copy-btn.copied { background: rgba(156,246,212,.12); border-color: var(--aqua); color: var(--aqua); }
-.m0-open-btn {
-  display: inline-flex; align-items: center;
-  background: rgba(104,94,247,.1); border: 1.5px solid rgba(104,94,247,.35);
-  border-radius: var(--r); padding: .6rem 1.2rem;
-  font-family: var(--f); font-size: 1.4rem; color: var(--cobalt);
-  text-decoration: none; transition: all .2s var(--ease);
+.m0-launch-btn:hover { background: rgba(242,245,55,.2); border-color: var(--canary); }
+.m0-frame-wrap { border: 1.5px solid var(--ch6); border-radius: var(--r); overflow: hidden; }
+.m0-iframe { width: 100%; height: 520px; border: none; display: block; }
+@media(max-width:900px){ .m0-iframe { height: 420px; } }
+
+/* ── Glossary tooltips ────────────────────────────────────── */
+.gloss-term { display: inline; white-space: normal; }
+.gloss-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.5rem; height: 1.5rem; margin-left: .2rem;
+  background: rgba(242,245,55,.15); border: 1px solid rgba(242,245,55,.4);
+  border-radius: 50%; font-family: var(--f); font-size: 1rem; font-weight: 700;
+  color: var(--canary); cursor: pointer; vertical-align: middle;
+  line-height: 1; padding: 0; transition: background .15s, border-color .15s;
 }
-.m0-open-btn:hover { background: rgba(104,94,247,.2); border-color: var(--cobalt); color: #b086e8; }
+.gloss-btn:hover { background: rgba(242,245,55,.3); border-color: var(--canary); }
+
+#gloss-tip {
+  position: absolute; z-index: 300;
+  background: var(--ch7); border: 1.5px solid rgba(242,245,55,.4);
+  border-radius: var(--r); padding: 1rem 1.4rem;
+  font-family: var(--f); font-size: 1.35rem; color: var(--ch2); line-height: 1.55;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  opacity: 0; pointer-events: none; transition: opacity .15s;
+  max-width: 320px;
+}
+#gloss-tip.show { opacity: 1; pointer-events: auto; }
+
+/* ── Glossary drawer ─────────────────────────────────────── */
+/* Floating tab */
+#gloss-tab {
+  position: fixed; left: 0; top: 50%; transform: translateY(-50%);
+  z-index: 400;
+  display: flex; flex-direction: column; align-items: center; gap: .3rem;
+  background: var(--ch7); border: 1.5px solid rgba(242,245,55,.3);
+  border-left: none; border-radius: 0 var(--r) var(--r) 0;
+  padding: 1rem .7rem; cursor: pointer;
+  font-family: var(--f); color: var(--canary); font-size: 1.2rem;
+  transition: background .2s, border-color .2s;
+  writing-mode: vertical-lr; /* stack icon+label vertically */
+}
+#gloss-tab .gloss-tab-icon { font-size: 1.6rem; writing-mode: horizontal-tb; }
+#gloss-tab .gloss-tab-label { letter-spacing: .06em; writing-mode: vertical-lr; text-orientation: mixed; }
+#gloss-tab:hover, #gloss-tab.active { background: rgba(242,245,55,.1); border-color: var(--canary); }
+
+/* Drawer */
+#gloss-drawer {
+  position: fixed; left: 0; top: 0; height: 100%;
+  width: min(360px, 88vw);
+  background: var(--ch7); border-right: 1.5px solid rgba(242,245,55,.2);
+  z-index: 410; display: flex; flex-direction: column;
+  transform: translateX(-100%); transition: transform .28s var(--ease);
+  box-shadow: 4px 0 24px rgba(0,0,0,.4);
+}
+#gloss-drawer.open { transform: translateX(0); }
+
+.gloss-drawer-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.4rem 1.6rem; border-bottom: 1px solid var(--ch6);
+  font-size: 1.6rem; font-weight: 500; color: var(--canary); flex-shrink: 0;
+}
+.gloss-drawer-close {
+  background: none; border: none; color: var(--ch4); font-size: 1.6rem;
+  cursor: pointer; padding: .2rem .4rem; transition: color .15s;
+}
+.gloss-drawer-close:hover { color: var(--white); }
+
+.gloss-drawer-search-wrap {
+  padding: 1rem 1.2rem; border-bottom: 1px solid var(--ch6); flex-shrink: 0;
+}
+#gloss-search {
+  width: 100%; background: rgba(255,255,255,.06); border: 1.5px solid var(--ch6);
+  border-radius: var(--r); padding: .7rem 1rem;
+  font-family: var(--mono); font-size: 1.35rem; color: var(--white);
+  outline: none; transition: border-color .15s; box-sizing: border-box;
+}
+#gloss-search:focus { border-color: var(--canary); }
+#gloss-search::placeholder { color: var(--ch4); }
+
+.gloss-drawer-list {
+  flex: 1; overflow-y: auto; padding: .8rem 0;
+}
+.gloss-entry {
+  padding: .9rem 1.6rem; border-bottom: 1px solid rgba(255,255,255,.04);
+  cursor: default;
+}
+.gloss-entry:hover { background: rgba(255,255,255,.04); }
+.gloss-entry-term {
+  display: block; font-family: var(--mono); font-size: 1.3rem;
+  color: var(--canary); margin-bottom: .3rem;
+}
+.gloss-entry-def {
+  display: block; font-size: 1.3rem; color: var(--ch2); line-height: 1.55;
+}
+.gloss-empty { padding: 1.6rem; color: var(--ch4); font-size: 1.4rem; }
+
+/* Overlay for mobile */
+#gloss-overlay {
+  display: none; position: fixed; inset: 0; z-index: 405;
+  background: rgba(0,0,0,.5); opacity: 0; transition: opacity .28s;
+}
+#gloss-overlay.show { display: block; opacity: 1; }
+
+/* Mobile: bottom drawer */
+@media(max-width:640px){
+  #gloss-tab {
+    writing-mode: horizontal-tb; flex-direction: row;
+    top: auto; bottom: 0; left: 50%; transform: translateX(-50%);
+    border-radius: var(--r) var(--r) 0 0; border: 1.5px solid rgba(242,245,55,.3);
+    border-bottom: none; padding: .8rem 1.4rem;
+  }
+  #gloss-tab .gloss-tab-label { writing-mode: horizontal-tb; }
+  #gloss-drawer {
+    top: auto; bottom: 0; left: 0; right: 0; width: 100%; height: 70vh;
+    border-right: none; border-top: 1.5px solid rgba(242,245,55,.2);
+    border-radius: var(--r) var(--r) 0 0;
+    transform: translateY(100%);
+  }
+  #gloss-drawer.open { transform: translateY(0); }
+}
