@@ -289,6 +289,14 @@ const LANG = {
     "error.grayzone":         "Il reste {pct}% de temps non documenté ({min} min). Décris comment tu l'as passé.",
     "error.merge_uuid":       "Impossible de fusionner : les fichiers proviennent de comptes différents.",
     "error.no_files":         "Aucun fichier sélectionné.",
+
+    // ── Making-of footer ────────────────────────────────────
+    "making.label":    "Comment cet outil a été créé",
+    "making.title":    "Comment cet outil a été fait",
+    "making.p1":       "Cet outil a été construit par une collaboration itérative entre Elisa Schaeffer, Doyenne de la Technologie et du Design au Collège LaSalle Montréal, et Claude (Anthropic), un assistant IA. Le contenu pédagogique, la structure, les fonctionnalités, les priorités et les choix éditoriaux ont été définis, questionnés et affinés par Elisa à chaque étape. Claude a généré le code, proposé des formulations et signalé les incohérences — mais chaque décision substantielle a été prise par un être humain.",
+    "making.p2":       "Ce n'est pas du contenu IA généré en une seule fois. C'est le résultat d'un dialogue de révision prolongé : chaque session a été lue, critiquée et corrigée. L'outil évolue.",
+    "making.p3":       "Utilisation réfléchie de l'IA — L'IA générative est un outil de travail, non un substitut au jugement professionnel. Ce projet illustre une approche où l'humain reste l'auteur·rice : l'IA amplifie la capacité de production, mais la responsabilité éditoriale, pédagogique et éthique reste entièrement humaine.",
+    "making.updated":  "Dernière mise à jour : avril 2026.",
   },
 
   "en-CA": {
@@ -575,6 +583,14 @@ const LANG = {
     "error.grayzone":         "{pct}% of your day is undocumented ({min} min). Please describe how you spent it.",
     "error.merge_uuid":       "Cannot merge: these files belong to different students.",
     "error.no_files":         "No files selected.",
+
+    // ── Making-of footer ────────────────────────────────────
+    "making.label":    "How this tool was made",
+    "making.title":    "How this tool was made",
+    "making.p1":       "This tool was built through iterative collaboration between Elisa Schaeffer, Dean of Technology and Design at Collège LaSalle Montréal, and Claude (Anthropic), an AI assistant. The pedagogical content, structure, features, priorities, and editorial choices were defined, questioned, and refined by Elisa at every step. Claude generated the code, proposed phrasings, and flagged inconsistencies — but every substantive decision was made by a human.",
+    "making.p2":       "This is not one-shot AI content. It is the result of a prolonged review dialogue: every session was read, critiqued, and corrected. The tool evolves.",
+    "making.p3":       "Thoughtful AI use — Generative AI is a work tool, not a substitute for professional judgment. This project illustrates an approach where the human remains the author: AI amplifies production capacity, but editorial, pedagogical, and ethical responsibility remains entirely human.",
+    "making.updated":  "Last updated: April 2026.",
   }
 };
 

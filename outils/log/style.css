@@ -999,11 +999,426 @@ input[type="checkbox"] { width: auto; accent-color: var(--accent); cursor: point
 .mb-8 { margin-bottom: var(--sp-8); }
 .w-full { width: 100%; }
 
-/* ── Responsive ───────────────────────────────────────────── */
+/* ============================================================
+   MOBILE — comprehensive responsive overrides
+   Primary breakpoints: 768px (tablet), 480px (phone)
+   ============================================================ */
+
+/* ── Prevent iOS input zoom (inputs must be ≥16px on mobile) ── */
 @media (max-width: 768px) {
-  .drawer-panel { width: 100%; max-width: 100vw; }
-  .drawer-toggles { display: none; }
+  input[type="text"],
+  input[type="email"],
+  input[type="date"],
+  input[type="time"],
+  input[type="number"],
+  select,
+  textarea {
+    font-size: 1.6rem; /* 16px — prevents iOS auto-zoom */
+  }
+}
+
+/* ── Bottom navigation bar (replaces hidden top nav) ──────── */
+.mobile-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Show bottom nav */
+  .mobile-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: var(--bg-header);
+    border-top: 1px solid rgba(255,255,255,.1);
+    padding: 0;
+    padding-bottom: env(safe-area-inset-bottom); /* iPhone home bar */
+  }
+
+  .mobile-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--sp-2) var(--sp-1);
+    min-height: 5.6rem;
+    text-decoration: none;
+    color: var(--color-charcoal-200);
+    font-size: 1.1rem;
+    font-family: inherit;
+    font-weight: 500;
+    background: none;
+    border: none;
+    cursor: pointer;
+    gap: 0.3rem;
+    transition: color var(--dur-fast);
+  }
+
+  .mobile-nav-item.active { color: var(--color-white); }
+  .mobile-nav-item:hover  { color: var(--color-white); text-decoration: none; }
+
+  .mobile-nav-icon {
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  /* Push page content above bottom nav */
+  .page-wrap {
+    padding-bottom: calc(5.6rem + env(safe-area-inset-bottom));
+  }
+
+  /* Hide desktop nav, keep header controls minimal */
   .site-nav { display: none; }
+
+  /* Collapse header actions on mobile */
+  .header-actions {
+    gap: var(--sp-1);
+  }
+
+  .header-actions .btn--ghost {
+    padding: var(--sp-1) var(--sp-2);
+    font-size: 1.2rem;
+  }
+
+  /* Hide desktop drawer toggle strip */
+  .drawer-toggles { display: none; }
+}
+
+/* ── Mobile drawer — full-screen sheet ────────────────────── */
+@media (max-width: 768px) {
+  .drawer-panel {
+    width: 100%;
+    max-width: 100vw;
+    /* Slide up from bottom on mobile */
+    top: auto;
+    bottom: 0;
+    height: 85vh;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    transform: translateY(100%);
+  }
+
+  .drawer-panel.open {
+    transform: translateY(0);
+  }
+
+  /* Drag handle */
+  .drawer-header::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: var(--sp-2);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4rem;
+    height: 0.4rem;
+    background: var(--border);
+    border-radius: var(--r-pill);
+  }
+
+  .drawer-header {
+    position: relative;
+    padding-top: var(--sp-5);
+  }
+}
+
+/* ── Mobile floating drawer buttons ──────────────────────── */
+.mobile-drawer-bar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-drawer-bar {
+    display: flex;
+    gap: var(--sp-2);
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--bg-card);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--sp-4);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .mobile-drawer-bar::-webkit-scrollbar { display: none; }
+
+  .mobile-drawer-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--r-pill);
+    font-size: 1.3rem;
+    font-weight: 500;
+    white-space: nowrap;
+    background: var(--bg-subtle);
+    border: 1.5px solid var(--border);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: inherit;
+    flex-shrink: 0;
+    transition: all var(--dur-fast);
+  }
+
+  .mobile-drawer-btn:hover,
+  .mobile-drawer-btn:active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--tag-bg);
+  }
+}
+
+/* ── Layout & grid ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .container { padding: 0 var(--sp-3); }
+
+  .main-content { padding: var(--sp-4) 0; }
+
+  .form-row,
+  .form-row--3 {
+    grid-template-columns: 1fr;
+  }
+
+  .pathway-grid {
+    grid-template-columns: 1fr;
+    gap: var(--sp-3);
+  }
+
+  .stat-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Cards slightly tighter */
+  .card { padding: var(--sp-4); }
+
+  /* Onboarding card */
+  .onboard-card { padding: var(--sp-5); }
+
+  /* Day summary strip wraps */
   .day-summary { flex-wrap: wrap; }
+}
+
+@media (max-width: 480px) {
   .stat-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Stack header completely */
+  .header-inner {
+    flex-wrap: wrap;
+    height: auto;
+    padding: var(--sp-2) 0;
+    gap: var(--sp-2);
+  }
+
+  .site-title { font-size: 1.6rem; }
+}
+
+/* ── Touch targets — minimum 44×44px ─────────────────────── */
+@media (max-width: 768px) {
+  .btn {
+    min-height: 4.4rem;
+    min-width: 4.4rem;
+  }
+
+  .btn--sm {
+    min-height: 3.6rem;
+  }
+
+  .btn--icon {
+    width: 4.4rem;
+    height: 4.4rem;
+  }
+
+  /* Rating buttons — bigger on mobile */
+  .rating { flex-wrap: wrap; gap: var(--sp-2); }
+
+  .rating-btn {
+    flex: 1;
+    min-width: 5.6rem;
+    min-height: 4.8rem;
+    font-size: 1.3rem;
+    text-align: center;
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+  }
+
+  /* Todo check boxes */
+  .todo-check {
+    width: 2.8rem;
+    height: 2.8rem;
+    flex-shrink: 0;
+  }
+
+  /* Task remove button */
+  .task-remove { min-width: 4rem; min-height: 4rem; }
+
+  /* Drawer items */
+  .drawer-item { padding: var(--sp-3) var(--sp-3); min-height: 5.6rem; }
+}
+
+/* ── Task block on mobile ─────────────────────────────────── */
+@media (max-width: 768px) {
+  .task-block { padding: var(--sp-3); }
+
+  .task-block-header { gap: var(--sp-2); }
+
+  /* Stack the two-column task header row */
+  .task-block-header > div > .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Floating download button (mobile) ───────────────────── */
+.fab-download {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .fab-download {
+    display: flex;
+    position: fixed;
+    bottom: calc(6.4rem + env(safe-area-inset-bottom));
+    right: var(--sp-4);
+    z-index: 90;
+    background: var(--color-chlorophyll-500);
+    color: white;
+    border: none;
+    border-radius: var(--r-pill);
+    padding: var(--sp-3) var(--sp-5);
+    font-family: inherit;
+    font-size: 1.5rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+    align-items: center;
+    gap: var(--sp-2);
+    transition: transform var(--dur-fast), box-shadow var(--dur-fast);
+  }
+
+  .fab-download:active {
+    transform: scale(0.96);
+    box-shadow: var(--shadow-md);
+  }
+
+  .fab-download.downloaded {
+    background: var(--color-charcoal-600);
+  }
+
+  /* Hide the in-page download button strip on mobile to avoid duplication */
+  .download-banner-inline { display: none; }
+}
+
+/* ── Report nav tabs scroll on mobile ─────────────────────── */
+@media (max-width: 768px) {
+  .report-nav {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: var(--sp-2);
+  }
+
+  .report-nav::-webkit-scrollbar { display: none; }
+
+  .report-nav-btn { flex-shrink: 0; }
+
+  /* Timeline chart scrolls horizontally */
+  .timeline-chart {
+    min-width: max-content;
+  }
+}
+
+/* ── Upload zone ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .upload-zone {
+    padding: var(--sp-6) var(--sp-4);
+  }
+}
+
+/* ── Steps — collapse labels on small screens ─────────────── */
+@media (max-width: 480px) {
+  .step-label { display: none; }
+  .steps { gap: var(--sp-1); }
+  .step-line { margin: 0; }
+}
+
+/* ── Accordion — bigger tap targets ──────────────────────── */
+@media (max-width: 768px) {
+  .accordion-header {
+    padding: var(--sp-4) 0;
+    font-size: 1.5rem;
+  }
+}
+
+/* ── Prevent horizontal scroll globally ──────────────────── */
+body { overflow-x: hidden; }
+.page-wrap { overflow-x: hidden; }
+
+/* ── Making-of footer ─────────────────────────────────────── */
+.making-of {
+  margin-top: var(--sp-12);
+  border-top: 2px solid var(--border);
+  padding: var(--sp-8) 0 var(--sp-10);
+  font-size: 1.3rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.making-of-inner {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0 var(--sp-4);
+}
+
+.making-of-label {
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+  margin-bottom: var(--sp-4);
+}
+
+.making-of-title {
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  margin-bottom: var(--sp-4);
+  line-height: 1.2;
+}
+
+.making-of p {
+  margin-bottom: var(--sp-3);
+}
+
+.making-of p:last-child {
+  margin-bottom: 0;
+}
+
+.making-of strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.making-of-divider {
+  width: 3.2rem;
+  height: 2px;
+  background: var(--accent);
+  margin-bottom: var(--sp-5);
+  border-radius: var(--r-pill);
+}
+
+@media (max-width: 768px) {
+  .making-of {
+    margin-top: var(--sp-8);
+    padding: var(--sp-6) 0 var(--sp-8);
+    /* Add extra bottom padding on mobile so it clears the bottom nav */
+    padding-bottom: calc(var(--sp-8) + 6rem + env(safe-area-inset-bottom));
+  }
 }

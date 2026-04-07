@@ -66,6 +66,14 @@
         <button class="btn btn--sm btn--secondary" style="margin-left:auto;" onclick="saveAndDownload()" data-i18n="action.download">Télécharger</button>
       </div>
 
+      <!-- Mobile drawer bar (visible only on small screens) -->
+      <div class="mobile-drawer-bar" id="mobile-drawer-bar" style="display:none">
+        <button class="mobile-drawer-btn" onclick="openDrawer('drawer-people')">👤 <span data-i18n="drawer.people_title"></span></button>
+        <button class="mobile-drawer-btn" onclick="openDrawer('drawer-tools')">🔧 <span data-i18n="drawer.tools_title"></span></button>
+        <button class="mobile-drawer-btn" onclick="openDrawer('drawer-types')">🏷 <span data-i18n="drawer.types_title"></span></button>
+        <button class="mobile-drawer-btn" id="mobile-projects-btn" onclick="openDrawer('drawer-projects')" style="display:none">📁 <span data-i18n="drawer.projects_title"></span></button>
+      </div>
+
       <!-- Main log layout -->
       <div id="log-main" class="log-layout hidden">
 
@@ -338,9 +346,37 @@
   <!-- Drawer toggle buttons -->
   <div class="drawer-toggles" id="drawer-toggle-btns"></div>
 
+  <!-- Mobile FAB download -->
+  <button class="fab-download" id="fab-download" onclick="saveAndDownload()">
+    ⬇ <span data-i18n="log.download_cta">Télécharger</span>
+  </button>
+
+  <!-- Mobile bottom nav -->
+  <nav class="mobile-nav">
+    <a href="index.html" class="mobile-nav-item">
+      <span class="mobile-nav-icon">⚙</span>
+      <span data-i18n="nav.setup">Config</span>
+    </a>
+    <a href="log.html" class="mobile-nav-item active">
+      <span class="mobile-nav-icon">📋</span>
+      <span data-i18n="nav.log">Journal</span>
+    </a>
+    <a href="report.html" class="mobile-nav-item">
+      <span class="mobile-nav-icon">📊</span>
+      <span data-i18n="nav.report">Rapport</span>
+    </a>
+  </nav>
+
   <footer class="site-footer">
-    <div class="container">
-      <span id="footer-save-status">—</span>
+    <div class="making-of">
+      <div class="making-of-inner">
+        <div class="making-of-label" data-i18n="making.label">Comment cet outil a été créé</div>
+        <div class="making-of-divider"></div>
+        <div class="making-of-title" data-i18n="making.title">Comment cet outil a été fait</div>
+        <p data-i18n="making.p1"></p>
+        <p data-i18n="making.p2"></p>
+        <p><strong data-i18n="making.p3"></strong> <span data-i18n="making.updated"></span></p>
+      </div>
     </div>
   </footer>
 </div>
