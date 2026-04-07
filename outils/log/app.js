@@ -225,20 +225,43 @@ function mergeInternshipFiles(files) {
     return result;
   }
 
-  // Check all same student_uuid
-  const uuids = [...new Set(files.map(f => f.meta?.student_uuid))];
+  // Separate reflection-only files from full internship files
+  const reflectionFiles = files.filter(f => f.meta?.type === "reflection");
+  const mainFiles = files.filter(f => f.meta?.type !== "reflection");
+
+  // If only reflection files were uploaded, nothing to merge against
+  if (!mainFiles.length && reflectionFiles.length) {
+    result.errors.push("error.no_files");
+    return result;
+  }
+
+  // Check all main files share the same student_uuid
+  const uuids = [...new Set(mainFiles.map(f => f.meta?.student_uuid))];
   if (uuids.length > 1) {
     result.errors.push("error.merge_uuid");
     return result;
   }
+  // Reflection files must also match
+  const reflUuids = reflectionFiles.map(f => f.meta?.student_uuid).filter(Boolean);
+  if (reflUuids.length && !reflUuids.every(u => u === uuids[0])) {
+    result.errors.push("error.merge_uuid");
+    return result;
+  }
 
-  // Use latest meta as base
-  files.sort((a, b) => new Date(b.meta.last_modified) - new Date(a.meta.last_modified));
-  const base = JSON.parse(JSON.stringify(files[0]));
+  // Use latest main file as base
+  mainFiles.sort((a, b) => new Date(b.meta.last_modified) - new Date(a.meta.last_modified));
+  const base = JSON.parse(JSON.stringify(mainFiles[0]));
+
+  // Absorb most recent reflection file (if any) — skip asking again
+  if (reflectionFiles.length) {
+    reflectionFiles.sort((a, b) => new Date(b.meta.saved_at) - new Date(a.meta.saved_at));
+    base.reflection = reflectionFiles[0].reflection;
+    result.warnings.push({ type: "reflection_preloaded", date: reflectionFiles[0].meta.saved_at });
+  }
 
   // Merge logs from all files
   const logMap = new Map();
-  for (const file of files) {
+  for (const file of [...mainFiles, ...reflectionFiles]) {
     for (const log of (file.logs || [])) {
       const existing = logMap.get(log.log_id);
       if (!existing) {
@@ -265,11 +288,11 @@ function mergeInternshipFiles(files) {
     return [...map.values()];
   };
 
-  base.people        = mergeById(base.people || [], files.flatMap(f => f.people || []), "person_id");
-  base.projects      = mergeById(base.projects || [], files.flatMap(f => f.projects || []), "project_id");
-  base.tools         = mergeById(base.tools || [], files.flatMap(f => f.tools || []), "tool_id");
-  base.todos         = mergeById(base.todos || [], files.flatMap(f => f.todos || []), "todo_id");
-  base.activity_types = mergeById(base.activity_types || [], files.flatMap(f => f.activity_types || []), "type_id");
+  base.people        = mergeById(base.people || [], mainFiles.flatMap(f => f.people || []), "person_id");
+  base.projects      = mergeById(base.projects || [], mainFiles.flatMap(f => f.projects || []), "project_id");
+  base.tools         = mergeById(base.tools || [], mainFiles.flatMap(f => f.tools || []), "tool_id");
+  base.todos         = mergeById(base.todos || [], mainFiles.flatMap(f => f.todos || []), "todo_id");
+  base.activity_types = mergeById(base.activity_types || [], mainFiles.flatMap(f => f.activity_types || []), "type_id");
 
   // Validate time integrity
   for (const [, log] of logMap) {

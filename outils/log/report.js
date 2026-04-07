@@ -140,6 +140,20 @@ function validateAndMerge(files) {
   document.getElementById("upload-files-list").after(okDiv);
 
   document.getElementById("proceed-btn").classList.remove("hidden");
+
+  // If a reflection file was pre-loaded, offer to skip straight to dashboard
+  if (result.warnings.some(w => w.type === "reflection_preloaded")) {
+    const skipDiv = document.createElement("div");
+    skipDiv.className = "alert alert--success mt-4";
+    const lang = getCurrentLang();
+    skipDiv.innerHTML = (lang === "fr-CA"
+      ? "Réponses de réflexion déjà importées. "
+      : "Reflection responses already imported. ")
+      + `<button class="btn btn--secondary btn--sm" style="margin-left:var(--sp-3)" onclick="mergedData.reflection=mergedData.reflection||{};generateDashboard()">`
+      + (lang === "fr-CA" ? "Aller au tableau de bord →" : "Go to dashboard →")
+      + "</button>";
+    document.getElementById("proceed-btn").after(skipDiv);
+  }
 }
 
 function resolveConflict(logId, keep) {
@@ -174,8 +188,6 @@ function populateReflectionForms() {
       ? r.future_plans.skills_to_pursue.join(", ")
       : r.future_plans?.skills_to_pursue
   );
-  setField("r-actual-end", r.actual_end_date);
-  if (r.total_weeks) document.getElementById("r-weeks").value = r.total_weeks;
 
   renderToolsReflection(r.tools_reflection || []);
   renderCollabAppreciation(r.collaborator_appreciation || []);
@@ -381,8 +393,6 @@ function toggleAccordion(btn) {
 // ── Collect reflection data ───────────────────────────────────
 function collectReflection() {
   return {
-    actual_end_date:                    document.getElementById("r-actual-end")?.value || null,
-    total_weeks:                        parseInt(document.getElementById("r-weeks")?.value) || 0,
     internship_reality_vs_expectation:  getField("r-reality"),
     significant_work:                   getField("r-significant").split("\n").filter(Boolean),
     proud_moment:                       getField("r-proud"),
@@ -459,6 +469,35 @@ function collectCompetencies() {
   })).filter(x => x.what);
 
   return { helpful, gaps, improvements };
+}
+
+// ── Download reflection JSON ──────────────────────────────────
+function downloadReflectionJSON() {
+  if (!mergedData) return;
+  const reflection = collectReflection();
+  const payload = {
+    meta: {
+      type: "reflection",
+      schema_version: mergedData.meta?.schema_version || "1.1",
+      student_uuid: mergedData.meta?.student_uuid,
+      saved_at: new Date().toISOString(),
+      language: getCurrentLang(),
+    },
+    profile: mergedData.profile,
+    reflection,
+  };
+  const studentId = mergedData.profile?.student_id || "stage";
+  const date = new Date().toISOString().slice(0, 10);
+  downloadJSON(payload, `${studentId}_reflexion_${date}.json`);
+
+  // Show confirmation
+  const btn = document.querySelector('[onclick="downloadReflectionJSON()"]');
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = "✓ " + t("report.reflection_saved");
+    btn.disabled = true;
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 4000);
+  }
 }
 
 // ── Generate dashboard ────────────────────────────────────────

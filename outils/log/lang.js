@@ -210,6 +210,8 @@ const LANG = {
     "report.validation_conflict":     "Deux versions du même journal ont été trouvées. Laquelle garder?",
     "report.keep_newer":      "Garder la plus récente",
     "report.keep_older":      "Garder la plus ancienne",
+    "report.download_reflection": "Télécharger mes réponses (JSON)",
+    "report.reflection_saved":    "Réponses sauvegardées — tu peux les réimporter lors d'une prochaine session.",
 
     "report.section_reflection": "Réflexion finale",
     "report.reality_vs_expectation": "En quelques phrases, décris ce que ce stage a vraiment été — maintenant que tu l'as vécu — comparé à ce que tu anticipais au départ.",
@@ -510,6 +512,8 @@ const LANG = {
     "report.validation_conflict":     "Two versions of the same log were found. Which one should be kept?",
     "report.keep_newer":      "Keep the newer one",
     "report.keep_older":      "Keep the older one",
+    "report.download_reflection": "Download my responses (JSON)",
+    "report.reflection_saved":    "Responses saved — you can re-upload this file in a future session.",
 
     "report.section_reflection":     "Final reflection",
     "report.reality_vs_expectation": "In a few sentences, describe what this internship was actually about — now that you've lived it — compared to what you expected at the start.",
