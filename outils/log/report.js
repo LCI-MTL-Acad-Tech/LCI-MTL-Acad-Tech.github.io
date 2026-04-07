@@ -710,8 +710,10 @@ function buildTimeline(logs, data) {
     `;
   }).join("");
 
-  // Size columns to fill available height — tallest bar = full container
-  sizeTimelineColumns(chart, maxMinutes);
+  // Size columns after the browser has done layout (clientHeight is 0 before paint)
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    sizeTimelineColumns(chart, maxMinutes);
+  }));
 
   // Legend — only types actually used
   const usedIds = new Set();
@@ -736,11 +738,16 @@ function buildTimeline(logs, data) {
 // the available container height, regardless of its CSS height.
 function sizeTimelineColumns(container, maxMinutes) {
   if (!container || !maxMinutes) return;
-  const availH = container.clientHeight
-    || parseInt(getComputedStyle(container).height)
-    || 320;
-  // Subtract padding (top + bottom = 2 * sp-4 = 32px)
-  const usable = Math.max(availH - 32, 80);
+
+  // getBoundingClientRect gives the rendered height reliably after layout
+  let availH = container.getBoundingClientRect().height;
+  if (!availH || availH < 10) {
+    // Still pre-layout — defer one more frame
+    requestAnimationFrame(() => sizeTimelineColumns(container, maxMinutes));
+    return;
+  }
+  // Subtract top + bottom padding (--sp-4 = 8px × 2 = 16px; use 24 to be safe)
+  const usable = Math.max(availH - 24, 80);
 
   container.querySelectorAll(".timeline-col[data-minutes]").forEach(col => {
     const mins = parseInt(col.dataset.minutes) || 0;
@@ -800,7 +807,7 @@ function buildPieChart(container, slices) {
       </path>
       ${pct >= 5 ? `<text x="${lx.toFixed(2)}" y="${ly.toFixed(2)}"
         text-anchor="middle" dominant-baseline="middle"
-        font-size="13" font-weight="500" fill="white"
+        font-size="13" font-weight="500" fill="${bestTextColor(slice.color)}"
         style="pointer-events:none">${pct}%</text>` : ''}
     `);
     angle += sweep;

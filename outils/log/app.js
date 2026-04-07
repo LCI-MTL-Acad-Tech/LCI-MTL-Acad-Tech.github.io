@@ -12,21 +12,22 @@ const SETTINGS = {
 // ── Default activity types ───────────────────────────────────
 const DEFAULT_ACTIVITY_TYPES = [
   // Work-type categories — cross-disciplinary
+  // Colors pass WCAG 3:1 on white (light mode) and have dark-mode variants in CSS
   { type_id: "sys-programming",   label_key: "activity.programming",   color: "#00587c", system: true },
-  { type_id: "sys-design",        label_key: "activity.design",        color: "#d485fa", system: true },
-  { type_id: "sys-research",      label_key: "activity.research",      color: "#8fb9a2", system: true },
-  { type_id: "sys-planning",      label_key: "activity.planning",      color: "#cc9f11", system: true },
-  { type_id: "sys-data-analysis", label_key: "activity.data_analysis", color: "#337996", system: true },
-  { type_id: "sys-debugging",     label_key: "activity.debugging",     color: "#eb2d37", system: true },
-  { type_id: "sys-production",    label_key: "activity.production",    color: "#9569b9", system: true },
-  { type_id: "sys-testing",       label_key: "activity.testing",       color: "#5b8000", system: true },
+  { type_id: "sys-design",        label_key: "activity.design",        color: "#9b3fd4", system: true },
+  { type_id: "sys-research",      label_key: "activity.research",      color: "#2e8a5e", system: true },
+  { type_id: "sys-planning",      label_key: "activity.planning",      color: "#9a6c00", system: true },
+  { type_id: "sys-data-analysis", label_key: "activity.data_analysis", color: "#1e6e8e", system: true },
+  { type_id: "sys-debugging",     label_key: "activity.debugging",     color: "#c41a23", system: true },
+  { type_id: "sys-production",    label_key: "activity.production",    color: "#7341a0", system: true },
+  { type_id: "sys-testing",       label_key: "activity.testing",       color: "#3e6b00", system: true },
   { type_id: "sys-documentation", label_key: "activity.documentation", color: "#784619", system: true },
-  { type_id: "sys-client-work",   label_key: "activity.client_work",   color: "#fe6c06", system: true },
+  { type_id: "sys-client-work",   label_key: "activity.client_work",   color: "#c24800", system: true },
   // Non-work categories
-  { type_id: "sys-meeting",       label_key: "activity.meeting",       color: "#685ef7", system: true },
-  { type_id: "sys-training",      label_key: "activity.training",      color: "#3d4c11", system: true },
-  { type_id: "sys-admin",         label_key: "activity.admin",         color: "#63625d", system: true },
-  { type_id: "sys-break",         label_key: "activity.break",         color: "#cdc19e", system: true },
+  { type_id: "sys-meeting",       label_key: "activity.meeting",       color: "#4a38d4", system: true },
+  { type_id: "sys-training",      label_key: "activity.training",      color: "#2e4a00", system: true },
+  { type_id: "sys-admin",         label_key: "activity.admin",         color: "#3a3f42", system: true },
+  { type_id: "sys-break",         label_key: "activity.break",         color: "#8a7a5a", system: true },
   { type_id: "sys-gray",          label_key: "activity.other",         color: "#576266", system: true },
 ];
 
@@ -445,7 +446,26 @@ function getActivityTypeLabel(data, typeId) {
 function getActivityTypeColor(data, typeId) {
   if (!typeId) return "#9ca3a5";
   const found = data.activity_types.find(a => a.type_id === typeId);
-  return found?.color || "#9ca3a5";
+  const base = found?.color || "#9ca3a5";
+  // In dark mode, check for a CSS variable override (--act-<name>)
+  // These are defined in style.css under [data-theme="dark"] for legibility
+  const cssVar = typeId.replace("sys-", "--act-");
+  const cssVal = getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim();
+  return cssVal || base;
+}
+
+// Return black or white depending on which has better contrast against the bg
+function bestTextColor(hexBg) {
+  try {
+    const h = hexBg.replace(/[^0-9a-fA-F]/g, "").slice(0, 6);
+    if (h.length < 6) return "#ffffff";
+    const r = parseInt(h.slice(0,2),16)/255;
+    const g = parseInt(h.slice(2,4),16)/255;
+    const b = parseInt(h.slice(4,6),16)/255;
+    const f = x => x <= 0.04045 ? x/12.92 : Math.pow((x+0.055)/1.055, 2.4);
+    const L = 0.2126*f(r) + 0.7152*f(g) + 0.0722*f(b);
+    return L > 0.179 ? "#07181e" : "#ffffff";
+  } catch { return "#ffffff"; }
 }
 
 // ── Theme ────────────────────────────────────────────────────

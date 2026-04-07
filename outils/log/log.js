@@ -763,7 +763,7 @@ function renderTypesDrawer() {
       <div class="drawer-item" draggable="true"
         data-assign-type="activity_type" data-assign-id="${at.type_id}"
         ondragstart="startDrag(event,'activity_type','${at.type_id}')">
-        <div class="drawer-item-dot" style="background:${at.color}"></div>
+        <div class="drawer-item-dot" style="background:${getActivityTypeColor(logData, at.type_id)}"></div>
         <div>
           <div class="drawer-item-label">${escHtml(label)}</div>
           ${at.system ? `<div class="drawer-item-sub" data-i18n="drawer.types_system"></div>` : ""}

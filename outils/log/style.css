@@ -119,20 +119,37 @@
   --bg-subtle:   var(--color-charcoal-700);
   --bg-header:   var(--color-charcoal-800);
   --border:      var(--color-charcoal-600);
-  --border-focus:var(--color-blue-400);
+  --border-focus:#4da6c4;
   --text:        var(--color-cream-500);
   --text-muted:  var(--color-charcoal-200);
-  --text-subtle: var(--color-charcoal-300);
+  --text-subtle: var(--color-charcoal-200);
   --text-on-dark:var(--color-cream-500);
-  --accent:      var(--color-blue-400);
-  --accent-hover:var(--color-blue-200);
+  --accent:      #4da6c4;
+  --accent-hover:#6bbedd;
   --danger:      #ff6b70;
   --success:     #7ec850;
   --warning:     #e6b830;
   --tag-bg:      var(--color-charcoal-700);
-  --tag-text:    var(--color-blue-200);
+  --tag-text:    #4da6c4;
   --drawer-bg:   var(--color-charcoal-800);
   --overlay:     rgba(0,0,0,.6);
+
+  /* Activity bar colours lightened for dark card (#202a2f) */
+  --act-programming:   #3a9ec4;
+  --act-design:        #d485fa;
+  --act-research:      #8fb9a2;
+  --act-planning:      #e6b830;
+  --act-data-analysis: #5ba8c4;
+  --act-debugging:     #ff6b70;
+  --act-production:    #b87ae8;
+  --act-testing:       #8ab840;
+  --act-documentation: #c47a3a;
+  --act-client-work:   #fe6c06;
+  --act-meeting:       #8e82f5;
+  --act-training:      #7aaa3a;
+  --act-admin:         #9ca3a5;
+  --act-break:         #cdc19e;
+  --act-other:         #9ca3a5;
 }
 
 /* ── Reset & base ─────────────────────────────────────────── */
