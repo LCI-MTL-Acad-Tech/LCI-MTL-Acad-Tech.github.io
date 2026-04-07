@@ -710,10 +710,17 @@ function buildTimeline(logs, data) {
     `;
   }).join("");
 
-  // Size columns after the browser has done layout (clientHeight is 0 before paint)
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    sizeTimelineColumns(chart, maxMinutes);
-  }));
+  // Set container height from data (1px per 5min, min 24rem, max 56rem)
+  // This avoids relying on getBoundingClientRect which fails on hidden parents.
+  const PX_PER_MIN = 1 / 5;
+  const targetH = Math.min(
+    Math.max(Math.round(maxMinutes * PX_PER_MIN), 240),
+    Math.round(window.innerHeight * 0.75)
+  );
+  chart.style.height = targetH + "px";
+
+  // Size columns synchronously against the known height
+  sizeTimelineColumns(chart, maxMinutes, targetH);
 
   // Legend — only types actually used
   const usedIds = new Set();
@@ -736,19 +743,13 @@ function buildTimeline(logs, data) {
 // ── Timeline column sizing ────────────────────────────────────
 // Sets column heights in pixels so the tallest bar always fills
 // the available container height, regardless of its CSS height.
-function sizeTimelineColumns(container, maxMinutes) {
+function sizeTimelineColumns(container, maxMinutes, knownHeight) {
   if (!container || !maxMinutes) return;
-
-  // getBoundingClientRect gives the rendered height reliably after layout
-  let availH = container.getBoundingClientRect().height;
-  if (!availH || availH < 10) {
-    // Still pre-layout — defer one more frame
-    requestAnimationFrame(() => sizeTimelineColumns(container, maxMinutes));
-    return;
-  }
-  // Subtract top + bottom padding (--sp-4 = 8px × 2 = 16px; use 24 to be safe)
-  const usable = Math.max(availH - 24, 80);
-
+  // Use knownHeight if provided (avoids getBoundingClientRect on hidden parents)
+  // Fall back to getBoundingClientRect for resize events (container is visible then)
+  const availH = knownHeight || container.getBoundingClientRect().height || 0;
+  if (!availH) return;
+  const usable = Math.max(availH - 16, 80); // 16px padding top+bottom
   container.querySelectorAll(".timeline-col[data-minutes]").forEach(col => {
     const mins = parseInt(col.dataset.minutes) || 0;
     const h = mins ? Math.max(Math.round((mins / maxMinutes) * usable), 2) : 2;

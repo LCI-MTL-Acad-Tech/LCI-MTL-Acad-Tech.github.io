@@ -711,7 +711,7 @@ input[type="checkbox"] { width: auto; accent-color: var(--accent); cursor: point
   display: flex;
   align-items: flex-end;
   gap: 2px;
-  height: var(--timeline-h, 32rem);
+  height: auto; /* set by JS from data: 1px per 5min */
   padding: var(--sp-4) 0;
   overflow-x: auto;
 }
@@ -1346,7 +1346,7 @@ input[type="checkbox"] { width: auto; accent-color: var(--accent); cursor: point
   /* Timeline chart scrolls horizontally */
   .timeline-chart {
     min-width: max-content;
-    --timeline-h: 24rem;
+    /* height set by JS */
   }
 }
 
@@ -1654,7 +1654,7 @@ body { overflow-x: hidden; }
   #section-weekly     { page-break-before: always; }
 
   /* Charts: let them size naturally */
-  .timeline-chart { height: 20rem !important; }
+  /* timeline height set by JS, print uses whatever JS set */
   .chart-wrap { box-shadow: none !important; border: 1px solid #e1e3e4; }
 
   /* Typography */
@@ -1679,7 +1679,7 @@ body { overflow-x: hidden; }
   /* Page margins */
   @page {
     margin: 2cm;
-    size: A4 portrait;
+    size: A4 landscape;
   }
 }
 

@@ -112,7 +112,7 @@
       </div>
 
       <!-- ── SCREEN 3: Profile ──────────────────────────────── -->
-      <div id="screen-profile" class="hidden">
+      <div id="screen-profile" class="hidden" style="max-width:84rem;margin:0 auto">
         <div class="steps mb-8" id="setup-steps"></div>
 
         <div class="card">
@@ -120,17 +120,17 @@
           <div class="form-row">
             <div class="form-group">
               <label data-i18n="field.name"></label>
-              <input type="text" id="profile-name" data-i18n-placeholder="field.name" placeholder="">
+              <input type="text" id="profile-name" autocomplete="name" name="name" data-i18n-placeholder="field.name" placeholder="">
             </div>
             <div class="form-group">
               <label data-i18n="field.student_id"></label>
-              <input type="text" id="profile-student-id" placeholder="ex. 12345678">
+              <input type="text" id="profile-student-id" autocomplete="on" name="student-id" placeholder="ex. 12345678">
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
               <label data-i18n="field.email"></label>
-              <input type="email" id="profile-email" placeholder="prenom.nom@college.qc.ca">
+              <input type="email" id="profile-email" autocomplete="email" name="email" placeholder="prenom.nom@lcieducation.net">
             </div>
             <div class="form-group">
               <label data-i18n="field.program"></label>
