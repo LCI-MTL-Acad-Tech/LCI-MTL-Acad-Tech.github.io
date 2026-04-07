@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Éco-conception — Tableau de bord / Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&display=swap');
+
+/* ── TOKENS ── */
+:root {
+  --blue:       #00587C;
+  --blue-dim:   #004561;
+  --blue-glow:  rgba(0,88,124,0.18);
+  --green:      #1B8B5A;
+  --green-dim:  #166f47;
+  --amber:      #C47A00;
+  --red:        #C0392B;
+  --pass:       #1B8B5A;
+  --fail:       #C0392B;
+  --pending:    #C47A00;
+
+  /* Light mode */
+  --bg:         #F5F3EE;
+  --bg2:        #EDEAE3;
+  --bg3:        #E3DFD6;
+  --surface:    #FFFFFF;
+  --surface2:   #F9F8F5;
+  --border:     rgba(0,0,0,0.10);
+  --border2:    rgba(0,0,0,0.06);
+  --text:       #0F1A20;
+  --text2:      #3D4F58;
+  --text3:      #6B7E88;
+  --accent:     var(--blue);
+  --accent-fg:  #FFFFFF;
+
+  --radius:     10px;
+  --radius-lg:  16px;
+  --shadow:     0 2px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
+
+  --font-display: 'DM Mono', monospace;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+
+  --transition: 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+
+[data-theme="dark"] {
+  --bg:         #0A1419;
+  --bg2:        #0F1E25;
+  --bg3:        #162530;
+  --surface:    #162530;
+  --surface2:   #1C2F3C;
+  --border:     rgba(255,255,255,0.09);
+  --border2:    rgba(255,255,255,0.05);
+  --text:       #EAF0F3;
+  --text2:      #A8BFC8;
+  --text3:      #6A8A98;
+  --accent:     #3AABCF;
+  --accent-fg:  #0A1419;
+  --blue:       #3AABCF;
+  --blue-glow:  rgba(58,171,207,0.15);
+  --green:      #2ECC8A;
+  --amber:      #F0A830;
+  --red:        #E05C4A;
+  --pass:       #2ECC8A;
+  --fail:       #E05C4A;
+  --pending:    #F0A830;
+}
+
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── LAYOUT ── */
+.app { display: flex; flex-direction: column; min-height: 100vh; }
+
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.header-inner {
+  max-width: 1280px; margin: 0 auto;
+  padding: 0 20px;
+  display: flex; align-items: center; gap: 16px;
+  height: 60px;
+}
+.logo {
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0;
+}
+.logo-mark {
+  width: 32px; height: 32px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: 13px; font-weight: 500;
+  color: var(--accent-fg);
+  letter-spacing: -0.5px;
+}
+.logo-text {
+  font-family: var(--font-display);
+  font-size: 14px; font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+.logo-text span { color: var(--text3); font-weight: 300; }
+.header-spacer { flex: 1; }
+.header-controls { display: flex; align-items: center; gap: 8px; }
+
+.btn-icon {
+  width: 36px; height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: all var(--transition);
+}
+.btn-icon:hover { background: var(--bg2); color: var(--text); border-color: var(--border2); }
+
+.lang-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.lang-toggle button {
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  color: var(--text3);
+  font-family: var(--font-display);
+  font-size: 11px; font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+  letter-spacing: 0.5px;
+}
+.lang-toggle button.active {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+main { flex: 1; max-width: 1280px; margin: 0 auto; padding: 24px 20px; width: 100%; }
+
+/* ── HELP BLOCK ── */
+.help-block {
+  max-width: 520px; width: 100%;
+}
+.help-block-inner {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  box-shadow: var(--shadow);
+}
+.help-title {
+  font-family: var(--font-display);
+  font-size: 11px; font-weight: 500;
+  color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  margin-bottom: 16px;
+}
+.help-steps { display: flex; flex-direction: column; gap: 14px; }
+.help-step { display: flex; gap: 14px; align-items: flex-start; }
+.help-step-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--accent); color: var(--accent-fg);
+  font-family: var(--font-display); font-size: 11px; font-weight: 500;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.help-step-text {
+  font-size: 13px; color: var(--text2); line-height: 1.6;
+}
+.help-step-text strong { color: var(--text); }
+.help-link {
+  display: inline-block; margin-top: 6px;
+  color: var(--accent); font-size: 13px;
+  text-decoration: none; font-weight: 500;
+}
+.help-link:hover { text-decoration: underline; }
+
+/* ── UPLOAD ZONE ── */
+.upload-zone {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: calc(100vh - 120px);
+  gap: 32px;
+  animation: fadeIn 0.4s ease;
+}
+.upload-card {
+  background: var(--surface);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: 48px 40px;
+  text-align: center;
+  max-width: 520px; width: 100%;
+  transition: all var(--transition);
+  cursor: pointer;
+}
+.upload-card:hover, .upload-card.drag-over {
+  border-color: var(--accent);
+  background: var(--bg2);
+  box-shadow: 0 0 0 4px var(--blue-glow);
+}
+.upload-icon {
+  font-size: 40px; margin-bottom: 16px; display: block;
+}
+.upload-title {
+  font-size: 20px; font-weight: 600; color: var(--text);
+  margin-bottom: 8px;
+}
+.upload-sub {
+  font-size: 14px; color: var(--text3); line-height: 1.6;
+  margin-bottom: 24px;
+}
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent); color: var(--accent-fg);
+  border: none; border-radius: var(--radius);
+  padding: 10px 20px;
+  font-family: var(--font-body); font-size: 14px; font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+.upload-note {
+  font-family: var(--font-display); font-size: 11px;
+  color: var(--text3); margin-top: 12px;
+}
+#fileInput { display: none; }
+
+/* ── DASHBOARD ── */
+.dashboard { animation: fadeIn 0.3s ease; }
+
+/* Summary bar */
+.summary-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+}
+.stat-label {
+  font-family: var(--font-display);
+  font-size: 10px; font-weight: 500;
+  color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  margin-bottom: 6px;
+}
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 28px; font-weight: 500;
+  color: var(--text);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+.stat-value.pass { color: var(--pass); }
+.stat-value.fail { color: var(--fail); }
+.stat-value.pending { color: var(--pending); }
+.stat-sub {
+  font-size: 11px; color: var(--text3);
+  margin-top: 4px;
+}
+
+/* Section averages */
+.section-bars {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+}
+.section-bars-title {
+  font-family: var(--font-display);
+  font-size: 11px; font-weight: 500;
+  color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  margin-bottom: 16px;
+}
+.section-bar-row {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 12px;
+}
+.section-bar-row:last-child { margin-bottom: 0; }
+.section-bar-label {
+  font-size: 12px; color: var(--text2);
+  width: 200px; flex-shrink: 0;
+}
+.section-bar-track {
+  flex: 1; height: 8px;
+  background: var(--bg2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.section-bar-fill {
+  height: 100%; border-radius: 4px;
+  background: var(--accent);
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+.section-bar-num {
+  font-family: var(--font-display);
+  font-size: 12px; color: var(--text2);
+  width: 64px; text-align: right; flex-shrink: 0;
+}
+
+/* Filters */
+.filters {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 16px; align-items: center;
+}
+.filter-label {
+  font-size: 12px; color: var(--text3);
+  font-family: var(--font-display);
+}
+.filter-select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-family: var(--font-body);
+  font-size: 13px; color: var(--text);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.filter-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--blue-glow); }
+
+/* Submissions table */
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.submissions-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.submissions-table th {
+  background: var(--bg2);
+  padding: 10px 16px;
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: 10px; font-weight: 500;
+  color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.submissions-table th.sortable { cursor: pointer; user-select: none; }
+.submissions-table th.sortable:hover { color: var(--text); }
+.sort-icon { margin-left: 4px; opacity: 0.5; }
+.submissions-table td {
+  padding: 12px 16px;
+  font-size: 13px; color: var(--text);
+  border-bottom: 1px solid var(--border2);
+  vertical-align: middle;
+}
+.submissions-table tr:last-child td { border-bottom: none; }
+.submissions-table tr { transition: background var(--transition); cursor: pointer; }
+.submissions-table tr:hover td { background: var(--bg2); }
+
+.score-pill {
+  display: inline-flex; align-items: center;
+  font-family: var(--font-display);
+  font-size: 13px; font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: -0.3px;
+}
+.score-pill.pass { background: rgba(27,139,90,0.12); color: var(--pass); }
+.score-pill.fail { background: rgba(192,57,43,0.12); color: var(--fail); }
+.score-pill.pending { background: rgba(196,122,0,0.12); color: var(--pending); }
+
+.section-mini {
+  display: flex; gap: 3px;
+}
+.section-dot {
+  width: 8px; height: 8px;
+  border-radius: 2px;
+  background: var(--bg3);
+  position: relative;
+}
+.section-dot[data-pct]::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0;
+  width: 100%;
+  height: calc(var(--pct) * 1%);
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.badge-jury {
+  display: inline-block;
+  font-size: 10px; font-family: var(--font-display);
+  padding: 2px 7px; border-radius: 20px;
+  background: rgba(196,122,0,0.12); color: var(--pending);
+  margin-left: 6px;
+}
+
+/* ── SCORE SHEET ── */
+.scoresheet { animation: fadeIn 0.25s ease; }
+.back-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent; border: 1px solid var(--border);
+  border-radius: 8px; padding: 7px 14px;
+  font-size: 13px; color: var(--text2);
+  cursor: pointer; margin-bottom: 24px;
+  transition: all var(--transition);
+  font-family: var(--font-body);
+}
+.back-btn:hover { background: var(--bg2); color: var(--text); }
+
+.sheet-header {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;
+}
+.sheet-student-info { flex: 1; min-width: 200px; }
+.sheet-name {
+  font-size: 22px; font-weight: 700; color: var(--text);
+  margin-bottom: 4px; letter-spacing: -0.5px;
+}
+.sheet-meta {
+  font-size: 13px; color: var(--text3); line-height: 1.8;
+}
+.sheet-meta strong { color: var(--text2); }
+.sheet-total {
+  text-align: center; flex-shrink: 0;
+}
+.sheet-total-num {
+  font-family: var(--font-display);
+  font-size: 56px; font-weight: 500; line-height: 1;
+  letter-spacing: -3px;
+}
+.sheet-total-label {
+  font-family: var(--font-display);
+  font-size: 11px; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  margin-top: 4px;
+}
+.sheet-total-status {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 11px; font-weight: 500;
+  padding: 3px 10px; border-radius: 20px;
+  margin-top: 8px;
+  letter-spacing: 0.5px;
+}
+.sheet-total-status.pass { background: rgba(27,139,90,0.12); color: var(--pass); }
+.sheet-total-status.fail { background: rgba(192,57,43,0.12); color: var(--fail); }
+.sheet-total-status.pending { background: rgba(196,122,0,0.12); color: var(--pending); }
+
+/* Score section blocks */
+.score-sections { display: flex; flex-direction: column; gap: 16px; }
+.score-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.score-section-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border2);
+  background: var(--surface2);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.score-section-header:hover { background: var(--bg2); }
+.section-code {
+  font-family: var(--font-display);
+  font-size: 10px; font-weight: 500;
+  color: var(--accent-fg);
+  background: var(--accent);
+  padding: 2px 8px; border-radius: 4px;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+.section-title { font-size: 14px; font-weight: 600; color: var(--text); flex: 1; }
+.section-score-display {
+  display: flex; align-items: baseline; gap: 3px;
+  flex-shrink: 0;
+}
+.section-score-pts {
+  font-family: var(--font-display);
+  font-size: 20px; font-weight: 500;
+  color: var(--text); letter-spacing: -0.5px;
+}
+.section-score-max {
+  font-family: var(--font-display);
+  font-size: 12px; color: var(--text3);
+}
+.section-expand { color: var(--text3); font-size: 12px; transition: transform var(--transition); }
+.section-expand.open { transform: rotate(180deg); }
+
+.score-section-body { padding: 16px 20px; display: none; }
+.score-section-body.open { display: block; animation: fadeIn 0.2s ease; }
+
+.criterion-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border2);
+}
+.criterion-row:last-child { border-bottom: none; }
+.criterion-check {
+  width: 18px; height: 18px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px; font-size: 11px;
+}
+.criterion-check.yes { background: rgba(27,139,90,0.12); color: var(--pass); }
+.criterion-check.no  { background: var(--bg2); color: var(--text3); }
+.criterion-check.na  { background: var(--bg3); color: var(--text3); }
+.criterion-text { flex: 1; font-size: 13px; color: var(--text2); line-height: 1.4; }
+.criterion-pts {
+  font-family: var(--font-display);
+  font-size: 13px; font-weight: 500;
+  flex-shrink: 0;
+}
+.criterion-pts.pos { color: var(--pass); }
+.criterion-pts.neg { color: var(--fail); }
+.criterion-pts.zero { color: var(--text3); }
+
+.qualitative-block {
+  background: var(--bg2);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 8px;
+}
+.qualitative-label {
+  font-family: var(--font-display);
+  font-size: 10px; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  margin-bottom: 6px;
+}
+.qualitative-value {
+  font-size: 13px; color: var(--text2);
+  line-height: 1.5; font-style: italic;
+}
+
+.jury-input-block {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(196,122,0,0.07);
+  border: 1px solid rgba(196,122,0,0.2);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 8px;
+}
+.jury-input-label { font-size: 13px; color: var(--pending); flex: 1; }
+.jury-score-input {
+  width: 70px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: var(--font-display);
+  font-size: 16px; text-align: center;
+  color: var(--text);
+  transition: all var(--transition);
+}
+.jury-score-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--blue-glow); }
+
+/* Override notice */
+.override-notice {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(27,139,90,0.08);
+  border: 1px solid rgba(27,139,90,0.2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-size: 13px; color: var(--pass);
+}
+
+/* Score bar in section */
+.section-score-bar {
+  margin: 12px 0 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-score-bar-track {
+  flex: 1; height: 6px;
+  background: var(--bg2); border-radius: 3px; overflow: hidden;
+}
+.section-score-bar-fill {
+  height: 100%; border-radius: 3px;
+  background: var(--accent);
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.section-score-bar-label {
+  font-family: var(--font-display);
+  font-size: 11px; color: var(--text3);
+  white-space: nowrap;
+}
+
+/* ── MISC ── */
+.empty-state {
+  text-align: center; padding: 60px 20px;
+  color: var(--text3); font-size: 14px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 680px) {
+  .header-inner { padding: 0 14px; }
+  main { padding: 16px 14px; }
+  .logo-text span { display: none; }
+  .summary-bar { grid-template-columns: repeat(2, 1fr); }
+  .section-bar-label { width: 120px; font-size: 11px; }
+  .submissions-table th:nth-child(4),
+  .submissions-table td:nth-child(4),
+  .submissions-table th:nth-child(5),
+  .submissions-table td:nth-child(5) { display: none; }
+  .sheet-header { flex-direction: column; }
+  .sheet-total { align-self: flex-start; }
+  .score-section-header { flex-wrap: wrap; }
+  .upload-card { padding: 32px 20px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-mark">É</div>
+      <div class="logo-text">Éco-conception</div>
+    </div>
+    <div class="header-spacer"></div>
+    <div class="header-controls">
+      <div class="lang-toggle">
+        <button id="btnFR" class="active" onclick="setLang('fr')">FR</button>
+        <button id="btnEN" onclick="setLang('en')">EN</button>
+      </div>
+      <button class="btn-icon" onclick="toggleTheme()" title="Toggle theme" id="themeBtn">🌙</button>
+      <button class="btn-icon" id="uploadBtn" onclick="triggerUpload()" title="Load new file" style="display:none">📂</button>
+    </div>
+  </div>
+</header>
+
+<main id="mainArea">
+  <!-- UPLOAD ZONE -->
+  <div class="upload-zone" id="uploadZone">
+
+    <div class="help-block">
+      <div class="help-block-inner">
+        <div class="help-title" data-i18n="helpTitle">Comment utiliser ce calculateur</div>
+        <div class="help-steps">
+          <div class="help-step">
+            <div class="help-step-num">1</div>
+            <div class="help-step-text" data-i18n="helpStep1">
+              Ce calculateur est associé au formulaire d'éco-conception. Les étudiant·e·s et les membres du jury y soumettent leurs réponses en ligne.
+              <a class="help-link" href="https://forms.cloud.microsoft/r/C176AVvEiW" target="_blank" data-i18n-href="helpFormLink">Accéder au formulaire →</a>
+            </div>
+          </div>
+          <div class="help-step">
+            <div class="help-step-num">2</div>
+            <div class="help-step-text" data-i18n="helpStep2">Une personne disposant d'un accès collaborateur au formulaire doit ouvrir Microsoft Forms, aller dans l'onglet <strong>Réponses</strong>, puis cliquer sur <strong>Ouvrir dans Excel</strong> pour télécharger le fichier .xlsx.</div>
+          </div>
+          <div class="help-step">
+            <div class="help-step-num">3</div>
+            <div class="help-step-text" data-i18n="helpStep3">Importez ce fichier Excel ici. Le calculateur attribue les scores automatiquement — aucune donnée n'est envoyée à un serveur.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="upload-card" id="dropZone"
+         ondragover="handleDragOver(event)"
+         ondragleave="handleDragLeave(event)"
+         ondrop="handleDrop(event)"
+         onclick="triggerUpload()">
+      <span class="upload-icon">📊</span>
+      <div class="upload-title" data-i18n="uploadTitle">Importer les réponses</div>
+      <div class="upload-sub" data-i18n="uploadSub">Glissez-déposez le fichier Excel exporté depuis Microsoft Forms, ou cliquez pour parcourir.</div>
+      <button class="btn-primary" onclick="triggerUpload(); event.stopPropagation()">
+        <span>📂</span>
+        <span data-i18n="uploadBtn">Choisir un fichier .xlsx</span>
+      </button>
+      <div class="upload-note" data-i18n="uploadNote">eco-conception_*.xlsx</div>
+    </div>
+    <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="handleFile(event)">
+  </div>
+
+  <!-- DASHBOARD (hidden until file loaded) -->
+  <div class="dashboard" id="dashboard" style="display:none"></div>
+</main>
+
+</div>
+<script>
+// ═══════════════════════════════════════════════════════
+// i18n
+// ═══════════════════════════════════════════════════════
+const T = {
+  fr: {
+    helpTitle: "Comment utiliser ce calculateur",
+    helpStep1: "Ce calculateur est associé au formulaire d'éco-conception. Les étudiant·e·s et les membres du jury y soumettent leurs réponses en ligne.",
+    helpFormLink: "Accéder au formulaire →",
+    helpStep2: "Une personne disposant d'un accès collaborateur au formulaire doit ouvrir Microsoft Forms, aller dans l'onglet Réponses, puis cliquer sur Ouvrir dans Excel pour télécharger le fichier .xlsx.",
+    helpStep3: "Importez ce fichier Excel ici. Le calculateur attribue les scores automatiquement — aucune donnée n'est envoyée à un serveur.",
+    uploadTitle: "Importer les réponses",
+    uploadSub: "Glissez-déposez le fichier Excel exporté depuis Microsoft Forms, ou cliquez pour parcourir.",
+    uploadBtn: "Choisir un fichier .xlsx",
+    uploadNote: "eco-conception_*.xlsx",
+    submissions: "Soumissions",
+    avgTotal: "Score moyen",
+    passCount: "Certifié·e·s",
+    failCount: "Non certifié·e·s",
+    pendingJury: "En attente du jury",
+    filterAll: "Tous les profils",
+    filterPass: "Certifié·e·s (≥ 80)",
+    filterFail: "Non certifié·e·s (< 80)",
+    filterPending: "En attente du jury",
+    colName: "Étudiant·e",
+    colProfile: "Profil",
+    colTotal: "Total",
+    colSections: "Sections",
+    colJury: "Jury",
+    colDate: "Date",
+    sortBy: "Trier par :",
+    backBtn: "← Retour au tableau de bord",
+    totalScore: "Score total",
+    certified: "CERTIFIÉ·E",
+    notCertified: "NON CERTIFIÉ·E",
+    pendingLabel: "EN ATTENTE",
+    sectionConceptualization: "Conceptualisation",
+    sectionFabrics: "Tissus & matériaux",
+    sectionProduction: "Production & assemblage",
+    sectionCare: "Entretien & fin de vie",
+    maxPts: "pts max",
+    juryPending: "Score du jury manquant",
+    juryLabel: "Score du jury (0–15) :",
+    override20: "Vêtement entièrement en récupération — section cotée à 20 pts.",
+    override15: "Construction sans déchet — remplace les autres items de gaspillage.",
+    overrideNoTrim: "Aucune garniture — remplace les autres items de garniture.",
+    overrideNoTransfo: "Aucune transformation — remplace les autres items de transformation.",
+    garmentCat: "Catégorie",
+    intendedUse: "Usage",
+    profile: "Profil",
+    submittedOn: "Soumis le",
+    avgsTitle: "Moyennes par section",
+    noSubmissions: "Aucune soumission ne correspond aux filtres.",
+    studentNumber: "N° étudiant·e",
+  },
+  en: {
+    helpTitle: "How to use this calculator",
+    helpStep1: "This calculator is linked to the eco-conception form. Students and jury members submit their responses online.",
+    helpFormLink: "Open the form →",
+    helpStep2: "Someone with collaborator access to the form must open Microsoft Forms, go to the Responses tab, then click Open in Excel to download the .xlsx file.",
+    helpStep3: "Import that Excel file here. The calculator scores submissions automatically — no data is sent to any server.",
+    uploadTitle: "Import responses",
+    uploadSub: "Drag and drop the Excel file exported from Microsoft Forms, or click to browse.",
+    uploadBtn: "Choose .xlsx file",
+    uploadNote: "eco-conception_*.xlsx",
+    submissions: "Submissions",
+    avgTotal: "Average score",
+    passCount: "Certified",
+    failCount: "Not certified",
+    pendingJury: "Awaiting jury",
+    filterAll: "All profiles",
+    filterPass: "Certified (≥ 80)",
+    filterFail: "Not certified (< 80)",
+    filterPending: "Awaiting jury",
+    colName: "Student",
+    colProfile: "Profile",
+    colTotal: "Total",
+    colSections: "Sections",
+    colJury: "Jury",
+    colDate: "Date",
+    sortBy: "Sort by:",
+    backBtn: "← Back to dashboard",
+    totalScore: "Total score",
+    certified: "CERTIFIED",
+    notCertified: "NOT CERTIFIED",
+    pendingLabel: "PENDING",
+    sectionConceptualization: "Conceptualization",
+    sectionFabrics: "Fabrics & materials",
+    sectionProduction: "Production & assembly",
+    sectionCare: "Care & end of use",
+    maxPts: "pts max",
+    juryPending: "Jury score missing",
+    juryLabel: "Jury score (0–15):",
+    override20: "Garment designed entirely from upcycled materials — section scored at 20 pts.",
+    override15: "Zero-waste construction — overrides other waste items.",
+    overrideNoTrim: "No trim selected — overrides other trim items.",
+    overrideNoTransfo: "No embellishments — overrides other transformation items.",
+    garmentCat: "Category",
+    intendedUse: "Intended use",
+    profile: "Profile",
+    submittedOn: "Submitted",
+    avgsTitle: "Section averages",
+    noSubmissions: "No submissions match the current filters.",
+    studentNumber: "Student no.",
+  }
+};
+
+let lang = 'fr';
+function t(k) { return T[lang][k] || T.fr[k] || k; }
+function setLang(l) {
+  lang = l;
+  document.getElementById('btnFR').classList.toggle('active', l==='fr');
+  document.getElementById('btnEN').classList.toggle('active', l==='en');
+  document.documentElement.lang = l;
+  renderAll();
+}
+
+// ═══════════════════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════════════════
+let dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  document.getElementById('themeBtn').textContent = dark ? '☀️' : '🌙';
+}
+function toggleTheme() { dark = !dark; applyTheme(); }
+applyTheme();
+
+// ═══════════════════════════════════════════════════════
+// FILE HANDLING
+// ═══════════════════════════════════════════════════════
+function triggerUpload() { document.getElementById('fileInput').click(); }
+
+function handleDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('drag-over'); }
+function handleDragLeave(e) { document.getElementById('dropZone').classList.remove('drag-over'); }
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+}
+function handleFile(e) { const file = e.target.files[0]; if (file) processFile(file); }
+
+let allSubmissions = [];
+
+function processFile(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const wb = XLSX.read(e.target.result, {type:'array'});
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, {header:1});
+    if (rows.length < 2) return;
+    const headers = rows[0];
+    const dataRows = rows.slice(1).filter(r => r.some(c => c !== undefined && c !== ''));
+    allSubmissions = dataRows.map(row => parseRow(headers, row));
+    showDashboard();
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ═══════════════════════════════════════════════════════
+// COLUMN MAPPING (positional, anchored to col index 6)
+// ═══════════════════════════════════════════════════════
+// Columns 0-5: system (ID, start, end, email, name, last modified)
+// Column 6 onwards: Q1..Q60 + student number at Q3 (index 8)
+const COL = {
+  role: 6,           // Q1
+  studentName: 7,    // Q2
+  studentNo: 8,      // Q3 (added in form — student number)
+  profile: 9,        // Q4
+  garmentCat: 10,    // Q5
+  intendedUse: 11,   // Q6
+  useDesc: 12,       // Q7
+  upcycledDesign: 13, // Q8
+  intentionalDesign: 14, // Q9
+  localSourcing: 15,  // Q10
+  digitalProto: 16,   // Q11
+  lowWasteCutting: 17,// Q12
+  lowImpactProcess: 18,// Q13
+  materialSelection: 19,// Q14 (note: construction research was merged/skipped)
+  multiMaterial: 20, // Q15
+  part1: 21, part2: 22, part3: 23, part4: 24, part5: 25,
+  mainFabricOrigin: 26,
+  mainFabricSupplier: 27,
+  mainFabricComp: 28,
+  stretchContent: 29,
+  liningOrigin: 30,
+  liningComp: 31,
+  combo1: 32, combo2: 33, combo3: 34,
+  trimChoices: 35,
+  transformationChoices: 36,
+  interfacingMethod: 37,
+  fusingJustification: 38,
+  fabricCertification: 39,
+  liningSupplier: 40,
+  fabricPhotoPlan: 41,
+  durableConstruction: 42,
+  wasteStrategy: 43,
+  wasteDescription: 44,
+  strategicPattern: 45,
+  fabricQuantity: 46,
+  seamTypes: 47,
+  threadWeight: 48,
+  threadComp: 49,
+  seamJustification: 50,
+  garmentPhoto: 51,
+  patternPhoto: 52,
+  reflection: 53,
+  // Q50 jury seam score — not present in student submissions; handled separately
+  easilyMended: 54,
+  easilyAltered: 55,
+  structurallySolid: 56,
+  materialsLastLong: 57,
+  accessibleCare: 58,
+  compostable: 59,
+  easyDisassemble: 60,
+  madeFromExisting: 61,
+  selfAssessment: 62, // was 62 based on export
+  additionalComments: 63, // may not be present
+  // jury seam score — injected manually, default 0
+};
+
+function cell(row, key) {
+  const idx = COL[key];
+  if (idx === undefined) return '';
+  const v = row[idx];
+  if (v === undefined || v === null) return '';
+  return String(v).trim();
+}
+
+function isYes(v) {
+  const s = String(v||'').toLowerCase();
+  return s.includes('oui') || s.includes('yes');
+}
+
+function hasOption(v, keyword) {
+  return String(v||'').toLowerCase().includes(keyword.toLowerCase());
+}
+
+// Multi-select: split on semicolons
+function options(v) {
+  return String(v||'').split(';').map(s=>s.trim()).filter(Boolean);
+}
+
+// ═══════════════════════════════════════════════════════
+// SCORING ENGINE
+// ═══════════════════════════════════════════════════════
+function parseRow(headers, row) {
+  const r = row; // raw row array
+  const get = key => cell(r, key);
+
+  const isJury = hasOption(get('role'), 'jury');
+
+  // ── SECTION 1: Conceptualization (max 20) ──
+  let s1 = 0, s1Override = false;
+  const upcycled = isYes(get('upcycledDesign'));
+  if (upcycled) {
+    s1 = 20; s1Override = true;
+  } else {
+    if (isYes(get('intentionalDesign')))  s1 += 5;
+    if (isYes(get('localSourcing')))       s1 += 5;
+    if (isYes(get('digitalProto')))        s1 += 5;
+    if (isYes(get('lowWasteCutting')))     s1 += 5;
+    if (isYes(get('lowImpactProcess')))    s1 += 5;
+    if (isYes(get('materialSelection')))   s1 += 3;
+    // construction research column missing in this form version — skip
+    s1 = Math.min(s1, 20);
+  }
+
+  // ── SECTION 2: Fabrics & materials (max 40) ──
+  // Origin
+  let s2Origin = 0;
+  const origin = get('mainFabricOrigin');
+  if (hasOption(origin,'Récupé') || hasOption(origin,'Upcycl')) s2Origin = 20;
+  else if (hasOption(origin,'technique') || hasOption(origin,'Technical')) s2Origin = 10;
+  else if (hasOption(origin,'Deadstock') || hasOption(origin,'deadstock')) s2Origin = 5;
+
+  // Composition
+  let s2Comp = 0;
+  const comp = get('mainFabricComp');
+  if (hasOption(comp,'biologique') || hasOption(comp,'organic')) s2Comp = 10;
+  else if (hasOption(comp,'conventionnelles / Natural') || hasOption(comp,'Natural conventional')) s2Comp = 7;
+  else if (hasOption(comp,'MMCF') || hasOption(comp,'cellulosic') || hasOption(comp,'lyocell') || hasOption(comp,'Tencel')) s2Comp = 5;
+  else if (hasOption(comp,'Nouvelles') || hasOption(comp,'New synthetic') || hasOption(comp,'recyclé') || hasOption(comp,'recycled polyester')) s2Comp = 3;
+  else if (hasOption(comp,'Mixtes') || hasOption(comp,'Mixed')) s2Comp = -5;
+  // stretch penalty
+  if (isYes(get('stretchContent'))) s2Comp -= 3;
+
+  // Trim
+  let s2Trim = 0, s2TrimOverride = false;
+  const trimRaw = get('trimChoices');
+  const trimOpts = options(trimRaw);
+  const noTrim = trimOpts.some(o => hasOption(o,'Aucune') || hasOption(o,'No trim'));
+  if (noTrim) { s2Trim = 10; s2TrimOverride = true; }
+  else {
+    trimOpts.forEach(o => {
+      if (hasOption(o,'Compatible')) s2Trim += 5;
+      else if (hasOption(o,'Minimale') || hasOption(o,'Minimal trim')) s2Trim += 5;
+      else if (hasOption(o,'recyclée') || hasOption(o,'Recycled') || hasOption(o,'Upcycled trim') || hasOption(o,'récupé')) s2Trim += 5;
+      else if (hasOption(o,'Deadstock trim') || hasOption(o,'deadstock')) s2Trim += 3;
+      else if (hasOption(o,'amovible') || hasOption(o,'Removable')) s2Trim += 3;
+      else if (hasOption(o,'toxique') || hasOption(o,'Toxic')) s2Trim -= 5;
+      else if (hasOption(o,'retirer') || hasOption(o,'Hard to remove') || hasOption(o,'rivet') || hasOption(o,'illet') || hasOption(o,'snap')) s2Trim -= 5;
+      else if (hasOption(o,'dégradable') || hasOption(o,'Degradable') || hasOption(o,'Velcro') || hasOption(o,'élastique')) s2Trim -= 5;
+    });
+  }
+
+  // Transformation
+  let s2Transfo = 0, s2TransfoOverride = false;
+  const transfoRaw = get('transformationChoices');
+  const transfoOpts = options(transfoRaw);
+  const noTransfo = transfoOpts.some(o => hasOption(o,'Aucune') || hasOption(o,'No transformation') || hasOption(o,'No embellishment'));
+  if (noTransfo) { s2Transfo = 10; s2TransfoOverride = true; }
+  else {
+    transfoOpts.forEach(o => {
+      if (hasOption(o,'artisanaux') || hasOption(o,'DIY')) s2Transfo += 5;
+      else if (hasOption(o,'naturelles') || hasOption(o,'Natural dyes')) s2Transfo += 5;
+      else if (hasOption(o,'Non teint') || hasOption(o,'Undyed') || hasOption(o,'minimal transformation') || hasOption(o,'transformation minimale')) s2Transfo += 7;
+      else if (hasOption(o,'Finition') || hasOption(o,'Finish') || hasOption(o,'perm-press') || hasOption(o,'waxed') || hasOption(o,'flocking')) s2Transfo -= 5;
+      else if (hasOption(o,'série') || hasOption(o,'Mass-produced') || hasOption(o,'paillettes') || hasOption(o,'sequins')) s2Transfo -= 5;
+      else if (hasOption(o,'combinant') || hasOption(o,'combining')) s2Transfo -= 5;
+    });
+  }
+
+  // Interfacing
+  let s2Interface = 0;
+  const iface = get('interfacingMethod');
+  const fusingJust = get('fusingJustification');
+  const hasFusingJust = fusingJust && fusingJust.length > 3;
+  if (hasOption(iface,'Aucun') || hasOption(iface,'None required')) s2Interface = 10;
+  else if (hasOption(iface,'minimal') && (hasOption(iface,'col') || hasOption(iface,'collar'))) s2Interface = 5;
+  else if ((hasOption(iface,'cousu') || hasOption(iface,'Sewn-in')) && (hasOption(iface,'même') || hasOption(iface,'same'))) s2Interface = 7;
+  else if ((hasOption(iface,'cousu') || hasOption(iface,'Sewn-in')) && (hasOption(iface,'différente') || hasOption(iface,'different'))) s2Interface = 5;
+  else if (hasOption(iface,'naturelle') || hasOption(iface,'natural fibre fus')) s2Interface = -3;
+  else if (hasOption(iface,'entier') || hasOption(iface,'Entire fabric')) s2Interface = -5;
+  else if (hasOption(iface,'synthétique') || hasOption(iface,'synthetic fibre fus')) s2Interface = hasFusingJust ? -3 : -10;
+  else if (hasOption(iface,'contrecollé') || hasOption(iface,'laminé') || hasOption(iface,'Bonded') || hasOption(iface,'laminated')) s2Interface = hasFusingJust ? -3 : -10;
+
+  const s2 = s2Origin + s2Comp + s2Trim + s2Transfo + s2Interface;
+
+  // ── SECTION 3: Production (max 30) ──
+  let s3 = 0, s3WasteOverride = false;
+  if (isYes(get('durableConstruction'))) s3 += 5;
+
+  const waste = get('wasteStrategy');
+  if (hasOption(waste,'zéro déchet') || hasOption(waste,'zero-waste') || hasOption(waste,'fully-fashion') || hasOption(waste,'fully fashion') || hasOption(waste,'Aucun déchet')) {
+    s3 += 15; s3WasteOverride = true;
+  } else if (hasOption(waste,'récupération') || hasOption(waste,'upcycling') || hasOption(waste,'Minimal waste')) {
+    if (upcycled) s3 += 10; // only if S1 upcycled
+  } else if (hasOption(waste,'gérés') || hasOption(waste,'managed') || hasOption(waste,'Waste managed') || hasOption(waste,'Déchets gérés')) {
+    s3 += 10;
+  }
+
+  if (isYes(get('strategicPattern'))) s3 += 5;
+
+  // Jury seam score: check col index — not present in student form; default 0
+  let jurySeam = 0;
+  // Will be handled via manual input or separate jury export
+  const jurySeamRaw = r[COL.jurySeamScore] !== undefined ? Number(r[COL.jurySeamScore]) : NaN;
+  const juryPending = isNaN(jurySeamRaw) || jurySeamRaw === 0;
+  // jurySeam stays 0 unless set
+
+  s3 += jurySeam;
+
+  // ── SECTION 4: Care (raw sum, display capped at 10) ──
+  let s4raw = 0;
+  if (isYes(get('easilyMended')))       s4raw += 3;
+  if (isYes(get('structurallySolid')))  s4raw += 3;
+  if (isYes(get('materialsLastLong')))  s4raw += 5;
+  if (isYes(get('accessibleCare')))     s4raw += 3;
+  if (isYes(get('easilyAltered')))      s4raw += 5;
+  if (isYes(get('compostable')))        s4raw += 10;
+  if (isYes(get('easyDisassemble')))    s4raw += 7;
+  if (isYes(get('madeFromExisting')))   s4raw += 10;
+  const s4 = Math.min(s4raw, 10);
+
+  const total = s1 + s2 + s3 + s4;
+
+  return {
+    raw: r,
+    isJury,
+    studentName: get('studentName') || 'Unknown',
+    studentNo: get('studentNo'),
+    profile: get('profile'),
+    garmentCat: get('garmentCat'),
+    intendedUse: get('intendedUse'),
+    useDesc: get('useDesc'),
+    submittedAt: r[1] ? String(r[1]).substring(0,16) : '',
+    s1, s1Override,
+    s2, s2Origin, s2Comp, s2Trim, s2TrimOverride, s2Transfo, s2TransfoOverride, s2Interface,
+    s3, s3WasteOverride, juryPending, jurySeam,
+    s4, s4raw,
+    total,
+    passed: total >= 80,
+    upcycled,
+    // raw answers for display
+    intentionalDesign: isYes(get('intentionalDesign')),
+    intentionalDesc: cell(r,'intentionalDesign'), // no separate desc col in this form
+    localSourcing: isYes(get('localSourcing')),
+    digitalProto: isYes(get('digitalProto')),
+    lowWasteCutting: isYes(get('lowWasteCutting')),
+    lowImpactProcess: isYes(get('lowImpactProcess')),
+    materialSelection: isYes(get('materialSelection')),
+    multiMaterial: get('multiMaterial'),
+    parts: [get('part1'),get('part2'),get('part3'),get('part4'),get('part5')].filter(Boolean),
+    mainFabricOrigin: get('mainFabricOrigin'),
+    mainFabricSupplier: get('mainFabricSupplier'),
+    mainFabricComp: get('mainFabricComp'),
+    stretchContent: isYes(get('stretchContent')),
+    liningOrigin: get('liningOrigin'),
+    liningComp: get('liningComp'),
+    combos: [get('combo1'),get('combo2'),get('combo3')].filter(Boolean),
+    trimRaw, transfoRaw,
+    interfacingMethod: get('interfacingMethod'),
+    fusingJustification: get('fusingJustification'),
+    fabricCertification: get('fabricCertification'),
+    durableConstruction: isYes(get('durableConstruction')),
+    wasteStrategy: get('wasteStrategy'),
+    wasteDescription: get('wasteDescription'),
+    strategicPattern: isYes(get('strategicPattern')),
+    fabricQuantity: get('fabricQuantity'),
+    seamTypes: get('seamTypes'),
+    threadWeight: get('threadWeight'),
+    threadComp: get('threadComp'),
+    seamJustification: get('seamJustification'),
+    reflection: get('reflection'),
+    easilyMended: isYes(get('easilyMended')),
+    easilyAltered: isYes(get('easilyAltered')),
+    structurallySolid: isYes(get('structurallySolid')),
+    materialsLastLong: isYes(get('materialsLastLong')),
+    accessibleCare: isYes(get('accessibleCare')),
+    compostable: isYes(get('compostable')),
+    easyDisassemble: isYes(get('easyDisassemble')),
+    madeFromExisting: isYes(get('madeFromExisting')),
+    selfAssessment: isYes(get('selfAssessment')),
+    additionalComments: cell(r,'additionalComments'),
+    garmentPhoto: get('garmentPhoto'),
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let currentView = 'dashboard'; // 'dashboard' | 'scoresheet'
+let currentSubmissionIdx = -1;
+let filterProfile = 'all';
+let filterStatus = 'all';
+let sortKey = 'total';
+let sortDir = -1;
+let juryScores = {}; // idx -> score
+
+function renderAll() {
+  if (currentView === 'dashboard') renderDashboard();
+  else if (currentView === 'scoresheet') renderScoresheet(currentSubmissionIdx);
+}
+
+// ═══════════════════════════════════════════════════════
+// DASHBOARD VIEW
+// ═══════════════════════════════════════════════════════
+function showDashboard() {
+  document.getElementById('uploadZone').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('uploadBtn').style.display = 'flex';
+  currentView = 'dashboard';
+  renderDashboard();
+}
+
+function renderDashboard() {
+  const students = allSubmissions.filter(s => !s.isJury);
+  const avgs = sectionAverages(students);
+
+  // Apply jury scores
+  students.forEach((s,i) => {
+    if (juryScores[i] !== undefined) {
+      s.jurySeam = juryScores[i];
+      s.s3 = s.s3 - (s.jurySeam||0) + juryScores[i];
+      s.total = s.s1 + s.s2 + s.s3 + s.s4;
+      s.passed = s.total >= 80;
+      s.juryPending = false;
+    }
+  });
+
+  // Filter
+  let filtered = students.filter(s => {
+    if (filterProfile !== 'all' && !s.profile.includes(filterProfile)) return false;
+    if (filterStatus === 'pass' && !s.passed) return false;
+    if (filterStatus === 'fail' && (s.passed || s.juryPending)) return false;
+    if (filterStatus === 'pending' && !s.juryPending) return false;
+    return true;
+  });
+
+  // Sort
+  filtered.sort((a,b) => {
+    let va, vb;
+    if (sortKey==='name') { va=a.studentName; vb=b.studentName; return sortDir*va.localeCompare(vb); }
+    if (sortKey==='total') { va=a.total; vb=b.total; }
+    else if (sortKey==='s1') { va=a.s1; vb=b.s1; }
+    else if (sortKey==='s2') { va=a.s2; vb=b.s2; }
+    else if (sortKey==='s3') { va=a.s3; vb=b.s3; }
+    else if (sortKey==='s4') { va=a.s4; vb=b.s4; }
+    else if (sortKey==='date') { va=a.submittedAt; vb=b.submittedAt; return sortDir*va.localeCompare(vb); }
+    return sortDir*(va-vb);
+  });
+
+  const passCount = students.filter(s=>s.passed && !s.juryPending).length;
+  const failCount = students.filter(s=>!s.passed && !s.juryPending).length;
+  const pendingCount = students.filter(s=>s.juryPending).length;
+  const avgTotal = students.length ? Math.round(students.reduce((a,s)=>a+s.total,0)/students.length) : 0;
+
+  const profiles = [...new Set(students.map(s=>s.profile).filter(Boolean))];
+
+  const html = `
+  <div class="summary-bar">
+    <div class="stat-card">
+      <div class="stat-label">${t('submissions')}</div>
+      <div class="stat-value">${students.length}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">${t('avgTotal')}</div>
+      <div class="stat-value">${avgTotal}<span style="font-size:16px;color:var(--text3)">/100</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">${t('passCount')}</div>
+      <div class="stat-value pass">${passCount}</div>
+      <div class="stat-sub">≥ 80 pts</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">${t('failCount')}</div>
+      <div class="stat-value fail">${failCount}</div>
+      <div class="stat-sub">< 80 pts</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">${t('pendingJury')}</div>
+      <div class="stat-value pending">${pendingCount}</div>
+    </div>
+  </div>
+
+  <div class="section-bars">
+    <div class="section-bars-title">${t('avgsTitle')}</div>
+    ${sectionBarRow(t('sectionConceptualization'), avgs.s1, 20)}
+    ${sectionBarRow(t('sectionFabrics'), avgs.s2, 40)}
+    ${sectionBarRow(t('sectionProduction'), avgs.s3, 30)}
+    ${sectionBarRow(t('sectionCare'), avgs.s4, 10)}
+  </div>
+
+  <div class="filters">
+    <span class="filter-label">${t('sortBy')}</span>
+    <select class="filter-select" onchange="setSort(this.value)">
+      <option value="total" ${sortKey==='total'?'selected':''}>Score total</option>
+      <option value="name" ${sortKey==='name'?'selected':''}>Nom</option>
+      <option value="s1" ${sortKey==='s1'?'selected':''}>S1</option>
+      <option value="s2" ${sortKey==='s2'?'selected':''}>S2</option>
+      <option value="s3" ${sortKey==='s3'?'selected':''}>S3</option>
+      <option value="s4" ${sortKey==='s4'?'selected':''}>S4</option>
+      <option value="date" ${sortKey==='date'?'selected':''}>Date</option>
+    </select>
+    <select class="filter-select" onchange="setFilterStatus(this.value)">
+      <option value="all">${t('filterAll').replace('profils','statuts').replace('profiles','statuses')}</option>
+      <option value="pass">${t('filterPass')}</option>
+      <option value="fail">${t('filterFail')}</option>
+      <option value="pending">${t('filterPending')}</option>
+    </select>
+    ${profiles.length > 1 ? `<select class="filter-select" onchange="setFilterProfile(this.value)">
+      <option value="all">${t('filterAll')}</option>
+      ${profiles.map(p=>`<option value="${p}" ${filterProfile===p?'selected':''}>${p}</option>`).join('')}
+    </select>` : ''}
+  </div>
+
+  <div class="table-wrap">
+    <table class="submissions-table">
+      <thead>
+        <tr>
+          <th class="sortable" onclick="setSort('name')">${t('colName')} ${sortIcon('name')}</th>
+          <th>${t('colProfile')}</th>
+          <th class="sortable" onclick="setSort('s1')">S1 ${sortIcon('s1')}</th>
+          <th class="sortable" onclick="setSort('s2')">S2 ${sortIcon('s2')}</th>
+          <th class="sortable" onclick="setSort('s3')">S3 ${sortIcon('s3')}</th>
+          <th class="sortable" onclick="setSort('s4')">S4 ${sortIcon('s4')}</th>
+          <th class="sortable" onclick="setSort('total')">${t('colTotal')} ${sortIcon('total')}</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${filtered.length === 0 ? `<tr><td colspan="7" class="empty-state">${t('noSubmissions')}</td></tr>` :
+          filtered.map(s => {
+            const idx = students.indexOf(s);
+            const statusClass = s.juryPending ? 'pending' : s.passed ? 'pass' : 'fail';
+            return `<tr onclick="openScoresheet(${idx})">
+              <td><strong>${esc(s.studentName)}</strong>${s.juryPending?`<span class="badge-jury">${t('juryPending').split(' ')[0]}</span>`:''}</td>
+              <td style="color:var(--text3);font-size:12px">${esc(s.profile)}</td>
+              <td style="font-family:var(--font-display)">${s.s1}<span style="color:var(--text3)">/20</span></td>
+              <td style="font-family:var(--font-display)">${s.s2}<span style="color:var(--text3)">/40</span></td>
+              <td style="font-family:var(--font-display)">${s.s3}<span style="color:var(--text3)">/30</span></td>
+              <td style="font-family:var(--font-display)">${s.s4}<span style="color:var(--text3)">/10</span></td>
+              <td><span class="score-pill ${statusClass}">${s.total}/100</span></td>
+            </tr>`;
+          }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById('dashboard').innerHTML = html;
+}
+
+function sectionBarRow(label, avg, max) {
+  const pct = max > 0 ? Math.max(0, Math.min(100, (avg/max)*100)) : 0;
+  return `<div class="section-bar-row">
+    <div class="section-bar-label">${label}</div>
+    <div class="section-bar-track"><div class="section-bar-fill" style="width:${pct}%"></div></div>
+    <div class="section-bar-num">${avg.toFixed(1)} / ${max}</div>
+  </div>`;
+}
+
+function sectionAverages(students) {
+  if (!students.length) return {s1:0,s2:0,s3:0,s4:0};
+  const sum = students.reduce((a,s)=>({s1:a.s1+s.s1,s2:a.s2+s.s2,s3:a.s3+s.s3,s4:a.s4+s.s4}),{s1:0,s2:0,s3:0,s4:0});
+  const n = students.length;
+  return {s1:sum.s1/n, s2:sum.s2/n, s3:sum.s3/n, s4:sum.s4/n};
+}
+
+function sortIcon(key) {
+  if (sortKey !== key) return '<span class="sort-icon">↕</span>';
+  return `<span class="sort-icon">${sortDir===1?'↑':'↓'}</span>`;
+}
+
+function setSort(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = -1; }
+  renderDashboard();
+}
+function setFilterStatus(v) { filterStatus = v; renderDashboard(); }
+function setFilterProfile(v) { filterProfile = v; renderDashboard(); }
+
+// ═══════════════════════════════════════════════════════
+// SCORE SHEET VIEW
+// ═══════════════════════════════════════════════════════
+function openScoresheet(idx) {
+  currentView = 'scoresheet';
+  currentSubmissionIdx = idx;
+  renderScoresheet(idx);
+}
+
+function renderScoresheet(idx) {
+  const students = allSubmissions.filter(s => !s.isJury);
+  const s = students[idx];
+  if (!s) return;
+
+  const statusClass = s.juryPending ? 'pending' : s.passed ? 'pass' : 'fail';
+  const statusLabel = s.juryPending ? t('pendingLabel') : s.passed ? t('certified') : t('notCertified');
+
+  const html = `
+  <div class="scoresheet">
+    <button class="back-btn" onclick="backToDashboard()">${t('backBtn')}</button>
+
+    <div class="sheet-header">
+      <div class="sheet-student-info">
+        <div class="sheet-name">${esc(s.studentName)}</div>
+        <div class="sheet-meta">
+          <strong>${t('studentNumber')}:</strong> ${esc(s.studentNo)}<br>
+          <strong>${t('profile')}:</strong> ${esc(s.profile)}<br>
+          <strong>${t('garmentCat')}:</strong> ${esc(s.garmentCat)}<br>
+          <strong>${t('intendedUse')}:</strong> ${esc(s.intendedUse)}<br>
+          <strong>${t('submittedOn')}:</strong> ${esc(s.submittedAt)}
+        </div>
+        ${s.useDesc ? `<div style="margin-top:10px;font-size:12px;color:var(--text3);line-height:1.5;font-style:italic">"${esc(s.useDesc)}"</div>` : ''}
+      </div>
+      <div class="sheet-total">
+        <div class="sheet-total-num" style="color:var(--${statusClass})">${s.total}</div>
+        <div class="sheet-total-label">/ 100 pts</div>
+        <div class="sheet-total-status ${statusClass}">${statusLabel}</div>
+      </div>
+    </div>
+
+    <div class="score-sections">
+      ${renderS1(s)}
+      ${renderS2(s)}
+      ${renderS3(s, idx)}
+      ${renderS4(s)}
+    </div>
+  </div>`;
+
+  document.getElementById('dashboard').innerHTML = html;
+}
+
+function renderS1(s) {
+  const pct = (s.s1/20)*100;
+  return sectionBlock('S1', t('sectionConceptualization'), s.s1, 20, pct, `s1-body`, `
+    ${s.s1Override ? `<div class="override-notice">✦ ${t('override20')}</div>` : ''}
+    <div class="section-score-bar">
+      <div class="section-score-bar-track"><div class="section-score-bar-fill" style="width:${pct}%"></div></div>
+      <div class="section-score-bar-label">${s.s1} / 20 ${t('maxPts')}</div>
+    </div>
+    ${crit(s.upcycled, lang==='fr'?'Vêtement entièrement conçu à partir de récupération':'Designed entirely from upcycled garments', s.upcycled?'+20':'0')}
+    ${!s.s1Override ? `
+      ${crit(s.intentionalDesign, lang==='fr'?'Conception intentionnelle (modularité, intemporel, matériaux innovants)':'Intentional design approach', s.intentionalDesign?'+5':'0')}
+      ${crit(s.localSourcing, lang==='fr'?'Approvisionnement local':'Local sourcing', s.localSourcing?'+5':'0')}
+      ${crit(s.digitalProto, lang==='fr'?'Prototypage numérique / patrons existants':'Digital prototyping or existing patterns', s.digitalProto?'+5':'0')}
+      ${crit(s.lowWasteCutting, lang==='fr'?'Coupe zéro déchet':'Low-waste cutting', s.lowWasteCutting?'+5':'0')}
+      ${crit(s.lowImpactProcess, lang==='fr'?'Procédés à faible impact (teintures, finitions)':'Low-impact transformation processes', s.lowImpactProcess?'+5':'0')}
+      ${crit(s.materialSelection, lang==='fr'?'Sélection appropriée des matériaux et garnitures':'Appropriate material and trim selection', s.materialSelection?'+3':'0')}
+    ` : ''}
+    ${s.parts.length ? `<div class="qualitative-block"><div class="qualitative-label">${lang==='fr'?'Matériaux par partie':'Materials by part'}</div><div class="qualitative-value">${s.parts.map((p,i)=>`${lang==='fr'?'Partie':'Part'} ${i+1}: ${esc(p)}`).join(' · ')}</div></div>` : ''}
+  `);
+}
+
+function renderS2(s) {
+  const pct = Math.max(0,(s.s2/40))*100;
+  const trimOpts = options(s.trimRaw);
+  const transfoOpts = options(s.transfoRaw);
+  return sectionBlock('S2', t('sectionFabrics'), s.s2, 40, pct, `s2-body`, `
+    <div class="section-score-bar">
+      <div class="section-score-bar-track"><div class="section-score-bar-fill" style="width:${Math.min(100,pct)}%"></div></div>
+      <div class="section-score-bar-label">${s.s2} / 40 ${t('maxPts')}</div>
+    </div>
+
+    <div style="font-size:11px;font-family:var(--font-display);color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin:12px 0 6px">${lang==='fr'?'Origine':'Origin'} (${pts(s.s2Origin)})</div>
+    <div class="criterion-row">
+      <div class="criterion-check yes">→</div>
+      <div class="criterion-text">${esc(s.mainFabricOrigin)}${s.mainFabricSupplier?` — ${esc(s.mainFabricSupplier)}`:''}${s.fabricCertification?` [${esc(s.fabricCertification)}]`:''}</div>
+      <div class="criterion-pts ${s.s2Origin>0?'pos':s.s2Origin<0?'neg':'zero'}">${pts(s.s2Origin)}</div>
+    </div>
+
+    <div style="font-size:11px;font-family:var(--font-display);color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin:12px 0 6px">${lang==='fr'?'Composition':'Composition'} (${pts(s.s2Comp)})</div>
+    <div class="criterion-row">
+      <div class="criterion-check yes">→</div>
+      <div class="criterion-text">${esc(s.mainFabricComp)}${s.stretchContent?` + ${lang==='fr'?'élastique':'stretch'} (−3)`:''}</div>
+      <div class="criterion-pts ${s.s2Comp>0?'pos':s.s2Comp<0?'neg':'zero'}">${pts(s.s2Comp)}</div>
+    </div>
+
+    <div style="font-size:11px;font-family:var(--font-display);color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin:12px 0 6px">${lang==='fr'?'Garnitures':'Trim'} (${pts(s.s2Trim)})</div>
+    ${s.s2TrimOverride ? `<div class="override-notice" style="font-size:12px">✦ ${t('overrideNoTrim')}</div>` : ''}
+    ${trimOpts.map(o=>`<div class="criterion-row"><div class="criterion-check yes">✓</div><div class="criterion-text">${esc(o)}</div></div>`).join('')}
+
+    <div style="font-size:11px;font-family:var(--font-display);color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin:12px 0 6px">${lang==='fr'?'Transformations':'Transformation'} (${pts(s.s2Transfo)})</div>
+    ${s.s2TransfoOverride ? `<div class="override-notice" style="font-size:12px">✦ ${t('overrideNoTransfo')}</div>` : ''}
+    ${transfoOpts.map(o=>`<div class="criterion-row"><div class="criterion-check yes">✓</div><div class="criterion-text">${esc(o)}</div></div>`).join('')}
+
+    <div style="font-size:11px;font-family:var(--font-display);color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin:12px 0 6px">${lang==='fr'?'Entoilage':'Interfacing'} (${pts(s.s2Interface)})</div>
+    <div class="criterion-row">
+      <div class="criterion-check yes">→</div>
+      <div class="criterion-text">${esc(s.interfacingMethod)}</div>
+      <div class="criterion-pts ${s.s2Interface>0?'pos':s.s2Interface<0?'neg':'zero'}">${pts(s.s2Interface)}</div>
+    </div>
+    ${s.fusingJustification ? `<div class="qualitative-block"><div class="qualitative-label">${lang==='fr'?'Justification':'Justification'}</div><div class="qualitative-value">${esc(s.fusingJustification)}</div></div>` : ''}
+
+    ${s.liningOrigin ? `<div style="margin-top:12px;font-size:12px;color:var(--text3)">${lang==='fr'?'Doublure':'Lining'}: ${esc(s.liningOrigin)} · ${esc(s.liningComp)}${s.liningSupplier?` · ${esc(s.liningSupplier)}`:''}</div>` : ''}
+    ${s.combos.length ? `<div style="font-size:12px;color:var(--text3);margin-top:4px">${lang==='fr'?'Tissus compl.':'Combo fabrics'}: ${s.combos.map(esc).join(', ')}</div>` : ''}
+    ${s.fabricPhotoPlan ? `<div style="font-size:12px;color:var(--text3);margin-top:4px">${lang==='fr'?'Plan tissu':'Fabric plan'}: <a href="${esc(s.fabricPhotoPlan)}" style="color:var(--accent)" target="_blank">${lang==='fr'?'Voir le lien':'View link'}</a></div>` : ''}
+  `);
+}
+
+function renderS3(s, idx) {
+  const pct = (s.s3/30)*100;
+  return sectionBlock('S3', t('sectionProduction'), s.s3, 30, pct, `s3-body`, `
+    <div class="section-score-bar">
+      <div class="section-score-bar-track"><div class="section-score-bar-fill" style="width:${Math.min(100,pct)}%"></div></div>
+      <div class="section-score-bar-label">${s.s3} / 30 ${t('maxPts')}</div>
+    </div>
+    ${crit(s.durableConstruction, lang==='fr'?'Construction solide et durable':'Durable construction', s.durableConstruction?'+5':'0')}
+    <div class="criterion-row">
+      <div class="criterion-check yes">→</div>
+      <div class="criterion-text">${esc(s.wasteStrategy)}</div>
+      <div class="criterion-pts ${s.s3WasteOverride?'pos':'pos'}">${s.s3WasteOverride?'+15':s.wasteStrategy&&(hasOption(s.wasteStrategy,'gérés')||hasOption(s.wasteStrategy,'managed'))?'+10':s.wasteStrategy&&(hasOption(s.wasteStrategy,'récupération')||hasOption(s.wasteStrategy,'upcycling'))&&s.upcycled?'+10':'0'}</div>
+    </div>
+    ${s.wasteDescription?`<div class="qualitative-block"><div class="qualitative-label">${lang==='fr'?'Gestion des déchets':'Waste management'}</div><div class="qualitative-value">${esc(s.wasteDescription)}</div></div>`:''}
+    ${s.s3WasteOverride?`<div class="override-notice" style="font-size:12px">✦ ${t('override15')}</div>`:''}
+    ${crit(s.strategicPattern, lang==='fr'?'Placement stratégique du patron':'Strategic pattern placement', s.strategicPattern?'+5':'0')}
+    ${s.fabricQuantity?`<div style="font-size:12px;color:var(--text3);margin:4px 0 0 30px">${lang==='fr'?'Tissu utilisé':'Fabric used'}: ${esc(s.fabricQuantity)}</div>`:''}
+    <div class="jury-input-block">
+      <div class="jury-input-label">🎯 ${t('juryLabel')}</div>
+      <input type="number" min="0" max="15" step="1" class="jury-score-input"
+        value="${juryScores[idx]||0}"
+        onchange="setJuryScore(${idx}, this.value)"
+        onclick="event.stopPropagation()">
+    </div>
+    ${s.seamTypes?`<div class="qualitative-block" style="margin-top:8px"><div class="qualitative-label">${lang==='fr'?'Types de coutures':'Seam types'}</div><div class="qualitative-value">${esc(s.seamTypes)}</div></div>`:''}
+    ${s.threadWeight?`<div style="font-size:12px;color:var(--text3);margin-top:6px">TEX: ${esc(s.threadWeight)} · ${lang==='fr'?'Fil':'Thread'}: ${esc(s.threadComp)}</div>`:''}
+    ${s.seamJustification?`<div class="qualitative-block" style="margin-top:6px"><div class="qualitative-label">${lang==='fr'?'Justification coutures':'Seam justification'}</div><div class="qualitative-value">${esc(s.seamJustification)}</div></div>`:''}
+    ${s.reflection?`<div class="qualitative-block" style="margin-top:6px"><div class="qualitative-label">${lang==='fr'?'Réflexion':'Reflection'}</div><div class="qualitative-value">${esc(s.reflection)}</div></div>`:''}
+    ${s.garmentPhoto?`<div style="font-size:12px;color:var(--text3);margin-top:6px">${lang==='fr'?'Photo':'Photo'}: <a href="${esc(s.garmentPhoto)}" style="color:var(--accent)" target="_blank">${lang==='fr'?'Voir le lien':'View link'}</a></div>`:''}
+  `);
+}
+
+function renderS4(s) {
+  const pct = (s.s4/10)*100;
+  return sectionBlock('S4', t('sectionCare'), s.s4, 10, pct, `s4-body`, `
+    <div class="section-score-bar">
+      <div class="section-score-bar-track"><div class="section-score-bar-fill" style="width:${pct}%"></div></div>
+      <div class="section-score-bar-label">${s.s4} / 10 ${t('maxPts')}${s.s4raw>s.s4?` (${lang==='fr'?'brut':'raw'}: ${s.s4raw})`:''}
+      </div>
+    </div>
+    ${crit(s.easilyMended, lang==='fr'?'Facilement réparable':'Easily mended', s.easilyMended?'+3':'0')}
+    ${crit(s.structurallySolid, lang==='fr'?'Solidité structurelle':'Structurally solid', s.structurallySolid?'+3':'0')}
+    ${crit(s.materialsLastLong, lang==='fr'?'Matériaux durables dans le temps':'Materials built to last', s.materialsLastLong?'+5':'0')}
+    ${crit(s.accessibleCare, lang==='fr'?'Entretien accessible (pas de nettoyage à sec)':'Accessible care (no dry-cleaning)', s.accessibleCare?'+3':'0')}
+    ${crit(s.easilyAltered, lang==='fr'?'Facilement modifiable pour prolonger la durée de vie':'Easily altered to extend lifespan', s.easilyAltered?'+5':'0')}
+    ${crit(s.compostable, lang==='fr'?'Compostable ou biodégradable':'Compostable or biodegradable', s.compostable?'+10':'0')}
+    ${crit(s.easyDisassemble, lang==='fr'?'Facile à démonter (recyclage, transformation)':'Easy to disassemble for recycling', s.easyDisassemble?'+7':'0')}
+    ${crit(s.madeFromExisting, lang==='fr'?'Fabriqué à partir de vêtements et garnitures existants':'Made from existing garments and trim', s.madeFromExisting?'+10':'0')}
+    ${s.selfAssessment!==undefined?`<div style="margin-top:12px;font-size:12px;color:var(--text3)">${lang==='fr'?'Auto-évaluation éco-conception':'Self-assessed eco-design'}: <strong style="color:${s.selfAssessment?'var(--pass)':'var(--fail)'}">${s.selfAssessment?(lang==='fr'?'Oui':'Yes'):(lang==='fr'?'Non':'No')}</strong></div>`:''}
+    ${s.additionalComments?`<div class="qualitative-block" style="margin-top:8px"><div class="qualitative-label">${lang==='fr'?'Commentaires':'Comments'}</div><div class="qualitative-value">${esc(s.additionalComments)}</div></div>`:''}
+  `);
+}
+
+function sectionBlock(code, title, score, max, pct, bodyId, bodyHtml) {
+  return `<div class="score-section">
+    <div class="score-section-header" onclick="toggleSection('${bodyId}')">
+      <span class="section-code">${code}</span>
+      <span class="section-title">${title}</span>
+      <div class="section-score-display">
+        <span class="section-score-pts">${score}</span>
+        <span class="section-score-max">/${max}</span>
+      </div>
+      <span class="section-expand" id="${bodyId}-arrow">▼</span>
+    </div>
+    <div class="score-section-body open" id="${bodyId}">${bodyHtml}</div>
+  </div>`;
+}
+
+function toggleSection(id) {
+  const body = document.getElementById(id);
+  const arrow = document.getElementById(id+'-arrow');
+  if (!body) return;
+  const open = body.classList.toggle('open');
+  if (arrow) arrow.classList.toggle('open', open);
+}
+
+function crit(val, label, ptsVal) {
+  const cls = val ? 'yes' : 'no';
+  const icon = val ? '✓' : '—';
+  const ptsClass = ptsVal.startsWith('+') && ptsVal !== '+0' && ptsVal !== '0' ? 'pos' : ptsVal.startsWith('-') ? 'neg' : 'zero';
+  return `<div class="criterion-row">
+    <div class="criterion-check ${cls}">${icon}</div>
+    <div class="criterion-text">${label}</div>
+    <div class="criterion-pts ${ptsClass}">${val ? ptsVal : '—'}</div>
+  </div>`;
+}
+
+function pts(n) { return n > 0 ? `+${n}` : String(n); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function setJuryScore(idx, val) {
+  const v = Math.max(0, Math.min(15, parseInt(val)||0));
+  juryScores[idx] = v;
+  const students = allSubmissions.filter(s=>!s.isJury);
+  const s = students[idx];
+  if (s) {
+    s.s3 = s.s3 - (s.jurySeam||0) + v;
+    s.jurySeam = v;
+    s.total = s.s1 + s.s2 + s.s3 + s.s4;
+    s.passed = s.total >= 80;
+    s.juryPending = false;
+    // update total display live
+    const totalEl = document.querySelector('.sheet-total-num');
+    if (totalEl) {
+      totalEl.textContent = s.total;
+      const statusEl = document.querySelector('.sheet-total-status');
+      if (statusEl) {
+        statusEl.className = 'sheet-total-status ' + (s.passed?'pass':'fail');
+        statusEl.textContent = s.passed ? t('certified') : t('notCertified');
+      }
+    }
+  }
+}
+
+function backToDashboard() {
+  currentView = 'dashboard';
+  renderDashboard();
+  window.scrollTo(0,0);
+}
+
+// Update i18n on static elements
+function updateStaticI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = T[lang][key];
+    if (!val) return;
+    // help steps contain <strong> and <a> — use innerHTML carefully
+    if (key.startsWith('helpStep')) {
+      const link = el.querySelector('.help-link');
+      el.childNodes.forEach(n => { if (n.nodeType === 3) n.textContent = val + ' '; });
+      if (link) {
+        const linkKey = 'helpFormLink';
+        link.textContent = T[lang][linkKey] || link.textContent;
+      }
+    } else {
+      el.textContent = val;
+    }
+  });
+}
+
+// Override renderAll to also update static
+const _renderAll = renderAll;
+window.renderAll = function() {
+  updateStaticI18n();
+  _renderAll();
+};
+
+// hasOption needed in render context
+function hasOption(v, kw) { return String(v||'').toLowerCase().includes(kw.toLowerCase()); }
+</script>
+</body>
+</html>
