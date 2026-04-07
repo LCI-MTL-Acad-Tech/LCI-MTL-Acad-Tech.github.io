@@ -78,12 +78,14 @@ function renderHeader() {
   if (currentLog.time_end) {
     document.getElementById("log-time-end").value = currentLog.time_end.slice(11, 16);
   }
-  document.getElementById("log-day-type").value = currentLog.day_type || "full";
+  document.getElementById("log-onsite").checked = currentLog.modality_onsite || false;
+  document.getElementById("log-remote").checked = currentLog.modality_remote || false;
 }
 
 function restoreFields() {
   document.getElementById("log-obstacle").value = currentLog.obstacle || "";
   document.getElementById("log-obstacle-response").value = currentLog.obstacle_response || "";
+  document.getElementById("log-win").value = currentLog.win || "";
   document.getElementById("log-closing").value = currentLog.closing_word || "";
   document.getElementById("grayzone-desc").value = currentLog.grayzone_description || "";
 
@@ -137,10 +139,16 @@ function renderTaskBlock(task, idx) {
           </div>
           <div class="form-group" style="margin:0">
             <label data-i18n="log.task_duration"></label>
-            <div class="input-with-unit">
-              <input type="number" min="0" max="999" style="width:8rem"
-                value="${task.duration_minutes || ""}"
-                oninput="updateTaskField('${task.task_id}','duration_minutes',parseInt(this.value)||0);updateTimings()">
+            <div class="duration-inputs">
+              <input type="number" min="0" max="99" class="duration-h"
+                placeholder="0" style="width:5.6rem;text-align:center"
+                value="${Math.floor((task.duration_minutes||0)/60) || ''}"
+                oninput="updateDuration('${task.task_id}',this,'h')">
+              <span class="input-unit">h</span>
+              <input type="number" min="0" max="59" class="duration-m"
+                placeholder="0" style="width:5.6rem;text-align:center"
+                value="${(task.duration_minutes||0)%60 || ''}"
+                oninput="updateDuration('${task.task_id}',this,'m')">
               <span class="input-unit">min</span>
             </div>
           </div>
@@ -149,6 +157,12 @@ function renderTaskBlock(task, idx) {
         ${isTraining ? renderTrainingFields(task) : ""}
         ${(isTraining || isMeeting) ? renderTopicLearning(task) : ""}
         <div class="task-tags" id="task-tags-${task.task_id}"></div>
+        <div class="task-assign-btns">
+          <button class="task-assign-btn" onclick="openDrawerForTask(event,'drawer-people','${task.task_id}')" data-i18n="drawer.people_title"></button>
+          <button class="task-assign-btn" onclick="openDrawerForTask(event,'drawer-tools','${task.task_id}')" data-i18n="drawer.tools_title"></button>
+          ${logData.pathway === "hub" ? `<button class="task-assign-btn" onclick="openDrawerForTask(event,'drawer-projects','${task.task_id}')" data-i18n="drawer.projects_title"></button>` : ""}
+          <button class="task-assign-btn" onclick="openDrawerForTask(event,'drawer-types','${task.task_id}')" data-i18n="drawer.types_title"></button>
+        </div>
       </div>
       <button class="btn btn--icon btn--sm task-remove" onclick="removeTask('${task.task_id}')" title="${t('action.delete')}">✕</button>
     </div>
@@ -248,6 +262,10 @@ function renderTaskTags(task) {
       if (tool) tags.push(`<span class="tag" style="background:var(--color-gold-500);color:white;">🔧 ${escHtml(tool.name)}<button class="tag-remove" onclick="removeToolFromTask('${task.task_id}','${tid}')">✕</button></span>`);
     });
   }
+  if (task.project_id) {
+    const proj = logData.projects?.find(x => x.project_id === task.project_id);
+    if (proj) tags.push(`<span class="tag" style="background:var(--color-chlorophyll-500);color:white;">📁 ${escHtml(proj.project_name)}<button class="tag-remove" onclick="updateTaskField('${task.task_id}','project_id','');renderTaskTags(logData.tasks?.find(t=>t.task_id==='${task.task_id}')||currentLog.tasks.find(t=>t.task_id==='${task.task_id}'))">✕</button></span>`);
+  }
   if (task.lesson_tags?.length) {
     task.lesson_tags.forEach((tag, i) => {
       tags.push(`<span class="tag">💡 ${escHtml(tag)}<button class="tag-remove" onclick="removeLessonTag('${task.task_id}',${i})">✕</button></span>`);
@@ -262,6 +280,23 @@ function addTask() {
   currentLog.tasks.push(task);
   updateLog();
   renderTasks();
+}
+
+function updateDuration(taskId, input, unit) {
+  const task = currentLog.tasks.find(t => t.task_id === taskId);
+  if (!task) return;
+  const block = document.getElementById(`task-${taskId}`);
+  if (!block) return;
+  const hEl = block.querySelector(".duration-h");
+  const mEl = block.querySelector(".duration-m");
+  const h = parseInt(hEl?.value) || 0;
+  const m = parseInt(mEl?.value) || 0;
+  // Clamp minutes to 0–59
+  if (unit === "m" && m > 59) { input.value = 59; }
+  const total = h * 60 + Math.min(m, 59);
+  task.duration_minutes = total;
+  updateTimings();
+  updateLog();
 }
 
 function removeTask(taskId) {
@@ -574,6 +609,7 @@ function renderPeopleDrawer() {
   const people = logData.people || [];
   list.innerHTML = people.map(p => `
     <div class="drawer-item" draggable="true"
+      data-assign-type="person" data-assign-id="${p.person_id}"
       ondragstart="startDrag(event,'person','${p.person_id}')">
       <div class="drawer-item-dot" style="background:var(--color-cobalt-500)"></div>
       <div>
@@ -589,6 +625,7 @@ function renderToolsDrawer() {
   const tools = logData.tools || [];
   list.innerHTML = tools.map(tool => `
     <div class="drawer-item" draggable="true"
+      data-assign-type="tool" data-assign-id="${tool.tool_id}"
       ondragstart="startDrag(event,'tool','${tool.tool_id}')">
       <div class="drawer-item-dot" style="background:var(--color-gold-500)"></div>
       <div>
@@ -606,6 +643,7 @@ function renderTypesDrawer() {
     const label = at.label_key ? t(at.label_key) : at.label;
     return `
       <div class="drawer-item" draggable="true"
+        data-assign-type="activity_type" data-assign-id="${at.type_id}"
         ondragstart="startDrag(event,'activity_type','${at.type_id}')">
         <div class="drawer-item-dot" style="background:${at.color}"></div>
         <div>
@@ -628,7 +666,8 @@ function renderProjectsDrawer() {
       `<option value="${s}" ${p.status === s ? "selected" : ""} data-i18n="drawer.projects_status_${s}"></option>`
     ).join("");
     return `
-      <div class="drawer-item" style="flex-direction:column;align-items:flex-start;gap:var(--sp-2)">
+      <div class="drawer-item" style="flex-direction:column;align-items:flex-start;gap:var(--sp-2)"
+        data-assign-type="project" data-assign-id="${p.project_id}">
         <div class="drawer-item-label">${escHtml(p.project_name)}</div>
         <div class="drawer-item-sub">${escHtml(p.client_name || "")}</div>
         <div class="flex gap-2 items-center" style="width:100%">
@@ -655,6 +694,32 @@ function updateProjectStatus(projectId, status) {
 function startDrag(event, type, id) {
   event.dataTransfer.setData("type", type);
   event.dataTransfer.setData("id", id);
+}
+
+// For mobile: open a drawer and wire its items to a specific task
+let _pendingTaskId = null;
+function openDrawerForTask(event, drawerId, taskId) {
+  event.stopPropagation();
+  _pendingTaskId = taskId;
+  openDrawer(drawerId);
+  // After drawer opens, clicking a drawer item assigns it to the pending task
+  setTimeout(() => {
+    document.querySelectorAll(`#${drawerId} .drawer-item`).forEach(item => {
+      item.style.cursor = "pointer";
+      item._taskHandler = function() {
+        const type = item.dataset.assignType;
+        const id   = item.dataset.assignId;
+        if (!type || !id || !_pendingTaskId) return;
+        if (type === "person")        addPersonToTask(_pendingTaskId, id);
+        else if (type === "tool")     addToolToTask(_pendingTaskId, id);
+        else if (type === "project")  addProjectToTask(_pendingTaskId, id);
+        else if (type === "activity_type") setActivityType(_pendingTaskId, id);
+        _pendingTaskId = null;
+        closeAllDrawers();
+      };
+      item.addEventListener("click", item._taskHandler);
+    });
+  }, 80);
 }
 
 // ── Add forms in drawers ──────────────────────────────────────
@@ -747,9 +812,11 @@ function saveNewProject() {
 // ── Update log state ──────────────────────────────────────────
 function updateLog() {
   currentLog.late_filing = document.getElementById("late-filing")?.checked || false;
-  currentLog.day_type = document.getElementById("log-day-type")?.value || "full";
+  currentLog.modality_onsite = document.getElementById("log-onsite")?.checked || false;
+  currentLog.modality_remote = document.getElementById("log-remote")?.checked || false;
   currentLog.obstacle = document.getElementById("log-obstacle")?.value.trim() || "";
   currentLog.obstacle_response = document.getElementById("log-obstacle-response")?.value.trim() || "";
+  currentLog.win = document.getElementById("log-win")?.value.trim() || "";
   currentLog.closing_word = document.getElementById("log-closing")?.value.trim() || "";
   currentLog.grayzone_description = document.getElementById("grayzone-desc")?.value.trim() || "";
 

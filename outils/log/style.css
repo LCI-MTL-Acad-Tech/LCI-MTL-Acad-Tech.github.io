@@ -1422,3 +1422,93 @@ body { overflow-x: hidden; }
     padding-bottom: calc(var(--sp-8) + 6rem + env(safe-area-inset-bottom));
   }
 }
+
+/* ── Modality checkboxes ──────────────────────────────────── */
+.modality-checks {
+  display: flex;
+  gap: var(--sp-5);
+  margin-top: var(--sp-1);
+}
+
+.modality-label {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  cursor: pointer;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: var(--text);
+  margin: 0;
+  min-height: 4.4rem;
+  user-select: none;
+}
+
+.modality-label input[type="checkbox"] {
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* ── Task duration h + m inputs ───────────────────────────── */
+.duration-inputs {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.duration-inputs input {
+  width: 5.6rem;
+  text-align: center;
+  padding: var(--sp-2);
+}
+
+/* ── Task assign buttons (always visible, tap-friendly) ───── */
+.task-assign-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px dashed var(--border);
+}
+
+.task-assign-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--r-pill);
+  font-size: 1.2rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  background: var(--bg-subtle);
+  border: 1.5px dashed var(--border);
+  color: var(--text-muted);
+  transition: all var(--dur-fast);
+  min-height: 3.2rem;
+}
+
+.task-assign-btn::before {
+  content: '+';
+  font-size: 1.4rem;
+  opacity: 0.6;
+}
+
+.task-assign-btn:hover,
+.task-assign-btn:active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--tag-bg);
+  border-style: solid;
+}
+
+@media (max-width: 768px) {
+  .task-assign-btn {
+    min-height: 4rem;
+    font-size: 1.3rem;
+    padding: var(--sp-2) var(--sp-3);
+  }
+}

@@ -485,6 +485,7 @@ function buildDashboard() {
   buildNav();
   buildTimeline(logs, data);
   buildBreakdown(logs, data);
+  buildModality(logs);
   buildToolsChart(logs, data);
   buildLessonsCloud(logs);
   buildReflectionSection(data);
@@ -536,6 +537,7 @@ function buildNav() {
   const sections = [
     { id: "section-timeline",   key: "dashboard.section_timeline" },
     { id: "section-breakdown",  key: "dashboard.section_breakdown" },
+    { id: "section-modality",   key: "dashboard.section_modality" },
     { id: "section-tools",      key: "dashboard.section_tools" },
     { id: "section-lessons",    key: "dashboard.section_lessons" },
     { id: "section-reflection", key: "dashboard.section_reflection" },
@@ -918,4 +920,58 @@ function escHtml(str) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+// ── Modality breakdown ────────────────────────────────────────
+function buildModality(logs) {
+  const container = document.getElementById("modality-chart");
+  if (!container) return;
+
+  let onsite = 0, remote = 0, both = 0, unspecified = 0;
+  logs.forEach(l => {
+    const o = l.modality_onsite || false;
+    const r = l.modality_remote || false;
+    if (o && r)      both++;
+    else if (o)      onsite++;
+    else if (r)      remote++;
+    else             unspecified++;
+  });
+
+  const total = logs.length || 1;
+  const bars = [
+    { key: "dashboard.modality_onsite",      val: onsite,      color: "var(--color-blue-500)" },
+    { key: "dashboard.modality_remote",      val: remote,      color: "var(--color-cobalt-500)" },
+    { key: "dashboard.modality_both",        val: both,        color: "var(--color-chlorophyll-500)" },
+    { key: "dashboard.modality_unspecified", val: unspecified, color: "var(--color-charcoal-200)" },
+  ];
+
+  container.innerHTML = bars.map(b => {
+    const pct = Math.round((b.val / total) * 100);
+    return `
+      <div class="tool-bar" style="margin-bottom:var(--sp-4)">
+        <div style="width:18rem;font-size:1.4rem;font-weight:500;flex-shrink:0">${t(b.key)}</div>
+        <div class="tool-bar-track">
+          <div class="tool-bar-fill" style="width:${pct}%;background:${b.color}"></div>
+        </div>
+        <div style="width:8rem;text-align:right;font-size:1.3rem;color:var(--text-muted);flex-shrink:0">
+          ${b.val} j · ${pct}%
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  // Dot-per-day calendar strip
+  const calEl = document.getElementById("modality-calendar");
+  if (!calEl) return;
+  calEl.innerHTML = logs.map(l => {
+    const o = l.modality_onsite || false;
+    const r = l.modality_remote || false;
+    let color = "var(--color-charcoal-100)";
+    let title = t("dashboard.modality_unspecified");
+    if (o && r)  { color = "var(--color-chlorophyll-500)"; title = t("dashboard.modality_both"); }
+    else if (o)  { color = "var(--color-blue-500)";        title = t("dashboard.modality_onsite"); }
+    else if (r)  { color = "var(--color-cobalt-500)";      title = t("dashboard.modality_remote"); }
+    return `<div title="${l.date} — ${title}"
+      style="width:1.4rem;height:1.4rem;border-radius:3px;background:${color};flex-shrink:0"></div>`;
+  }).join("");
 }

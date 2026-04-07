@@ -214,7 +214,7 @@ function saveContextAndNext() {
     setupData.context.supervisor_name = document.getElementById("ctx-sup-name").value.trim();
     setupData.context.supervisor_role = document.getElementById("ctx-sup-role").value.trim();
   } else {
-    setupData.context.faculty_supervisor = document.getElementById("ctx-fac-supervisor").value.trim();
+    setupData.context.faculty_supervisor = setupData.profile.supervising_professor || "";
     setupData.projects = collectProjects();
   }
 
@@ -308,7 +308,7 @@ function finishSetup() {
   if (currentPathway === "company" && setupData.context.supervisor_name) {
     addPerson(data, {
       name: setupData.context.supervisor_name,
-      role_type: t("drawer.projects_status_active") === "Active" ? "Workplace supervisor" : "Superviseur·e",
+      role_type: getCurrentLang() === "fr-CA" ? "Superviseur·e" : "Workplace supervisor",
       organization: setupData.context.company?.organization_name || "",
       notes: setupData.context.supervisor_role || "",
     });

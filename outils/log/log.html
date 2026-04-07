@@ -102,13 +102,17 @@
                 <input type="time" id="log-time-end" onchange="updateTimings()">
               </div>
               <div class="form-group">
-                <label data-i18n="log.day_type"></label>
-                <select id="log-day-type" onchange="updateLog()">
-                  <option value="full" data-i18n="log.day_type_full">Journée complète</option>
-                  <option value="partial" data-i18n="log.day_type_partial">Journée partielle</option>
-                  <option value="remote" data-i18n="log.day_type_remote">Télétravail</option>
-                  <option value="hybrid" data-i18n="log.day_type_hybrid">Hybride</option>
-                </select>
+                <label data-i18n="log.day_modality"></label>
+                <div class="modality-checks">
+                  <label class="modality-label">
+                    <input type="checkbox" id="log-onsite" onchange="updateLog()">
+                    <span data-i18n="log.day_type_onsite"></span>
+                  </label>
+                  <label class="modality-label">
+                    <input type="checkbox" id="log-remote" onchange="updateLog()">
+                    <span data-i18n="log.day_type_remote"></span>
+                  </label>
+                </div>
               </div>
             </div>
 
@@ -166,6 +170,10 @@
             <div class="form-group" id="obstacle-response-group" style="display:none">
               <label data-i18n="log.obstacle_response"></label>
               <textarea id="log-obstacle-response" rows="2" onchange="updateLog()"></textarea>
+            </div>
+            <div class="form-group">
+              <label data-i18n="log.win"></label>
+              <textarea id="log-win" rows="2" onchange="updateLog()"></textarea>
             </div>
             <div class="form-group">
               <label data-i18n="log.day_rating"></label>
@@ -372,7 +380,6 @@
       <div class="making-of-inner">
         <div class="making-of-label" data-i18n="making.label">Comment cet outil a été créé</div>
         <div class="making-of-divider"></div>
-        <div class="making-of-title" data-i18n="making.title">Comment cet outil a été fait</div>
         <p data-i18n="making.p1"></p>
         <p data-i18n="making.p2"></p>
         <p><strong data-i18n="making.p3"></strong> <span data-i18n="making.updated"></span></p>
