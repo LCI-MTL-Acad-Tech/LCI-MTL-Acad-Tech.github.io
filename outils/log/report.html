@@ -17,7 +17,7 @@
     .word-cloud { display: flex; flex-wrap: wrap; gap: var(--sp-3); padding: var(--sp-4); }
     .word-item { border-radius: var(--r-pill); padding: 0.3rem var(--sp-3); font-weight: 500; background: var(--tag-bg); color: var(--tag-text); }
     .tool-bar { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-2); }
-    .tool-bar-track { flex: 1; height: 0.8rem; background: var(--bg-subtle); border-radius: var(--r-pill); overflow: hidden; }
+    .tool-bar-track { flex: 1; height: 2.4rem; background: var(--bg-subtle); border-radius: var(--r-pill); overflow: hidden; }
     .tool-bar-fill { height: 100%; background: var(--accent); border-radius: var(--r-pill); transition: width var(--dur-slow) var(--ease-exp); }
     .reflection-text { font-size: 1.5rem; line-height: 1.8; color: var(--text); white-space: pre-wrap; }
     .reflection-label { font-size: 1.2rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-subtle); margin-bottom: var(--sp-2); }
@@ -248,10 +248,6 @@
             <div class="timeline-legend" id="timeline-legend"></div>
           </div>
 
-          <div class="chart-wrap">
-            <h4 data-i18n="dashboard.grayzone_evolution" style="margin-bottom:var(--sp-4)"></h4>
-            <div class="timeline-chart" id="grayzone-chart"></div>
-          </div>
         </div>
 
         <!-- Section: Breakdown -->
@@ -370,11 +366,16 @@
   <footer class="site-footer">
     <div class="making-of">
       <div class="making-of-inner">
-        <div class="making-of-label" data-i18n="making.label">Comment cet outil a été créé</div>
-        <div class="making-of-divider"></div>
-        <p data-i18n="making.p1"></p>
-        <p data-i18n="making.p2"></p>
-        <p><strong data-i18n="making.p3"></strong> <span data-i18n="making.updated"></span></p>
+        <button class="making-of-toggle" onclick="toggleMakingOf(this)" aria-expanded="false">
+          <span class="making-of-label" data-i18n="making.label">Comment cet outil a été créé</span>
+          <span class="making-of-chevron" aria-hidden="true">›</span>
+        </button>
+        <div class="making-of-body" hidden>
+          <div class="making-of-divider"></div>
+          <p data-i18n="making.p1"></p>
+          <p data-i18n="making.p2"></p>
+          <p><strong data-i18n="making.p3"></strong> <span data-i18n="making.updated"></span></p>
+        </div>
       </div>
     </div>
   </footer>

@@ -27,7 +27,7 @@ const DEFAULT_ACTIVITY_TYPES = [
   { type_id: "sys-training",      label_key: "activity.training",      color: "#3d4c11", system: true },
   { type_id: "sys-admin",         label_key: "activity.admin",         color: "#63625d", system: true },
   { type_id: "sys-break",         label_key: "activity.break",         color: "#cdc19e", system: true },
-  { type_id: "sys-gray",          label_key: "activity.undocumented",  color: "#576266", system: true },
+  { type_id: "sys-gray",          label_key: "activity.other",         color: "#576266", system: true },
 ];
 
 // LCI palette options for user-defined activity types
@@ -56,19 +56,93 @@ function generateUUID() {
 
 // ── localStorage keys ────────────────────────────────────────
 const LS = {
-  CACHE:    "internship_cache",    // profile, known people/tools
-  DATA:     "internship_data",     // current internship JSON
-  SETTINGS: "internship_settings", // user-overridden settings
-  THEME:    "internship_theme",
-  LANG:     "lang",
+  CACHE:       "internship_cache",    // profile, known people/tools
+  DATA:        "internship_data",     // current internship JSON
+  REPORT_DATA: "internship_report",   // merged report data (survives page nav)
+  SETTINGS:    "internship_settings", // user-overridden settings
+  THEME:       "internship_theme",
+  LANG:        "lang",
 };
 
 // ── Storage helpers ──────────────────────────────────────────
 function loadData() {
   try {
     const raw = localStorage.getItem(LS.DATA);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    migrateData(data);
+    return data;
+  } catch { return null; }
+}
+
+// ── Data migration ────────────────────────────────────────────
+// Upgrades localStorage data from older schema versions in-place.
+function migrateData(data) {
+  if (!data) return;
+
+  // v1 → v2: sys-work renamed to sys-programming; activity.undocumented → activity.other
+  const typeRemap = {
+    "sys-work": "sys-programming",
+  };
+  const labelRemap = {
+    "activity.work":         "activity.programming",
+    "activity.undocumented": "activity.other",
+  };
+
+  // Remap activity_types array
+  if (data.activity_types) {
+    data.activity_types = data.activity_types.map(at => {
+      if (typeRemap[at.type_id]) {
+        at.type_id = typeRemap[at.type_id];
+      }
+      if (labelRemap[at.label_key]) {
+        at.label_key = labelRemap[at.label_key];
+      }
+      // Remove obsolete sys-gray label (renamed to sys-other)
+      if (at.type_id === "sys-gray") {
+        at.label_key = "activity.other";
+      }
+      return at;
+    });
+    // Deduplicate by type_id (migration may create dupes)
+    const seen = new Set();
+    data.activity_types = data.activity_types.filter(at => {
+      if (seen.has(at.type_id)) return false;
+      seen.add(at.type_id);
+      return true;
+    });
+  }
+
+  // Remap task activity_type_ids
+  if (data.logs) {
+    data.logs.forEach(log => {
+      (log.tasks || []).forEach(task => {
+        if (typeRemap[task.activity_type_id]) {
+          task.activity_type_id = typeRemap[task.activity_type_id];
+        }
+      });
+    });
+  }
+}
+
+function loadReportData() {
+  try {
+    const raw = localStorage.getItem(LS.REPORT_DATA);
     return raw ? JSON.parse(raw) : null;
   } catch { return null; }
+}
+
+function saveReportData(data) {
+  try {
+    localStorage.setItem(LS.REPORT_DATA, JSON.stringify(data));
+  } catch (e) {
+    // localStorage may be full — silently ignore, data still in memory
+    console.warn("Could not persist report data:", e);
+  }
+}
+
+function clearReportData() {
+  localStorage.removeItem(LS.REPORT_DATA);
 }
 
 function saveData(data) {
@@ -484,6 +558,7 @@ function clearAllData(keepPrefs = true) {
 
   // Clear all internship keys
   Object.values(LS).forEach(key => localStorage.removeItem(key));
+  clearReportData();
 
   // Restore preferences if requested
   if (keepPrefs) {
@@ -527,4 +602,31 @@ function executeReset() {
   document.getElementById("reset-modal")?.classList.add("hidden");
   // Redirect to index to start fresh
   window.location.href = "index.html";
+}
+
+// ── Making-of footer toggle ───────────────────────────────────
+function toggleMakingOf(btn) {
+  const body = btn.nextElementSibling;
+  const open = btn.getAttribute("aria-expanded") === "true";
+  btn.setAttribute("aria-expanded", String(!open));
+  if (open) {
+    // Animate close
+    body.style.maxHeight = body.scrollHeight + "px";
+    requestAnimationFrame(() => {
+      body.style.maxHeight = "0";
+      body.addEventListener("transitionend", () => {
+        body.hidden = true;
+        body.style.maxHeight = "";
+      }, { once: true });
+    });
+  } else {
+    body.hidden = false;
+    body.style.maxHeight = "0";
+    requestAnimationFrame(() => {
+      body.style.maxHeight = body.scrollHeight + "px";
+      body.addEventListener("transitionend", () => {
+        body.style.maxHeight = "";
+      }, { once: true });
+    });
+  }
 }

@@ -24,7 +24,7 @@
         <div class="header-actions">
           <button class="btn btn--ghost btn--sm lang-toggle-btn" data-lang-target="en-CA">EN</button>
           <button class="btn btn--ghost btn--sm theme-toggle-btn" aria-label="Toggle theme" style="padding:var(--sp-2);line-height:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg></button>
-          <button class="btn btn--ghost btn--sm reset-trigger-btn" onclick="openResetModal()" data-i18n="nav.reset" title="" style="opacity:.6"></button>
+
         </div>
       </div>
     </div>
@@ -61,6 +61,14 @@
               <a href="report.html" class="btn btn--secondary" data-i18n="welcome.cta_report">Rapport</a>
             </div>
           </div>
+        </div>
+
+        <!-- Start over — only shown when continue card is visible -->
+        <div id="reset-link-row" class="hidden" style="text-align:right;margin-top:calc(-1 * var(--sp-2));margin-bottom:var(--sp-4)">
+          <button onclick="openResetModal()"
+            style="background:none;border:none;cursor:pointer;font-family:inherit;
+                   font-size:1.3rem;color:var(--text-subtle);text-decoration:underline;padding:0"
+            data-i18n="nav.reset"></button>
         </div>
       </div>
 
@@ -290,11 +298,16 @@
   <footer class="site-footer">
     <div class="making-of">
       <div class="making-of-inner">
-        <div class="making-of-label" data-i18n="making.label">Comment cet outil a été créé</div>
-        <div class="making-of-divider"></div>
-        <p data-i18n="making.p1"></p>
-        <p data-i18n="making.p2"></p>
-        <p><strong data-i18n="making.p3"></strong> <span data-i18n="making.updated"></span></p>
+        <button class="making-of-toggle" onclick="toggleMakingOf(this)" aria-expanded="false">
+          <span class="making-of-label" data-i18n="making.label">Comment cet outil a été créé</span>
+          <span class="making-of-chevron" aria-hidden="true">›</span>
+        </button>
+        <div class="making-of-body" hidden>
+          <div class="making-of-divider"></div>
+          <p data-i18n="making.p1"></p>
+          <p data-i18n="making.p2"></p>
+          <p><strong data-i18n="making.p3"></strong> <span data-i18n="making.updated"></span></p>
+        </div>
       </div>
     </div>
   </footer>

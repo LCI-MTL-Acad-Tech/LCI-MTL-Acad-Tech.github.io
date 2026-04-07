@@ -42,6 +42,15 @@
     </div>
   </header>
 
+  <!-- Autosave status bar -->
+  <div id="save-status-bar" style="
+    background:var(--bg-subtle);border-bottom:1px solid var(--border);
+    padding:var(--sp-1) var(--sp-4);font-size:1.2rem;
+    color:var(--text-subtle);text-align:right;min-height:2.4rem;
+    transition:color var(--dur-mod)">
+    <span id="footer-save-status"></span>
+  </div>
+
   <main class="main-content">
     <div class="container container--wide">
 
@@ -86,10 +95,18 @@
           <!-- Date and time header -->
           <div class="card mb-4">
             <div class="flex items-center justify-between mb-4" style="flex-wrap:wrap;gap:var(--sp-3)">
+              <!-- Normal date heading (hidden when late filing) -->
               <h2 id="log-date-display" style="font-size:2.8rem"></h2>
+              <!-- Date picker (shown when late filing checked) -->
+              <div id="log-date-picker-wrap" style="display:none;align-items:center;gap:var(--sp-3)">
+                <input type="date" id="log-date-picker"
+                  style="font-size:2rem;font-weight:400;letter-spacing:-0.02em;border:none;
+                         background:transparent;color:var(--text);font-family:inherit;padding:0;width:auto"
+                  onchange="updateLogDate(this.value)">
+              </div>
               <div class="flex gap-2 items-center">
                 <label style="margin:0; font-size:1.4rem;">
-                  <input type="checkbox" id="late-filing" onchange="updateLog()" style="margin-right:var(--sp-2)">
+                  <input type="checkbox" id="late-filing" onchange="toggleLateFiling(this.checked)" style="margin-right:var(--sp-2)">
                   <span data-i18n="log.late_filing"></span>
                 </label>
               </div>
@@ -500,15 +517,52 @@
   <footer class="site-footer">
     <div class="making-of">
       <div class="making-of-inner">
-        <div class="making-of-label" data-i18n="making.label">Comment cet outil a été créé</div>
-        <div class="making-of-divider"></div>
-        <p data-i18n="making.p1"></p>
-        <p data-i18n="making.p2"></p>
-        <p><strong data-i18n="making.p3"></strong> <span data-i18n="making.updated"></span></p>
+        <button class="making-of-toggle" onclick="toggleMakingOf(this)" aria-expanded="false">
+          <span class="making-of-label" data-i18n="making.label">Comment cet outil a été créé</span>
+          <span class="making-of-chevron" aria-hidden="true">›</span>
+        </button>
+        <div class="making-of-body" hidden>
+          <div class="making-of-divider"></div>
+          <p data-i18n="making.p1"></p>
+          <p data-i18n="making.p2"></p>
+          <p><strong data-i18n="making.p3"></strong> <span data-i18n="making.updated"></span></p>
+        </div>
       </div>
     </div>
   </footer>
 </div>
+
+  <!-- Intro tour overlay -->
+  <div id="tour-overlay" class="tour-overlay hidden">
+    <div id="tour-backdrop" class="tour-backdrop"></div>
+    <div id="tour-card" class="tour-card">
+      <div class="tour-progress" id="tour-progress"></div>
+      <div class="tour-body">
+        <div class="tour-icon" id="tour-icon"></div>
+        <h3 class="tour-title" id="tour-title"></h3>
+        <p class="tour-text" id="tour-text"></p>
+      </div>
+      <div class="tour-footer">
+        <button class="btn btn--ghost btn--sm" onclick="endTour()" id="tour-skip-btn"></button>
+        <div class="flex gap-2">
+          <button class="btn btn--ghost btn--sm" onclick="tourStep(-1)" id="tour-prev-btn"></button>
+          <button class="btn btn--primary" onclick="tourStep(1)" id="tour-next-btn"></button>
+        </div>
+      </div>
+    </div>
+    <!-- Highlight cutout (positioned dynamically) -->
+    <div id="tour-highlight" class="tour-highlight hidden"></div>
+  </div>
+
+  <!-- Help button (always available after first use) -->
+  <button id="help-btn" class="help-btn hidden" onclick="startTour(false)" aria-label="Help">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+  </button>
 
 <script src="lang.js"></script>
 <script src="app.js"></script>

@@ -355,6 +355,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("welcome-options-new").classList.add("hidden");
     const cont = document.getElementById("welcome-options-continue");
     cont.classList.remove("hidden");
+    // Show the start-over link beneath the continue card
+    document.getElementById("reset-link-row")?.classList.remove("hidden");
     const lang = getCurrentLang();
     document.getElementById("welcome-continue-name").textContent =
       lang === "fr-CA"

@@ -10,13 +10,39 @@ document.addEventListener("DOMContentLoaded", () => {
   initPage();
   setupDropZone();
 
-  // Pre-load current session data if available
-  const existing = loadData();
-  if (existing && existing.profile?.full_name) {
-    uploadedFiles = [existing];
-    renderFileList([{ name: "session_actuelle.json", ok: true }]);
+  // Restore previously merged report data (survives tab navigation)
+  const savedReport = loadReportData();
+  if (savedReport) {
+    mergedData = savedReport;
+    uploadedFiles = [savedReport];
+    const lang = getCurrentLang();
+    const logCount = savedReport.logs?.length || 0;
+    renderFileList([{ name: lang === "fr-CA"
+      ? `Session restaurée — ${logCount} journaux`
+      : `Restored session — ${logCount} logs`, ok: true }]);
     document.getElementById("proceed-btn").classList.remove("hidden");
-    mergedData = existing;
+    // If reflection was already complete, offer dashboard directly
+    if (savedReport.reflection && Object.keys(savedReport.reflection).length > 0) {
+      const skipDiv = document.createElement("div");
+      skipDiv.className = "alert alert--success mt-4";
+      skipDiv.innerHTML = (lang === "fr-CA"
+        ? "Session précédente restaurée. "
+        : "Previous session restored. ")
+        + `<button class="btn btn--secondary btn--sm" style="margin-left:var(--sp-3)"
+            onclick="mergedData.reflection=mergedData.reflection||{};generateDashboard()">
+            ${lang === "fr-CA" ? "Aller au tableau de bord →" : "Go to dashboard →"}
+           </button>`;
+      document.getElementById("upload-files-list")?.after(skipDiv);
+    }
+  } else {
+    // Fall back to current session data
+    const existing = loadData();
+    if (existing && existing.profile?.full_name) {
+      mergedData = existing;
+      uploadedFiles = [existing];
+      renderFileList([{ name: "session_actuelle.json", ok: true }]);
+      document.getElementById("proceed-btn").classList.remove("hidden");
+    }
   }
 
   applyLanguage(getCurrentLang());
@@ -45,6 +71,7 @@ function setupDropZone() {
 function handleFiles(fileList) {
   const files = Array.from(fileList).filter(f => f.name.endsWith(".json"));
   if (!files.length) return;
+  clearReportData(); // clear stale session on new upload
 
   const fileInfos = [];
   const parsed = [];
@@ -129,6 +156,7 @@ function validateAndMerge(files) {
   }
 
   mergedData = result.data;
+  saveReportData(mergedData); // persist so tab navigation doesn't lose data
 
   // Success message
   const okDiv = document.createElement("div");
@@ -526,6 +554,7 @@ function downloadReflectionJSON() {
 // ── Generate dashboard ────────────────────────────────────────
 function generateDashboard() {
   mergedData.reflection = collectReflection();
+  saveReportData(mergedData); // persist updated reflection
 
   // Flag settings deviation
   const snap = mergedData.meta?.settings_snapshot || {};
@@ -627,8 +656,6 @@ function switchSection(sectionId, btn) {
 function buildTimeline(logs, data) {
   const chart   = document.getElementById("timeline-chart");
   const legend  = document.getElementById("timeline-legend");
-  const gzChart = document.getElementById("grayzone-chart");
-
   if (!logs.length) {
     chart.innerHTML = `<p class="text-muted" style="padding:var(--sp-4)">—</p>`;
     return;
@@ -701,31 +728,7 @@ function buildTimeline(logs, data) {
     </div>`;
   }).join("");
 
-  // Grayzone evolution chart
-  const maxGzPct = Math.max(...logs.map(log =>
-    log.day_duration_minutes
-      ? Math.round(((log.grayzone_minutes || 0) / log.day_duration_minutes) * 100)
-      : 0
-  ), 1);
-
-  gzChart.innerHTML = logs.map(log => {
-    const pct = log.day_duration_minutes
-      ? Math.min(Math.round(((log.grayzone_minutes || 0) / log.day_duration_minutes) * 100), 100)
-      : 0;
-    const over = pct > SETTINGS.GRAYZONE_THRESHOLD_PCT;
-    const color = over ? "var(--danger)" : "var(--color-chlorophyll-500)";
-    return `
-      <div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:1.4rem;max-width:3.2rem;">
-        <div style="width:100%;flex:1;display:flex;align-items:flex-end;">
-          <div class="gz-bar" data-pct="${pct}" style="width:100%;background:${color};
-            border-radius:2px 2px 0 0;min-height:${pct > 0 ? 2 : 0}px" title="${pct}%"></div>
-        </div>
-        <div class="timeline-date">${log.date.slice(5)}</div>
-      </div>
-    `;
-  }).join("");
-
-  sizeGrayzoneColumns(gzChart, maxGzPct);
+  // Grayzone chart removed — data shown inline in timeline opacity
 }
 
 // ── Timeline column sizing ────────────────────────────────────
@@ -746,19 +749,7 @@ function sizeTimelineColumns(container, maxMinutes) {
   });
 }
 
-function sizeGrayzoneColumns(container, maxPct) {
-  if (!container || !maxPct) return;
-  const availH = container.clientHeight
-    || parseInt(getComputedStyle(container).height)
-    || 320;
-  const usable = Math.max(availH - 32, 80);
 
-  container.querySelectorAll(".gz-bar[data-pct]").forEach(bar => {
-    const pct = parseInt(bar.dataset.pct) || 0;
-    const h = pct ? Math.max(Math.round((pct / maxPct) * usable), 2) : 0;
-    bar.style.height = h + "px";
-  });
-}
 
 // Re-size on window resize (debounced)
 let _resizeTimer;
@@ -769,16 +760,8 @@ window.addEventListener("resize", () => {
       const logs = mergedData.logs;
       const maxM = Math.max(...logs.map(l => l.day_duration_minutes || l.task_total_minutes || 0), 1);
       const chart = document.getElementById("timeline-chart");
-      const gz    = document.getElementById("grayzone-chart");
       if (chart) sizeTimelineColumns(chart, maxM);
-      if (gz) {
-        const maxGz = Math.max(...logs.map(l =>
-          l.day_duration_minutes
-            ? Math.round(((l.grayzone_minutes || 0) / l.day_duration_minutes) * 100)
-            : 0
-        ), 1);
-        sizeGrayzoneColumns(gz, maxGz);
-      }
+
     }
   }, 120);
 });
@@ -1342,13 +1325,8 @@ function printReport() {
     const maxM = Math.max(...logs.map(l => l.day_duration_minutes || l.task_total_minutes || 0), 1);
     setTimeout(() => {
       const chart = document.getElementById("timeline-chart");
-      const gz = document.getElementById("grayzone-chart");
       if (chart) sizeTimelineColumns(chart, maxM);
-      if (gz) {
-        const maxGz = Math.max(...logs.map(l =>
-          l.day_duration_minutes ? Math.round(((l.grayzone_minutes||0)/l.day_duration_minutes)*100) : 0), 1);
-        sizeGrayzoneColumns(gz, maxGz);
-      }
+
       window.print();
       // Restore after print dialog closes
       setTimeout(restoreAfterPrint, 800);

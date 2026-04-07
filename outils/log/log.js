@@ -49,6 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   applyLanguage(getCurrentLang());
+  checkAutoTour();
 });
 
 // ── Render everything ─────────────────────────────────────────
@@ -80,6 +81,10 @@ function renderHeader() {
   }
   document.getElementById("log-onsite").checked = currentLog.modality_onsite || false;
   document.getElementById("log-remote").checked = currentLog.modality_remote || false;
+  // Restore late-filing date picker state
+  if (currentLog.late_filing) {
+    toggleLateFiling(true);
+  }
   renderMorningEnergy();
 }
 
@@ -422,6 +427,44 @@ function removeLessonTag(taskId, idx) {
   task.lesson_tags.splice(idx, 1);
   updateLog();
   renderTaskTags(task);
+}
+
+// ── Late filing date selector ────────────────────────────────
+function toggleLateFiling(checked) {
+  currentLog.late_filing = checked;
+  const heading = document.getElementById("log-date-display");
+  const pickerWrap = document.getElementById("log-date-picker-wrap");
+  const picker = document.getElementById("log-date-picker");
+
+  if (checked) {
+    heading.style.display = "none";
+    pickerWrap.style.display = "flex";
+    // Pre-fill with current log date
+    picker.value = currentLog.date;
+    picker.max = new Date().toISOString().slice(0, 10); // can't file late for the future
+  } else {
+    heading.style.display = "";
+    pickerWrap.style.display = "none";
+    // Restore to today's date
+    const today = new Date().toISOString().slice(0, 10);
+    currentLog.date = today;
+    document.getElementById("log-date-display").textContent =
+      formatDate(today + "T12:00:00");
+  }
+  updateLog();
+}
+
+function updateLogDate(newDate) {
+  if (!newDate) return;
+  currentLog.date = newDate;
+  // Update time fields to match the new date
+  if (currentLog.time_start) {
+    currentLog.time_start = newDate + "T" + currentLog.time_start.slice(11);
+  }
+  if (currentLog.time_end) {
+    currentLog.time_end = newDate + "T" + currentLog.time_end.slice(11);
+  }
+  updateLog();
 }
 
 // ── Timings ───────────────────────────────────────────────────
@@ -887,6 +930,7 @@ function saveNewProject() {
 // ── Update log state ──────────────────────────────────────────
 function updateLog() {
   currentLog.late_filing = document.getElementById("late-filing")?.checked || false;
+  // date may have been updated by updateLogDate() — no DOM read needed
   currentLog.modality_onsite = document.getElementById("log-onsite")?.checked || false;
   currentLog.modality_remote = document.getElementById("log-remote")?.checked || false;
   currentLog.project_status_updates = collectProjectStatusUpdates();
@@ -950,9 +994,22 @@ function updateFooterStatus(saved = false) {
   if (!el) return;
   const lang = getCurrentLang();
   const now = new Date().toLocaleTimeString(lang, { timeStyle: "short" });
-  el.textContent = saved
-    ? (lang === "fr-CA" ? `Téléchargé à ${now}` : `Downloaded at ${now}`)
-    : (lang === "fr-CA" ? `Modifié à ${now} — non téléchargé` : `Modified at ${now} — not downloaded`);
+  if (saved) {
+    el.textContent = lang === "fr-CA" ? `Téléchargé à ${now}` : `Downloaded at ${now}`;
+    el.style.color = "var(--success)";
+  } else {
+    // Show brief "saving…" flash then settle on "autosaved"
+    el.textContent = lang === "fr-CA" ? "Enregistrement…" : "Saving…";
+    el.style.color = "var(--text-subtle)";
+    setTimeout(() => {
+      if (!lastDownloaded) {
+        el.textContent = lang === "fr-CA"
+          ? `✓ Sauvegardé automatiquement à ${now}`
+          : `✓ Auto-saved at ${now}`;
+        el.style.color = "var(--success)";
+      }
+    }, 400);
+  }
 }
 
 // ── Idle timer ────────────────────────────────────────────────
@@ -1112,3 +1169,102 @@ function initMobile() {
 }
 
 
+
+// ── Intro tour ────────────────────────────────────────────────
+const TOUR_STEPS = [
+  { icon: "📋", title: "tour.step1.title", text: "tour.step1.text", target: null },
+  { icon: "⚡", title: "tour.step2.title", text: "tour.step2.text", target: "morning-energy-group" },
+  { icon: "✅", title: "tour.step3.title", text: "tour.step3.text", target: "morning-todos-card" },
+  { icon: "➕", title: "tour.step4.title", text: "tour.step4.text", target: "tasks-list" },
+  { icon: "🗂",  title: "tour.step5.title", text: "tour.step5.text", target: "drawer-toggle-btns", targetMobile: "mobile-drawer-bar" },
+  { icon: "🌟", title: "tour.step6.title", text: "tour.step6.text", target: "log-win" },
+  { icon: "⬇",  title: "tour.step7.title", text: "tour.step7.text", target: "fab-download" },
+];
+
+let _tourStep = 0;
+
+function startTour(autoStart = true) {
+  _tourStep = 0;
+  document.getElementById("tour-overlay")?.classList.remove("hidden");
+  renderTourStep();
+  // Mark as seen so it doesn't auto-show again
+  if (autoStart) localStorage.setItem("internship_tour_seen", "1");
+}
+
+function endTour() {
+  document.getElementById("tour-overlay")?.classList.add("hidden");
+  clearTourHighlight();
+  localStorage.setItem("internship_tour_seen", "1");
+  document.getElementById("help-btn")?.classList.remove("hidden");
+}
+
+function tourStep(dir) {
+  _tourStep = Math.max(0, Math.min(TOUR_STEPS.length - 1, _tourStep + dir));
+  if (dir > 0 && _tourStep === TOUR_STEPS.length - 1 + 1) {
+    endTour();
+    return;
+  }
+  renderTourStep();
+}
+
+function renderTourStep() {
+  const step = TOUR_STEPS[_tourStep];
+  const total = TOUR_STEPS.length;
+  const isLast = _tourStep === total - 1;
+
+  document.getElementById("tour-icon").textContent  = step.icon;
+  document.getElementById("tour-title").textContent = t(step.title);
+  document.getElementById("tour-text").textContent  = t(step.text);
+  document.getElementById("tour-skip-btn").textContent = t("tour.skip");
+  document.getElementById("tour-prev-btn").textContent = t("tour.prev");
+  document.getElementById("tour-next-btn").textContent = isLast ? t("tour.finish") : t("tour.next");
+  document.getElementById("tour-prev-btn").style.visibility = _tourStep === 0 ? "hidden" : "visible";
+
+  // Progress dots
+  const prog = document.getElementById("tour-progress");
+  prog.innerHTML = TOUR_STEPS.map((_, i) =>
+    `<div class="tour-dot ${i === _tourStep ? "active" : i < _tourStep ? "done" : ""}"></div>`
+  ).join("");
+
+  // Highlight target element — use mobile target on small screens
+  const isMobile = window.innerWidth <= 768;
+  const targetId = (isMobile && step.targetMobile) ? step.targetMobile : step.target;
+  if (targetId) {
+    highlightElement(targetId);
+    const el = document.getElementById(targetId);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+  } else {
+    clearTourHighlight();
+  }
+}
+
+function highlightElement(targetId) {
+  const target = document.getElementById(targetId);
+  const highlight = document.getElementById("tour-highlight");
+  if (!target || !highlight) return;
+
+  const rect = target.getBoundingClientRect();
+  const pad = 8;
+  highlight.style.cssText = `
+    top: ${rect.top + window.scrollY - pad}px;
+    left: ${rect.left + window.scrollX - pad}px;
+    width: ${rect.width + pad * 2}px;
+    height: ${rect.height + pad * 2}px;
+  `;
+  highlight.classList.remove("hidden");
+}
+
+function clearTourHighlight() {
+  document.getElementById("tour-highlight")?.classList.add("hidden");
+}
+
+function checkAutoTour() {
+  const seen = localStorage.getItem("internship_tour_seen");
+  const hasData = logData && logData.profile?.full_name;
+  if (!seen && hasData) {
+    // Small delay so page renders first
+    setTimeout(() => startTour(true), 600);
+  } else if (seen) {
+    document.getElementById("help-btn")?.classList.remove("hidden");
+  }
+}

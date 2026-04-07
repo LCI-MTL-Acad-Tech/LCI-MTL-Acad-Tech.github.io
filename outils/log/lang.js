@@ -209,7 +209,7 @@ const LANG = {
     "activity.training":      "Formation",
     "activity.admin":         "Administratif",
     "activity.break":         "Pause",
-    "activity.undocumented":  "Non documenté",
+    "activity.other":          "Autre / Non spécifié",
 
     // ── Report / Final ───────────────────────────────────────
     "report.upload_title":    "Téléverser tes journaux",
@@ -294,7 +294,6 @@ const LANG = {
     "dashboard.avg_rating":         "Évaluation moyenne",
     "dashboard.top_activity":       "Activité principale",
     "dashboard.settings_note":      "Ce rapport a été généré avec des paramètres différents des valeurs par défaut.",
-    "dashboard.grayzone_evolution": "Évolution du temps non documenté",
     "dashboard.section_mood":       "Humeur et énergie",
     "dashboard.mood_timeline":      "Courbe d'humeur au fil du stage",
     "dashboard.section_weekly":     "Bilans hebdomadaires",
@@ -324,6 +323,27 @@ const LANG = {
     "reset.cta":              "Effacer définitivement",
     "reset.cancel":           "Annuler",
     "reset.keep_prefs":       "Conserver mes préférences de langue et de thème",
+
+
+    // ── Intro tour ───────────────────────────────────────────────
+    "tour.skip":          "Passer",
+    "tour.prev":          "Précédent",
+    "tour.next":          "Suivant",
+    "tour.finish":        "Commencer !",
+    "tour.step1.title":   "Bienvenue dans ton journal",
+    "tour.step1.text":    "Ce journal est ton espace quotidien. Tu y documentes ta journée, tes tâches, tes apprentissages et ton humeur. Tout est sauvegardé automatiquement.",
+    "tour.step2.title":   "Commence par ton énergie du matin",
+    "tour.step2.text":    "Avant de commencer, évalue ton énergie d'arrivée. Cette note apparaîtra sur ta courbe d'humeur dans le rapport final.",
+    "tour.step3.title":   "Tes priorités du jour",
+    "tour.step3.text":    "Consulte ta liste de tâches en haut — ce sont les choses que tu avais prévues hier ou ajoutées précédemment. Tu peux en ajouter de nouvelles.",
+    "tour.step4.title":   "Documente tes tâches",
+    "tour.step4.text":    "Ajoute une tâche pour chaque activité de ta journée. Précise le type, la durée, les outils et les personnes impliquées en glissant depuis les tiroirs, ou en cliquant les boutons + sous chaque tâche.",
+    "tour.step5.title":   "Tiroirs : personnes, outils, types",
+    "tour.step5.text":    "Les boutons à droite (ou en bas de chaque tâche sur mobile) ouvrent des tiroirs. Définis d'abord tes collaborateurs, outils et types d'activité — tu pourras ensuite les glisser sur tes tâches.",
+    "tour.step6.title":   "Bilan de fin de journée",
+    "tour.step6.text":    "En bas du journal : un obstacle rencontré, ta victoire du jour, une évaluation et un mot pour résumer ta journée. Et ce que tu prévois pour demain.",
+    "tour.step7.title":   "Télécharge ton journal",
+    "tour.step7.text":    "Avant de fermer l'onglet, télécharge ton journal en JSON. Crée un dossier sur ton ordinateur et conserve tous tes fichiers. Tu en auras besoin pour générer le rapport final.",
 
     // ── Making-of footer ────────────────────────────────────
     "making.label":    "Comment cet outil a été créé",
@@ -537,7 +557,7 @@ const LANG = {
     "activity.training":      "Training",
     "activity.admin":         "Administrative",
     "activity.break":         "Break",
-    "activity.undocumented":  "Undocumented",
+    "activity.other":          "Other / Unspecified",
 
     // ── Report / Final ───────────────────────────────────────
     "report.upload_title":    "Upload your logs",
@@ -622,7 +642,6 @@ const LANG = {
     "dashboard.avg_rating":         "Average rating",
     "dashboard.top_activity":       "Top activity",
     "dashboard.settings_note":      "This report was generated with settings that differ from the defaults.",
-    "dashboard.grayzone_evolution": "Undocumented time over the internship",
     "dashboard.section_mood":       "Mood and energy",
     "dashboard.mood_timeline":      "Mood curve over the internship",
     "dashboard.section_weekly":     "Weekly wrap-ups",
@@ -652,6 +671,27 @@ const LANG = {
     "reset.cta":              "Erase permanently",
     "reset.cancel":           "Cancel",
     "reset.keep_prefs":       "Keep my language and theme preferences",
+
+
+    // ── Intro tour ───────────────────────────────────────────────
+    "tour.skip":          "Skip",
+    "tour.prev":          "Back",
+    "tour.next":          "Next",
+    "tour.finish":        "Let's start!",
+    "tour.step1.title":   "Welcome to your daily log",
+    "tour.step1.text":    "This is your daily workspace. You document your day, tasks, learnings, and mood here. Everything is auto-saved.",
+    "tour.step2.title":   "Start with your morning energy",
+    "tour.step2.text":    "Before you begin, rate your morning energy. This score will appear on your mood curve in the final report.",
+    "tour.step3.title":   "Your priorities for today",
+    "tour.step3.text":    "Check your to-do list at the top — these are things you planned yesterday or added previously. You can add new ones.",
+    "tour.step4.title":   "Document your tasks",
+    "tour.step4.text":    "Add a task for each thing you work on. Specify the type, duration, tools, and people involved by dragging from the drawers, or clicking the + buttons under each task.",
+    "tour.step5.title":   "Drawers: people, tools, types",
+    "tour.step5.text":    "The buttons on the right (or below each task on mobile) open drawers. Define your collaborators, tools, and activity types first — then drag them onto your tasks.",
+    "tour.step6.title":   "End-of-day reflection",
+    "tour.step6.text":    "At the bottom: an obstacle you faced, your win of the day, a rating, and a word to describe your day. And what you plan for tomorrow.",
+    "tour.step7.title":   "Download your log",
+    "tour.step7.text":    "Before closing this tab, download your log as JSON. Create a folder on your computer and keep all your files. You will need them to generate the final report.",
 
     // ── Making-of footer ────────────────────────────────────
     "making.label":    "How this tool was made",
@@ -688,9 +728,9 @@ function applyLanguage(lang) {
   document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
     el.placeholder = t(el.getAttribute("data-i18n-placeholder"));
   });
-  // Update lang toggle button
+  // Update lang toggle button — show the OTHER language as label
   document.querySelectorAll(".lang-toggle-btn").forEach(btn => {
-    btn.textContent = t("nav.lang");
+    btn.textContent = lang === "fr-CA" ? "EN" : "FR";
     btn.setAttribute("data-lang-target", lang === "fr-CA" ? "en-CA" : "fr-CA");
   });
   document.documentElement.lang = lang === "fr-CA" ? "fr" : "en";
