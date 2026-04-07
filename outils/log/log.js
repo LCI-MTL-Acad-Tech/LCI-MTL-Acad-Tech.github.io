@@ -87,6 +87,20 @@ function restoreFields() {
   document.getElementById("log-obstacle-response").value = currentLog.obstacle_response || "";
   document.getElementById("log-win").value = currentLog.win || "";
   document.getElementById("log-closing").value = currentLog.closing_word || "";
+  document.getElementById("log-plan-tomorrow").value = currentLog.plan_tomorrow || "";
+
+  // Restore weekly wrap if present
+  if (currentLog.weekly_wrap) {
+    document.getElementById("log-weekly-highlight").value = currentLog.weekly_wrap.highlight || "";
+    document.getElementById("log-weekly-learning").value  = currentLog.weekly_wrap.learning  || "";
+    document.getElementById("log-weekly-change").value    = currentLog.weekly_wrap.change    || "";
+  }
+
+  // Show tomorrow reminder if previous log had a plan
+  showTomorrowReminder();
+
+  // Show weekly wrap if this is a Friday or last log of week
+  checkWeeklyWrap();
   document.getElementById("grayzone-desc").value = currentLog.grayzone_description || "";
 
   if (currentLog.obstacle) {
@@ -817,6 +831,7 @@ function updateLog() {
   currentLog.obstacle = document.getElementById("log-obstacle")?.value.trim() || "";
   currentLog.obstacle_response = document.getElementById("log-obstacle-response")?.value.trim() || "";
   currentLog.win = document.getElementById("log-win")?.value.trim() || "";
+  currentLog.plan_tomorrow = document.getElementById("log-plan-tomorrow")?.value.trim() || "";
   currentLog.closing_word = document.getElementById("log-closing")?.value.trim() || "";
   currentLog.grayzone_description = document.getElementById("grayzone-desc")?.value.trim() || "";
 
@@ -880,6 +895,53 @@ function resetIdleTimer() {
 function escHtml(str) {
   if (!str) return "";
   return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// ── Tomorrow reminder ────────────────────────────────────────
+function showTomorrowReminder() {
+  const banner = document.getElementById("tomorrow-reminder");
+  const textEl = document.getElementById("tomorrow-reminder-text");
+  if (!banner || !textEl) return;
+
+  // Find the most recent previous log that has a plan_tomorrow
+  const today = currentLog.date;
+  const prevLogs = (logData.logs || [])
+    .filter(l => l.date < today && l.plan_tomorrow)
+    .sort((a, b) => b.date.localeCompare(a.date));
+
+  if (prevLogs.length && prevLogs[0].plan_tomorrow) {
+    textEl.textContent = prevLogs[0].plan_tomorrow;
+    banner.classList.remove("hidden");
+  } else {
+    banner.classList.add("hidden");
+  }
+}
+
+// ── Weekly wrap-up ────────────────────────────────────────────
+function checkWeeklyWrap() {
+  const card = document.getElementById("weekly-wrap-card");
+  if (!card) return;
+  const d = new Date(currentLog.date + "T12:00:00");
+  const dow = d.getDay(); // 0=Sun, 5=Fri, 6=Sat
+  // Show on Fridays, or if already has a weekly_wrap saved
+  if (dow === 5 || currentLog.weekly_wrap) {
+    card.style.display = "block";
+  } else {
+    card.style.display = "none";
+  }
+}
+
+function updateWeeklyWrap() {
+  const highlight = document.getElementById("log-weekly-highlight")?.value.trim() || "";
+  const learning  = document.getElementById("log-weekly-learning")?.value.trim()  || "";
+  const change    = document.getElementById("log-weekly-change")?.value.trim()    || "";
+
+  if (highlight || learning || change) {
+    currentLog.weekly_wrap = { highlight, learning, change };
+  } else {
+    currentLog.weekly_wrap = null;
+  }
+  updateLog();
 }
 
 // ── Mobile enhancements ───────────────────────────────────────

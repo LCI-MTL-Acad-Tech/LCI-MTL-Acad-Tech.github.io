@@ -185,6 +185,7 @@ function collectProjects() {
     project_end_date: null,
     initial_impression: b.querySelector(".proj-impression")?.value.trim() || "",
     anticipated_challenges: b.querySelector(".proj-challenges")?.value.trim() || "",
+    situation_before: b.querySelector(".proj-situation-before")?.value.trim() || "",
     status: "active",
     client_person_id: null,
     added_date: new Date().toISOString().slice(0, 10),
@@ -213,6 +214,7 @@ function saveContextAndNext() {
     };
     setupData.context.supervisor_name = document.getElementById("ctx-sup-name").value.trim();
     setupData.context.supervisor_role = document.getElementById("ctx-sup-role").value.trim();
+    setupData.context.situation_before = document.getElementById("ctx-situation-before").value.trim();
   } else {
     setupData.context.faculty_supervisor = setupData.profile.supervising_professor || "";
     setupData.projects = collectProjects();

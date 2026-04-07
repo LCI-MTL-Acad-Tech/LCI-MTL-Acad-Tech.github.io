@@ -117,6 +117,11 @@
             <textarea id="r-different" rows="3"></textarea>
           </div>
           <div class="form-group">
+            <label data-i18n="report.suggestions_school"></label>
+            <p class="form-hint" data-i18n="report.suggestions_school_q" style="margin-bottom:var(--sp-2)"></p>
+            <textarea id="r-suggestions-school" rows="4"></textarea>
+          </div>
+          <div class="form-group">
             <label data-i18n="report.comments"></label>
             <textarea id="r-comments" rows="2"></textarea>
           </div>
@@ -220,7 +225,10 @@
         <!-- Summary stats -->
         <div class="flex items-center justify-between mb-6" style="flex-wrap:wrap;gap:var(--sp-4)">
           <h2 data-i18n="dashboard.title" id="dashboard-name"></h2>
-          <button class="btn btn--secondary btn--sm" onclick="window.print()" style="print-display:none">⬇ PDF</button>
+          <div class="flex gap-2">
+            <button class="btn btn--ghost btn--sm" onclick="editReflection()" data-i18n="report.edit_reflection"></button>
+            <button class="btn btn--secondary btn--sm" onclick="window.print()" style="print-display:none">⬇ PDF</button>
+          </div>
         </div>
 
         <div class="stat-grid mb-6" id="stat-grid"></div>
@@ -260,6 +268,20 @@
               <div id="modality-calendar" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
             </div>
           </div>
+        </div>
+
+        <!-- Section: Mood -->
+        <div class="report-section" id="section-mood">
+          <div class="chart-wrap">
+            <h4 data-i18n="dashboard.section_mood" style="margin-bottom:var(--sp-5)"></h4>
+            <p class="text-muted" style="font-size:1.3rem;margin-bottom:var(--sp-4)" data-i18n="dashboard.mood_timeline"></p>
+            <div id="mood-chart" style="overflow-x:auto"></div>
+          </div>
+        </div>
+
+        <!-- Section: Weekly wraps -->
+        <div class="report-section" id="section-weekly">
+          <div id="weekly-wraps-content"></div>
         </div>
 
         <!-- Section: Tools -->

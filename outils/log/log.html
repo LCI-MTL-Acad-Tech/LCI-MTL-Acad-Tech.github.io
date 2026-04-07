@@ -116,6 +116,15 @@
               </div>
             </div>
 
+            <!-- Tomorrow reminder (shown if previous day had a plan) -->
+            <div id="tomorrow-reminder" class="hidden"
+              style="background:var(--tag-bg);border:1.5px solid var(--border);border-radius:var(--r-md);
+                     padding:var(--sp-3) var(--sp-4);margin-bottom:var(--sp-4);font-size:1.4rem;">
+              <div style="font-size:1.2rem;font-weight:500;color:var(--text-subtle);margin-bottom:var(--sp-1)"
+                data-i18n="log.tomorrow_reminder"></div>
+              <div id="tomorrow-reminder-text" style="color:var(--text);font-style:italic"></div>
+            </div>
+
             <!-- Mini stats bar -->
             <div class="flex gap-4 mt-4" id="day-summary-strip">
               <div class="mini-stat">
@@ -182,6 +191,33 @@
             <div class="form-group">
               <label data-i18n="log.closing_word"></label>
               <input type="text" id="log-closing" onchange="updateLog()">
+            </div>
+            <div class="form-group">
+              <label data-i18n="log.plan_tomorrow"></label>
+              <textarea id="log-plan-tomorrow" rows="2" onchange="updateLog()"
+                data-i18n-placeholder="log.plan_tomorrow_hint" placeholder=""></textarea>
+              <div class="form-hint" data-i18n="log.plan_tomorrow_hint"></div>
+            </div>
+          </div>
+
+          <!-- Weekly wrap-up (shown on Fridays / last day of work week) -->
+          <div class="card mb-4 card--accent" id="weekly-wrap-card" style="display:none">
+            <div class="section-title" data-i18n="log.section_weekly"></div>
+            <div class="alert alert--info mb-4" style="font-size:1.4rem">
+              <span>📅</span>
+              <span data-i18n="log.weekly_prompt"></span>
+            </div>
+            <div class="form-group">
+              <label data-i18n="log.weekly_highlight"></label>
+              <textarea id="log-weekly-highlight" rows="2" onchange="updateWeeklyWrap()"></textarea>
+            </div>
+            <div class="form-group">
+              <label data-i18n="log.weekly_learning"></label>
+              <textarea id="log-weekly-learning" rows="2" onchange="updateWeeklyWrap()"></textarea>
+            </div>
+            <div class="form-group">
+              <label data-i18n="log.weekly_change"></label>
+              <textarea id="log-weekly-change" rows="2" onchange="updateWeeklyWrap()"></textarea>
             </div>
           </div>
 

@@ -11,12 +11,14 @@ const SETTINGS = {
 
 // ── Default activity types ───────────────────────────────────
 const DEFAULT_ACTIVITY_TYPES = [
-  { type_id: "sys-work",     label_key: "activity.work",         color: "#00587c", system: true },
-  { type_id: "sys-meeting",  label_key: "activity.meeting",      color: "#685ef7", system: true },
-  { type_id: "sys-training", label_key: "activity.training",     color: "#5b8000", system: true },
-  { type_id: "sys-admin",    label_key: "activity.admin",        color: "#cc9f11", system: true },
-  { type_id: "sys-break",    label_key: "activity.break",        color: "#cdc19e", system: true },
-  { type_id: "sys-gray",     label_key: "activity.undocumented", color: "#eb2d37", system: true },
+  { type_id: "sys-work",       label_key: "activity.work",         color: "#00587c", system: true },
+  { type_id: "sys-production", label_key: "activity.production",   color: "#9569b9", system: true },
+  { type_id: "sys-research",   label_key: "activity.research",     color: "#8fb9a2", system: true },
+  { type_id: "sys-meeting",    label_key: "activity.meeting",      color: "#685ef7", system: true },
+  { type_id: "sys-training",   label_key: "activity.training",     color: "#5b8000", system: true },
+  { type_id: "sys-admin",      label_key: "activity.admin",        color: "#cc9f11", system: true },
+  { type_id: "sys-break",      label_key: "activity.break",        color: "#cdc19e", system: true },
+  { type_id: "sys-gray",       label_key: "activity.undocumented", color: "#eb2d37", system: true },
 ];
 
 // LCI palette options for user-defined activity types
@@ -149,6 +151,9 @@ function createNewLog(date) {
     grayzone_prompted: false,
     obstacle: "",
     obstacle_response: "",
+    win: "",
+    plan_tomorrow: "",
+    weekly_wrap: null,
     day_rating: 3,
     closing_word: "",
     todos_completed_today: [],

@@ -694,7 +694,7 @@ input[type="checkbox"] { width: auto; accent-color: var(--accent); cursor: point
   display: flex;
   align-items: flex-end;
   gap: 2px;
-  height: 16rem;
+  height: 32rem;
   padding: var(--sp-4) 0;
   overflow-x: auto;
 }
@@ -975,7 +975,6 @@ input[type="checkbox"] { width: auto; accent-color: var(--accent); cursor: point
   border-top: 1px solid var(--border);
   font-size: 1.3rem;
   color: var(--text-subtle);
-  text-align: center;
 }
 
 /* ── Utilities ────────────────────────────────────────────── */
@@ -1330,6 +1329,7 @@ input[type="checkbox"] { width: auto; accent-color: var(--accent); cursor: point
   /* Timeline chart scrolls horizontally */
   .timeline-chart {
     min-width: max-content;
+    height: 24rem;
   }
 }
 
@@ -1370,6 +1370,7 @@ body { overflow-x: hidden; }
 }
 
 .making-of-inner {
+  text-align: left;
   max-width: 72rem;
   margin: 0 auto;
   padding: 0 var(--sp-4);
@@ -1511,4 +1512,42 @@ body { overflow-x: hidden; }
     font-size: 1.3rem;
     padding: var(--sp-2) var(--sp-3);
   }
+}
+
+/* ── Weekly wrap card ─────────────────────────────────────── */
+.card--accent {
+  border-left: 4px solid var(--accent);
+}
+
+#weekly-wrap-card {
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--tag-bg) 100%);
+}
+
+/* ── Tomorrow reminder banner ─────────────────────────────── */
+#tomorrow-reminder {
+  position: relative;
+}
+
+#tomorrow-reminder::before {
+  content: '→';
+  position: absolute;
+  left: var(--sp-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent);
+  font-size: 1.6rem;
+}
+
+#tomorrow-reminder {
+  padding-left: var(--sp-8) !important;
+}
+
+/* ── Mood chart SVG ───────────────────────────────────────── */
+#mood-chart svg {
+  overflow: visible;
+}
+
+#mood-chart {
+  border-radius: var(--r-md);
+  background: var(--bg-card);
 }

@@ -164,6 +164,16 @@ function resolveConflict(logId, keep) {
 // ── Reflection phase ──────────────────────────────────────────
 function proceedToReflection() {
   if (!mergedData) return;
+  // If reflection already present (pre-loaded or embedded), go straight to dashboard
+  if (mergedData.reflection && Object.keys(mergedData.reflection).length > 0) {
+    generateDashboard();
+    return;
+  }
+  goToPhase("phase-reflection");
+  populateReflectionForms();
+}
+
+function editReflection() {
   goToPhase("phase-reflection");
   populateReflectionForms();
 }
@@ -181,6 +191,7 @@ function populateReflectionForms() {
   setField("r-advice",         r.advice_to_next_student);
   setField("r-different",      r.would_do_differently);
   setField("r-comments",       r.additional_comments);
+  setField("r-suggestions-school", r.suggestions_for_school);
   setField("r-future-direction", r.future_plans?.career_direction_impact);
   setField("r-future-steps",     r.future_plans?.next_steps);
   setField("r-future-skills",
@@ -392,7 +403,18 @@ function toggleAccordion(btn) {
 
 // ── Collect reflection data ───────────────────────────────────
 function collectReflection() {
+  // Derive end date and weeks automatically from the data
+  const today = new Date().toISOString().slice(0, 10);
+  const logs = (mergedData.logs || []).sort((a, b) => a.date.localeCompare(b.date));
+  const firstDate = logs[0]?.date;
+  const lastDate  = logs[logs.length - 1]?.date;
+  const weeksCompleted = (firstDate && lastDate)
+    ? Math.round((new Date(lastDate) - new Date(firstDate)) / (7 * 24 * 60 * 60 * 1000) * 10) / 10
+    : 0;
+
   return {
+    actual_end_date:   today,
+    total_weeks:       weeksCompleted,
     internship_reality_vs_expectation:  getField("r-reality"),
     significant_work:                   getField("r-significant").split("\n").filter(Boolean),
     proud_moment:                       getField("r-proud"),
@@ -403,6 +425,7 @@ function collectReflection() {
     advice_to_next_student:             getField("r-advice"),
     would_do_differently:               getField("r-different"),
     additional_comments:                getField("r-comments"),
+    suggestions_for_school:             getField("r-suggestions-school"),
     tools_reflection:                   collectToolsReflectionData(),
     collaborator_appreciation:          collectCollabData(),
     competencies:                       collectCompetencies(),
@@ -525,6 +548,8 @@ function buildDashboard() {
   buildTimeline(logs, data);
   buildBreakdown(logs, data);
   buildModality(logs);
+  buildMoodTimeline(logs);
+  buildWeeklyWraps(logs);
   buildToolsChart(logs, data);
   buildLessonsCloud(logs);
   buildReflectionSection(data);
@@ -577,6 +602,8 @@ function buildNav() {
     { id: "section-timeline",   key: "dashboard.section_timeline" },
     { id: "section-breakdown",  key: "dashboard.section_breakdown" },
     { id: "section-modality",   key: "dashboard.section_modality" },
+    { id: "section-mood",       key: "dashboard.section_mood" },
+    { id: "section-weekly",     key: "dashboard.section_weekly" },
     { id: "section-tools",      key: "dashboard.section_tools" },
     { id: "section-lessons",    key: "dashboard.section_lessons" },
     { id: "section-reflection", key: "dashboard.section_reflection" },
@@ -692,7 +719,68 @@ function buildTimeline(logs, data) {
   }).join("");
 }
 
-// ── Breakdown chart ───────────────────────────────────────────
+// ── SVG Pie chart helper ──────────────────────────────────────
+function buildPieChart(container, slices) {
+  // slices: [{label, value, color}]
+  if (!container) return;
+  const total = slices.reduce((s, x) => s + x.value, 0);
+  if (!total) { container.innerHTML = `<p class="text-muted">—</p>`; return; }
+
+  const R = 120, cx = 160, cy = 160;
+  let angle = -Math.PI / 2; // start at top
+  const paths = [];
+
+  slices.forEach(slice => {
+    if (!slice.value) return;
+    const sweep = (slice.value / total) * 2 * Math.PI;
+    const x1 = cx + R * Math.cos(angle);
+    const y1 = cy + R * Math.sin(angle);
+    const x2 = cx + R * Math.cos(angle + sweep);
+    const y2 = cy + R * Math.sin(angle + sweep);
+    const large = sweep > Math.PI ? 1 : 0;
+    // Label position
+    const midAngle = angle + sweep / 2;
+    const lr = R * 0.65;
+    const lx = cx + lr * Math.cos(midAngle);
+    const ly = cy + lr * Math.sin(midAngle);
+    const pct = Math.round((slice.value / total) * 100);
+
+    paths.push(`
+      <path d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)}
+               A${R},${R} 0 ${large},1 ${x2.toFixed(2)},${y2.toFixed(2)} Z"
+            fill="${slice.color}" stroke="var(--bg-card)" stroke-width="2">
+        <title>${escHtml(slice.label)}: ${pct}%</title>
+      </path>
+      ${pct >= 5 ? `<text x="${lx.toFixed(2)}" y="${ly.toFixed(2)}"
+        text-anchor="middle" dominant-baseline="middle"
+        font-size="13" font-weight="500" fill="white"
+        style="pointer-events:none">${pct}%</text>` : ''}
+    `);
+    angle += sweep;
+  });
+
+  const legendItems = slices.filter(s => s.value > 0).map(s => {
+    const pct = Math.round((s.value / total) * 100);
+    return `<div class="legend-item">
+      <div class="legend-swatch" style="background:${s.color}"></div>
+      <span>${escHtml(s.label)}</span>
+      <span style="margin-left:auto;color:var(--text-muted);font-size:1.2rem">${s.sublabel || ''} · ${pct}%</span>
+    </div>`;
+  }).join("");
+
+  container.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:var(--sp-8);flex-wrap:wrap">
+      <svg viewBox="0 0 320 320" width="240" height="240" style="flex-shrink:0;overflow:visible">
+        ${paths.join("")}
+      </svg>
+      <div class="timeline-legend" style="flex:1;min-width:18rem;align-content:start;margin-top:var(--sp-3)">
+        ${legendItems}
+      </div>
+    </div>
+  `;
+}
+
+// ── Breakdown chart (pie) ──────────────────────────────────────
 function buildBreakdown(logs, data) {
   const container = document.getElementById("breakdown-chart");
   const totals = {};
@@ -708,25 +796,19 @@ function buildBreakdown(logs, data) {
 
   if (!grandTotal) { container.innerHTML = `<p class="text-muted">—</p>`; return; }
 
-  container.innerHTML = Object.entries(totals)
+  const slices = Object.entries(totals)
     .sort((a, b) => b[1] - a[1])
     .map(([tid, mins]) => {
       const at = data.activity_types?.find(x => x.type_id === tid);
-      const label = at ? (at.label_key ? t(at.label_key) : at.label) : tid;
-      const color = at?.color || "#9ca3a5";
-      const pct = Math.round((mins / grandTotal) * 100);
-      return `
-        <div class="tool-bar" style="margin-bottom:var(--sp-3)">
-          <div style="width:16rem;font-size:1.4rem;font-weight:500;flex-shrink:0">${escHtml(label)}</div>
-          <div class="tool-bar-track">
-            <div class="tool-bar-fill" style="width:${pct}%;background:${color}"></div>
-          </div>
-          <div style="width:10rem;text-align:right;font-size:1.3rem;color:var(--text-muted);flex-shrink:0">
-            ${formatDuration(mins)} · ${pct}%
-          </div>
-        </div>
-      `;
-    }).join("");
+      return {
+        label:    at ? (at.label_key ? t(at.label_key) : at.label) : tid,
+        value:    mins,
+        color:    at?.color || "#9ca3a5",
+        sublabel: formatDuration(mins),
+      };
+    });
+
+  buildPieChart(container, slices);
 }
 
 // ── Tools chart ───────────────────────────────────────────────
@@ -937,6 +1019,26 @@ function buildReflectionSection(data) {
   }
 
   if (r.additional_comments) html += block("report.comments", r.additional_comments);
+  if (r.suggestions_for_school) html += block("report.suggestions_school", r.suggestions_for_school);
+
+  // Situation before — from context (company) or projects (hub)
+  const ctx = data.context;
+  if (ctx?.situation_before) {
+    html += `<div class="reflection-block">
+      <div class="reflection-label">${t("setup.situation_before_company")}</div>
+      <div class="reflection-text">${escHtml(ctx.situation_before)}</div>
+    </div>`;
+  }
+  if (data.projects?.some(p => p.situation_before)) {
+    html += `<div class="reflection-block">
+      <div class="reflection-label">${t("setup.situation_before")}</div>
+      ${data.projects.filter(p => p.situation_before).map(p => `
+        <div class="competency-item">
+          <div style="font-weight:500">${escHtml(p.project_name)}</div>
+          <div style="font-size:1.4rem;margin-top:var(--sp-1)">${escHtml(p.situation_before)}</div>
+        </div>`).join("")}
+    </div>`;
+  }
 
   container.innerHTML = html || `<p class="text-muted">—</p>`;
   applyLanguage(getCurrentLang());
@@ -949,6 +1051,142 @@ function toggleCollab() {
   content.style.display = hidden ? "block" : "none";
   btn.setAttribute("data-i18n", hidden ? "dashboard.hide_appreciation" : "dashboard.show_appreciation");
   btn.textContent = t(hidden ? "dashboard.hide_appreciation" : "dashboard.show_appreciation");
+}
+
+// ── Mood timeline ────────────────────────────────────────────
+function buildMoodTimeline(logs) {
+  const container = document.getElementById("mood-chart");
+  if (!container || !logs.length) return;
+
+  const W = Math.max(logs.length * 24, 320);
+  const H = 160;
+  const padL = 28, padR = 12, padT = 16, padB = 32;
+  const chartW = W - padL - padR;
+  const chartH = H - padT - padB;
+
+  // Y: rating 1–5; X: evenly spaced days
+  const xs = logs.map((_, i) => padL + (i / Math.max(logs.length - 1, 1)) * chartW);
+  const ys = logs.map(l => padT + chartH - ((( l.day_rating || 3) - 1) / 4) * chartH);
+
+  // Smooth polyline points
+  const pts = logs.map((l, i) => `${xs[i].toFixed(1)},${ys[i].toFixed(1)}`).join(" ");
+
+  // Area fill path
+  const areaPath = [
+    `M${xs[0].toFixed(1)},${(padT + chartH).toFixed(1)}`,
+    ...logs.map((l, i) => `L${xs[i].toFixed(1)},${ys[i].toFixed(1)}`),
+    `L${xs[xs.length-1].toFixed(1)},${(padT + chartH).toFixed(1)}`,
+    "Z"
+  ].join(" ");
+
+  // Y-axis grid lines (ratings 1–5)
+  const gridLines = [1,2,3,4,5].map(r => {
+    const y = padT + chartH - ((r - 1) / 4) * chartH;
+    const labels = { 1: t("log.rating_1"), 3: t("log.rating_3"), 5: t("log.rating_5") };
+    return `
+      <line x1="${padL}" y1="${y.toFixed(1)}" x2="${(W-padR).toFixed(1)}" y2="${y.toFixed(1)}"
+        stroke="var(--border)" stroke-width="1" stroke-dasharray="${r===3 ? '4,2' : '2,4'}"/>
+      ${labels[r] ? `<text x="${(padL-4).toFixed(1)}" y="${y.toFixed(1)}"
+        text-anchor="end" dominant-baseline="middle"
+        font-size="9" fill="var(--text-subtle)">${labels[r].slice(0,4)}</text>` : ''}
+    `;
+  }).join("");
+
+  // Data point circles + date labels (every ~7 days)
+  const circles = logs.map((l, i) => {
+    const rating = l.day_rating || 3;
+    const fillColor = rating >= 4 ? "var(--color-chlorophyll-500)"
+                    : rating <= 2 ? "var(--danger)"
+                    : "var(--color-blue-400)";
+    const showDate = i === 0 || i === logs.length - 1 || i % 7 === 0;
+    return `
+      <circle cx="${xs[i].toFixed(1)}" cy="${ys[i].toFixed(1)}" r="4"
+        fill="${fillColor}" stroke="var(--bg-card)" stroke-width="1.5">
+        <title>${l.date} — ${rating}/5 — ${escHtml(l.closing_word || '')}</title>
+      </circle>
+      ${showDate ? `<text x="${xs[i].toFixed(1)}" y="${(H - 4).toFixed(1)}"
+        text-anchor="middle" font-size="8" fill="var(--text-subtle)">${l.date.slice(5)}</text>` : ''}
+    `;
+  }).join("");
+
+  // Win markers — small star above point if win was filled
+  const winMarkers = logs.map((l, i) => {
+    if (!l.win) return '';
+    return `<text x="${xs[i].toFixed(1)}" y="${(ys[i] - 10).toFixed(1)}"
+      text-anchor="middle" font-size="10" fill="var(--color-gold-500)">★
+      <title>${escHtml(l.win)}</title>
+    </text>`;
+  }).join("");
+
+  container.innerHTML = `
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"
+        style="min-width:${W}px;display:block">
+        <defs>
+          <linearGradient id="moodGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--color-blue-500)" stop-opacity="0.2"/>
+            <stop offset="100%" stop-color="var(--color-blue-500)" stop-opacity="0.02"/>
+          </linearGradient>
+        </defs>
+        ${gridLines}
+        <path d="${areaPath}" fill="url(#moodGrad)"/>
+        <polyline points="${pts}" fill="none"
+          stroke="var(--color-blue-500)" stroke-width="2"
+          stroke-linejoin="round" stroke-linecap="round"/>
+        ${winMarkers}
+        ${circles}
+      </svg>
+    </div>
+    <div style="display:flex;gap:var(--sp-4);margin-top:var(--sp-3);font-size:1.2rem;flex-wrap:wrap">
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--color-chlorophyll-500);margin-right:4px"></span>${t("log.rating_4")} / ${t("log.rating_5")}</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--color-blue-400);margin-right:4px"></span>${t("log.rating_3")}</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--danger);margin-right:4px"></span>${t("log.rating_1")} / ${t("log.rating_2")}</span>
+      <span><span style="color:var(--color-gold-500);margin-right:4px">★</span>${getCurrentLang() === "fr-CA" ? "Victoire du jour" : "Daily win"}</span>
+    </div>
+  `;
+}
+
+// ── Weekly wrap-ups section ───────────────────────────────────
+function buildWeeklyWraps(logs) {
+  const container = document.getElementById("weekly-wraps-content");
+  if (!container) return;
+
+  const wraps = logs
+    .filter(l => l.weekly_wrap && (l.weekly_wrap.highlight || l.weekly_wrap.learning || l.weekly_wrap.change))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  if (!wraps.length) {
+    container.innerHTML = `<div class="chart-wrap"><p class="text-muted" style="padding:var(--sp-4)">—</p></div>`;
+    return;
+  }
+
+  container.innerHTML = wraps.map((log, idx) => {
+    const w = log.weekly_wrap;
+    const weekNum = idx + 1;
+    const lang = getCurrentLang();
+    return `
+      <div class="chart-wrap" style="margin-bottom:var(--sp-4)">
+        <div class="flex items-center justify-between mb-4" style="flex-wrap:wrap;gap:var(--sp-2)">
+          <h5 style="font-size:1.6rem;margin:0">
+            ${lang === "fr-CA" ? "Semaine du" : "Week of"} ${formatDate(log.date + "T12:00:00")}
+          </h5>
+          <span class="tag">${["★","★★","★★★","★★★★","★★★★★"][Math.min(idx,4)]}</span>
+        </div>
+        ${w.highlight ? `<div class="reflection-block" style="padding-bottom:var(--sp-3);margin-bottom:var(--sp-3)">
+          <div class="reflection-label">${t("dashboard.weekly_highlight")}</div>
+          <div class="reflection-text">${escHtml(w.highlight)}</div>
+        </div>` : ''}
+        ${w.learning ? `<div class="reflection-block" style="padding-bottom:var(--sp-3);margin-bottom:var(--sp-3)">
+          <div class="reflection-label">${t("dashboard.weekly_learning")}</div>
+          <div class="reflection-text">${escHtml(w.learning)}</div>
+        </div>` : ''}
+        ${w.change ? `<div class="reflection-block" style="border:none;margin:0;padding:0">
+          <div class="reflection-label">${t("dashboard.weekly_change")}</div>
+          <div class="reflection-text">${escHtml(w.change)}</div>
+        </div>` : ''}
+      </div>
+    `;
+  }).join("");
 }
 
 // ── Utility ───────────────────────────────────────────────────
@@ -984,20 +1222,13 @@ function buildModality(logs) {
     { key: "dashboard.modality_unspecified", val: unspecified, color: "var(--color-charcoal-200)" },
   ];
 
-  container.innerHTML = bars.map(b => {
-    const pct = Math.round((b.val / total) * 100);
-    return `
-      <div class="tool-bar" style="margin-bottom:var(--sp-4)">
-        <div style="width:18rem;font-size:1.4rem;font-weight:500;flex-shrink:0">${t(b.key)}</div>
-        <div class="tool-bar-track">
-          <div class="tool-bar-fill" style="width:${pct}%;background:${b.color}"></div>
-        </div>
-        <div style="width:8rem;text-align:right;font-size:1.3rem;color:var(--text-muted);flex-shrink:0">
-          ${b.val} j · ${pct}%
-        </div>
-      </div>
-    `;
-  }).join("");
+  const slices = bars.filter(b => b.val > 0).map(b => ({
+    label:    t(b.key),
+    value:    b.val,
+    color:    b.color,
+    sublabel: `${b.val} j`,
+  }));
+  buildPieChart(container, slices);
 
   // Dot-per-day calendar strip
   const calEl = document.getElementById("modality-calendar");

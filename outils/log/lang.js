@@ -90,6 +90,7 @@ const LANG = {
     "setup.country":          "Pays",
     "setup.supervisor_name":  "Nom du·de la superviseur·e en milieu de travail",
     "setup.supervisor_role":  "Rôle du·de la superviseur·e",
+    "setup.situation_before_company":    "Quelle était la situation dans l'organisation avant ton arrivée? Quel problème ou quelle opportunité ce stage vient-il adresser?",
 
     // Setup — Hub pathway
     "setup.faculty_supervisor": "Enseignant·e responsable",
@@ -101,6 +102,7 @@ const LANG = {
     "setup.student_joined":   "Date à laquelle tu t'es joint·e au projet",
     "setup.project_initial_impression": "Quelle est ton impression initiale de ce projet — portée, complexité, inconnues?",
     "setup.project_challenges":         "Quels défis anticipes-tu?",
+    "setup.situation_before":            "Quelle était la situation avant ton arrivée? Quel problème ou quelle opportunité ce stage vient-il adresser?",
 
     // ── Daily Log ────────────────────────────────────────────
     "log.title":              "Journal du jour",
@@ -149,6 +151,14 @@ const LANG = {
     "log.rating_4":           "Bonne",
     "log.rating_5":           "Excellente",
     "log.closing_word":       "Un mot ou une courte phrase pour décrire comment tu repars aujourd'hui",
+    "log.plan_tomorrow":      "Qu'est-ce que tu prévois faire demain?",
+    "log.plan_tomorrow_hint": "Ces notes apparaîtront comme rappel à l'ouverture du prochain journal.",
+    "log.tomorrow_reminder":  "Hier tu prévoyais :",
+    "log.section_weekly":     "Bilan de la semaine",
+    "log.weekly_highlight":   "Quelle a été la meilleure chose de cette semaine?",
+    "log.weekly_learning":    "Qu'est-ce que tu garderais comme bonne pratique pour la semaine prochaine?",
+    "log.weekly_change":      "Qu'est-ce que tu ferais différemment la semaine prochaine?",
+    "log.weekly_prompt":      "C'est la fin de ta semaine de travail. Prends deux minutes pour faire un bilan.",
 
     "log.section_todos":      "Liste de tâches",
     "log.todo_description":   "Tâche à faire",
@@ -192,6 +202,8 @@ const LANG = {
 
     // ── Default activity types ───────────────────────────────
     "activity.work":          "Travail",
+    "activity.production":     "Production",
+    "activity.research":       "Recherche",
     "activity.meeting":       "Réunion",
     "activity.training":      "Formation",
     "activity.admin":         "Administratif",
@@ -211,6 +223,7 @@ const LANG = {
     "report.keep_newer":      "Garder la plus récente",
     "report.keep_older":      "Garder la plus ancienne",
     "report.download_reflection": "Télécharger mes réponses (JSON)",
+    "report.edit_reflection":     "Modifier mes réponses",
     "report.reflection_saved":    "Réponses sauvegardées — tu peux les réimporter lors d'une prochaine session.",
 
     "report.section_reflection": "Réflexion finale",
@@ -224,6 +237,8 @@ const LANG = {
     "report.advice":             "Quel conseil donnerais-tu à un·e étudiant·e qui commence ce même stage?",
     "report.would_do_differently": "Si tu pouvais recommencer, qu'est-ce que tu ferais différemment?",
     "report.comments":           "Commentaires supplémentaires",
+    "report.suggestions_school":       "Suggestions pour la formation",
+    "report.suggestions_school_q":     "Qu'est-ce que ce stage révèle sur des lacunes dans ta formation? Quels cours, outils, méthodes ou expériences auraient pu mieux te préparer?",
 
     "report.tools_reflection_title":   "Bilan des outils",
     "report.tools_proficiency_start":  "Niveau au début",
@@ -281,6 +296,12 @@ const LANG = {
     "dashboard.top_activity":       "Activité principale",
     "dashboard.settings_note":      "Ce rapport a été généré avec des paramètres différents des valeurs par défaut.",
     "dashboard.grayzone_evolution": "Évolution du temps non documenté",
+    "dashboard.section_mood":       "Humeur et énergie",
+    "dashboard.mood_timeline":      "Courbe d'humeur au fil du stage",
+    "dashboard.section_weekly":     "Bilans hebdomadaires",
+    "dashboard.weekly_highlight":   "Meilleure chose de la semaine",
+    "dashboard.weekly_learning":    "Bonne pratique à conserver",
+    "dashboard.weekly_change":      "À faire différemment",
     "dashboard.hide_appreciation":  "Masquer les appréciations",
     "dashboard.show_appreciation":  "Afficher les appréciations",
     "dashboard.section_modality":   "Modalité de présence",
@@ -392,6 +413,7 @@ const LANG = {
     "setup.country":          "Country",
     "setup.supervisor_name":  "Workplace supervisor's name",
     "setup.supervisor_role":  "Supervisor's role",
+    "setup.situation_before_company":    "What was the situation in the organization before you arrived? What problem or opportunity does this internship address?",
 
     // Setup — Hub pathway
     "setup.faculty_supervisor": "Responsible teacher",
@@ -403,6 +425,7 @@ const LANG = {
     "setup.student_joined":   "Date you joined the project",
     "setup.project_initial_impression": "What is your initial read on this project — scope, complexity, unknowns?",
     "setup.project_challenges":         "What challenges do you anticipate?",
+    "setup.situation_before":            "What was the situation before you arrived? What problem or opportunity is this project addressing?",
 
     // ── Daily Log ────────────────────────────────────────────
     "log.title":              "Today's Log",
@@ -451,6 +474,14 @@ const LANG = {
     "log.rating_4":           "Good",
     "log.rating_5":           "Excellent",
     "log.closing_word":       "One word or short phrase to describe how you're leaving today",
+    "log.plan_tomorrow":      "What do you plan to do tomorrow?",
+    "log.plan_tomorrow_hint": "These notes will appear as a reminder when you open the next log.",
+    "log.tomorrow_reminder":  "Yesterday you planned:",
+    "log.section_weekly":     "Weekly wrap-up",
+    "log.weekly_highlight":   "What was the best thing about this week?",
+    "log.weekly_learning":    "What would you keep as a good practice going forward?",
+    "log.weekly_change":      "What would you do differently next week?",
+    "log.weekly_prompt":      "This is the end of your work week. Take two minutes to reflect.",
 
     "log.section_todos":      "To-do list",
     "log.todo_description":   "Task to do",
@@ -494,6 +525,8 @@ const LANG = {
 
     // ── Default activity types ───────────────────────────────
     "activity.work":          "Work",
+    "activity.production":     "Production",
+    "activity.research":       "Research",
     "activity.meeting":       "Meeting",
     "activity.training":      "Training",
     "activity.admin":         "Administrative",
@@ -513,6 +546,7 @@ const LANG = {
     "report.keep_newer":      "Keep the newer one",
     "report.keep_older":      "Keep the older one",
     "report.download_reflection": "Download my responses (JSON)",
+    "report.edit_reflection":     "Edit my responses",
     "report.reflection_saved":    "Responses saved — you can re-upload this file in a future session.",
 
     "report.section_reflection":     "Final reflection",
@@ -526,6 +560,8 @@ const LANG = {
     "report.advice":                 "What advice would you give a student starting this same internship?",
     "report.would_do_differently":   "If you could do it again, what would you do differently?",
     "report.comments":               "Additional comments",
+    "report.suggestions_school":       "Suggestions for the program",
+    "report.suggestions_school_q":     "What does this internship reveal about gaps in your training? Which courses, tools, methods, or experiences would have better prepared you?",
 
     "report.tools_reflection_title":   "Tools reflection",
     "report.tools_proficiency_start":  "Level at start",
@@ -583,6 +619,12 @@ const LANG = {
     "dashboard.top_activity":       "Top activity",
     "dashboard.settings_note":      "This report was generated with settings that differ from the defaults.",
     "dashboard.grayzone_evolution": "Undocumented time over the internship",
+    "dashboard.section_mood":       "Mood and energy",
+    "dashboard.mood_timeline":      "Mood curve over the internship",
+    "dashboard.section_weekly":     "Weekly wrap-ups",
+    "dashboard.weekly_highlight":   "Best thing of the week",
+    "dashboard.weekly_learning":    "Good practice to keep",
+    "dashboard.weekly_change":      "To do differently",
     "dashboard.hide_appreciation":  "Hide appreciations",
     "dashboard.show_appreciation":  "Show appreciations",
     "dashboard.section_modality":   "Work modality",
