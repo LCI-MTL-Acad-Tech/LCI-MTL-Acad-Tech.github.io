@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Journal de stage</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <div class="header-inner">
+        <div class="site-title" data-i18n="welcome.title">Journal de stage<span></span></div>
+        <nav class="site-nav">
+          <a href="index.html" class="nav-link active" data-i18n="nav.setup">Configuration</a>
+          <a href="log.html" class="nav-link" data-i18n="nav.log">Journal</a>
+          <a href="report.html" class="nav-link" data-i18n="nav.report">Rapport</a>
+        </nav>
+        <div class="header-actions">
+          <button class="btn btn--ghost btn--sm lang-toggle-btn" data-lang-target="en-CA">EN</button>
+          <button class="btn btn--ghost btn--sm theme-toggle-btn" data-i18n="nav.toggle_dark">Mode sombre</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container container--narrow">
+
+      <!-- ── SCREEN 0: Welcome ─────────────────────────────── -->
+      <div id="screen-welcome">
+        <div style="text-align:center; padding: var(--sp-10) 0 var(--sp-8);">
+          <h1 data-i18n="welcome.title" style="margin-bottom:var(--sp-3)">Journal de stage</h1>
+          <p class="text-muted" data-i18n="welcome.subtitle" style="font-size:1.8rem">Documente ton parcours. Explore tes apprentissages.</p>
+        </div>
+
+        <div id="welcome-options-new" class="card" style="margin-bottom:var(--sp-4)">
+          <div class="flex items-center gap-4" style="flex-wrap:wrap;">
+            <div style="flex:1; min-width:20rem;">
+              <h4 data-i18n="welcome.cta_new">Commencer la configuration</h4>
+              <p class="text-muted" style="font-size:1.4rem; margin-top:var(--sp-1)">Première fois? Configure ton profil et commence à documenter.</p>
+            </div>
+            <button class="btn btn--primary" onclick="goToScreen('screen-onboard')" data-i18n="welcome.cta_new">Commencer la configuration</button>
+          </div>
+        </div>
+
+        <div id="welcome-options-continue" class="card card--flat hidden" style="margin-bottom:var(--sp-4)">
+          <div class="flex items-center gap-4" style="flex-wrap:wrap;">
+            <div style="flex:1;">
+              <h4 data-i18n="welcome.cta_continue">Continuer mon journal</h4>
+              <p class="text-muted" id="welcome-continue-name" style="font-size:1.4rem; margin-top:var(--sp-1)"></p>
+            </div>
+            <div class="flex gap-2">
+              <a href="log.html" class="btn btn--primary" data-i18n="nav.log">Journal</a>
+              <a href="report.html" class="btn btn--secondary" data-i18n="welcome.cta_report">Rapport</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SCREEN 1: Onboarding ───────────────────────────── -->
+      <div id="screen-onboard" class="hidden">
+        <div class="onboard-card">
+          <h2 data-i18n="onboard.title" style="margin-bottom:var(--sp-6)">Avant de commencer</h2>
+
+          <p data-i18n="onboard.p1"></p>
+          <p data-i18n="onboard.p2"></p>
+          <p data-i18n="onboard.p3"></p>
+          <p data-i18n="onboard.p4"></p>
+          <p data-i18n="onboard.p5"></p>
+
+          <label class="checklist-row" id="onboard-check-row">
+            <input type="checkbox" id="onboard-check" onchange="toggleOnboardCheck(this)">
+            <span data-i18n="onboard.checklist"></span>
+          </label>
+
+          <button class="btn btn--primary btn--full btn--lg mt-6" id="onboard-cta" disabled
+                  onclick="goToScreen('screen-pathway')" data-i18n="onboard.cta">C'est compris</button>
+        </div>
+      </div>
+
+      <!-- ── SCREEN 2: Pathway selection ───────────────────── -->
+      <div id="screen-pathway" class="hidden">
+        <h2 data-i18n="welcome.pathway_prompt" style="margin-bottom:var(--sp-6)">Quel type de stage?</h2>
+
+        <div class="pathway-grid">
+          <button class="pathway-card" onclick="selectPathway('company')">
+            <div class="pathway-card-icon">🏢</div>
+            <div class="pathway-card-title" data-i18n="welcome.pathway_company"></div>
+            <div class="pathway-card-desc" data-i18n="welcome.pathway_company_desc"></div>
+          </button>
+          <button class="pathway-card" onclick="selectPathway('hub')">
+            <div class="pathway-card-icon">🔬</div>
+            <div class="pathway-card-title" data-i18n="welcome.pathway_hub"></div>
+            <div class="pathway-card-desc" data-i18n="welcome.pathway_hub_desc"></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── SCREEN 3: Profile ──────────────────────────────── -->
+      <div id="screen-profile" class="hidden">
+        <div class="steps mb-8" id="setup-steps"></div>
+
+        <div class="card">
+          <h3 class="card-title" data-i18n="setup.section_profile">Ton profil</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="field.name"></label>
+              <input type="text" id="profile-name" data-i18n-placeholder="field.name" placeholder="">
+            </div>
+            <div class="form-group">
+              <label data-i18n="field.student_id"></label>
+              <input type="text" id="profile-student-id" placeholder="ex. 12345678">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="field.email"></label>
+              <input type="email" id="profile-email" placeholder="prenom.nom@college.qc.ca">
+            </div>
+            <div class="form-group">
+              <label data-i18n="field.program"></label>
+              <input type="text" id="profile-program">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="field.cohort"></label>
+              <input type="text" id="profile-cohort">
+            </div>
+            <div class="form-group">
+              <label data-i18n="field.professor"></label>
+              <input type="text" id="profile-professor">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6">
+          <button class="btn btn--ghost" onclick="goToScreen('screen-pathway')" data-i18n="action.back">Retour</button>
+          <button class="btn btn--primary" onclick="saveProfileAndNext()" data-i18n="action.next">Suivant</button>
+        </div>
+      </div>
+
+      <!-- ── SCREEN 4: Internship context ──────────────────── -->
+      <div id="screen-context" class="hidden">
+        <div class="steps mb-8" id="setup-steps-2"></div>
+
+        <div class="card mb-4">
+          <h3 class="card-title" data-i18n="setup.section_internship">Ton stage</h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="field.start_date"></label>
+              <input type="date" id="ctx-start-date">
+            </div>
+            <div class="form-group">
+              <label data-i18n="field.end_date"></label>
+              <input type="date" id="ctx-end-date">
+            </div>
+          </div>
+
+          <!-- Company fields -->
+          <div id="ctx-company-fields">
+            <div class="form-row">
+              <div class="form-group">
+                <label data-i18n="setup.org_name"></label>
+                <input type="text" id="ctx-org-name">
+              </div>
+              <div class="form-group">
+                <label data-i18n="setup.industry"></label>
+                <input type="text" id="ctx-industry">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label data-i18n="setup.city"></label>
+                <input type="text" id="ctx-city">
+              </div>
+              <div class="form-group">
+                <label data-i18n="setup.country"></label>
+                <input type="text" id="ctx-country">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label data-i18n="setup.supervisor_name"></label>
+                <input type="text" id="ctx-sup-name">
+              </div>
+              <div class="form-group">
+                <label data-i18n="setup.supervisor_role"></label>
+                <input type="text" id="ctx-sup-role">
+              </div>
+            </div>
+          </div>
+
+          <!-- Hub fields -->
+          <div id="ctx-hub-fields" class="hidden">
+            <div class="form-group">
+              <label data-i18n="setup.faculty_supervisor"></label>
+              <input type="text" id="ctx-fac-supervisor">
+            </div>
+            <div class="mt-6">
+              <div class="section-title" data-i18n="drawer.projects_title">Projets</div>
+              <div id="ctx-projects-list"></div>
+              <button class="add-block-btn mt-4" onclick="addProjectBlock()">
+                + <span data-i18n="setup.add_project">Ajouter un projet</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6">
+          <button class="btn btn--ghost" onclick="goToScreen('screen-profile')" data-i18n="action.back">Retour</button>
+          <button class="btn btn--primary" onclick="saveContextAndNext()" data-i18n="action.next">Suivant</button>
+        </div>
+      </div>
+
+      <!-- ── SCREEN 5: Expectations & tools ────────────────── -->
+      <div id="screen-expectations" class="hidden">
+        <div class="steps mb-8" id="setup-steps-3"></div>
+
+        <div class="card mb-4">
+          <h3 class="card-title" data-i18n="setup.section_expectations">Tes attentes</h3>
+
+          <div class="form-group">
+            <label data-i18n="setup.skills_to_develop"></label>
+            <div id="skills-tags" class="tags-container mb-4"></div>
+            <div class="flex gap-2">
+              <input type="text" id="skill-input" data-i18n-placeholder="setup.skills_placeholder" placeholder="">
+              <button class="btn btn--secondary btn--sm" onclick="addSkillTag()" data-i18n="action.add">Ajouter</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="setup.apprehensions"></label>
+            <textarea id="ctx-apprehensions" rows="3"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="setup.success"></label>
+            <textarea id="ctx-success" rows="3"></textarea>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title" data-i18n="setup.section_tools">Outils et compétences</h3>
+
+          <div class="form-group">
+            <label data-i18n="setup.tools_known"></label>
+            <div id="tools-known-tags" class="tags-container mb-4"></div>
+            <div class="flex gap-2">
+              <input type="text" id="tool-known-input" placeholder="Figma, VS Code…">
+              <button class="btn btn--secondary btn--sm" onclick="addToolKnown()" data-i18n="action.add">Ajouter</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="setup.tools_to_learn"></label>
+            <div id="tools-learn-tags" class="tags-container mb-4"></div>
+            <div class="flex gap-2">
+              <input type="text" id="tool-learn-input" placeholder="React, Blender…">
+              <button class="btn btn--secondary btn--sm" onclick="addToolToLearn()" data-i18n="action.add">Ajouter</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6">
+          <button class="btn btn--ghost" onclick="goToScreen('screen-context')" data-i18n="action.back">Retour</button>
+          <button class="btn btn--primary" onclick="finishSetup()" data-i18n="action.confirm">Terminer la configuration</button>
+        </div>
+      </div>
+
+      <!-- ── SCREEN 6: Setup complete ──────────────────────── -->
+      <div id="screen-done" class="hidden" style="text-align:center; padding: var(--sp-10) 0;">
+        <div style="font-size:5rem; margin-bottom:var(--sp-4)">✓</div>
+        <h2 style="margin-bottom:var(--sp-3)" id="done-title">Configuration complète</h2>
+        <p class="text-muted" style="margin-bottom:var(--sp-8)" id="done-msg">Tout est prêt. Reviens ici chaque jour pour documenter ton stage.</p>
+        <a href="log.html" class="btn btn--primary btn--lg" data-i18n="action.open_log">Ouvrir le journal du jour</a>
+      </div>
+
+    </div><!-- /container -->
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <span id="footer-text">Journal de stage &mdash; Données conservées localement dans ton navigateur</span>
+    </div>
+  </footer>
+</div>
+
+<script src="assets/lang.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/setup.js"></script>
+</body>
+</html>

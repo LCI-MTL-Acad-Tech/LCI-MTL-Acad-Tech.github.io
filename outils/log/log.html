@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Journal du jour</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .log-layout { display: grid; grid-template-columns: 1fr 32rem; gap: var(--sp-6); align-items: start; }
+    @media (max-width: 960px) { .log-layout { grid-template-columns: 1fr; } }
+    .log-sidebar { position: sticky; top: 7rem; }
+    .time-bar { display: flex; height: 0.6rem; border-radius: var(--r-pill); background: var(--bg-subtle); overflow: hidden; margin-top: var(--sp-2); }
+    .time-bar-fill { height: 100%; border-radius: var(--r-pill); transition: width var(--dur-mod) var(--ease-exp); }
+    .mini-stat { text-align: center; flex: 1; }
+    .mini-stat-val { font-size: 2rem; font-weight: 500; letter-spacing: -0.03em; color: var(--accent); }
+    .mini-stat-label { font-size: 1.1rem; color: var(--text-subtle); }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <header class="site-header">
+    <div class="container container--wide">
+      <div class="header-inner">
+        <a href="index.html" class="site-title" style="text-decoration:none;">
+          Journal de stage<span></span>
+        </a>
+        <nav class="site-nav">
+          <a href="index.html" class="nav-link" data-i18n="nav.setup">Configuration</a>
+          <a href="log.html" class="nav-link active" data-i18n="nav.log">Journal</a>
+          <a href="report.html" class="nav-link" data-i18n="nav.report">Rapport</a>
+        </nav>
+        <div class="header-actions">
+          <button class="btn btn--ghost btn--sm lang-toggle-btn" data-lang-target="en-CA">EN</button>
+          <button class="btn btn--ghost btn--sm theme-toggle-btn" data-i18n="nav.toggle_dark">Mode sombre</button>
+          <button class="btn btn--download btn--sm" onclick="saveAndDownload()" data-i18n="log.download_cta">Télécharger</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container container--wide">
+
+      <!-- No data warning -->
+      <div id="no-data-warning" class="hidden">
+        <div class="card card--warning" style="max-width:50rem; margin: var(--sp-10) auto; text-align:center;">
+          <div style="font-size:3rem; margin-bottom:var(--sp-3)">⚠</div>
+          <h3 id="no-data-title" style="margin-bottom:var(--sp-3)">Aucune configuration trouvée</h3>
+          <p class="text-muted" style="margin-bottom:var(--sp-5)" id="no-data-msg">Configure d'abord ton profil de stage.</p>
+          <a href="index.html" class="btn btn--primary" data-i18n="welcome.cta_new">Commencer la configuration</a>
+        </div>
+      </div>
+
+      <!-- Download reminder banner -->
+      <div id="download-banner" class="download-banner hidden">
+        <span data-i18n="log.download_reminder">N'oublie pas de télécharger ton journal avant de fermer cet onglet.</span>
+        <button class="btn btn--sm" style="background:white;color:var(--color-chlorophyll-500);font-weight:600;"
+                onclick="saveAndDownload()" data-i18n="log.download_cta">Télécharger</button>
+      </div>
+
+      <!-- Idle reminder -->
+      <div id="idle-banner" class="alert alert--warning hidden" style="margin-bottom:var(--sp-4)">
+        <span>⏰</span>
+        <span data-i18n="log.idle_reminder">Pense à sauvegarder une copie.</span>
+        <button class="btn btn--sm btn--secondary" style="margin-left:auto;" onclick="saveAndDownload()" data-i18n="action.download">Télécharger</button>
+      </div>
+
+      <!-- Main log layout -->
+      <div id="log-main" class="log-layout hidden">
+
+        <!-- LEFT: Main form -->
+        <div>
+
+          <!-- Date and time header -->
+          <div class="card mb-4">
+            <div class="flex items-center justify-between mb-4" style="flex-wrap:wrap;gap:var(--sp-3)">
+              <h2 id="log-date-display" style="font-size:2.8rem"></h2>
+              <div class="flex gap-2 items-center">
+                <label style="margin:0; font-size:1.4rem;">
+                  <input type="checkbox" id="late-filing" onchange="updateLog()" style="margin-right:var(--sp-2)">
+                  <span data-i18n="log.late_filing"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label data-i18n="log.time_start"></label>
+                <input type="time" id="log-time-start" onchange="updateTimings()">
+              </div>
+              <div class="form-group">
+                <label data-i18n="log.time_end"></label>
+                <input type="time" id="log-time-end" onchange="updateTimings()">
+              </div>
+              <div class="form-group">
+                <label data-i18n="log.day_type"></label>
+                <select id="log-day-type" onchange="updateLog()">
+                  <option value="full" data-i18n="log.day_type_full">Journée complète</option>
+                  <option value="partial" data-i18n="log.day_type_partial">Journée partielle</option>
+                  <option value="remote" data-i18n="log.day_type_remote">Télétravail</option>
+                  <option value="hybrid" data-i18n="log.day_type_hybrid">Hybride</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Mini stats bar -->
+            <div class="flex gap-4 mt-4" id="day-summary-strip">
+              <div class="mini-stat">
+                <div class="mini-stat-val" id="stat-hours">0h</div>
+                <div class="mini-stat-label" data-i18n="log.summary_hours"></div>
+              </div>
+              <div class="mini-stat">
+                <div class="mini-stat-val" id="stat-tasks">0</div>
+                <div class="mini-stat-label" data-i18n="log.summary_tasks"></div>
+              </div>
+              <div class="mini-stat">
+                <div class="mini-stat-val" id="stat-gray" style="color:var(--danger)">—</div>
+                <div class="mini-stat-label" data-i18n="log.summary_grayzone"></div>
+              </div>
+            </div>
+            <div class="time-bar mt-2" id="time-bar"></div>
+          </div>
+
+          <!-- Tasks section -->
+          <div class="card mb-4">
+            <div class="flex items-center justify-between mb-4">
+              <div class="section-title" style="border:none;margin:0;padding:0" data-i18n="log.section_tasks">Tâches</div>
+              <button class="btn btn--secondary btn--sm" onclick="addTask()">
+                + <span data-i18n="log.add_task">Ajouter une tâche</span>
+              </button>
+            </div>
+            <div id="tasks-list"></div>
+          </div>
+
+          <!-- Grayzone warning -->
+          <div id="grayzone-warning" class="grayzone-banner mb-4 hidden">
+            <div class="grayzone-icon">⚠</div>
+            <div class="grayzone-text">
+              <div class="flex items-center gap-4 mb-2">
+                <span class="grayzone-pct" id="grayzone-pct">—</span>
+                <span data-i18n="log.grayzone_info"></span>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label data-i18n="log.grayzone_prompt"></label>
+                <textarea id="grayzone-desc" rows="2" onchange="updateLog()"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reflection -->
+          <div class="card mb-4">
+            <div class="section-title" data-i18n="log.section_reflection">Bilan</div>
+            <div class="form-group">
+              <label data-i18n="log.obstacle"></label>
+              <textarea id="log-obstacle" rows="2" onchange="updateLog()"></textarea>
+            </div>
+            <div class="form-group" id="obstacle-response-group" style="display:none">
+              <label data-i18n="log.obstacle_response"></label>
+              <textarea id="log-obstacle-response" rows="2" onchange="updateLog()"></textarea>
+            </div>
+            <div class="form-group">
+              <label data-i18n="log.day_rating"></label>
+              <div class="rating" id="rating-btns"></div>
+            </div>
+            <div class="form-group">
+              <label data-i18n="log.closing_word"></label>
+              <input type="text" id="log-closing" onchange="updateLog()">
+            </div>
+          </div>
+
+          <!-- Download reminder at bottom -->
+          <div class="card card--success">
+            <div class="flex items-center justify-between" style="flex-wrap:wrap;gap:var(--sp-3)">
+              <span style="font-size:1.5rem;" data-i18n="log.download_reminder"></span>
+              <button class="btn btn--download" onclick="saveAndDownload()" data-i18n="log.download_cta">Télécharger</button>
+            </div>
+          </div>
+
+        </div><!-- /left -->
+
+        <!-- RIGHT: Sidebar -->
+        <div class="log-sidebar">
+
+          <!-- To-do list -->
+          <div class="card mb-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="section-title" style="border:none;margin:0;padding:0" data-i18n="log.section_todos"></div>
+              <button class="btn btn--icon btn--sm" onclick="addTodo()" title="+">+</button>
+            </div>
+            <div id="todos-list"></div>
+            <div id="todos-empty" class="text-muted" style="font-size:1.3rem; text-align:center; padding:var(--sp-4) 0; display:none">—</div>
+          </div>
+
+          <!-- Projects quick view (hub) -->
+          <div class="card mb-4" id="projects-sidebar" style="display:none">
+            <div class="section-title" data-i18n="drawer.projects_title" style="margin-bottom:var(--sp-3)"></div>
+            <div id="projects-sidebar-list"></div>
+          </div>
+
+        </div><!-- /right -->
+      </div><!-- /log-main -->
+
+    </div>
+  </main>
+
+  <!-- Drawers -->
+  <div class="drawer-overlay" id="drawer-overlay" onclick="closeAllDrawers()"></div>
+
+  <!-- People drawer -->
+  <div class="drawer-panel" id="drawer-people">
+    <div class="drawer-header">
+      <div class="drawer-title" data-i18n="drawer.people_title"></div>
+      <button class="btn btn--icon" onclick="closeAllDrawers()">✕</button>
+    </div>
+    <div class="drawer-body">
+      <p class="text-muted" style="font-size:1.3rem;margin-bottom:var(--sp-3)" data-i18n="drawer.people_drag"></p>
+      <div id="people-drawer-list"></div>
+    </div>
+    <div class="drawer-footer">
+      <button class="btn btn--secondary btn--full btn--sm" onclick="showAddPersonForm()">
+        + <span data-i18n="drawer.people_add"></span>
+      </button>
+      <div id="add-person-form" class="hidden mt-4">
+        <div class="form-group">
+          <label data-i18n="drawer.people_name"></label>
+          <input type="text" id="new-person-name">
+        </div>
+        <div class="form-group">
+          <label data-i18n="drawer.people_role"></label>
+          <input type="text" id="new-person-role" data-i18n-placeholder="drawer.people_role_placeholder">
+        </div>
+        <div class="form-group">
+          <label data-i18n="drawer.people_org"></label>
+          <input type="text" id="new-person-org">
+        </div>
+        <div class="flex gap-2 mt-3">
+          <button class="btn btn--primary btn--sm btn--full" onclick="saveNewPerson()" data-i18n="action.save"></button>
+          <button class="btn btn--ghost btn--sm" onclick="hideAddPersonForm()" data-i18n="action.cancel"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tools drawer -->
+  <div class="drawer-panel" id="drawer-tools">
+    <div class="drawer-header">
+      <div class="drawer-title" data-i18n="drawer.tools_title"></div>
+      <button class="btn btn--icon" onclick="closeAllDrawers()">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div id="tools-drawer-list"></div>
+    </div>
+    <div class="drawer-footer">
+      <button class="btn btn--secondary btn--full btn--sm" onclick="showAddToolForm()">
+        + <span data-i18n="drawer.tools_add"></span>
+      </button>
+      <div id="add-tool-form" class="hidden mt-4">
+        <div class="form-group">
+          <label data-i18n="drawer.tools_name"></label>
+          <input type="text" id="new-tool-name">
+        </div>
+        <div class="form-group">
+          <label data-i18n="drawer.tools_category"></label>
+          <input type="text" id="new-tool-cat" data-i18n-placeholder="drawer.tools_category_placeholder">
+        </div>
+        <div class="flex gap-2 mt-3">
+          <button class="btn btn--primary btn--sm btn--full" onclick="saveNewTool()" data-i18n="action.save"></button>
+          <button class="btn btn--ghost btn--sm" onclick="hideAddToolForm()" data-i18n="action.cancel"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity types drawer -->
+  <div class="drawer-panel" id="drawer-types">
+    <div class="drawer-header">
+      <div class="drawer-title" data-i18n="drawer.types_title"></div>
+      <button class="btn btn--icon" onclick="closeAllDrawers()">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div id="types-drawer-list"></div>
+    </div>
+    <div class="drawer-footer">
+      <button class="btn btn--secondary btn--full btn--sm" onclick="showAddTypeForm()">
+        + <span data-i18n="drawer.types_add"></span>
+      </button>
+      <div id="add-type-form" class="hidden mt-4">
+        <div class="form-group">
+          <label data-i18n="drawer.types_label"></label>
+          <input type="text" id="new-type-label">
+        </div>
+        <div class="form-group">
+          <label data-i18n="drawer.types_color"></label>
+          <div class="color-picker" id="type-color-picker"></div>
+          <input type="hidden" id="new-type-color" value="#00587c">
+        </div>
+        <div class="flex gap-2 mt-3">
+          <button class="btn btn--primary btn--sm btn--full" onclick="saveNewType()" data-i18n="action.save"></button>
+          <button class="btn btn--ghost btn--sm" onclick="hideAddTypeForm()" data-i18n="action.cancel"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Projects drawer (hub) -->
+  <div class="drawer-panel" id="drawer-projects">
+    <div class="drawer-header">
+      <div class="drawer-title" data-i18n="drawer.projects_title"></div>
+      <button class="btn btn--icon" onclick="closeAllDrawers()">✕</button>
+    </div>
+    <div class="drawer-body" id="projects-drawer-body"></div>
+    <div class="drawer-footer">
+      <button class="btn btn--secondary btn--full btn--sm" onclick="showAddProjectForm()">
+        + <span data-i18n="drawer.projects_add"></span>
+      </button>
+      <div id="add-project-form" class="hidden mt-4">
+        <div class="form-group">
+          <label data-i18n="setup.project_name"></label>
+          <input type="text" id="new-proj-name">
+        </div>
+        <div class="form-group">
+          <label data-i18n="setup.client_name"></label>
+          <input type="text" id="new-proj-client">
+        </div>
+        <div class="form-group">
+          <label data-i18n="setup.student_joined"></label>
+          <input type="date" id="new-proj-joined">
+        </div>
+        <div class="flex gap-2 mt-3">
+          <button class="btn btn--primary btn--sm btn--full" onclick="saveNewProject()" data-i18n="action.save"></button>
+          <button class="btn btn--ghost btn--sm" onclick="hideAddProjectForm()" data-i18n="action.cancel"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drawer toggle buttons -->
+  <div class="drawer-toggles" id="drawer-toggle-btns"></div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <span id="footer-save-status">—</span>
+    </div>
+  </footer>
+</div>
+
+<script src="assets/lang.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/log.js"></script>
+</body>
+</html>

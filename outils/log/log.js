@@ -1,0 +1,815 @@
+// ============================================================
+// log.js — Daily log logic
+// ============================================================
+
+let logData = null;       // full internship data
+let currentLog = null;    // today's log object
+let idleTimer = null;
+let lastDownloaded = false;
+
+// ── Init ──────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+  initPage();
+
+  logData = loadData();
+  if (!logData || !logData.profile?.full_name) {
+    document.getElementById("no-data-warning").classList.remove("hidden");
+    applyLanguage(getCurrentLang());
+    return;
+  }
+
+  document.getElementById("log-main").classList.remove("hidden");
+
+  // Load or create today's log
+  const today = new Date().toISOString().slice(0, 10);
+  currentLog = getTodayLogId(logData);
+  if (!currentLog) {
+    currentLog = createNewLog(today);
+    logData.logs.push(currentLog);
+    saveData(logData);
+  }
+
+  renderAll();
+  renderDrawerToggles();
+  buildColorPicker();
+  setupIdleTimer();
+
+  // Show download reminder after 5 minutes
+  setTimeout(() => {
+    if (!lastDownloaded) showDownloadBanner();
+  }, 5 * 60 * 1000);
+
+  // Warn on tab close
+  window.addEventListener("beforeunload", e => {
+    if (!lastDownloaded) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+  });
+
+  applyLanguage(getCurrentLang());
+});
+
+// ── Render everything ─────────────────────────────────────────
+function renderAll() {
+  renderHeader();
+  renderTasks();
+  renderTodos();
+  renderRating();
+  renderDrawers();
+  updateTimings();
+  if (logData.pathway === "hub") {
+    document.getElementById("projects-sidebar").style.display = "block";
+    renderProjectsSidebar();
+  }
+  restoreFields();
+}
+
+function renderHeader() {
+  const lang = getCurrentLang();
+  const dateStr = formatDate(currentLog.date + "T12:00:00");
+  document.getElementById("log-date-display").textContent = dateStr;
+  document.getElementById("late-filing").checked = currentLog.late_filing || false;
+
+  if (currentLog.time_start) {
+    document.getElementById("log-time-start").value = currentLog.time_start.slice(11, 16);
+  }
+  if (currentLog.time_end) {
+    document.getElementById("log-time-end").value = currentLog.time_end.slice(11, 16);
+  }
+  document.getElementById("log-day-type").value = currentLog.day_type || "full";
+}
+
+function restoreFields() {
+  document.getElementById("log-obstacle").value = currentLog.obstacle || "";
+  document.getElementById("log-obstacle-response").value = currentLog.obstacle_response || "";
+  document.getElementById("log-closing").value = currentLog.closing_word || "";
+  document.getElementById("grayzone-desc").value = currentLog.grayzone_description || "";
+
+  if (currentLog.obstacle) {
+    document.getElementById("obstacle-response-group").style.display = "block";
+  }
+
+  document.getElementById("log-obstacle").addEventListener("input", function() {
+    document.getElementById("obstacle-response-group").style.display = this.value ? "block" : "none";
+    updateLog();
+  });
+}
+
+// ── Tasks ─────────────────────────────────────────────────────
+function renderTasks() {
+  const list = document.getElementById("tasks-list");
+  list.innerHTML = "";
+  (currentLog.tasks || []).forEach((task, idx) => renderTaskBlock(task, idx));
+  if (!currentLog.tasks?.length) {
+    list.innerHTML = `<p class="text-muted" style="font-size:1.4rem; text-align:center; padding:var(--sp-4) 0">—</p>`;
+  }
+}
+
+function renderTaskBlock(task, idx) {
+  const list = document.getElementById("tasks-list");
+  const block = document.createElement("div");
+  block.className = "task-block";
+  block.id = `task-${task.task_id}`;
+  block.dataset.taskId = task.task_id;
+
+  const typeColor = getActivityTypeColor(logData, task.activity_type_id);
+  const isTraining = task.activity_type_id === "sys-training" || task.training_subtype;
+  const isMeeting = task.activity_type_id === "sys-meeting";
+
+  block.innerHTML = `
+    <div class="task-block-header">
+      <div class="task-color-bar" style="background:${typeColor}"></div>
+      <div style="flex:1">
+        <div class="form-row" style="margin-bottom:var(--sp-2)">
+          <div class="form-group" style="margin:0;grid-column:1/-1">
+            <input type="text" value="${escHtml(task.description)}"
+              placeholder="${t('log.task_description')}"
+              oninput="updateTaskField('${task.task_id}','description',this.value)"
+              style="font-weight:500;">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="margin:0">
+            <label data-i18n="log.task_type"></label>
+            ${renderActivityTypeSelect(task)}
+          </div>
+          <div class="form-group" style="margin:0">
+            <label data-i18n="log.task_duration"></label>
+            <div class="input-with-unit">
+              <input type="number" min="0" max="999" style="width:8rem"
+                value="${task.duration_minutes || ""}"
+                oninput="updateTaskField('${task.task_id}','duration_minutes',parseInt(this.value)||0);updateTimings()">
+              <span class="input-unit">min</span>
+            </div>
+          </div>
+        </div>
+        ${logData.pathway === "hub" ? renderProjectSelect(task) : ""}
+        ${isTraining ? renderTrainingFields(task) : ""}
+        ${(isTraining || isMeeting) ? renderTopicLearning(task) : ""}
+        <div class="task-tags" id="task-tags-${task.task_id}"></div>
+      </div>
+      <button class="btn btn--icon btn--sm task-remove" onclick="removeTask('${task.task_id}')" title="${t('action.delete')}">✕</button>
+    </div>
+  `;
+
+  // Drop target
+  block.addEventListener("dragover", e => { e.preventDefault(); block.classList.add("drag-over"); });
+  block.addEventListener("dragleave", () => block.classList.remove("drag-over"));
+  block.addEventListener("drop", e => {
+    e.preventDefault();
+    block.classList.remove("drag-over");
+    const type = e.dataTransfer.getData("type");
+    const id = e.dataTransfer.getData("id");
+    if (type === "person") addPersonToTask(task.task_id, id);
+    else if (type === "tool") addToolToTask(task.task_id, id);
+    else if (type === "project") addProjectToTask(task.task_id, id);
+    else if (type === "activity_type") setActivityType(task.task_id, id);
+  });
+
+  list.appendChild(block);
+  renderTaskTags(task);
+  applyLanguage(getCurrentLang());
+}
+
+function renderActivityTypeSelect(task) {
+  const opts = (logData.activity_types || []).map(at => {
+    const label = at.label_key ? t(at.label_key) : at.label;
+    const sel = task.activity_type_id === at.type_id ? "selected" : "";
+    return `<option value="${at.type_id}" ${sel}>${label}</option>`;
+  }).join("");
+  return `<select onchange="setActivityType('${task.task_id}',this.value)">
+    <option value="">—</option>${opts}</select>`;
+}
+
+function renderProjectSelect(task) {
+  if (!logData.projects?.length) return "";
+  const opts = logData.projects.filter(p => p.status !== "cancelled").map(p => {
+    const sel = task.project_id === p.project_id ? "selected" : "";
+    return `<option value="${p.project_id}" ${sel}>${escHtml(p.project_name)}</option>`;
+  }).join("");
+  return `<div class="form-group" style="margin:var(--sp-2) 0 0 0">
+    <label data-i18n="log.task_project"></label>
+    <select onchange="updateTaskField('${task.task_id}','project_id',this.value)">
+      <option value="">—</option>${opts}
+    </select>
+  </div>`;
+}
+
+function renderTrainingFields(task) {
+  const subtypes = ["reading","video","coaching","workshop","course","other"];
+  const opts = subtypes.map(s => {
+    const sel = task.training_subtype === s ? "selected" : "";
+    return `<option value="${s}" ${sel} data-i18n="log.training_${s}"></option>`;
+  }).join("");
+  return `<div class="form-group" style="margin:var(--sp-2) 0 0 0">
+    <label data-i18n="log.training_subtype"></label>
+    <select onchange="updateTaskField('${task.task_id}','training_subtype',this.value)">${opts}</select>
+  </div>`;
+}
+
+function renderTopicLearning(task) {
+  return `
+    <div class="form-group" style="margin:var(--sp-2) 0 0 0">
+      <label data-i18n="log.task_topic"></label>
+      <input type="text" value="${escHtml(task.topic || "")}"
+        oninput="updateTaskField('${task.task_id}','topic',this.value)">
+    </div>
+    <div class="form-group" style="margin:var(--sp-2) 0 0 0">
+      <label data-i18n="log.task_learning"></label>
+      <textarea rows="2" oninput="updateTaskField('${task.task_id}','learning',this.value)">${escHtml(task.learning || "")}</textarea>
+    </div>
+    <div class="form-group" style="margin:var(--sp-2) 0 0 0">
+      <label data-i18n="log.task_lesson_tags"></label>
+      <div class="flex gap-2">
+        <input type="text" id="lesson-tag-input-${task.task_id}"
+          data-i18n-placeholder="log.task_tags_placeholder" placeholder="">
+        <button class="btn btn--ghost btn--sm" onclick="addLessonTag('${task.task_id}')">+</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderTaskTags(task) {
+  const container = document.getElementById(`task-tags-${task.task_id}`);
+  if (!container) return;
+  const tags = [];
+
+  if (task.person_ids?.length) {
+    task.person_ids.forEach(pid => {
+      const p = logData.people.find(x => x.person_id === pid);
+      if (p) tags.push(`<span class="tag" style="background:var(--color-cobalt-500);color:white;">👤 ${escHtml(p.name)}<button class="tag-remove" onclick="removePersonFromTask('${task.task_id}','${pid}')">✕</button></span>`);
+    });
+  }
+  if (task.tool_ids?.length) {
+    task.tool_ids.forEach(tid => {
+      const tool = logData.tools.find(x => x.tool_id === tid);
+      if (tool) tags.push(`<span class="tag" style="background:var(--color-gold-500);color:white;">🔧 ${escHtml(tool.name)}<button class="tag-remove" onclick="removeToolFromTask('${task.task_id}','${tid}')">✕</button></span>`);
+    });
+  }
+  if (task.lesson_tags?.length) {
+    task.lesson_tags.forEach((tag, i) => {
+      tags.push(`<span class="tag">💡 ${escHtml(tag)}<button class="tag-remove" onclick="removeLessonTag('${task.task_id}',${i})">✕</button></span>`);
+    });
+  }
+
+  container.innerHTML = tags.join("");
+}
+
+function addTask() {
+  const task = createNewTask();
+  currentLog.tasks.push(task);
+  updateLog();
+  renderTasks();
+}
+
+function removeTask(taskId) {
+  currentLog.tasks = currentLog.tasks.filter(t => t.task_id !== taskId);
+  updateLog();
+  renderTasks();
+}
+
+function updateTaskField(taskId, field, value) {
+  const task = currentLog.tasks.find(t => t.task_id === taskId);
+  if (!task) return;
+  task[field] = value;
+  if (field === "activity_type_id") {
+    const el = document.getElementById(`task-${taskId}`);
+    if (el) {
+      el.querySelector(".task-color-bar").style.background = getActivityTypeColor(logData, value);
+    }
+  }
+  updateLog();
+}
+
+function setActivityType(taskId, typeId) {
+  updateTaskField(taskId, "activity_type_id", typeId);
+  // Re-render block to show/hide training fields
+  const task = currentLog.tasks.find(t => t.task_id === taskId);
+  if (task) {
+    const el = document.getElementById(`task-${taskId}`);
+    if (el) el.remove();
+    const idx = currentLog.tasks.findIndex(t => t.task_id === taskId);
+    renderTaskBlock(task, idx);
+  }
+}
+
+function addPersonToTask(taskId, personId) {
+  const task = currentLog.tasks.find(t => t.task_id === taskId);
+  if (!task) return;
+  if (!task.person_ids.includes(personId)) {
+    task.person_ids.push(personId);
+    updateLog();
+    renderTaskTags(task);
+  }
+}
+
+function removePersonFromTask(taskId, personId) {
+  const task = currentLog.tasks.find(t => t.task_id === taskId);
+  if (!task) return;
+  task.person_ids = task.person_ids.filter(x => x !== personId);
+  updateLog();
+  renderTaskTags(task);
+}
+
+function addToolToTask(taskId, toolId) {
+  const task = currentLog.tasks.find(t => t.task_id === taskId);
+  if (!task) return;
+  if (!task.tool_ids.includes(toolId)) {
+    task.tool_ids.push(toolId);
+    updateLog();
+    renderTaskTags(task);
+  }
+}
+
+function removeToolFromTask(taskId, toolId) {
+  const task = currentLog.tasks.find(t => t.task_id === taskId);
+  if (!task) return;
+  task.tool_ids = task.tool_ids.filter(x => x !== toolId);
+  updateLog();
+  renderTaskTags(task);
+}
+
+function addProjectToTask(taskId, projectId) {
+  updateTaskField(taskId, "project_id", projectId);
+}
+
+function addLessonTag(taskId) {
+  const input = document.getElementById(`lesson-tag-input-${taskId}`);
+  if (!input) return;
+  const val = input.value.trim();
+  if (!val) return;
+  const task = currentLog.tasks.find(t => t.task_id === taskId);
+  if (!task) return;
+  task.lesson_tags = task.lesson_tags || [];
+  task.lesson_tags.push(val);
+  input.value = "";
+  updateLog();
+  renderTaskTags(task);
+}
+
+function removeLessonTag(taskId, idx) {
+  const task = currentLog.tasks.find(t => t.task_id === taskId);
+  if (!task) return;
+  task.lesson_tags.splice(idx, 1);
+  updateLog();
+  renderTaskTags(task);
+}
+
+// ── Timings ───────────────────────────────────────────────────
+function updateTimings() {
+  const startVal = document.getElementById("log-time-start").value;
+  const endVal = document.getElementById("log-time-end").value;
+  const today = new Date().toISOString().slice(0, 10);
+
+  if (startVal) currentLog.time_start = `${today}T${startVal}:00`;
+  if (endVal) currentLog.time_end = `${today}T${endVal}:00`;
+
+  calcLogMinutes(currentLog);
+  updateStats();
+  checkGrayzone();
+  updateLog();
+}
+
+function updateStats() {
+  const h = Math.floor(currentLog.task_total_minutes / 60);
+  const m = currentLog.task_total_minutes % 60;
+  document.getElementById("stat-hours").textContent = formatDuration(currentLog.task_total_minutes);
+  document.getElementById("stat-tasks").textContent = currentLog.tasks?.length || 0;
+
+  if (currentLog.day_duration_minutes > 0) {
+    const pct = Math.round((currentLog.grayzone_minutes / currentLog.day_duration_minutes) * 100);
+    document.getElementById("stat-gray").textContent = pct + "%";
+    renderTimeBar();
+  } else {
+    document.getElementById("stat-gray").textContent = "—";
+  }
+}
+
+function renderTimeBar() {
+  const bar = document.getElementById("time-bar");
+  if (!currentLog.day_duration_minutes) { bar.innerHTML = ""; return; }
+
+  const total = currentLog.day_duration_minutes;
+  const segments = buildTimeBarSegments();
+  bar.innerHTML = segments.map(s =>
+    `<div class="time-bar-fill" style="width:${(s.minutes/total)*100}%;background:${s.color}" title="${s.label}"></div>`
+  ).join("");
+}
+
+function buildTimeBarSegments() {
+  const byType = {};
+  (currentLog.tasks || []).forEach(task => {
+    const typeId = task.activity_type_id || "sys-gray";
+    const color = getActivityTypeColor(logData, typeId);
+    if (!byType[typeId]) byType[typeId] = { minutes: 0, color };
+    byType[typeId].minutes += task.duration_minutes || 0;
+  });
+
+  const segments = Object.values(byType);
+  if (currentLog.grayzone_minutes > 0) {
+    segments.push({ minutes: currentLog.grayzone_minutes, color: getActivityTypeColor(logData, "sys-gray"), label: t("log.grayzone_label") });
+  }
+  return segments;
+}
+
+function checkGrayzone() {
+  const warning = document.getElementById("grayzone-warning");
+  const pctEl = document.getElementById("grayzone-pct");
+  if (greyzoneExceeded(currentLog)) {
+    const pct = Math.round((currentLog.grayzone_minutes / currentLog.day_duration_minutes) * 100);
+    pctEl.textContent = pct + "%";
+    warning.classList.remove("hidden");
+    currentLog.grayzone_prompted = true;
+  } else {
+    warning.classList.add("hidden");
+  }
+}
+
+// ── Rating ────────────────────────────────────────────────────
+function renderRating() {
+  const container = document.getElementById("rating-btns");
+  container.innerHTML = [1,2,3,4,5].map(n =>
+    `<button class="rating-btn ${currentLog.day_rating === n ? "active" : ""}"
+      onclick="setRating(${n})">${n} <span style="font-size:1.1rem">${t("log.rating_" + n)}</span></button>`
+  ).join("");
+}
+
+function setRating(n) {
+  currentLog.day_rating = n;
+  updateLog();
+  renderRating();
+}
+
+// ── To-dos ────────────────────────────────────────────────────
+function renderTodos() {
+  const list = document.getElementById("todos-list");
+  const empty = document.getElementById("todos-empty");
+  const todos = logData.todos || [];
+
+  if (!todos.length) {
+    list.innerHTML = "";
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  list.innerHTML = todos.map(todo => `
+    <div class="todo-item ${todo.completed ? "done" : ""}">
+      <div class="todo-check ${todo.completed ? "checked" : ""}" onclick="toggleTodo('${todo.todo_id}')">
+        ${todo.completed ? "✓" : ""}
+      </div>
+      <div style="flex:1">
+        <div class="todo-text">${escHtml(todo.description)}</div>
+        ${todo.due_date ? `<div class="todo-meta">📅 ${formatDate(todo.due_date + "T12:00:00")}</div>` : ""}
+        ${todo.project_id ? `<div class="todo-meta">${getTodoProjectName(todo.project_id)}</div>` : ""}
+      </div>
+      <button class="btn btn--icon btn--sm" onclick="removeTodo('${todo.todo_id}')">✕</button>
+    </div>
+  `).join("");
+}
+
+function getTodoProjectName(projectId) {
+  const p = logData.projects?.find(x => x.project_id === projectId);
+  return p ? `📁 ${p.project_name}` : "";
+}
+
+function addTodo() {
+  const desc = prompt(t("log.todo_description"));
+  if (!desc?.trim()) return;
+  const todo = {
+    todo_id: generateUUID(),
+    description: desc.trim(),
+    project_id: null,
+    created_date: new Date().toISOString().slice(0, 10),
+    due_date: null,
+    completed: false,
+    completed_date: null,
+    log_id_completed: null,
+  };
+  logData.todos.push(todo);
+  saveData(logData);
+  renderTodos();
+}
+
+function toggleTodo(todoId) {
+  const todo = logData.todos.find(x => x.todo_id === todoId);
+  if (!todo) return;
+  todo.completed = !todo.completed;
+  if (todo.completed) {
+    todo.completed_date = new Date().toISOString().slice(0, 10);
+    todo.log_id_completed = currentLog.log_id;
+    if (!currentLog.todos_completed_today.includes(todoId)) {
+      currentLog.todos_completed_today.push(todoId);
+    }
+  } else {
+    todo.completed_date = null;
+    todo.log_id_completed = null;
+    currentLog.todos_completed_today = currentLog.todos_completed_today.filter(x => x !== todoId);
+  }
+  saveData(logData);
+  renderTodos();
+}
+
+function removeTodo(todoId) {
+  logData.todos = logData.todos.filter(x => x.todo_id !== todoId);
+  saveData(logData);
+  renderTodos();
+}
+
+// ── Projects sidebar ──────────────────────────────────────────
+function renderProjectsSidebar() {
+  const list = document.getElementById("projects-sidebar-list");
+  const projects = logData.projects?.filter(p => p.status === "active") || [];
+  list.innerHTML = projects.map(p => `
+    <div class="drawer-item" style="margin-bottom:var(--sp-2);cursor:default">
+      <div style="flex:1">
+        <div class="drawer-item-label">${escHtml(p.project_name)}</div>
+        <div class="drawer-item-sub">${escHtml(p.client_name || "")}</div>
+      </div>
+      <span class="tag" style="background:var(--color-chlorophyll-500);color:white;font-size:1rem">${t("drawer.projects_status_active")}</span>
+    </div>
+  `).join("") || `<p class="text-muted" style="font-size:1.3rem">—</p>`;
+}
+
+// ── Drawers ───────────────────────────────────────────────────
+function renderDrawers() {
+  renderPeopleDrawer();
+  renderToolsDrawer();
+  renderTypesDrawer();
+  if (logData.pathway === "hub") renderProjectsDrawer();
+}
+
+function renderDrawerToggles() {
+  const container = document.getElementById("drawer-toggle-btns");
+  const drawers = [
+    { id: "drawer-people", key: "drawer.people_title" },
+    { id: "drawer-tools", key: "drawer.tools_title" },
+    { id: "drawer-types", key: "drawer.types_title" },
+  ];
+  if (logData.pathway === "hub") {
+    drawers.push({ id: "drawer-projects", key: "drawer.projects_title" });
+  }
+  container.innerHTML = drawers.map(d =>
+    `<button class="drawer-toggle" onclick="openDrawer('${d.id}')" data-i18n="${d.key}"></button>`
+  ).join("");
+  applyLanguage(getCurrentLang());
+}
+
+function openDrawer(id) {
+  closeAllDrawers();
+  renderDrawers();
+  document.getElementById(id)?.classList.add("open");
+  document.getElementById("drawer-overlay")?.classList.add("visible");
+}
+
+function closeAllDrawers() {
+  document.querySelectorAll(".drawer-panel").forEach(d => d.classList.remove("open"));
+  document.getElementById("drawer-overlay")?.classList.remove("visible");
+}
+
+function renderPeopleDrawer() {
+  const list = document.getElementById("people-drawer-list");
+  const people = logData.people || [];
+  list.innerHTML = people.map(p => `
+    <div class="drawer-item" draggable="true"
+      ondragstart="startDrag(event,'person','${p.person_id}')">
+      <div class="drawer-item-dot" style="background:var(--color-cobalt-500)"></div>
+      <div>
+        <div class="drawer-item-label">${escHtml(p.name)}</div>
+        <div class="drawer-item-sub">${escHtml(p.role_type || "")}${p.organization ? " · " + escHtml(p.organization) : ""}</div>
+      </div>
+    </div>
+  `).join("") || `<p class="text-muted" style="font-size:1.3rem">—</p>`;
+}
+
+function renderToolsDrawer() {
+  const list = document.getElementById("tools-drawer-list");
+  const tools = logData.tools || [];
+  list.innerHTML = tools.map(tool => `
+    <div class="drawer-item" draggable="true"
+      ondragstart="startDrag(event,'tool','${tool.tool_id}')">
+      <div class="drawer-item-dot" style="background:var(--color-gold-500)"></div>
+      <div>
+        <div class="drawer-item-label">${escHtml(tool.name)}</div>
+        <div class="drawer-item-sub">${escHtml(tool.category || "")}</div>
+      </div>
+    </div>
+  `).join("") || `<p class="text-muted" style="font-size:1.3rem">—</p>`;
+}
+
+function renderTypesDrawer() {
+  const list = document.getElementById("types-drawer-list");
+  const types = logData.activity_types || [];
+  list.innerHTML = types.map(at => {
+    const label = at.label_key ? t(at.label_key) : at.label;
+    return `
+      <div class="drawer-item" draggable="true"
+        ondragstart="startDrag(event,'activity_type','${at.type_id}')">
+        <div class="drawer-item-dot" style="background:${at.color}"></div>
+        <div>
+          <div class="drawer-item-label">${escHtml(label)}</div>
+          ${at.system ? `<div class="drawer-item-sub" data-i18n="drawer.types_system"></div>` : ""}
+        </div>
+      </div>
+    `;
+  }).join("");
+  applyLanguage(getCurrentLang());
+}
+
+function renderProjectsDrawer() {
+  const body = document.getElementById("projects-drawer-body");
+  if (!body) return;
+  const projects = logData.projects || [];
+  const statuses = ["active","completed","paused","cancelled"];
+  body.innerHTML = projects.map(p => {
+    const statusOpts = statuses.map(s =>
+      `<option value="${s}" ${p.status === s ? "selected" : ""} data-i18n="drawer.projects_status_${s}"></option>`
+    ).join("");
+    return `
+      <div class="drawer-item" style="flex-direction:column;align-items:flex-start;gap:var(--sp-2)">
+        <div class="drawer-item-label">${escHtml(p.project_name)}</div>
+        <div class="drawer-item-sub">${escHtml(p.client_name || "")}</div>
+        <div class="flex gap-2 items-center" style="width:100%">
+          <select style="flex:1;font-size:1.3rem" onchange="updateProjectStatus('${p.project_id}',this.value)">${statusOpts}</select>
+        </div>
+      </div>
+    `;
+  }).join("") || `<p class="text-muted" style="font-size:1.3rem;padding:var(--sp-4)">—</p>`;
+  applyLanguage(getCurrentLang());
+}
+
+function updateProjectStatus(projectId, status) {
+  const project = logData.projects.find(p => p.project_id === projectId);
+  if (!project) return;
+  project.status = status;
+  if (status === "completed" || status === "cancelled") {
+    project.project_end_date = new Date().toISOString().slice(0, 10);
+  }
+  saveData(logData);
+  renderProjectsSidebar();
+}
+
+// ── Drag and drop ─────────────────────────────────────────────
+function startDrag(event, type, id) {
+  event.dataTransfer.setData("type", type);
+  event.dataTransfer.setData("id", id);
+}
+
+// ── Add forms in drawers ──────────────────────────────────────
+function showAddPersonForm() { document.getElementById("add-person-form").classList.remove("hidden"); }
+function hideAddPersonForm() { document.getElementById("add-person-form").classList.add("hidden"); }
+
+function saveNewPerson() {
+  const name = document.getElementById("new-person-name").value.trim();
+  if (!name) return;
+  const cache = loadCache();
+  const person = addPerson(logData, {
+    name,
+    role_type: document.getElementById("new-person-role").value.trim(),
+    organization: document.getElementById("new-person-org").value.trim(),
+    notes: "",
+  });
+  updateCache(logData);
+  hideAddPersonForm();
+  document.getElementById("new-person-name").value = "";
+  document.getElementById("new-person-role").value = "";
+  document.getElementById("new-person-org").value = "";
+  renderPeopleDrawer();
+}
+
+function showAddToolForm() { document.getElementById("add-tool-form").classList.remove("hidden"); }
+function hideAddToolForm() { document.getElementById("add-tool-form").classList.add("hidden"); }
+
+function saveNewTool() {
+  const name = document.getElementById("new-tool-name").value.trim();
+  if (!name) return;
+  addTool(logData, {
+    name,
+    category: document.getElementById("new-tool-cat").value.trim(),
+  });
+  updateCache(logData);
+  hideAddToolForm();
+  document.getElementById("new-tool-name").value = "";
+  document.getElementById("new-tool-cat").value = "";
+  renderToolsDrawer();
+}
+
+function showAddTypeForm() { document.getElementById("add-type-form").classList.remove("hidden"); }
+function hideAddTypeForm() { document.getElementById("add-type-form").classList.add("hidden"); }
+
+function buildColorPicker() {
+  const picker = document.getElementById("type-color-picker");
+  if (!picker) return;
+  picker.innerHTML = LCI_PALETTE.map(c =>
+    `<div class="color-swatch ${c.hex === "#00587c" ? "selected" : ""}"
+      style="background:${c.hex}" title="${c.name}"
+      onclick="selectColor('${c.hex}', this)"></div>`
+  ).join("");
+}
+
+function selectColor(hex, el) {
+  document.querySelectorAll(".color-swatch").forEach(s => s.classList.remove("selected"));
+  el.classList.add("selected");
+  document.getElementById("new-type-color").value = hex;
+}
+
+function saveNewType() {
+  const label = document.getElementById("new-type-label").value.trim();
+  const color = document.getElementById("new-type-color").value;
+  if (!label) return;
+  addActivityType(logData, { label, color });
+  hideAddTypeForm();
+  document.getElementById("new-type-label").value = "";
+  renderTypesDrawer();
+}
+
+function showAddProjectForm() { document.getElementById("add-project-form").classList.remove("hidden"); }
+function hideAddProjectForm() { document.getElementById("add-project-form").classList.add("hidden"); }
+
+function saveNewProject() {
+  const name = document.getElementById("new-proj-name").value.trim();
+  if (!name) return;
+  addProject(logData, {
+    project_name: name,
+    client_name: document.getElementById("new-proj-client").value.trim(),
+    student_joined_date: document.getElementById("new-proj-joined").value || new Date().toISOString().slice(0, 10),
+    project_start_date: null,
+    client_person_id: null,
+  });
+  hideAddProjectForm();
+  document.getElementById("new-proj-name").value = "";
+  renderProjectsDrawer();
+  renderProjectsSidebar();
+}
+
+// ── Update log state ──────────────────────────────────────────
+function updateLog() {
+  currentLog.late_filing = document.getElementById("late-filing")?.checked || false;
+  currentLog.day_type = document.getElementById("log-day-type")?.value || "full";
+  currentLog.obstacle = document.getElementById("log-obstacle")?.value.trim() || "";
+  currentLog.obstacle_response = document.getElementById("log-obstacle-response")?.value.trim() || "";
+  currentLog.closing_word = document.getElementById("log-closing")?.value.trim() || "";
+  currentLog.grayzone_description = document.getElementById("grayzone-desc")?.value.trim() || "";
+
+  // Upsert in data
+  const idx = logData.logs.findIndex(l => l.log_id === currentLog.log_id);
+  if (idx >= 0) logData.logs[idx] = currentLog;
+  else logData.logs.push(currentLog);
+
+  saveData(logData);
+  lastDownloaded = false;
+  showDownloadBanner();
+  updateFooterStatus();
+  resetIdleTimer();
+}
+
+// ── Download ──────────────────────────────────────────────────
+function saveAndDownload() {
+  updateLog();
+  exportLogJSON(logData, currentLog);
+  lastDownloaded = true;
+  hideDownloadBanner();
+  updateFooterStatus(true);
+}
+
+function showDownloadBanner() {
+  document.getElementById("download-banner").classList.remove("hidden");
+}
+
+function hideDownloadBanner() {
+  const banner = document.getElementById("download-banner");
+  banner.classList.add("hidden");
+  banner.classList.add("downloaded");
+}
+
+function updateFooterStatus(saved = false) {
+  const el = document.getElementById("footer-save-status");
+  if (!el) return;
+  const lang = getCurrentLang();
+  const now = new Date().toLocaleTimeString(lang, { timeStyle: "short" });
+  el.textContent = saved
+    ? (lang === "fr-CA" ? `Téléchargé à ${now}` : `Downloaded at ${now}`)
+    : (lang === "fr-CA" ? `Modifié à ${now} — non téléchargé` : `Modified at ${now} — not downloaded`);
+}
+
+// ── Idle timer ────────────────────────────────────────────────
+function setupIdleTimer() {
+  resetIdleTimer();
+}
+
+function resetIdleTimer() {
+  if (idleTimer) clearTimeout(idleTimer);
+  document.getElementById("idle-banner")?.classList.add("hidden");
+  idleTimer = setTimeout(() => {
+    if (!lastDownloaded) {
+      document.getElementById("idle-banner")?.classList.remove("hidden");
+    }
+  }, SETTINGS.IDLE_REMINDER_MINUTES * 60 * 1000);
+}
+
+// ── Utilities ─────────────────────────────────────────────────
+function escHtml(str) {
+  if (!str) return "";
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}

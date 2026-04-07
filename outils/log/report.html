@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rapport de stage</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .report-nav { display: flex; gap: var(--sp-2); flex-wrap: wrap; margin-bottom: var(--sp-8); }
+    .report-nav-btn { padding: var(--sp-2) var(--sp-4); border-radius: var(--r-pill); font-size: 1.4rem; font-weight: 500; cursor: pointer; border: 1.5px solid var(--border); background: var(--bg-card); color: var(--text-muted); font-family: inherit; transition: all var(--dur-fast); }
+    .report-nav-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+    .report-section { display: none; }
+    .report-section.active { display: block; }
+    .chart-wrap { background: var(--bg-card); border-radius: var(--r-lg); padding: var(--sp-5); box-shadow: var(--shadow-md); margin-bottom: var(--sp-6); }
+    .word-cloud { display: flex; flex-wrap: wrap; gap: var(--sp-3); padding: var(--sp-4); }
+    .word-item { border-radius: var(--r-pill); padding: 0.3rem var(--sp-3); font-weight: 500; background: var(--tag-bg); color: var(--tag-text); }
+    .tool-bar { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-2); }
+    .tool-bar-track { flex: 1; height: 0.8rem; background: var(--bg-subtle); border-radius: var(--r-pill); overflow: hidden; }
+    .tool-bar-fill { height: 100%; background: var(--accent); border-radius: var(--r-pill); transition: width var(--dur-slow) var(--ease-exp); }
+    .reflection-text { font-size: 1.5rem; line-height: 1.8; color: var(--text); white-space: pre-wrap; }
+    .reflection-label { font-size: 1.2rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-subtle); margin-bottom: var(--sp-2); }
+    .reflection-block { margin-bottom: var(--sp-6); padding-bottom: var(--sp-6); border-bottom: 1px solid var(--border); }
+    .reflection-block:last-child { border-bottom: none; }
+    .competency-item { padding: var(--sp-3) var(--sp-4); background: var(--bg-subtle); border-radius: var(--r-md); margin-bottom: var(--sp-2); }
+    .project-outcome-card { border: 1.5px solid var(--border); border-radius: var(--r-lg); padding: var(--sp-5); margin-bottom: var(--sp-4); background: var(--bg-card); }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <header class="site-header">
+    <div class="container container--wide">
+      <div class="header-inner">
+        <a href="index.html" class="site-title" style="text-decoration:none;">
+          Journal de stage<span></span>
+        </a>
+        <nav class="site-nav">
+          <a href="index.html" class="nav-link" data-i18n="nav.setup">Configuration</a>
+          <a href="log.html" class="nav-link" data-i18n="nav.log">Journal</a>
+          <a href="report.html" class="nav-link active" data-i18n="nav.report">Rapport</a>
+        </nav>
+        <div class="header-actions">
+          <button class="btn btn--ghost btn--sm lang-toggle-btn" data-lang-target="en-CA">EN</button>
+          <button class="btn btn--ghost btn--sm theme-toggle-btn" data-i18n="nav.toggle_dark">Mode sombre</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container container--wide">
+
+      <!-- ── PHASE 1: Upload ─────────────────────────────── -->
+      <div id="phase-upload">
+        <div style="max-width:60rem; margin:0 auto;">
+          <h2 data-i18n="report.upload_title" style="margin-bottom:var(--sp-3)"></h2>
+          <p class="text-muted" data-i18n="report.upload_instructions" style="margin-bottom:var(--sp-6)"></p>
+
+          <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+            <div class="upload-icon">📂</div>
+            <p data-i18n="report.upload_cta" style="font-size:1.6rem;font-weight:500;margin-bottom:var(--sp-2)"></p>
+            <p class="text-muted" data-i18n="report.upload_drop" style="font-size:1.4rem"></p>
+            <input type="file" id="file-input" accept=".json" multiple style="display:none" onchange="handleFiles(this.files)">
+          </div>
+
+          <div id="upload-files-list" class="upload-files-list hidden"></div>
+
+          <div id="upload-errors" class="hidden"></div>
+          <div id="upload-conflicts" class="hidden"></div>
+
+          <button class="btn btn--primary btn--full btn--lg mt-6 hidden" id="proceed-btn"
+                  onclick="proceedToReflection()" data-i18n="action.next"></button>
+        </div>
+      </div>
+
+      <!-- ── PHASE 2: Reflection forms ──────────────────── -->
+      <div id="phase-reflection" class="hidden">
+        <h2 data-i18n="report.section_reflection" style="margin-bottom:var(--sp-6)"></h2>
+
+        <div class="card mb-4">
+          <div class="section-title" data-i18n="report.section_reflection"></div>
+
+          <div class="form-group">
+            <label data-i18n="report.reality_vs_expectation"></label>
+            <textarea id="r-reality" rows="4"></textarea>
+          </div>
+          <div class="form-group">
+            <label data-i18n="report.significant_work"></label>
+            <textarea id="r-significant" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label data-i18n="report.proud_moment"></label>
+            <textarea id="r-proud" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label data-i18n="report.failure_moment"></label>
+            <textarea id="r-failure" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label data-i18n="report.failure_lesson"></label>
+            <textarea id="r-failure-lesson" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label data-i18n="report.env_lesson"></label>
+            <textarea id="r-env" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label data-i18n="report.supervisor_rel"></label>
+            <textarea id="r-supervisor" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label data-i18n="report.advice"></label>
+            <textarea id="r-advice" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label data-i18n="report.would_do_differently"></label>
+            <textarea id="r-different" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label data-i18n="report.comments"></label>
+            <textarea id="r-comments" rows="2"></textarea>
+          </div>
+        </div>
+
+        <!-- Tools reflection -->
+        <div class="card mb-4">
+          <div class="section-title" data-i18n="report.tools_reflection_title"></div>
+          <div id="tools-reflection-list"></div>
+        </div>
+
+        <!-- Collaborator appreciation -->
+        <div class="card mb-4">
+          <div class="section-title" data-i18n="report.collab_title"></div>
+          <p class="text-muted" style="font-size:1.3rem;margin-bottom:var(--sp-4)" data-i18n="report.collab_note"></p>
+          <div id="collab-appreciation-list"></div>
+        </div>
+
+        <!-- Competencies -->
+        <div class="card mb-4">
+          <div class="section-title" data-i18n="report.competencies_title"></div>
+
+          <div class="accordion-item">
+            <button class="accordion-header" onclick="toggleAccordion(this)">
+              <span data-i18n="report.competencies_helpful"></span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <p class="text-muted" style="font-size:1.4rem;margin-bottom:var(--sp-4)" data-i18n="report.competencies_helpful_q"></p>
+              <div id="competencies-helpful-list"></div>
+              <button class="add-block-btn" onclick="addCompetencyBlock('helpful')">
+                + <span data-i18n="action.add"></span>
+              </button>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-header" onclick="toggleAccordion(this)">
+              <span data-i18n="report.competencies_gaps"></span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <p class="text-muted" style="font-size:1.4rem;margin-bottom:var(--sp-4)" data-i18n="report.competencies_gaps_q"></p>
+              <div id="competencies-gaps-list"></div>
+              <button class="add-block-btn" onclick="addCompetencyBlock('gaps')">
+                + <span data-i18n="action.add"></span>
+              </button>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-header" onclick="toggleAccordion(this)">
+              <span data-i18n="report.competencies_improve"></span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <p class="text-muted" style="font-size:1.4rem;margin-bottom:var(--sp-4)" data-i18n="report.competencies_improve_q"></p>
+              <div id="competencies-improve-list"></div>
+              <button class="add-block-btn" onclick="addCompetencyBlock('improve')">
+                + <span data-i18n="action.add"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project outcomes (hub) -->
+        <div class="card mb-4 hidden" id="project-outcomes-card">
+          <div class="section-title" data-i18n="report.project_outcomes_title"></div>
+          <div id="project-outcomes-list"></div>
+        </div>
+
+        <!-- Future -->
+        <div class="card mb-4">
+          <div class="section-title" data-i18n="report.future_title"></div>
+          <div class="form-group">
+            <label data-i18n="report.future_direction"></label>
+            <textarea id="r-future-direction" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label data-i18n="report.future_next_steps"></label>
+            <textarea id="r-future-steps" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label data-i18n="report.future_skills"></label>
+            <textarea id="r-future-skills" rows="2"></textarea>
+          </div>
+        </div>
+
+        <!-- Dates -->
+        <div class="card mb-6">
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="field.end_date"></label>
+              <input type="date" id="r-actual-end">
+            </div>
+            <div class="form-group">
+              <label>Semaines complétées / Weeks completed</label>
+              <input type="number" id="r-weeks" min="0" max="52">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-between">
+          <button class="btn btn--ghost" onclick="goToPhase('phase-upload')" data-i18n="action.back"></button>
+          <button class="btn btn--primary btn--lg" onclick="generateDashboard()" data-i18n="action.confirm"></button>
+        </div>
+      </div>
+
+      <!-- ── PHASE 3: Dashboard ──────────────────────────── -->
+      <div id="phase-dashboard" class="hidden">
+
+        <!-- Summary stats -->
+        <div class="flex items-center justify-between mb-6" style="flex-wrap:wrap;gap:var(--sp-4)">
+          <h2 data-i18n="dashboard.title" id="dashboard-name"></h2>
+          <button class="btn btn--secondary btn--sm" onclick="window.print()" style="print-display:none">⬇ PDF</button>
+        </div>
+
+        <div class="stat-grid mb-6" id="stat-grid"></div>
+
+        <!-- Nav tabs -->
+        <div class="report-nav" id="report-nav"></div>
+
+        <!-- Section: Timeline -->
+        <div class="report-section active" id="section-timeline">
+          <div class="chart-wrap">
+            <h4 data-i18n="dashboard.section_timeline" style="margin-bottom:var(--sp-4)"></h4>
+            <div class="timeline-chart" id="timeline-chart"></div>
+            <div class="timeline-legend" id="timeline-legend"></div>
+          </div>
+
+          <div class="chart-wrap">
+            <h4 data-i18n="dashboard.grayzone_evolution" style="margin-bottom:var(--sp-4)"></h4>
+            <div class="timeline-chart" id="grayzone-chart"></div>
+          </div>
+        </div>
+
+        <!-- Section: Breakdown -->
+        <div class="report-section" id="section-breakdown">
+          <div class="chart-wrap">
+            <h4 data-i18n="dashboard.section_breakdown" style="margin-bottom:var(--sp-5)"></h4>
+            <div id="breakdown-chart"></div>
+          </div>
+        </div>
+
+        <!-- Section: Tools -->
+        <div class="report-section" id="section-tools">
+          <div class="chart-wrap">
+            <h4 data-i18n="dashboard.section_tools" style="margin-bottom:var(--sp-5)"></h4>
+            <div id="tools-chart"></div>
+          </div>
+        </div>
+
+        <!-- Section: Lessons -->
+        <div class="report-section" id="section-lessons">
+          <div class="chart-wrap">
+            <h4 data-i18n="dashboard.section_lessons" style="margin-bottom:var(--sp-4)"></h4>
+            <div class="word-cloud" id="lessons-cloud"></div>
+          </div>
+        </div>
+
+        <!-- Section: Reflection -->
+        <div class="report-section" id="section-reflection">
+          <div class="card" id="reflection-content"></div>
+        </div>
+
+      </div><!-- /phase-dashboard -->
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <span id="report-footer">Journal de stage</span>
+    </div>
+  </footer>
+</div>
+
+<script src="assets/lang.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/report.js"></script>
+</body>
+</html>
