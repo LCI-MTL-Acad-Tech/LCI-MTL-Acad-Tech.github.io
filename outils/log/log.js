@@ -31,6 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderAll();
   renderDrawerToggles();
+  initMobile();
   buildColorPicker();
   setupIdleTimer();
 
@@ -812,4 +813,33 @@ function resetIdleTimer() {
 function escHtml(str) {
   if (!str) return "";
   return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// ── Mobile enhancements ───────────────────────────────────────
+function initMobile() {
+  // Show mobile drawer bar (CSS controls visibility via media query)
+  const bar = document.getElementById("mobile-drawer-bar");
+  if (bar) bar.style.removeProperty("display");
+
+  // Show hub projects button if needed
+  if (logData && logData.pathway === "hub") {
+    const projBtn = document.getElementById("mobile-projects-btn");
+    if (projBtn) projBtn.style.removeProperty("display");
+  }
+}
+
+// Patch saveAndDownload to also update FAB state
+const _origSaveAndDownload = saveAndDownload;
+function saveAndDownload() {
+  _origSaveAndDownload();
+  const fab = document.getElementById("fab-download");
+  if (fab) {
+    fab.classList.add("downloaded");
+    const lang = getCurrentLang();
+    fab.innerHTML = `✓ ${lang === "fr-CA" ? "Téléchargé" : "Downloaded"}`;
+    setTimeout(() => {
+      fab.classList.remove("downloaded");
+      fab.innerHTML = `⬇ <span data-i18n="log.download_cta">${t("log.download_cta")}</span>`;
+    }, 3000);
+  }
 }
