@@ -11,14 +11,23 @@ const SETTINGS = {
 
 // ── Default activity types ───────────────────────────────────
 const DEFAULT_ACTIVITY_TYPES = [
-  { type_id: "sys-work",       label_key: "activity.work",         color: "#00587c", system: true },
-  { type_id: "sys-production", label_key: "activity.production",   color: "#9569b9", system: true },
-  { type_id: "sys-research",   label_key: "activity.research",     color: "#8fb9a2", system: true },
-  { type_id: "sys-meeting",    label_key: "activity.meeting",      color: "#685ef7", system: true },
-  { type_id: "sys-training",   label_key: "activity.training",     color: "#5b8000", system: true },
-  { type_id: "sys-admin",      label_key: "activity.admin",        color: "#cc9f11", system: true },
-  { type_id: "sys-break",      label_key: "activity.break",        color: "#cdc19e", system: true },
-  { type_id: "sys-gray",       label_key: "activity.undocumented", color: "#eb2d37", system: true },
+  // Work-type categories — cross-disciplinary
+  { type_id: "sys-programming",   label_key: "activity.programming",   color: "#00587c", system: true },
+  { type_id: "sys-design",        label_key: "activity.design",        color: "#d485fa", system: true },
+  { type_id: "sys-research",      label_key: "activity.research",      color: "#8fb9a2", system: true },
+  { type_id: "sys-planning",      label_key: "activity.planning",      color: "#cc9f11", system: true },
+  { type_id: "sys-data-analysis", label_key: "activity.data_analysis", color: "#337996", system: true },
+  { type_id: "sys-debugging",     label_key: "activity.debugging",     color: "#eb2d37", system: true },
+  { type_id: "sys-production",    label_key: "activity.production",    color: "#9569b9", system: true },
+  { type_id: "sys-testing",       label_key: "activity.testing",       color: "#5b8000", system: true },
+  { type_id: "sys-documentation", label_key: "activity.documentation", color: "#784619", system: true },
+  { type_id: "sys-client-work",   label_key: "activity.client_work",   color: "#fe6c06", system: true },
+  // Non-work categories
+  { type_id: "sys-meeting",       label_key: "activity.meeting",       color: "#685ef7", system: true },
+  { type_id: "sys-training",      label_key: "activity.training",      color: "#3d4c11", system: true },
+  { type_id: "sys-admin",         label_key: "activity.admin",         color: "#63625d", system: true },
+  { type_id: "sys-break",         label_key: "activity.break",         color: "#cdc19e", system: true },
+  { type_id: "sys-gray",          label_key: "activity.undocumented",  color: "#576266", system: true },
 ];
 
 // LCI palette options for user-defined activity types
@@ -149,11 +158,13 @@ function createNewLog(date) {
     grayzone_minutes: 0,
     grayzone_description: "",
     grayzone_prompted: false,
+    morning_energy: null,
     obstacle: "",
     obstacle_response: "",
     win: "",
     plan_tomorrow: "",
     weekly_wrap: null,
+    project_status_updates: [],
     day_rating: 3,
     closing_word: "",
     todos_completed_today: [],
@@ -364,22 +375,33 @@ function getActivityTypeColor(data, typeId) {
 }
 
 // ── Theme ────────────────────────────────────────────────────
-function applyTheme(theme) {
+function applyTheme(theme, persist = false) {
   document.documentElement.setAttribute("data-theme", theme);
-  localStorage.setItem(LS.THEME, theme);
-}
-
-function toggleTheme() {
-  const current = localStorage.getItem(LS.THEME) || "light";
-  applyTheme(current === "light" ? "dark" : "light");
+  // Only persist if called from user action (persist=true) or already stored
+  if (persist || localStorage.getItem(LS.THEME)) {
+    localStorage.setItem(LS.THEME, theme);
+  }
   updateThemeButton();
 }
 
+function toggleTheme() {
+  const current = document.documentElement.getAttribute("data-theme") || "light";
+  applyTheme(current === "light" ? "dark" : "light", true); // true = persist
+}
+
+// SVG icons for theme toggle
+const ICON_MOON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>`;
+const ICON_SUN  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+
 function updateThemeButton() {
-  const theme = localStorage.getItem(LS.THEME) || "light";
+  const theme = document.documentElement.getAttribute("data-theme") || "light";
+  const isDark = theme === "dark";
   document.querySelectorAll(".theme-toggle-btn").forEach(btn => {
-    btn.setAttribute("data-i18n", theme === "light" ? "nav.toggle_dark" : "nav.toggle_light");
-    btn.textContent = t(theme === "light" ? "nav.toggle_dark" : "nav.toggle_light");
+    btn.innerHTML = isDark ? ICON_SUN : ICON_MOON;
+    btn.setAttribute("aria-label", t(isDark ? "nav.toggle_light" : "nav.toggle_dark"));
+    btn.title = t(isDark ? "nav.toggle_light" : "nav.toggle_dark");
+    // Remove data-i18n since content is now SVG, not text
+    btn.removeAttribute("data-i18n");
   });
 }
 
@@ -397,20 +419,112 @@ function setupAutocomplete(input, suggestions) {
   input.setAttribute("list", list.id);
 }
 
-// ── Init on every page ───────────────────────────────────────
-function initPage() {
-  const theme = localStorage.getItem(LS.THEME) || "light";
-  applyTheme(theme);
-  const lang = localStorage.getItem(LS.LANG) || "fr-CA";
-  applyLanguage(lang);
+// ── HTML escape utility ──────────────────────────────────────
+function escHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
 
+// ── Init on every page ───────────────────────────────────────
+function detectBrowserTheme() {
+  // Only called when no stored preference exists
+  if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    return "dark";
+  }
+  return "light";
+}
+
+function detectBrowserLang() {
+  // Only called when no stored preference exists
+  const nav = navigator.language || navigator.languages?.[0] || "fr-CA";
+  // French variants → fr-CA, everything else → en-CA
+  return nav.toLowerCase().startsWith("fr") ? "fr-CA" : "en-CA";
+}
+
+function initPage() {
+  // Theme: stored preference first, then browser default
+  const storedTheme = localStorage.getItem(LS.THEME);
+  applyTheme(storedTheme || detectBrowserTheme());
+
+  // Lang: stored preference first, then browser default
+  const storedLang = localStorage.getItem(LS.LANG);
+  // persist=false on auto-detect so we don't lock in browser default
+  applyLanguage(storedLang || detectBrowserLang(), !!storedLang);
+
+  // Wire up toggle buttons
   document.querySelectorAll(".theme-toggle-btn").forEach(btn => {
     btn.addEventListener("click", toggleTheme);
   });
   document.querySelectorAll(".lang-toggle-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const target = btn.getAttribute("data-lang-target") || (getCurrentLang() === "fr-CA" ? "en-CA" : "fr-CA");
+      // Persist explicitly — user override
+      localStorage.setItem(LS.LANG, target);
       applyLanguage(target);
     });
   });
+
+  // Listen for OS theme changes (only if no stored preference)
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
+    if (!localStorage.getItem(LS.THEME)) {
+      applyTheme(e.matches ? "dark" : "light");
+      updateThemeButton();
+    }
+  });
+}
+
+// ── Reset / start over ────────────────────────────────────────
+function clearAllData(keepPrefs = true) {
+  const theme = localStorage.getItem(LS.THEME);
+  const lang  = localStorage.getItem(LS.LANG);
+
+  // Clear all internship keys
+  Object.values(LS).forEach(key => localStorage.removeItem(key));
+
+  // Restore preferences if requested
+  if (keepPrefs) {
+    if (theme) localStorage.setItem(LS.THEME, theme);
+    if (lang)  localStorage.setItem(LS.LANG,  lang);
+  }
+}
+
+// ── Reset modal ───────────────────────────────────────────────
+function openResetModal() {
+  const modal = document.getElementById("reset-modal");
+  if (!modal) return;
+  // Clear input each time it opens
+  const input = document.getElementById("reset-confirm-input");
+  if (input) input.value = "";
+  const btn = document.getElementById("reset-confirm-btn");
+  if (btn) btn.disabled = true;
+  modal.classList.remove("hidden");
+  // Focus the input after a brief delay so the transition settles
+  setTimeout(() => input?.focus(), 80);
+  applyLanguage(getCurrentLang());
+}
+
+function closeResetModal(event) {
+  // Close if clicking the overlay itself, not the modal box
+  if (event && event.target !== document.getElementById("reset-modal")) return;
+  document.getElementById("reset-modal")?.classList.add("hidden");
+}
+
+function checkResetConfirm(value) {
+  const lang = getCurrentLang();
+  // Accept either language's confirmation word
+  const required = lang === "fr-CA" ? "RECOMMENCER" : "RESET";
+  const btn = document.getElementById("reset-confirm-btn");
+  if (btn) btn.disabled = value.trim().toUpperCase() !== required;
+}
+
+function executeReset() {
+  const keepPrefs = document.getElementById("reset-keep-prefs")?.checked !== false;
+  clearAllData(keepPrefs);
+  document.getElementById("reset-modal")?.classList.add("hidden");
+  // Redirect to index to start fresh
+  window.location.href = "index.html";
 }

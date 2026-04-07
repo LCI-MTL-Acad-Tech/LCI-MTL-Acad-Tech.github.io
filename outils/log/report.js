@@ -647,10 +647,10 @@ function buildTimeline(logs, data) {
     };
   });
 
-  // Main timeline
+  // Calculate pixel heights after render using ResizeObserver
+  // Build HTML first with data attributes, then size after paint
   chart.innerHTML = logs.map(log => {
     const dayTotal = log.day_duration_minutes || log.task_total_minutes || 0;
-    const colHeightPct = dayTotal ? Math.max((dayTotal / maxMinutes) * 100, 2) : 2;
 
     // Group minutes by activity type
     const byType = {};
@@ -670,18 +670,21 @@ function buildTimeline(logs, data) {
         title="${actMap[tid]?.label || tid}: ${mins}min"></div>`;
     }).join("");
 
-    // Use day rating as opacity signal
+    // Opacity encodes day rating
     const opacity = 0.35 + ((log.day_rating || 3) / 5) * 0.65;
 
     return `
       <div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:1.4rem;max-width:3.2rem;">
-        <div class="timeline-col" style="height:${colHeightPct}%;opacity:${opacity}">
+        <div class="timeline-col" data-minutes="${dayTotal}" style="opacity:${opacity}">
           ${segments}
         </div>
         <div class="timeline-date">${log.date.slice(5)}</div>
       </div>
     `;
   }).join("");
+
+  // Size columns to fill available height — tallest bar = full container
+  sizeTimelineColumns(chart, maxMinutes);
 
   // Legend — only types actually used
   const usedIds = new Set();
@@ -699,7 +702,12 @@ function buildTimeline(logs, data) {
   }).join("");
 
   // Grayzone evolution chart
-  const maxGzPct = 100;
+  const maxGzPct = Math.max(...logs.map(log =>
+    log.day_duration_minutes
+      ? Math.round(((log.grayzone_minutes || 0) / log.day_duration_minutes) * 100)
+      : 0
+  ), 1);
+
   gzChart.innerHTML = logs.map(log => {
     const pct = log.day_duration_minutes
       ? Math.min(Math.round(((log.grayzone_minutes || 0) / log.day_duration_minutes) * 100), 100)
@@ -709,15 +717,71 @@ function buildTimeline(logs, data) {
     return `
       <div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:1.4rem;max-width:3.2rem;">
         <div style="width:100%;flex:1;display:flex;align-items:flex-end;">
-          <div style="width:100%;height:${pct}%;background:${color};
-            border-radius:2px 2px 0 0;min-height:${pct > 0 ? 2 : 0}px;
-            transition:height var(--dur-slow)" title="${pct}%"></div>
+          <div class="gz-bar" data-pct="${pct}" style="width:100%;background:${color};
+            border-radius:2px 2px 0 0;min-height:${pct > 0 ? 2 : 0}px" title="${pct}%"></div>
         </div>
         <div class="timeline-date">${log.date.slice(5)}</div>
       </div>
     `;
   }).join("");
+
+  sizeGrayzoneColumns(gzChart, maxGzPct);
 }
+
+// ── Timeline column sizing ────────────────────────────────────
+// Sets column heights in pixels so the tallest bar always fills
+// the available container height, regardless of its CSS height.
+function sizeTimelineColumns(container, maxMinutes) {
+  if (!container || !maxMinutes) return;
+  const availH = container.clientHeight
+    || parseInt(getComputedStyle(container).height)
+    || 320;
+  // Subtract padding (top + bottom = 2 * sp-4 = 32px)
+  const usable = Math.max(availH - 32, 80);
+
+  container.querySelectorAll(".timeline-col[data-minutes]").forEach(col => {
+    const mins = parseInt(col.dataset.minutes) || 0;
+    const h = mins ? Math.max(Math.round((mins / maxMinutes) * usable), 2) : 2;
+    col.style.height = h + "px";
+  });
+}
+
+function sizeGrayzoneColumns(container, maxPct) {
+  if (!container || !maxPct) return;
+  const availH = container.clientHeight
+    || parseInt(getComputedStyle(container).height)
+    || 320;
+  const usable = Math.max(availH - 32, 80);
+
+  container.querySelectorAll(".gz-bar[data-pct]").forEach(bar => {
+    const pct = parseInt(bar.dataset.pct) || 0;
+    const h = pct ? Math.max(Math.round((pct / maxPct) * usable), 2) : 0;
+    bar.style.height = h + "px";
+  });
+}
+
+// Re-size on window resize (debounced)
+let _resizeTimer;
+window.addEventListener("resize", () => {
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(() => {
+    if (typeof mergedData !== "undefined" && mergedData?.logs?.length) {
+      const logs = mergedData.logs;
+      const maxM = Math.max(...logs.map(l => l.day_duration_minutes || l.task_total_minutes || 0), 1);
+      const chart = document.getElementById("timeline-chart");
+      const gz    = document.getElementById("grayzone-chart");
+      if (chart) sizeTimelineColumns(chart, maxM);
+      if (gz) {
+        const maxGz = Math.max(...logs.map(l =>
+          l.day_duration_minutes
+            ? Math.round(((l.grayzone_minutes || 0) / l.day_duration_minutes) * 100)
+            : 0
+        ), 1);
+        sizeGrayzoneColumns(gz, maxGz);
+      }
+    }
+  }, 120);
+});
 
 // ── SVG Pie chart helper ──────────────────────────────────────
 function buildPieChart(container, slices) {
@@ -1068,8 +1132,16 @@ function buildMoodTimeline(logs) {
   const xs = logs.map((_, i) => padL + (i / Math.max(logs.length - 1, 1)) * chartW);
   const ys = logs.map(l => padT + chartH - ((( l.day_rating || 3) - 1) / 4) * chartH);
 
-  // Smooth polyline points
+  // Smooth polyline points — end-of-day rating
   const pts = logs.map((l, i) => `${xs[i].toFixed(1)},${ys[i].toFixed(1)}`).join(" ");
+
+  // Morning energy line (dashed, only for logs that have it)
+  const morningLogs = logs.filter(l => l.morning_energy != null);
+  const morningPts = morningLogs.map(l => {
+    const i = logs.indexOf(l);
+    const my = padT + chartH - (((l.morning_energy) - 1) / 4) * chartH;
+    return `${xs[i].toFixed(1)},${my.toFixed(1)}`;
+  }).join(" ");
 
   // Area fill path
   const areaPath = [
@@ -1133,6 +1205,9 @@ function buildMoodTimeline(logs) {
         <polyline points="${pts}" fill="none"
           stroke="var(--color-blue-500)" stroke-width="2"
           stroke-linejoin="round" stroke-linecap="round"/>
+        ${morningPts ? `<polyline points="${morningPts}" fill="none"
+          stroke="var(--color-gold-500)" stroke-width="1.5" stroke-dasharray="4,3"
+          stroke-linejoin="round" stroke-linecap="round" opacity="0.7"/>` : ''}
         ${winMarkers}
         ${circles}
       </svg>
@@ -1142,6 +1217,7 @@ function buildMoodTimeline(logs) {
       <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--color-blue-400);margin-right:4px"></span>${t("log.rating_3")}</span>
       <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--danger);margin-right:4px"></span>${t("log.rating_1")} / ${t("log.rating_2")}</span>
       <span><span style="color:var(--color-gold-500);margin-right:4px">★</span>${getCurrentLang() === "fr-CA" ? "Victoire du jour" : "Daily win"}</span>
+      ${morningLogs.length ? `<span><span style="display:inline-block;width:20px;height:2px;background:var(--color-gold-500);opacity:0.7;margin-right:4px;vertical-align:middle;border-top:2px dashed var(--color-gold-500)"></span>${getCurrentLang() === "fr-CA" ? "Énergie matinale" : "Morning energy"}</span>` : ''}
     </div>
   `;
 }
@@ -1189,15 +1265,7 @@ function buildWeeklyWraps(logs) {
   }).join("");
 }
 
-// ── Utility ───────────────────────────────────────────────────
-function escHtml(str) {
-  if (!str) return "";
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
+// escHtml is defined in app.js
 
 // ── Modality breakdown ────────────────────────────────────────
 function buildModality(logs) {
@@ -1244,4 +1312,63 @@ function buildModality(logs) {
     return `<div title="${l.date} — ${title}"
       style="width:1.4rem;height:1.4rem;border-radius:3px;background:${color};flex-shrink:0"></div>`;
   }).join("");
+}
+
+// ── Print / PDF ───────────────────────────────────────────────
+function printReport() {
+  // Expand all sections before printing, then restore after
+  const sections = document.querySelectorAll(".report-section");
+  const nav = document.getElementById("report-nav");
+  const wasActive = document.querySelector(".report-section.active")?.id;
+
+  // Show all sections
+  sections.forEach(s => {
+    s.classList.add("active");
+    s.dataset.printShown = "1";
+  });
+  // Show all accordions
+  document.querySelectorAll(".accordion-item").forEach(item => {
+    item.classList.add("open");
+    const body = item.querySelector(".accordion-body");
+    if (body) body.style.display = "block";
+  });
+  // Show collab content
+  const collab = document.getElementById("collab-content");
+  if (collab) collab.style.display = "block";
+
+  // Re-size timeline charts for print (they need a moment to render)
+  if (typeof mergedData !== "undefined" && mergedData?.logs?.length) {
+    const logs = mergedData.logs;
+    const maxM = Math.max(...logs.map(l => l.day_duration_minutes || l.task_total_minutes || 0), 1);
+    setTimeout(() => {
+      const chart = document.getElementById("timeline-chart");
+      const gz = document.getElementById("grayzone-chart");
+      if (chart) sizeTimelineColumns(chart, maxM);
+      if (gz) {
+        const maxGz = Math.max(...logs.map(l =>
+          l.day_duration_minutes ? Math.round(((l.grayzone_minutes||0)/l.day_duration_minutes)*100) : 0), 1);
+        sizeGrayzoneColumns(gz, maxGz);
+      }
+      window.print();
+      // Restore after print dialog closes
+      setTimeout(restoreAfterPrint, 800);
+    }, 200);
+  } else {
+    window.print();
+    setTimeout(restoreAfterPrint, 800);
+  }
+
+  function restoreAfterPrint() {
+    sections.forEach(s => {
+      s.classList.remove("active");
+      delete s.dataset.printShown;
+    });
+    if (wasActive) document.getElementById(wasActive)?.classList.add("active");
+    document.querySelectorAll(".accordion-item").forEach(item => {
+      item.classList.remove("open");
+      const body = item.querySelector(".accordion-body");
+      if (body) body.style.display = "";
+    });
+    if (collab) collab.style.display = "none";
+  }
 }

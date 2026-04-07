@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Journal du jour</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPCEtLSBCYWNrZ3JvdW5kIGNpcmNsZSAtLT4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0iIzAwNTg3YyIvPgogIDwhLS0gQnJpZWZjYXNlIGJvZHkgLS0+CiAgPHJlY3QgeD0iNSIgeT0iMTMiIHdpZHRoPSIyMiIgaGVpZ2h0PSIxNCIgcng9IjIuNSIgZmlsbD0id2hpdGUiLz4KICA8IS0tIEJyaWVmY2FzZSBoYW5kbGUgLS0+CiAgPHBhdGggZD0iTTExIDEzdi0yLjVhMSAxIDAgMCAxIDEtMWg4YTEgMSAwIDAgMSAxIDFWMTMiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPCEtLSBDZW50ZXIgY2xhc3AgLS0+CiAgPHJlY3QgeD0iMTMuNSIgeT0iMTcuNSIgd2lkdGg9IjUiIGhlaWdodD0iMyIgcng9IjEiIGZpbGw9IiMwMDU4N2MiLz4KICA8IS0tIEhvcml6b250YWwgYmFuZCAtLT4KICA8cmVjdCB4PSI1IiB5PSIxOC41IiB3aWR0aD0iMjIiIGhlaWdodD0iMi41IiBmaWxsPSJyZ2JhKDAsODgsMTI0LDAuMTUpIi8+Cjwvc3ZnPg==">
   <link rel="stylesheet" href="style.css">
   <style>
     .log-layout { display: grid; grid-template-columns: 1fr 32rem; gap: var(--sp-6); align-items: start; }
@@ -32,7 +34,8 @@
         </nav>
         <div class="header-actions">
           <button class="btn btn--ghost btn--sm lang-toggle-btn" data-lang-target="en-CA">EN</button>
-          <button class="btn btn--ghost btn--sm theme-toggle-btn" data-i18n="nav.toggle_dark">Mode sombre</button>
+          <button class="btn btn--ghost btn--sm theme-toggle-btn" aria-label="Toggle theme" style="padding:var(--sp-2);line-height:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg></button>
+          <button class="btn btn--ghost btn--sm reset-trigger-btn" onclick="openResetModal()" data-i18n="nav.reset" title="" style="opacity:.6"></button>
           <button class="btn btn--download btn--sm" onclick="saveAndDownload()" data-i18n="log.download_cta">Télécharger</button>
         </div>
       </div>
@@ -92,6 +95,13 @@
               </div>
             </div>
 
+            <!-- Morning energy (top of day) -->
+            <div class="form-group mb-4" id="morning-energy-group">
+              <label data-i18n="log.morning_energy"></label>
+              <div class="rating" id="morning-energy-btns"></div>
+              <div class="form-hint" data-i18n="log.morning_energy_hint"></div>
+            </div>
+
             <div class="form-row">
               <div class="form-group">
                 <label data-i18n="log.time_start"></label>
@@ -143,6 +153,25 @@
             <div class="time-bar mt-2" id="time-bar"></div>
           </div>
 
+          <!-- Morning todo / priorities (collapsible) -->
+          <div class="card mb-4" id="morning-todos-card">
+            <button class="accordion-header" onclick="toggleTodosPanel(this)"
+              style="width:100%;text-align:left;font-family:inherit;">
+              <span data-i18n="log.section_todos"></span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div id="morning-todos-body" class="accordion-body" style="display:block">
+              <p class="text-muted" style="font-size:1.3rem;margin-bottom:var(--sp-3)"
+                data-i18n="log.todos_morning_prompt"></p>
+              <div id="todos-list-inline"></div>
+              <div id="todos-empty-inline" class="text-muted"
+                style="font-size:1.3rem;text-align:center;padding:var(--sp-3) 0;display:none">—</div>
+              <button class="add-block-btn mt-2" onclick="addTodo()">
+                + <span data-i18n="action.new_todo"></span>
+              </button>
+            </div>
+          </div>
+
           <!-- Tasks section -->
           <div class="card mb-4">
             <div class="flex items-center justify-between mb-4">
@@ -167,6 +196,14 @@
                 <textarea id="grayzone-desc" rows="2" onchange="updateLog()"></textarea>
               </div>
             </div>
+          </div>
+
+          <!-- Active project status (hub pathway, shown if projects exist) -->
+          <div class="card mb-4 hidden" id="project-status-card">
+            <div class="section-title" data-i18n="log.section_project_status"></div>
+            <p class="text-muted" style="font-size:1.3rem;margin-bottom:var(--sp-4)"
+              data-i18n="log.project_status_prompt"></p>
+            <div id="project-status-list"></div>
           </div>
 
           <!-- Reflection -->
@@ -198,6 +235,18 @@
                 data-i18n-placeholder="log.plan_tomorrow_hint" placeholder=""></textarea>
               <div class="form-hint" data-i18n="log.plan_tomorrow_hint"></div>
             </div>
+          </div>
+
+          <!-- End-of-day: final todo check -->
+          <div class="card mb-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="section-title" style="border:none;margin:0;padding:0"
+                data-i18n="log.todos_eod_prompt"></div>
+              <button class="btn btn--icon btn--sm" onclick="addTodo()" title="+">+</button>
+            </div>
+            <div id="todos-list-eod"></div>
+            <div id="todos-empty-eod" class="text-muted"
+              style="font-size:1.3rem;text-align:center;padding:var(--sp-2) 0;display:none">—</div>
           </div>
 
           <!-- Weekly wrap-up (shown on Fridays / last day of work week) -->
@@ -396,7 +445,44 @@
   </button>
 
   <!-- Mobile bottom nav -->
-  <nav class="mobile-nav">
+  
+<!-- Reset confirmation modal -->
+<div id="reset-modal" class="reset-modal-overlay hidden" onclick="closeResetModal(event)">
+  <div class="reset-modal-box" role="dialog" aria-modal="true" aria-labelledby="reset-modal-title">
+    <div class="reset-modal-header">
+      <h3 id="reset-modal-title" data-i18n="reset.title"></h3>
+    </div>
+    <div class="reset-modal-body">
+      <div class="alert alert--error mb-4">
+        <span style="font-size:2rem;flex-shrink:0">⚠</span>
+        <div>
+          <p data-i18n="reset.warning" style="margin-bottom:var(--sp-2)"></p>
+          <p><strong data-i18n="reset.download_first"></strong></p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label data-i18n="reset.confirm_label"></label>
+        <input type="text" id="reset-confirm-input"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+          oninput="checkResetConfirm(this.value)"
+          style="font-family:monospace;letter-spacing:0.1em;font-size:1.6rem">
+      </div>
+      <div class="form-group">
+        <label class="modality-label">
+          <input type="checkbox" id="reset-keep-prefs" checked>
+          <span data-i18n="reset.keep_prefs"></span>
+        </label>
+      </div>
+    </div>
+    <div class="reset-modal-footer">
+      <button class="btn btn--ghost" onclick="closeResetModal()" data-i18n="reset.cancel"></button>
+      <button class="btn btn--danger" id="reset-confirm-btn" disabled
+        onclick="executeReset()" data-i18n="reset.cta"></button>
+    </div>
+  </div>
+</div>
+
+<nav class="mobile-nav">
     <a href="index.html" class="mobile-nav-item">
       <span class="mobile-nav-icon">⚙</span>
       <span data-i18n="nav.setup">Config</span>

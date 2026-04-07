@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function renderAll() {
   renderHeader();
   renderTasks();
-  renderTodos();
+  renderAllTodoLists();
   renderRating();
   renderDrawers();
   updateTimings();
@@ -80,6 +80,22 @@ function renderHeader() {
   }
   document.getElementById("log-onsite").checked = currentLog.modality_onsite || false;
   document.getElementById("log-remote").checked = currentLog.modality_remote || false;
+  renderMorningEnergy();
+}
+
+function renderMorningEnergy() {
+  const container = document.getElementById("morning-energy-btns");
+  if (!container) return;
+  container.innerHTML = [1,2,3,4,5].map(n =>
+    `<button class="rating-btn ${currentLog.morning_energy === n ? "active" : ""}"
+      onclick="setMorningEnergy(${n})">${n} <span style="font-size:1.1rem">${t("log.rating_" + n)}</span></button>`
+  ).join("");
+}
+
+function setMorningEnergy(n) {
+  currentLog.morning_energy = n;
+  updateLog();
+  renderMorningEnergy();
 }
 
 function restoreFields() {
@@ -88,6 +104,8 @@ function restoreFields() {
   document.getElementById("log-win").value = currentLog.win || "";
   document.getElementById("log-closing").value = currentLog.closing_word || "";
   document.getElementById("log-plan-tomorrow").value = currentLog.plan_tomorrow || "";
+
+  // Morning energy is rendered in renderHeader via renderMorningEnergy()
 
   // Restore weekly wrap if present
   if (currentLog.weekly_wrap) {
@@ -524,6 +542,49 @@ function getTodoProjectName(projectId) {
   return p ? `📁 ${p.project_name}` : "";
 }
 
+function renderAllTodoLists() {
+  renderTodos();
+  renderTodosInto("todos-list-inline", "todos-empty-inline");
+  renderTodosInto("todos-list-eod", "todos-empty-eod");
+}
+
+function renderTodosInto(listId, emptyId) {
+  const list = document.getElementById(listId);
+  const empty = document.getElementById(emptyId);
+  if (!list) return;
+  const todos = logData.todos || [];
+  if (!todos.length) {
+    list.innerHTML = "";
+    if (empty) empty.style.display = "block";
+    return;
+  }
+  if (empty) empty.style.display = "none";
+  list.innerHTML = todos.map(todo => `
+    <div class="todo-item ${todo.completed ? "done" : ""}">
+      <div class="todo-check ${todo.completed ? "checked" : ""}" onclick="toggleTodo('${todo.todo_id}')">
+        ${todo.completed ? "✓" : ""}
+      </div>
+      <div style="flex:1">
+        <div class="todo-text">${escHtml(todo.description)}</div>
+        ${todo.due_date ? `<div class="todo-meta">📅 ${formatDate(todo.due_date + "T12:00:00")}</div>` : ""}
+      </div>
+      <button class="btn btn--icon btn--sm" onclick="removeTodo('${todo.todo_id}')">✕</button>
+    </div>
+  `).join("");
+}
+
+function toggleTodosPanel(btn) {
+  const body = document.getElementById("morning-todos-body");
+  const item = btn.closest(".card");
+  if (body.style.display === "none" || body.style.display === "") {
+    body.style.display = "block";
+    btn.querySelector(".accordion-arrow").style.transform = "rotate(180deg)";
+  } else {
+    body.style.display = "none";
+    btn.querySelector(".accordion-arrow").style.transform = "";
+  }
+}
+
 function addTodo() {
   const desc = prompt(t("log.todo_description"));
   if (!desc?.trim()) return;
@@ -539,7 +600,7 @@ function addTodo() {
   };
   logData.todos.push(todo);
   saveData(logData);
-  renderTodos();
+  renderAllTodoLists();
 }
 
 function toggleTodo(todoId) {
@@ -558,13 +619,13 @@ function toggleTodo(todoId) {
     currentLog.todos_completed_today = currentLog.todos_completed_today.filter(x => x !== todoId);
   }
   saveData(logData);
-  renderTodos();
+  renderAllTodoLists();
 }
 
 function removeTodo(todoId) {
   logData.todos = logData.todos.filter(x => x.todo_id !== todoId);
   saveData(logData);
-  renderTodos();
+  renderAllTodoLists();
 }
 
 // ── Projects sidebar ──────────────────────────────────────────
@@ -828,11 +889,18 @@ function updateLog() {
   currentLog.late_filing = document.getElementById("late-filing")?.checked || false;
   currentLog.modality_onsite = document.getElementById("log-onsite")?.checked || false;
   currentLog.modality_remote = document.getElementById("log-remote")?.checked || false;
+  currentLog.project_status_updates = collectProjectStatusUpdates();
   currentLog.obstacle = document.getElementById("log-obstacle")?.value.trim() || "";
   currentLog.obstacle_response = document.getElementById("log-obstacle-response")?.value.trim() || "";
   currentLog.win = document.getElementById("log-win")?.value.trim() || "";
   currentLog.plan_tomorrow = document.getElementById("log-plan-tomorrow")?.value.trim() || "";
   currentLog.closing_word = document.getElementById("log-closing")?.value.trim() || "";
+  // Safety reads — these are normally set by dedicated handlers,
+  // but updateLog catches any state they may have missed
+  if (currentLog.morning_energy == null) {
+    // left as null — renderMorningEnergy handles it
+  }
+  // day_rating and weekly_wrap are always set by their own handlers; no DOM read needed here
   currentLog.grayzone_description = document.getElementById("grayzone-desc")?.value.trim() || "";
 
   // Upsert in data
@@ -854,6 +922,17 @@ function saveAndDownload() {
   lastDownloaded = true;
   hideDownloadBanner();
   updateFooterStatus(true);
+  // Update FAB state
+  const fab = document.getElementById("fab-download");
+  if (fab) {
+    fab.classList.add("downloaded");
+    const lang = getCurrentLang();
+    fab.innerHTML = `✓ ${lang === "fr-CA" ? "Téléchargé" : "Downloaded"}`;
+    setTimeout(() => {
+      fab.classList.remove("downloaded");
+      fab.innerHTML = `⬇ <span>${t("log.download_cta")}</span>`;
+    }, 3000);
+  }
 }
 
 function showDownloadBanner() {
@@ -891,11 +970,7 @@ function resetIdleTimer() {
   }, SETTINGS.IDLE_REMINDER_MINUTES * 60 * 1000);
 }
 
-// ── Utilities ─────────────────────────────────────────────────
-function escHtml(str) {
-  if (!str) return "";
-  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-}
+// escHtml is defined in app.js
 
 // ── Tomorrow reminder ────────────────────────────────────────
 function showTomorrowReminder() {
@@ -944,6 +1019,85 @@ function updateWeeklyWrap() {
   updateLog();
 }
 
+// ── Project status updates ───────────────────────────────────
+function renderProjectStatusCard() {
+  const card = document.getElementById("project-status-card");
+  const list = document.getElementById("project-status-list");
+  if (!card || !list) return;
+
+  const activeProjects = (logData.projects || []).filter(p => p.status === "active");
+  if (!activeProjects.length) { card.classList.add("hidden"); return; }
+
+  card.classList.remove("hidden");
+  const saved = currentLog.project_status_updates || [];
+
+  list.innerHTML = activeProjects.map(proj => {
+    const existing = saved.find(u => u.project_id === proj.project_id) || {};
+    const statusOpts = ["active","completed","paused","cancelled"].map(s =>
+      `<option value="${s}" ${(existing.status || proj.status) === s ? "selected" : ""}
+        data-i18n="drawer.projects_status_${s}"></option>`
+    ).join("");
+    return `
+      <div class="repeatable-block" style="margin-bottom:var(--sp-3)" data-proj-id="${proj.project_id}">
+        <div style="font-weight:500;margin-bottom:var(--sp-3)">${escHtml(proj.project_name)}
+          ${proj.client_name ? `<span class="text-muted" style="font-weight:400"> · ${escHtml(proj.client_name)}</span>` : ""}
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="margin:0">
+            <label data-i18n="log.project_status_label"></label>
+            <select class="proj-status-select" onchange="updateProjectStatusFromLog('${proj.project_id}', this.value)">
+              ${statusOpts}
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:var(--sp-3);margin-bottom:0">
+          <label data-i18n="log.project_status_notes"></label>
+          <textarea rows="2" class="proj-status-notes"
+            oninput="updateProjectStatusNotes('${proj.project_id}', this.value)"
+            >${escHtml(existing.notes || "")}</textarea>
+        </div>
+      </div>
+    `;
+  }).join("");
+  applyLanguage(getCurrentLang());
+}
+
+function updateProjectStatusFromLog(projectId, status) {
+  if (!currentLog.project_status_updates) currentLog.project_status_updates = [];
+  let entry = currentLog.project_status_updates.find(u => u.project_id === projectId);
+  if (!entry) {
+    entry = { project_id: projectId, status, notes: "" };
+    currentLog.project_status_updates.push(entry);
+  } else {
+    entry.status = status;
+  }
+  // Also update the project itself
+  const proj = logData.projects.find(p => p.project_id === projectId);
+  if (proj) proj.status = status;
+  updateLog();
+}
+
+function updateProjectStatusNotes(projectId, notes) {
+  if (!currentLog.project_status_updates) currentLog.project_status_updates = [];
+  let entry = currentLog.project_status_updates.find(u => u.project_id === projectId);
+  if (!entry) {
+    entry = { project_id: projectId, status: "active", notes };
+    currentLog.project_status_updates.push(entry);
+  } else {
+    entry.notes = notes;
+  }
+  updateLog();
+}
+
+function collectProjectStatusUpdates() {
+  const blocks = document.querySelectorAll("#project-status-list [data-proj-id]");
+  return Array.from(blocks).map(b => ({
+    project_id: b.dataset.projId,
+    status: b.querySelector(".proj-status-select")?.value || "active",
+    notes: b.querySelector(".proj-status-notes")?.value?.trim() || "",
+  }));
+}
+
 // ── Mobile enhancements ───────────────────────────────────────
 function initMobile() {
   // Show mobile drawer bar (CSS controls visibility via media query)
@@ -957,18 +1111,4 @@ function initMobile() {
   }
 }
 
-// Patch saveAndDownload to also update FAB state
-const _origSaveAndDownload = saveAndDownload;
-function saveAndDownload() {
-  _origSaveAndDownload();
-  const fab = document.getElementById("fab-download");
-  if (fab) {
-    fab.classList.add("downloaded");
-    const lang = getCurrentLang();
-    fab.innerHTML = `✓ ${lang === "fr-CA" ? "Téléchargé" : "Downloaded"}`;
-    setTimeout(() => {
-      fab.classList.remove("downloaded");
-      fab.innerHTML = `⬇ <span data-i18n="log.download_cta">${t("log.download_cta")}</span>`;
-    }, 3000);
-  }
-}
+

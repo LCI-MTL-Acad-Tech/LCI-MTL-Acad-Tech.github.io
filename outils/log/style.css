@@ -694,7 +694,7 @@ input[type="checkbox"] { width: auto; accent-color: var(--accent); cursor: point
   display: flex;
   align-items: flex-end;
   gap: 2px;
-  height: 32rem;
+  height: var(--timeline-h, 32rem);
   padding: var(--sp-4) 0;
   overflow-x: auto;
 }
@@ -704,11 +704,11 @@ input[type="checkbox"] { width: auto; accent-color: var(--accent); cursor: point
   min-width: 2rem;
   flex: 1;
   max-width: 4rem;
-  height: 100%;
+  /* height set inline by JS as fraction of container */
   border-radius: var(--r-sm) var(--r-sm) 0 0;
   overflow: hidden;
   cursor: pointer;
-  transition: filter var(--dur-fast);
+  transition: height var(--dur-slow) var(--ease-exp), filter var(--dur-fast);
 }
 .timeline-col:hover { filter: brightness(1.15); }
 .timeline-segment { transition: height var(--dur-slow) var(--ease-exp); }
@@ -1329,7 +1329,7 @@ input[type="checkbox"] { width: auto; accent-color: var(--accent); cursor: point
   /* Timeline chart scrolls horizontally */
   .timeline-chart {
     min-width: max-content;
-    height: 24rem;
+    --timeline-h: 24rem;
   }
 }
 
@@ -1550,4 +1550,200 @@ body { overflow-x: hidden; }
 #mood-chart {
   border-radius: var(--r-md);
   background: var(--bg-card);
+}
+
+/* ── Print stylesheet ─────────────────────────────────────── */
+@media print {
+  /* Hide all chrome */
+  .site-header,
+  .site-footer,
+  .mobile-nav,
+  .report-nav,
+  .fab-download,
+  .drawer-panel,
+  .drawer-overlay,
+  .drawer-toggles,
+  .mobile-drawer-bar,
+  #upload-errors,
+  #upload-conflicts,
+  [onclick="editReflection()"],
+  [onclick="printReport()"],
+  [data-i18n="dashboard.print_report"],
+  .btn--ghost,
+  #collab-toggle {
+    display: none !important;
+  }
+
+  /* Show all sections */
+  .report-section {
+    display: block !important;
+    page-break-inside: avoid;
+  }
+
+  /* Section titles as print headings */
+  .report-section::before {
+    content: attr(id);
+    display: block;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #576266;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #c7c4ba;
+    padding-bottom: 0.4rem;
+  }
+
+  /* Page breaks */
+  #section-reflection { page-break-before: always; }
+  #section-weekly     { page-break-before: always; }
+
+  /* Charts: let them size naturally */
+  .timeline-chart { height: 20rem !important; }
+  .chart-wrap { box-shadow: none !important; border: 1px solid #e1e3e4; }
+
+  /* Typography */
+  body {
+    font-size: 11pt;
+    color: #07181e;
+    background: white !important;
+  }
+
+  h1, h2, h3, h4, h5 { color: #07181e; }
+
+  /* SVG charts */
+  svg { max-width: 100%; }
+
+  /* Collab content always visible in print */
+  #collab-content { display: block !important; }
+
+  /* Avoid orphaned headings */
+  .reflection-label { page-break-after: avoid; }
+  .reflection-block { page-break-inside: avoid; }
+
+  /* Page margins */
+  @page {
+    margin: 2cm;
+    size: A4 portrait;
+  }
+}
+
+/* ── Morning energy rating ───────────────────────────────── */
+#morning-energy-group {
+  background: var(--bg-subtle);
+  border-radius: var(--r-lg);
+  padding: var(--sp-4);
+  border-left: 3px solid var(--color-gold-500);
+}
+
+/* ── Reset confirmation modal ─────────────────────────────── */
+.reset-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-4);
+  animation: fadeIn var(--dur-mod) var(--ease-exp);
+}
+
+.reset-modal-overlay.hidden {
+  display: none !important;
+}
+
+.reset-modal-box {
+  background: var(--bg-card);
+  border-radius: var(--r-xl);
+  width: 100%;
+  max-width: 48rem;
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  animation: slideUp var(--dur-mod) var(--ease-exp);
+}
+
+.reset-modal-header {
+  padding: var(--sp-5) var(--sp-6);
+  border-bottom: 1px solid var(--border);
+}
+
+.reset-modal-header h3 {
+  font-size: 2rem;
+  color: var(--danger);
+  margin: 0;
+}
+
+.reset-modal-body {
+  padding: var(--sp-5) var(--sp-6);
+}
+
+.reset-modal-footer {
+  padding: var(--sp-4) var(--sp-6);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-3);
+}
+
+/* Danger state on the confirm input when correct */
+#reset-confirm-input:valid {
+  border-color: var(--danger);
+}
+
+/* Subtle trigger button — small, quiet, doesn't compete */
+.reset-trigger-btn {
+  opacity: 0.5;
+  font-size: 1.1rem !important;
+  padding: var(--sp-1) var(--sp-2) !important;
+  color: var(--color-charcoal-200) !important;
+  border-color: transparent !important;
+  transition: opacity var(--dur-fast), color var(--dur-fast) !important;
+}
+
+.reset-trigger-btn:hover {
+  opacity: 1 !important;
+  color: var(--danger) !important;
+  border-color: var(--danger) !important;
+  background: transparent !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(2rem); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@media (max-width: 480px) {
+  .reset-modal-box { border-radius: var(--r-lg); }
+  .reset-modal-footer { flex-direction: column-reverse; }
+  .reset-modal-footer .btn { width: 100%; }
+}
+
+/* Hide reset button in print */
+@media print {
+  .reset-trigger-btn { display: none !important; }
+}
+
+/* ── Theme toggle icon button ─────────────────────────────── */
+.theme-toggle-btn {
+  padding: var(--sp-2) !important;
+  line-height: 0;
+  min-width: 3.2rem;
+  min-height: 3.2rem;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle-btn svg {
+  flex-shrink: 0;
+  transition: transform var(--dur-mod) var(--ease-exp);
+}
+
+.theme-toggle-btn:hover svg {
+  transform: rotate(20deg) scale(1.15);
 }

@@ -12,8 +12,8 @@ const LANG = {
     "nav.log":                "Journal",
     "nav.report":             "Rapport",
     "nav.toggle_dark":        "Mode sombre",
+    "nav.reset":              "Recommencer",
     "nav.toggle_light":       "Mode clair",
-    "nav.lang":               "EN",
 
     // ── Global actions ───────────────────────────────────────
     "action.save":            "Enregistrer",
@@ -25,11 +25,8 @@ const LANG = {
     "action.confirm":         "Confirmer",
     "action.next":            "Suivant",
     "action.back":            "Retour",
-    "action.close":           "Fermer",
     "action.open_log":        "Ouvrir le journal du jour",
     "action.new_todo":        "Nouvelle tâche",
-    "action.complete":        "Marquer comme fait",
-    "action.reopen":          "Rouvrir",
 
     // ── Global field labels ──────────────────────────────────
     "field.name":             "Nom complet",
@@ -40,12 +37,8 @@ const LANG = {
     "field.cohort":           "Cohorte / Semestre",
     "field.cohort_placeholder": "ex. : Hiver 2026",
     "field.teacher":          "Enseignant·e responsable",
-    "field.date":             "Date",
     "field.start_date":       "Date de début",
     "field.end_date":         "Date de fin prévue",
-    "field.notes":            "Notes",
-    "field.description":      "Description",
-    "field.optional":         "(facultatif)",
 
     // ── Welcome / Landing ────────────────────────────────────
     "welcome.title":          "Journal de stage",
@@ -105,8 +98,6 @@ const LANG = {
     "setup.situation_before":            "Quelle était la situation avant ton arrivée? Quel problème ou quelle opportunité ce stage vient-il adresser?",
 
     // ── Daily Log ────────────────────────────────────────────
-    "log.title":              "Journal du jour",
-    "log.date_label":         "Date",
     "log.time_start":         "Heure de début",
     "log.time_end":           "Heure de fin",
     "log.day_duration":       "Durée totale",
@@ -121,8 +112,6 @@ const LANG = {
     "log.task_duration":      "Durée",
     "log.task_type":          "Type d'activité",
     "log.task_project":       "Pour quel projet?",
-    "log.task_tools":         "Outils utilisés",
-    "log.task_people":        "Avec qui?",
     "log.task_topic":         "Sujet / thème",
     "log.task_learning":      "Qu'as-tu appris ou retenu?",
     "log.task_lesson_tags":   "Étiquettes d'apprentissage",
@@ -135,7 +124,6 @@ const LANG = {
     "log.training_course":    "Cours",
     "log.training_other":     "Autre",
 
-    "log.section_grayzone":   "Temps non documenté",
     "log.grayzone_info":      "Il reste du temps non comptabilisé dans tes tâches.",
     "log.grayzone_prompt":    "Comment as-tu passé ce temps? (transitions, déplacements, temps informel…)",
     "log.grayzone_label":     "Temps non documenté",
@@ -144,6 +132,12 @@ const LANG = {
     "log.obstacle":           "As-tu rencontré un problème ou un obstacle aujourd'hui?",
     "log.obstacle_response":  "Comment l'as-tu géré, ou comment prévois-tu le gérer?",
     "log.win":                "Quelle est ta plus belle victoire, ton apprentissage ou ta fierté d'aujourd'hui?",
+    "log.section_project_status": "État des projets actifs",
+    "log.project_status_prompt":  "Fais un point rapide sur chaque projet en cours.",
+    "log.project_status_label":   "État",
+    "log.project_status_notes":   "Notes",
+        "log.morning_energy":     "Avec quelle énergie arrives-tu ce matin? (motivation, forme)",
+    "log.morning_energy_hint": "Cette note apparaît sur la courbe d'humeur avec ton bilan de fin de journée.",
     "log.day_rating":         "Comment évalues-tu cette journée?",
     "log.rating_1":           "Difficile",
     "log.rating_2":           "Lente",
@@ -161,9 +155,9 @@ const LANG = {
     "log.weekly_prompt":      "C'est la fin de ta semaine de travail. Prends deux minutes pour faire un bilan.",
 
     "log.section_todos":      "Liste de tâches",
+    "log.todos_morning_prompt": "Quelles sont tes priorités pour aujourd'hui?",
+    "log.todos_eod_prompt":     "Y a-t-il des tâches à ajouter avant de terminer?",
     "log.todo_description":   "Tâche à faire",
-    "log.todo_due":           "Échéance (facultatif)",
-    "log.todo_project":       "Projet associé",
 
     "log.download_reminder":  "N'oublie pas de télécharger ton journal avant de fermer cet onglet.",
     "log.download_cta":       "Télécharger le journal du jour",
@@ -201,9 +195,16 @@ const LANG = {
     "drawer.tools_category_placeholder": "Ex. : Design, Développement, Communication…",
 
     // ── Default activity types ───────────────────────────────
-    "activity.work":          "Travail",
-    "activity.production":     "Production",
+    "activity.programming":   "Programmation",
+    "activity.design":         "Design",
     "activity.research":       "Recherche",
+    "activity.planning":       "Planification",
+    "activity.data_analysis":  "Analyse de données",
+    "activity.debugging":      "Débogage",
+    "activity.production":     "Production",
+    "activity.testing":        "Tests",
+    "activity.documentation":  "Documentation",
+    "activity.client_work":    "Travail client",
     "activity.meeting":       "Réunion",
     "activity.training":      "Formation",
     "activity.admin":         "Administratif",
@@ -211,13 +212,11 @@ const LANG = {
     "activity.undocumented":  "Non documenté",
 
     // ── Report / Final ───────────────────────────────────────
-    "report.title":           "Rapport de stage",
     "report.upload_title":    "Téléverser tes journaux",
     "report.upload_instructions": "Sélectionne tous les fichiers JSON de ton dossier de stage. L'application les fusionnera automatiquement.",
     "report.upload_cta":      "Choisir les fichiers",
     "report.upload_drop":     "Ou glisse les fichiers ici",
     "report.validation_ok":   "Fichiers validés",
-    "report.validation_error_uuid": "Ces fichiers ne proviennent pas du même étudiant·e.",
     "report.validation_warning_time": "Certains journaux semblent avoir été créés en moins de temps que les heures déclarées.",
     "report.validation_conflict":     "Deux versions du même journal ont été trouvées. Laquelle garder?",
     "report.keep_newer":      "Garder la plus récente",
@@ -304,6 +303,7 @@ const LANG = {
     "dashboard.weekly_change":      "À faire différemment",
     "dashboard.hide_appreciation":  "Masquer les appréciations",
     "dashboard.show_appreciation":  "Afficher les appréciations",
+    "dashboard.print_report":       "Version imprimable",
     "dashboard.section_modality":   "Modalité de présence",
     "dashboard.modality_onsite":    "Jours en présentiel",
     "dashboard.modality_remote":    "Jours à distance",
@@ -311,17 +311,22 @@ const LANG = {
     "dashboard.modality_unspecified": "Non précisé",
 
     // ── Validation & Errors ──────────────────────────────────
-    "error.required":         "Ce champ est obligatoire.",
-    "error.email":            "Adresse courriel invalide.",
-    "error.date":             "Date invalide.",
-    "error.time_order":       "L'heure de fin doit être après l'heure de début.",
     "error.grayzone":         "Il reste {pct}% de temps non documenté ({min} min). Décris comment tu l'as passé.",
     "error.merge_uuid":       "Impossible de fusionner : les fichiers proviennent de comptes différents.",
     "error.no_files":         "Aucun fichier sélectionné.",
 
+    // ── Reset dialogue
+    "reset.title":            "Effacer toutes les données?",
+    "reset.warning":          "Cette action est irréversible. Toutes les données de ta configuration et tes journaux en cours dans ce navigateur seront effacées.",
+    "reset.download_first":   "Tu devrais d'abord télécharger tes journaux si tu ne l'as pas encore fait.",
+    "reset.confirm_label":    "Pour confirmer, écris RECOMMENCER dans le champ ci-dessous :",
+    "reset.confirm_word":     "RECOMMENCER",
+    "reset.cta":              "Effacer définitivement",
+    "reset.cancel":           "Annuler",
+    "reset.keep_prefs":       "Conserver mes préférences de langue et de thème",
+
     // ── Making-of footer ────────────────────────────────────
     "making.label":    "Comment cet outil a été créé",
-    "making.title":    "Comment cet outil a été fait",
     "making.p1":       "Cet outil a été construit par une collaboration itérative entre Elisa Schaeffer, Doyenne de la Technologie et du Design au Collège LaSalle Montréal, et Claude (Anthropic), un assistant IA. Le contenu pédagogique, la structure, les fonctionnalités, les priorités et les choix éditoriaux ont été définis, questionnés et affinés par Elisa à chaque étape. Claude a généré le code, proposé des formulations et signalé les incohérences — mais chaque décision substantielle a été prise par un être humain.",
     "making.p2":       "Ce n'est pas du contenu IA généré en une seule fois. C'est le résultat d'un dialogue de révision prolongé : chaque session a été lue, critiquée et corrigée. L'outil évolue.",
     "making.p3":       "Utilisation réfléchie de l'IA — L'IA générative est un outil de travail, non un substitut au jugement professionnel. Ce projet illustre une approche où l'humain reste l'auteur·rice : l'IA amplifie la capacité de production, mais la responsabilité éditoriale, pédagogique et éthique reste entièrement humaine.",
@@ -335,8 +340,8 @@ const LANG = {
     "nav.log":                "Daily Log",
     "nav.report":             "Report",
     "nav.toggle_dark":        "Dark mode",
+    "nav.reset":              "Start over",
     "nav.toggle_light":       "Light mode",
-    "nav.lang":               "FR",
 
     // ── Global actions ───────────────────────────────────────
     "action.save":            "Save",
@@ -348,11 +353,8 @@ const LANG = {
     "action.confirm":         "Confirm",
     "action.next":            "Next",
     "action.back":            "Back",
-    "action.close":           "Close",
     "action.open_log":        "Open today's log",
     "action.new_todo":        "New task",
-    "action.complete":        "Mark as done",
-    "action.reopen":          "Reopen",
 
     // ── Global field labels ──────────────────────────────────
     "field.name":             "Full name",
@@ -363,12 +365,8 @@ const LANG = {
     "field.cohort":           "Cohort / Semester",
     "field.cohort_placeholder": "e.g.: Winter 2026",
     "field.teacher":          "Responsible teacher",
-    "field.date":             "Date",
     "field.start_date":       "Start date",
     "field.end_date":         "Scheduled end date",
-    "field.notes":            "Notes",
-    "field.description":      "Description",
-    "field.optional":         "(optional)",
 
     // ── Welcome / Landing ────────────────────────────────────
     "welcome.title":          "Internship Journal",
@@ -428,8 +426,6 @@ const LANG = {
     "setup.situation_before":            "What was the situation before you arrived? What problem or opportunity is this project addressing?",
 
     // ── Daily Log ────────────────────────────────────────────
-    "log.title":              "Today's Log",
-    "log.date_label":         "Date",
     "log.time_start":         "Start time",
     "log.time_end":           "End time",
     "log.day_duration":       "Total duration",
@@ -444,8 +440,6 @@ const LANG = {
     "log.task_duration":      "Duration",
     "log.task_type":          "Activity type",
     "log.task_project":       "Which project?",
-    "log.task_tools":         "Tools used",
-    "log.task_people":        "Who was involved?",
     "log.task_topic":         "Topic / subject",
     "log.task_learning":      "What did you learn or take away?",
     "log.task_lesson_tags":   "Learning tags",
@@ -458,7 +452,6 @@ const LANG = {
     "log.training_course":    "Course",
     "log.training_other":     "Other",
 
-    "log.section_grayzone":   "Undocumented time",
     "log.grayzone_info":      "Some time in your day is not accounted for in your tasks.",
     "log.grayzone_prompt":    "How did you spend this time? (transitions, commuting, informal moments…)",
     "log.grayzone_label":     "Undocumented",
@@ -467,6 +460,12 @@ const LANG = {
     "log.obstacle":           "Did you encounter a problem or obstacle today?",
     "log.obstacle_response":  "How did you handle it, or how do you plan to?",
     "log.win":                "What was your biggest win, coolest discovery, or proudest moment today?",
+    "log.section_project_status": "Active project status",
+    "log.project_status_prompt":  "Quick check-in on each active project.",
+    "log.project_status_label":   "Status",
+    "log.project_status_notes":   "Notes",
+        "log.morning_energy":     "How are you arriving this morning? (energy, motivation)",
+    "log.morning_energy_hint": "This rating shows on the mood chart alongside your end-of-day score.",
     "log.day_rating":         "How would you rate today?",
     "log.rating_1":           "Rough",
     "log.rating_2":           "Slow",
@@ -484,9 +483,9 @@ const LANG = {
     "log.weekly_prompt":      "This is the end of your work week. Take two minutes to reflect.",
 
     "log.section_todos":      "To-do list",
+    "log.todos_morning_prompt": "What are your priorities for today?",
+    "log.todos_eod_prompt":     "Anything to add before you wrap up?",
     "log.todo_description":   "Task to do",
-    "log.todo_due":           "Due date (optional)",
-    "log.todo_project":       "Related project",
 
     "log.download_reminder":  "Remember to download your log before closing this tab.",
     "log.download_cta":       "Download today's log",
@@ -524,9 +523,16 @@ const LANG = {
     "drawer.tools_category_placeholder": "E.g.: Design, Development, Communication…",
 
     // ── Default activity types ───────────────────────────────
-    "activity.work":          "Work",
-    "activity.production":     "Production",
+    "activity.programming":   "Programming",
+    "activity.design":         "Design",
     "activity.research":       "Research",
+    "activity.planning":       "Planning",
+    "activity.data_analysis":  "Data analysis",
+    "activity.debugging":      "Debugging",
+    "activity.production":     "Production",
+    "activity.testing":        "Testing",
+    "activity.documentation":  "Documentation",
+    "activity.client_work":    "Client work",
     "activity.meeting":       "Meeting",
     "activity.training":      "Training",
     "activity.admin":         "Administrative",
@@ -534,13 +540,11 @@ const LANG = {
     "activity.undocumented":  "Undocumented",
 
     // ── Report / Final ───────────────────────────────────────
-    "report.title":           "Internship Report",
     "report.upload_title":    "Upload your logs",
     "report.upload_instructions": "Select all the JSON files from your internship folder. The app will merge them automatically.",
     "report.upload_cta":      "Choose files",
     "report.upload_drop":     "Or drag files here",
     "report.validation_ok":   "Files validated",
-    "report.validation_error_uuid": "These files do not belong to the same student.",
     "report.validation_warning_time": "Some logs appear to have been created in less time than the declared hours.",
     "report.validation_conflict":     "Two versions of the same log were found. Which one should be kept?",
     "report.keep_newer":      "Keep the newer one",
@@ -627,6 +631,7 @@ const LANG = {
     "dashboard.weekly_change":      "To do differently",
     "dashboard.hide_appreciation":  "Hide appreciations",
     "dashboard.show_appreciation":  "Show appreciations",
+    "dashboard.print_report":       "Printable version",
     "dashboard.section_modality":   "Work modality",
     "dashboard.modality_onsite":    "On-site days",
     "dashboard.modality_remote":    "Remote days",
@@ -634,17 +639,22 @@ const LANG = {
     "dashboard.modality_unspecified": "Unspecified",
 
     // ── Validation & Errors ──────────────────────────────────
-    "error.required":         "This field is required.",
-    "error.email":            "Invalid email address.",
-    "error.date":             "Invalid date.",
-    "error.time_order":       "End time must be after start time.",
     "error.grayzone":         "{pct}% of your day is undocumented ({min} min). Please describe how you spent it.",
     "error.merge_uuid":       "Cannot merge: these files belong to different students.",
     "error.no_files":         "No files selected.",
 
+    // ── Reset dialogue
+    "reset.title":            "Erase all data?",
+    "reset.warning":          "This cannot be undone. All your setup data and current logs stored in this browser will be erased.",
+    "reset.download_first":   "You should download your logs first if you haven't already.",
+    "reset.confirm_label":    "To confirm, type RESET in the field below:",
+    "reset.confirm_word":     "RESET",
+    "reset.cta":              "Erase permanently",
+    "reset.cancel":           "Cancel",
+    "reset.keep_prefs":       "Keep my language and theme preferences",
+
     // ── Making-of footer ────────────────────────────────────
     "making.label":    "How this tool was made",
-    "making.title":    "How this tool was made",
     "making.p1":       "This tool was built through iterative collaboration between Elisa Schaeffer, Dean of Technology and Design at Collège LaSalle Montréal, and Claude (Anthropic), an AI assistant. The pedagogical content, structure, features, priorities, and editorial choices were defined, questioned, and refined by Elisa at every step. Claude generated the code, proposed phrasings, and flagged inconsistencies — but every substantive decision was made by a human.",
     "making.p2":       "This is not one-shot AI content. It is the result of a prolonged review dialogue: every session was read, critiqued, and corrected. The tool evolves.",
     "making.p3":       "Thoughtful AI use — Generative AI is a work tool, not a substitute for professional judgment. This project illustrates an approach where the human remains the author: AI amplifies production capacity, but editorial, pedagogical, and ethical responsibility remains entirely human.",
