@@ -122,8 +122,11 @@ function restoreFields() {
   // Show tomorrow reminder if previous log had a plan
   showTomorrowReminder();
 
-  // Show weekly wrap if this is a Friday or last log of week
+  // Show weekly wrap if this is the week-end day
   checkWeeklyWrap();
+
+  // Show end-of-internship or weekly report reminders
+  checkEndReminders();
   document.getElementById("grayzone-desc").value = currentLog.grayzone_description || "";
 
   if (currentLog.obstacle) {
@@ -1050,13 +1053,18 @@ function showTomorrowReminder() {
 }
 
 // ── Weekly wrap-up ────────────────────────────────────────────
+function getWeekEndDay() {
+  // Reads from saved data; falls back to 5 (Friday) if not set
+  return parseInt(logData?.context?.week_end_day ?? 5);
+}
+
 function checkWeeklyWrap() {
   const card = document.getElementById("weekly-wrap-card");
   if (!card) return;
   const d = new Date(currentLog.date + "T12:00:00");
-  const dow = d.getDay(); // 0=Sun, 5=Fri, 6=Sat
-  // Show on Fridays, or if already has a weekly_wrap saved
-  if (dow === 5 || currentLog.weekly_wrap) {
+  const dow = d.getDay();
+  const weekEndDay = getWeekEndDay();
+  if (dow === weekEndDay || currentLog.weekly_wrap) {
     card.style.display = "block";
   } else {
     card.style.display = "none";
@@ -1153,6 +1161,35 @@ function collectProjectStatusUpdates() {
     status: b.querySelector(".proj-status-select")?.value || "active",
     notes: b.querySelector(".proj-status-notes")?.value?.trim() || "",
   }));
+}
+
+// ── End-of-internship and weekly report reminders ────────────
+function checkEndReminders() {
+  const today = currentLog.date;
+
+  // End-of-internship banner
+  const endBanner = document.getElementById("end-of-internship-banner");
+  if (endBanner) {
+    const endDate = logData?.context?.scheduled_end_date;
+    if (endDate && today >= endDate) {
+      endBanner.classList.remove("hidden");
+    } else {
+      endBanner.classList.add("hidden");
+    }
+  }
+
+  // Weekly report reminder (shown on week-end day)
+  const weeklyReminder = document.getElementById("weekly-report-reminder");
+  if (weeklyReminder) {
+    const d = new Date(today + "T12:00:00");
+    const dow = d.getDay();
+    const weekEndDay = getWeekEndDay();
+    if (dow === weekEndDay) {
+      weeklyReminder.classList.remove("hidden");
+    } else {
+      weeklyReminder.classList.add("hidden");
+    }
+  }
 }
 
 // ── Mobile enhancements ───────────────────────────────────────

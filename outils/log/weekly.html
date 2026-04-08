@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bilan hebdomadaire — Journal de stage</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPCEtLSBCYWNrZ3JvdW5kIGNpcmNsZSAtLT4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0iIzAwNTg3YyIvPgogIDwhLS0gQnJpZWZjYXNlIGJvZHkgLS0+CiAgPHJlY3QgeD0iNSIgeT0iMTMiIHdpZHRoPSIyMiIgaGVpZ2h0PSIxNCIgcng9IjIuNSIgZmlsbD0id2hpdGUiLz4KICA8IS0tIEJyaWVmY2FzZSBoYW5kbGUgLS0+CiAgPHBhdGggZD0iTTExIDEzdi0yLjVhMSAxIDAgMCAxIDEtMWg4YTEgMSAwIDAgMSAxIDFWMTMiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPCEtLSBDZW50ZXIgY2xhc3AgLS0+CiAgPHJlY3QgeD0iMTMuNSIgeT0iMTcuNSIgd2lkdGg9IjUiIGhlaWdodD0iMyIgcng9IjEiIGZpbGw9IiMwMDU4N2MiLz4KICA8IS0tIEhvcml6b250YWwgYmFuZCAtLT4KICA8cmVjdCB4PSI1IiB5PSIxOC41IiB3aWR0aD0iMjIiIGhlaWdodD0iMi41IiBmaWxsPSJyZ2JhKDAsODgsMTI0LDAuMTUpIi8+Cjwvc3ZnPg==">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .week-stat { text-align:center; flex:1; }
+    .week-stat-val { font-size:3.2rem; font-weight:600; color:var(--accent); letter-spacing:-0.04em; }
+    .week-stat-label { font-size:1.2rem; color:var(--text-subtle); margin-top:var(--sp-1); }
+    .day-col { flex:1; min-width:0; }
+    .day-header { font-size:1.2rem; font-weight:600; color:var(--text-subtle); text-align:center; margin-bottom:var(--sp-2); }
+    .day-bar-wrap { display:flex; flex-direction:column; align-items:center; gap:2px; }
+    .day-bar { width:100%; border-radius:2px; min-height:2px; }
+    .day-rating-dot { width:1rem; height:1rem; border-radius:50%; margin:var(--sp-1) auto 0; }
+    .win-item { padding:var(--sp-2) 0; border-bottom:1px solid var(--border); font-size:1.4rem; }
+    .win-item:last-child { border-bottom:none; }
+    .mood-row { display:flex; align-items:center; gap:var(--sp-3); font-size:1.3rem; }
+    .mood-bar-track { flex:1; height:0.8rem; background:var(--bg-subtle); border-radius:var(--r-pill); overflow:hidden; }
+    .mood-bar-fill { height:100%; border-radius:var(--r-pill); }
+    .project-status-row { padding:var(--sp-3) 0; border-bottom:1px solid var(--border); }
+    .project-status-row:last-child { border-bottom:none; }
+    @media print {
+      .no-print { display:none !important; }
+      .report-section { display:block !important; }
+      @page { size:A4 landscape; margin:1.5cm; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="site-title" style="text-decoration:none;">
+        <span data-i18n="welcome.title">Journal de stage</span>
+      </a>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link" data-i18n="nav.setup">Configuration</a>
+        <a href="log.html" class="nav-link" data-i18n="nav.log">Journal</a>
+        <a href="weekly.html" class="nav-link active" data-i18n="nav.weekly">Bilan hebdo</a>
+        <a href="report.html" class="nav-link" data-i18n="nav.report">Suivi</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn btn--ghost btn--sm lang-toggle-btn" data-lang-target="en-CA">EN</button>
+        <button class="btn btn--ghost btn--sm theme-toggle-btn" aria-label="Toggle theme" style="padding:var(--sp-2);line-height:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg></button>
+        <button class="btn btn--ghost btn--sm reset-trigger-btn" onclick="openResetModal()" data-i18n="nav.reset" title="" style="opacity:.6"></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container container--wide">
+
+      <!-- Upload phase -->
+      <div id="phase-upload">
+        <h1 style="font-size:2.8rem;margin-bottom:var(--sp-2)" data-i18n="weekly.title">Bilan hebdomadaire</h1>
+        <p class="text-muted mb-6" data-i18n="weekly.upload_prompt"></p>
+
+        <div class="upload-zone" id="upload-zone"
+          ondragover="event.preventDefault();this.classList.add('drag-over')"
+          ondragleave="this.classList.remove('drag-over')"
+          ondrop="event.preventDefault();this.classList.remove('drag-over');handleWeeklyFiles(event.dataTransfer.files)">
+          <div class="upload-zone-icon">📁</div>
+          <p data-i18n="report.upload_cta"></p>
+          <input type="file" id="file-input" accept=".json" style="display:none" onchange="handleWeeklyFiles(this.files)">
+          <button class="btn btn--secondary mt-4 no-print" onclick="document.getElementById('file-input').click()" data-i18n="report.upload_btn"></button>
+        </div>
+        <div id="upload-status" class="mt-4"></div>
+      </div>
+
+      <!-- Week selector + report -->
+      <div id="phase-report" class="hidden">
+        <div class="flex items-center justify-between mb-6" style="flex-wrap:wrap;gap:var(--sp-4)">
+          <div>
+            <h1 style="font-size:2.8rem;margin-bottom:var(--sp-1)" data-i18n="weekly.title">Bilan hebdomadaire</h1>
+            <div id="student-label" style="font-size:1.6rem;color:var(--text-muted)"></div>
+          </div>
+          <div class="flex gap-3 no-print" style="flex-wrap:wrap;align-items:center">
+            <label style="font-size:1.4rem;color:var(--text-muted)" data-i18n="weekly.week_select"></label>
+            <select id="week-select" class="btn btn--ghost" onchange="renderWeek(this.value)"
+              style="font-size:1.4rem;padding:var(--sp-2) var(--sp-3);cursor:pointer"></select>
+            <button class="btn btn--secondary" onclick="window.print()" data-i18n="weekly.print"></button>
+            <button class="btn btn--ghost btn--sm" onclick="resetWeekly()" data-i18n="action.back"></button>
+          </div>
+        </div>
+
+        <!-- Stat grid -->
+        <div class="flex gap-4 mb-6" id="week-stats"
+          style="background:var(--bg-card);border-radius:var(--r-xl);padding:var(--sp-5);box-shadow:var(--shadow-sm)"></div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);margin-bottom:var(--sp-4)" id="week-top-row">
+          <!-- Day-by-day mini timeline -->
+          <div class="card" id="week-days-card">
+            <div class="section-title" data-i18n="weekly.section_days"></div>
+            <div id="week-days" style="display:flex;gap:var(--sp-2);align-items:flex-end;height:12rem;margin-top:var(--sp-3)"></div>
+          </div>
+          <!-- Activity pie -->
+          <div class="card" id="week-activity-card">
+            <div class="section-title" data-i18n="weekly.section_activity"></div>
+            <div id="week-activity"></div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);margin-bottom:var(--sp-4)">
+          <!-- Mood -->
+          <div class="card">
+            <div class="section-title" data-i18n="weekly.section_mood"></div>
+            <div id="week-mood"></div>
+          </div>
+          <!-- Wins -->
+          <div class="card">
+            <div class="section-title" data-i18n="weekly.section_wins"></div>
+            <div id="week-wins"></div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);margin-bottom:var(--sp-4)">
+          <!-- Obstacle -->
+          <div class="card" id="week-obstacle-card">
+            <div class="section-title" data-i18n="weekly.section_obstacle"></div>
+            <div id="week-obstacle"></div>
+          </div>
+          <!-- Weekly wrap -->
+          <div class="card">
+            <div class="section-title" data-i18n="weekly.section_wrap"></div>
+            <div id="week-wrap"></div>
+          </div>
+        </div>
+
+        <!-- Project status (hub only) -->
+        <div class="card mb-4 hidden" id="week-projects-card">
+          <div class="section-title" data-i18n="weekly.section_projects"></div>
+          <div id="week-projects"></div>
+        </div>
+
+      </div><!-- /phase-report -->
+    </div>
+  </main>
+
+  <!-- Making-of footer -->
+  <footer class="site-footer">
+    <div class="making-of">
+      <div class="making-of-inner">
+        <button class="making-of-toggle" onclick="toggleMakingOf(this)" aria-expanded="false">
+          <span class="making-of-label" data-i18n="making.label">Comment cet outil a été créé</span>
+          <span class="making-of-chevron" aria-hidden="true">›</span>
+        </button>
+        <div class="making-of-body" hidden>
+          <div class="making-of-divider"></div>
+          <p data-i18n="making.p1"></p>
+          <p data-i18n="making.p2"></p>
+          <p><strong data-i18n="making.p3"></strong> <span data-i18n="making.updated"></span></p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /page-wrap -->
+
+<!-- Mobile nav -->
+<nav class="mobile-nav">
+  <a href="index.html" class="mobile-nav-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span data-i18n="nav.setup">Config</span>
+  </a>
+  <a href="log.html" class="mobile-nav-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    <span data-i18n="nav.log">Journal</span>
+  </a>
+  <a href="weekly.html" class="mobile-nav-item active">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span data-i18n="nav.weekly">Hebdo</span>
+  </a>
+  <a href="report.html" class="mobile-nav-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    <span data-i18n="nav.report">Tracker</span>
+  </a>
+</nav>
+
+<!-- Reset modal -->
+<div id="reset-modal" class="reset-modal-overlay hidden" onclick="closeResetModal(event)">
+  <div class="reset-modal-box" role="dialog" aria-modal="true" aria-labelledby="reset-modal-title">
+    <div class="reset-modal-header">
+      <h3 id="reset-modal-title" data-i18n="reset.title"></h3>
+    </div>
+    <div class="reset-modal-body">
+      <div class="alert alert--error mb-4">
+        <span style="font-size:2rem;flex-shrink:0">⚠</span>
+        <div>
+          <p data-i18n="reset.warning" style="margin-bottom:var(--sp-2)"></p>
+          <p><strong data-i18n="reset.download_first"></strong></p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label data-i18n="reset.confirm_label"></label>
+        <input type="text" id="reset-confirm-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="checkResetConfirm(this.value)" style="font-family:monospace;letter-spacing:0.1em;font-size:1.6rem">
+      </div>
+      <div class="form-group">
+        <label class="modality-label">
+          <input type="checkbox" id="reset-keep-prefs" checked>
+          <span data-i18n="reset.keep_prefs"></span>
+        </label>
+      </div>
+    </div>
+    <div class="reset-modal-footer">
+      <button class="btn btn--ghost" onclick="closeResetModal()" data-i18n="reset.cancel"></button>
+      <button class="btn btn--danger" id="reset-confirm-btn" disabled onclick="executeReset()" data-i18n="reset.cta"></button>
+    </div>
+  </div>
+</div>
+
+<script src="lang.js"></script>
+<script src="app.js"></script>
+<script src="weekly.js"></script>
+</body>
+</html>

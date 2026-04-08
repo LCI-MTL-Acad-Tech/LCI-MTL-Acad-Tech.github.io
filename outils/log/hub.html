@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hub — Tableau de bord superviseur·e</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPCEtLSBCYWNrZ3JvdW5kIGNpcmNsZSAtLT4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0iIzAwNTg3YyIvPgogIDwhLS0gQnJpZWZjYXNlIGJvZHkgLS0+CiAgPHJlY3QgeD0iNSIgeT0iMTMiIHdpZHRoPSIyMiIgaGVpZ2h0PSIxNCIgcng9IjIuNSIgZmlsbD0id2hpdGUiLz4KICA8IS0tIEJyaWVmY2FzZSBoYW5kbGUgLS0+CiAgPHBhdGggZD0iTTExIDEzdi0yLjVhMSAxIDAgMCAxIDEtMWg4YTEgMSAwIDAgMSAxIDFWMTMiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPCEtLSBDZW50ZXIgY2xhc3AgLS0+CiAgPHJlY3QgeD0iMTMuNSIgeT0iMTcuNSIgd2lkdGg9IjUiIGhlaWdodD0iMyIgcng9IjEiIGZpbGw9IiMwMDU4N2MiLz4KICA8IS0tIEhvcml6b250YWwgYmFuZCAtLT4KICA8cmVjdCB4PSI1IiB5PSIxOC41IiB3aWR0aD0iMjIiIGhlaWdodD0iMi41IiBmaWxsPSJyZ2JhKDAsODgsMTI0LDAuMTUpIi8+Cjwvc3ZnPg==">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Hub-specific table styles */
+    .hub-table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    #hub-table { width:100%; border-collapse:collapse; font-size:1.4rem; }
+    #hub-table th, #hub-table td { padding:var(--sp-3) var(--sp-4); border-bottom:1px solid var(--border); vertical-align:middle; text-align:left; }
+    #hub-table th { background:var(--bg-subtle); font-size:1.2rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-subtle); position:sticky; top:0; z-index:1; }
+    #hub-table th:hover { color:var(--accent); }
+    #hub-table tbody tr:hover td { background:var(--bg-subtle); }
+    #hub-table tbody tr.hidden { display:none; }
+    .hub-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--sp-4); margin-bottom:var(--sp-6); }
+    .hub-title { font-size:2.8rem; font-weight:600; letter-spacing:-0.03em; }
+    .hub-subtitle { font-size:1.4rem; color:var(--text-muted); margin-top:var(--sp-1); }
+    @media print {
+      .no-print { display:none !important; }
+      #hub-table th { background:white; }
+      @page { size:A3 landscape; margin:1cm; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="site-title">
+        <span>Hub superviseur·e</span>
+      </div>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link" data-i18n="nav.setup">Configuration</a>
+        <a href="log.html" class="nav-link" data-i18n="nav.log">Journal</a>
+        <a href="weekly.html" class="nav-link" data-i18n="nav.weekly">Bilan hebdo</a>
+        <a href="report.html" class="nav-link" data-i18n="nav.report">Suivi</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn btn--ghost btn--sm lang-toggle-btn" data-lang-target="en-CA">EN</button>
+        <button class="btn btn--ghost btn--sm theme-toggle-btn" aria-label="Toggle theme" style="padding:var(--sp-2);line-height:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container container--wide">
+
+      <!-- Upload phase -->
+      <div id="phase-upload">
+        <div class="hub-header">
+          <div>
+            <div class="hub-title">Tableau de bord superviseur·e</div>
+            <div class="hub-subtitle">Téléverse les fichiers JSON des étudiant·e·s pour voir leur progression.<br>
+            Aucune donnée n'est conservée — tout disparaît au rechargement de la page.</div>
+          </div>
+        </div>
+
+        <div class="upload-zone" id="hub-drop-zone"
+          ondragover="event.preventDefault();this.classList.add('drag-over')"
+          ondragleave="this.classList.remove('drag-over')"
+          ondrop="event.preventDefault();this.classList.remove('drag-over');loadFiles(event.dataTransfer.files)">
+          <div class="upload-zone-icon">📂</div>
+          <p style="font-size:1.6rem;margin-bottom:var(--sp-2)">Dépose les fichiers JSON ici</p>
+          <p class="text-muted" style="font-size:1.3rem">Tu peux déposer plusieurs fichiers à la fois, un par étudiant·e.</p>
+          <input type="file" id="file-input" accept=".json" multiple style="display:none" onchange="loadFiles(this.files)">
+          <button class="btn btn--primary mt-4" onclick="document.getElementById('file-input').click()">
+            Sélectionner des fichiers
+          </button>
+        </div>
+        <div id="hub-status" class="mt-4"></div>
+      </div>
+
+      <!-- Dashboard phase -->
+      <div id="phase-dashboard" class="hidden">
+        <div class="hub-header">
+          <div>
+            <div class="hub-title">Progression des stagiaires</div>
+            <div class="hub-subtitle" id="student-count"></div>
+          </div>
+          <div class="flex gap-3 no-print" style="flex-wrap:wrap">
+            <button class="btn btn--ghost btn--sm" onclick="exportCSV()">
+              ⬇ CSV
+            </button>
+            <input type="file" id="file-input-more" accept=".json" multiple style="display:none" onchange="loadFiles(this.files)">
+            <button class="btn btn--secondary btn--sm" onclick="loadMore()">
+              + Ajouter des fichiers
+            </button>
+            <button class="btn btn--ghost btn--sm" onclick="students=[];renderTable();document.getElementById('phase-upload').classList.remove('hidden');document.getElementById('phase-dashboard').classList.add('hidden')">
+              Réinitialiser
+            </button>
+          </div>
+        </div>
+
+        <div id="hub-status" class="mb-4"></div>
+
+        <div class="hub-table-wrap card" style="padding:0;overflow:hidden">
+          <table id="hub-table"></table>
+        </div>
+
+        <div class="mt-4 no-print" style="font-size:1.2rem;color:var(--text-subtle)">
+          Clique sur une ligne pour voir le détail. · Clic sur un en-tête de colonne pour trier.
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="making-of">
+      <div class="making-of-inner">
+        <button class="making-of-toggle" onclick="toggleMakingOf(this)" aria-expanded="false">
+          <span class="making-of-label" data-i18n="making.label">Comment cet outil a été créé</span>
+          <span class="making-of-chevron" aria-hidden="true">›</span>
+        </button>
+        <div class="making-of-body" hidden>
+          <div class="making-of-divider"></div>
+          <p data-i18n="making.p1"></p>
+          <p data-i18n="making.p2"></p>
+          <p><strong data-i18n="making.p3"></strong> <span data-i18n="making.updated"></span></p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /page-wrap -->
+
+<script src="lang.js"></script>
+<script src="app.js"></script>
+<script src="hub.js"></script>
+</body>
+</html>

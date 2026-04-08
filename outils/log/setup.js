@@ -200,6 +200,7 @@ function saveContextAndNext() {
   setupData.context = {
     start_date: startDate,
     scheduled_end_date: endDate,
+    week_end_day: parseInt(document.getElementById("ctx-week-end-day").value ?? "5"),
     skills_to_develop: [],
     apprehensions: "",
     personal_success_definition: "",
