@@ -1109,6 +1109,37 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 .vg-ack.checked .vg-ack__label {
   color: var(--success);
 }
+
+/* === INTERVIEW QUESTIONS SECTION === */
+.iq-section { margin: 2.4rem 0 0; }
+.iq-intro {
+  padding: 1.4rem 1.6rem;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+  font-size: 1.3rem; color: var(--text-3); font-style: italic;
+  line-height: 1.5;
+}
+.iq-group { padding: 1.6rem 1.6rem 0.8rem; border-bottom: 1px solid var(--border); }
+.iq-group:last-child { border-bottom: none; }
+.iq-group__title {
+  font-size: 1.1rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-4);
+  margin-bottom: 1.2rem;
+}
+.iq-card {
+  margin-bottom: 1.4rem;
+  padding: 1.2rem 1.4rem;
+  border-left: 3px solid var(--blue);
+  background: var(--bg);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.iq-card__q {
+  font-size: 1.4rem; font-weight: 600; color: var(--text);
+  margin-bottom: 0.5rem;
+}
+.iq-card__tip {
+  font-size: 1.3rem; color: var(--text-3); line-height: 1.55;
+}
 </style>
 </head>
 <body>
@@ -2955,6 +2986,81 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
     </div>
 
   </div>
+
+    <!-- ==================== TYPICAL QUESTIONS ==================== -->
+    <div class="platform-section iq-section" id="iv-questions">
+      <button class="platform-toggle" aria-expanded="false" aria-controls="iv-questions-body" onclick="togglePlatform(this, 'iv-questions-body')">
+        <span class="platform-toggle__label" data-fr="Questions d’entretien typiques — exemples et ce qu’elles évaluent vraiment" data-en="Typical interview questions — examples and what they really assess">Questions d’entretien typiques — exemples et ce qu’elles évaluent vraiment</span>
+        <span class="platform-toggle__chevron" aria-hidden="true">›</span>
+      </button>
+      <div class="platform-body" id="iv-questions-body" hidden>
+        <div class="iq-intro">
+          <span data-fr="Ces exemples ne sont pas une liste à mémoriser — ils illustrent ce que l’intervieweur cherche vraiment à comprendre derrière chaque question. Préparez vos propres réponses ancrées dans vos expériences réelles." data-en="These examples are not a list to memorise — they illustrate what the interviewer is really trying to understand behind each question. Prepare your own answers grounded in your real experiences.">Ces exemples ne sont pas une liste à mémoriser — ils illustrent ce que l’intervieweur cherche vraiment à comprendre derrière chaque question.</span>
+        </div>
+      <div class="iq-group">
+        <div class="iq-group__title" data-fr="Questions générales" data-en="General questions">Questions générales</div>
+        <div class="iq-card">
+          <div class="iq-card__q"><span data-fr="Parlez-moi de vous." data-en="Tell me about yourself.">Parlez-moi de vous.</span></div>
+          <div class="iq-card__tip"><span data-fr="Ce n’est pas une invitation à réciter votre CV. L’intervieweur cherche à voir si vous savez vous présenter de façon concise et pertinente. Préparez un résumé de 60–90 secondes : qui vous êtes professionnellement, ce que vous faites, et pourquoi ce poste vous intéresse." data-en="This is not an invitation to recite your CV. The interviewer wants to see if you can introduce yourself concisely and relevantly. Prepare a 60–90 second summary: who you are professionally, what you do, and why this role interests you.">Ce n’est pas une invitation à réciter votre CV. L’intervieweur cherche à voir si vous savez vous présenter de façon concise et pertinente. Préparez un résumé de 60–90 secondes : qui vous êtes professionnellement, ce que vous faites, et pourquoi ce poste vous intéresse.</span></div>
+        </div>
+        <div class="iq-card">
+          <div class="iq-card__q"><span data-fr="Pourquoi ce poste ? Pourquoi cette entreprise ?" data-en="Why this role? Why this company?">Pourquoi ce poste ? Pourquoi cette entreprise ?</span></div>
+          <div class="iq-card__tip"><span data-fr="L’intervieweur vérifie si vous avez fait vos recherches et si votre motivation est réelle ou générique. Mentionnez quelque chose de spécifique à l’entreprise : un projet, une valeur, une technologie. Évitez « parce que vous êtes un leader du secteur» — tout le monde dit ça." data-en="The interviewer is checking whether you have done your research and whether your motivation is genuine or generic. Mention something specific to the company: a project, a value, a technology. Avoid ‘because you are a sector leader’ — everyone says that.">L’intervieweur vérifie si vous avez fait vos recherches et si votre motivation est réelle ou générique. Mentionnez quelque chose de spécifique à l’entreprise : un projet, une valeur, une technologie. Évitez « parce que vous êtes un leader du secteur» — tout le monde dit ça.</span></div>
+        </div>
+        <div class="iq-card">
+          <div class="iq-card__q"><span data-fr="Quelles sont vos forces ? Vos faiblesses ?" data-en="What are your strengths? Your weaknesses?">Quelles sont vos forces ? Vos faiblesses ?</span></div>
+          <div class="iq-card__tip"><span data-fr="Pour les forces : choisissez-en une ou deux vraiment pertinentes pour ce poste, avec un exemple concret. Pour les faiblesses : soyez honnête et montrez que vous travaillez dessus. Une faiblesse réelle avec un plan d’amélioration vaut mieux qu’une fausse faiblesse (« je suis perfectionniste»)." data-en="For strengths: choose one or two genuinely relevant to this role, with a concrete example. For weaknesses: be honest and show you are working on it. A real weakness with an improvement plan is better than a fake one (‘I am a perfectionist’).">Pour les forces : choisissez-en une ou deux vraiment pertinentes pour ce poste, avec un exemple concret. Pour les faiblesses : soyez honnête et montrez que vous travaillez dessus. Une faiblesse réelle avec un plan d’amélioration vaut mieux qu’une fausse faiblesse (« je suis perfectionniste»).</span></div>
+        </div>
+        <div class="iq-card">
+          <div class="iq-card__q"><span data-fr="Où vous voyez-vous dans cinq ans ?" data-en="Where do you see yourself in five years?">Où vous voyez-vous dans cinq ans ?</span></div>
+          <div class="iq-card__tip"><span data-fr="L’intervieweur cherche à savoir si vous avez des ambitions réalistes et si ce poste s’inscrit logiquement dans votre trajectoire. Pas besoin d’une réponse précise : montrez que vous réfléchissez à votre développement professionnel." data-en="The interviewer wants to know whether you have realistic ambitions and whether this role fits logically into your trajectory. No need for a precise answer: show that you think about your professional development.">L’intervieweur cherche à savoir si vous avez des ambitions réalistes et si ce poste s’inscrit logiquement dans votre trajectoire. Pas besoin d’une réponse précise : montrez que vous réfléchissez à votre développement professionnel.</span></div>
+        </div>
+        <div class="iq-card">
+          <div class="iq-card__q"><span data-fr="Avez-vous des questions pour nous ?" data-en="Do you have questions for us?">Avez-vous des questions pour nous ?</span></div>
+          <div class="iq-card__tip"><span data-fr="Cette question n’est pas optionnelle. Dire « non» signale un désengagement. Posez 2–3 questions préparées à l’avance (voir iv-2). Les meilleures questions montrent que vous avez réfléchi au poste et à l’équipe, pas seulement au salaire." data-en="This question is not optional. Saying ‘no’ signals disengagement. Ask 2–3 questions prepared in advance (see iv-2). The best questions show you have thought about the role and team, not just the salary.">Cette question n’est pas optionnelle. Dire « non» signale un désengagement. Posez 2–3 questions préparées à l’avance (voir iv-2). Les meilleures questions montrent que vous avez réfléchi au poste et à l’équipe, pas seulement au salaire.</span></div>
+        </div>
+      </div>
+      <div class="iq-group">
+        <div class="iq-group__title" data-fr="Questions comportementales (méthode STAR)" data-en="Behavioural questions (STAR method)">Questions comportementales (méthode STAR)</div>
+        <div class="iq-card">
+          <div class="iq-card__q"><span data-fr="Parlez-moi d’un projet dont vous êtes fier·ère." data-en="Tell me about a project you are proud of.">Parlez-moi d’un projet dont vous êtes fier·ère.</span></div>
+          <div class="iq-card__tip"><span data-fr="Utilisez la méthode STAR. L’intervieweur évalue votre capacité à réfléchir sur votre propre travail, à identifier ce qui a bien fonctionné, et à communiquer clairement. Choisissez un projet récent et pertinent pour le poste." data-en="Use the STAR method. The interviewer is assessing your ability to reflect on your own work, identify what went well, and communicate clearly. Choose a recent project relevant to the role.">Utilisez la méthode STAR. L’intervieweur évalue votre capacité à réfléchir sur votre propre travail, à identifier ce qui a bien fonctionné, et à communiquer clairement. Choisissez un projet récent et pertinent pour le poste.</span></div>
+        </div>
+        <div class="iq-card">
+          <div class="iq-card__q"><span data-fr="Décrivez une situation où vous avez eu un conflit avec un collègue ou un client." data-en="Describe a situation where you had a conflict with a colleague or client.">Décrivez une situation où vous avez eu un conflit avec un collègue ou un client.</span></div>
+          <div class="iq-card__tip"><span data-fr="L’intervieweur ne cherche pas un saint — il cherche quelqu’un qui gère les conflits de façon professionnelle et constructive. Concentrez-vous sur la résolution, pas sur les torts. Évitez de critiquer l’autre personne." data-en="The interviewer is not looking for a saint — they want someone who handles conflict professionally and constructively. Focus on the resolution, not on who was wrong. Avoid criticising the other person.">L’intervieweur ne cherche pas un saint — il cherche quelqu’un qui gère les conflits de façon professionnelle et constructive. Concentrez-vous sur la résolution, pas sur les torts. Évitez de critiquer l’autre personne.</span></div>
+        </div>
+        <div class="iq-card">
+          <div class="iq-card__q"><span data-fr="Donnez un exemple où vous avez dû apprendre quelque chose rapidement." data-en="Give an example of when you had to learn something quickly.">Donnez un exemple où vous avez dû apprendre quelque chose rapidement.</span></div>
+          <div class="iq-card__tip"><span data-fr="Ce type de question évalue votre adaptabilité et votre autonomie d’apprentissage — des qualités essentielles en tech et en design où les outils évoluent vite. Montrez comment vous avez trouvé les ressources et comment vous avez appliqué ce que vous avez appris." data-en="This type of question evaluates your adaptability and learning autonomy — essential qualities in tech and design where tools evolve quickly. Show how you found the resources and how you applied what you learned.">Ce type de question évalue votre adaptabilité et votre autonomie d’apprentissage — des qualités essentielles en tech et en design où les outils évoluent vite. Montrez comment vous avez trouvé les ressources et comment vous avez appliqué ce que vous avez appris.</span></div>
+        </div>
+        <div class="iq-card">
+          <div class="iq-card__q"><span data-fr="Comment gérez-vous les échéances serrées ou le stress ?" data-en="How do you handle tight deadlines or stress?">Comment gérez-vous les échéances serrées ou le stress ?</span></div>
+          <div class="iq-card__tip"><span data-fr="L’intervieweur évalue votre maturité professionnelle. Une réponse convaincante décrit une stratégie concrète (prétorisation, communication proactive, découpage en sous-tâches) appuyée par un exemple réel — pas une affirmation abstraite comme « je travaille bien sous pression»." data-en="The interviewer is evaluating your professional maturity. A convincing answer describes a concrete strategy (prioritisation, proactive communication, breaking tasks down) backed by a real example — not an abstract claim like ‘I work well under pressure’.">L’intervieweur évalue votre maturité professionnelle. Une réponse convaincante décrit une stratégie concrète (prétorisation, communication proactive, découpage en sous-tâches) appuyée par un exemple réel — pas une affirmation abstraite comme « je travaille bien sous pression».</span></div>
+        </div>
+      </div>
+      <div class="iq-group">
+        <div class="iq-group__title" data-fr="Questions techniques et professionnelles" data-en="Technical and professional questions">Questions techniques et professionnelles</div>
+        <div class="iq-card">
+          <div class="iq-card__q"><span data-fr="Décrivez votre processus de travail sur un projet." data-en="Describe your work process on a project.">Décrivez votre processus de travail sur un projet.</span></div>
+          <div class="iq-card__tip"><span data-fr="En tech, on attend une description structurée : analyse, planification, développement, tests, livraison. En design, le processus créatif compte : recherche utilisateur, idéation, protótypage, itération. Montrez que vous avez une méthode, même si elle évolue selon les projets." data-en="In tech, a structured description is expected: analysis, planning, development, testing, delivery. In design, the creative process matters: user research, ideation, prototyping, iteration. Show that you have a method, even if it adapts to each project.">En tech, on attend une description structurée : analyse, planification, développement, tests, livraison. En design, le processus créatif compte : recherche utilisateur, idéation, protótypage, itération. Montrez que vous avez une méthode, même si elle évolue selon les projets.</span></div>
+        </div>
+        <div class="iq-card">
+          <div class="iq-card__q"><span data-fr="Comment vous tenez-vous à jour dans votre domaine ?" data-en="How do you keep up with your field?">Comment vous tenez-vous à jour dans votre domaine ?</span></div>
+          <div class="iq-card__tip"><span data-fr="L’intervieweur évalue votre curiosité intellectuelle et votre initiative. Nommez des sources concrètes : blogs, podécasts, conférences, communautés en ligne, side projects. Évitez les réponses vagues comme « je fais de la veille»." data-en="The interviewer is assessing your intellectual curiosity and initiative. Name concrete sources: blogs, podcasts, conferences, online communities, side projects. Avoid vague answers like ‘I keep up with trends’.">L’intervieweur évalue votre curiosité intellectuelle et votre initiative. Nommez des sources concrètes : blogs, podécasts, conférences, communautés en ligne, side projects. Évitez les réponses vagues comme « je fais de la veille».</span></div>
+        </div>
+        <div class="iq-card">
+          <div class="iq-card__q"><span data-fr="Quel outil ou technologie avez-vous appris récemment ?" data-en="What tool or technology have you learned recently?">Quel outil ou technologie avez-vous appris récemment ?</span></div>
+          <div class="iq-card__tip"><span data-fr="Cette question évalue votre dynamisme et votre rapport à l’apprentissage continu. Choisissez quelque chose d’authentique et de récent. Expliquez pourquoi vous l’avez appris et comment vous l’avez utilisé ou comptez l’utiliser." data-en="This question assesses your dynamism and relationship to continuous learning. Choose something authentic and recent. Explain why you learned it and how you used it or plan to use it.">Cette question évalue votre dynamisme et votre rapport à l’apprentissage continu. Choisissez quelque chose d’authentique et de récent. Expliquez pourquoi vous l’avez appris et comment vous l’avez utilisé ou comptez l’utiliser.</span></div>
+        </div>
+        <div class="iq-card">
+          <div class="iq-card__q"><span data-fr="Avez-vous de l’expérience avec le travail en équipe ou en mode agile ?" data-en="Do you have experience working in a team or in an agile environment?">Avez-vous de l’expérience avec le travail en équipe ou en mode agile ?</span></div>
+          <div class="iq-card__tip"><span data-fr="Même sans expérience professionnelle formelle, vous pouvez parler de projets d’équipe académiques. L’intervieweur cherche à savoir si vous comprenez la collaboration, la répartition des tâches, et les cycles itératifs. Soyez honnête sur votre niveau." data-en="Even without formal professional experience, you can talk about academic team projects. The interviewer wants to know if you understand collaboration, task distribution, and iterative cycles. Be honest about your level.">Même sans expérience professionnelle formelle, vous pouvez parler de projets d’équipe académiques. L’intervieweur cherche à savoir si vous comprenez la collaboration, la répartition des tâches, et les cycles itératifs. Soyez honnête sur votre niveau.</span></div>
+        </div>
+      </div>
+      </div>
+    </div>
+
 
 
   <!-- ==================== TAB 7: VIGILANCE ==================== -->
