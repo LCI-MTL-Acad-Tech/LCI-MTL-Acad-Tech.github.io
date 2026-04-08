@@ -549,6 +549,9 @@ main { flex: 1; max-width: 1280px; margin: 0 auto; padding: 24px 20px; width: 10
 .criterion-pts.pos { color: var(--pass); }
 .criterion-pts.neg { color: var(--fail); }
 .criterion-pts.zero { color: var(--text3); }
+.criterion-pts.neg-missed { color: var(--border); }
+.crit-missed { opacity: 0.45; }
+.crit-missed .criterion-text { color: var(--text3); }
 
 .qualitative-block {
   background: var(--bg2);
@@ -1424,6 +1427,62 @@ function renderS1(s) {
   `);
 }
 
+
+// ── Trim & transformation full option renderers ──────────────────────────────
+const TRIM_OPTIONS = [
+  { kw: ['Aucune','No trim'],                                            pts: '+10', fr: 'Aucune garniture de couture',                                   en: 'No trim' },
+  { kw: ['Compatible'],                                                  pts: '+5',  fr: 'Compatible avec ou fait du tissu principal',                    en: 'Compatible with or made from main fabric' },
+  { kw: ['Minimale','Minimal trim'],                                     pts: '+5',  fr: 'Garniture minimale',                                            en: 'Minimal trim' },
+  { kw: ['recyclée','Recycled','upcycled trim','récupé'],               pts: '+5',  fr: 'Garniture recyclée ou récupérée',                               en: 'Recycled or upcycled trim' },
+  { kw: ['Deadstock trim','deadstock'],                                  pts: '+3',  fr: 'Garniture deadstock',                                           en: 'Deadstock trim' },
+  { kw: ['amovible','Removable'],                                        pts: '+3',  fr: 'Garniture amovible (recyclage ou réutilisation)',                en: 'Removable trim (for recycling or repurposing)' },
+  { kw: ['toxique','Toxic','colle'],                                     pts: '−5',  fr: 'Application toxique (ex. colle)',                               en: 'Toxic application (e.g. glue)' },
+  { kw: ['retirer','Hard to remove','rivet','illet','snap'],             pts: '−5',  fr: 'Difficile à retirer (rivets, illets, boutons-pression)',         en: 'Hard to remove (rivets, eyelets, snap buttons)' },
+  { kw: ['dégradable','Degradable','Velcro','élastique'],               pts: '−5',  fr: 'Garniture dégradable (élastique, Velcro)',                       en: 'Degradable trim (elastic, Velcro)' },
+];
+
+const TRANSFO_OPTIONS = [
+  { kw: ['Aucune','No transformation','No embellishment'],               pts: '+10', fr: 'Aucune transformation',                                         en: 'No embellishments' },
+  { kw: ['artisanaux','DIY'],                                            pts: '+5',  fr: 'Embellissements artisanaux',                                    en: 'DIY embellishments' },
+  { kw: ['naturelles','Natural dyes'],                                   pts: '+5',  fr: 'Teintures naturelles',                                          en: 'Natural dyes' },
+  { kw: ['Non teint','Undyed','minimal transformation','transformation minimale'], pts: '+7', fr: 'Non teint ou transformation minimale',              en: 'Undyed or minimal transformation' },
+  { kw: ['Finition','Finish','perm-press','waxed','flocking'],           pts: '−5',  fr: 'Finition (perm-press, ciré, flocage)',                          en: 'Finish (perm-press, waxed, flocking)' },
+  { kw: ['série','Mass-produced','paillettes','sequins'],                pts: '−5',  fr: 'Embellissements produits en série (ex. paillettes)',             en: 'Mass-produced embellishments (e.g. sequins)' },
+  { kw: ['combinant','combining'],                                       pts: '−5',  fr: 'Transformation textile combinant différentes fibres/matériaux',   en: 'Textile transformation combining fibres or materials' },
+];
+
+function optionSelected(raw, kws) {
+  const r = String(raw||'').toLowerCase();
+  return kws.some(k => r.includes(k.toLowerCase()));
+}
+
+function renderTrimOptions(s, selectedOpts) {
+  if (s.s2TrimOverride) {
+    // Only show "no trim" as selected, rest as not applicable
+    return TRIM_OPTIONS.map(o => {
+      const sel = o.kw.some(k => ['Aucune','No trim'].includes(k));
+      return scoredOption(sel, lang==='fr' ? o.fr : o.en, o.pts);
+    }).join('');
+  }
+  return TRIM_OPTIONS.map(o => {
+    const sel = optionSelected(s.trimRaw, o.kw);
+    return scoredOption(sel, lang==='fr' ? o.fr : o.en, o.pts);
+  }).join('');
+}
+
+function renderTransfoOptions(s, selectedOpts) {
+  if (s.s2TransfoOverride) {
+    return TRANSFO_OPTIONS.map(o => {
+      const sel = o.kw.some(k => ['Aucune','No transformation','No embellishment'].includes(k));
+      return scoredOption(sel, lang==='fr' ? o.fr : o.en, o.pts);
+    }).join('');
+  }
+  return TRANSFO_OPTIONS.map(o => {
+    const sel = optionSelected(s.transfoRaw, o.kw);
+    return scoredOption(sel, lang==='fr' ? o.fr : o.en, o.pts);
+  }).join('');
+}
+
 function renderS2(s) {
   const pct = Math.max(0,(s.s2/40))*100;
   const trimOpts = options(s.trimRaw);
@@ -1450,11 +1509,11 @@ function renderS2(s) {
 
     <div style="font-size:11px;font-family:var(--font-display);color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin:12px 0 6px">${lang==='fr'?'Garnitures':'Trim'} (${pts(s.s2Trim)})</div>
     ${s.s2TrimOverride ? `<div class="override-notice" style="font-size:12px">✦ ${t('overrideNoTrim')}</div>` : ''}
-    ${trimOpts.map(o=>`<div class="criterion-row"><div class="criterion-check yes">✓</div><div class="criterion-text">${esc(o)}</div></div>`).join('')}
+    ${renderTrimOptions(s, trimOpts)}
 
     <div style="font-size:11px;font-family:var(--font-display);color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin:12px 0 6px">${lang==='fr'?'Transformations':'Transformation'} (${pts(s.s2Transfo)})</div>
     ${s.s2TransfoOverride ? `<div class="override-notice" style="font-size:12px">✦ ${t('overrideNoTransfo')}</div>` : ''}
-    ${transfoOpts.map(o=>`<div class="criterion-row"><div class="criterion-check yes">✓</div><div class="criterion-text">${esc(o)}</div></div>`).join('')}
+    ${renderTransfoOptions(s, transfoOpts)}
 
     <div style="font-size:11px;font-family:var(--font-display);color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin:12px 0 6px">${lang==='fr'?'Entoilage':'Interfacing'} (${pts(s.s2Interface)})</div>
     <div class="criterion-row">
@@ -1547,13 +1606,28 @@ function toggleSection(id) {
 }
 
 function crit(val, label, ptsVal) {
+  const isPos = String(ptsVal).startsWith('+') && ptsVal !== '+0' && String(ptsVal) !== '0';
+  const isNeg = String(ptsVal).startsWith('-');
   const cls = val ? 'yes' : 'no';
-  const icon = val ? '✓' : '—';
-  const ptsClass = ptsVal.startsWith('+') && ptsVal !== '+0' && ptsVal !== '0' ? 'pos' : ptsVal.startsWith('-') ? 'neg' : 'zero';
-  return `<div class="criterion-row">
+  const icon = val ? '✓' : '○';
+  const ptsClass = val ? (isPos ? 'pos' : isNeg ? 'neg' : 'zero') : (isNeg ? 'neg-missed' : 'zero');
+  return `<div class="criterion-row${val ? '' : ' crit-missed'}">
     <div class="criterion-check ${cls}">${icon}</div>
     <div class="criterion-text">${label}</div>
-    <div class="criterion-pts ${ptsClass}">${val ? ptsVal : '—'}</div>
+    <div class="criterion-pts ${ptsClass}">${ptsVal}</div>
+  </div>`;
+}
+
+function scoredOption(selected, label, ptsVal) {
+  const isPos = String(ptsVal).startsWith('+') && ptsVal !== '+0';
+  const isNeg = String(ptsVal).startsWith('-');
+  const cls = selected ? 'yes' : 'no';
+  const icon = selected ? '✓' : '○';
+  const ptsClass = selected ? (isPos ? 'pos' : isNeg ? 'neg' : 'zero') : (isNeg ? 'neg-missed' : 'zero');
+  return `<div class="criterion-row${selected ? '' : ' crit-missed'}">
+    <div class="criterion-check ${cls}">${icon}</div>
+    <div class="criterion-text">${label}</div>
+    <div class="criterion-pts ${ptsClass}">${ptsVal}</div>
   </div>`;
 }
 
