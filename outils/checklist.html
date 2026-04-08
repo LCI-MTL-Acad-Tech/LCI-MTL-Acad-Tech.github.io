@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzAwNTg3YyIvPgogIDxwb2x5bGluZSBwb2ludHM9IjcsMTcgMTMsMjMgMjUsMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIzLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Checklists interactives pour préparer CV, portfolio, lettre de motivation et présence en ligne. Interactive career checklists for CV, portfolio, cover letter and online presence.">
 <meta name="robots" content="index, follow">
@@ -628,6 +629,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
   width: 100%; display: flex; align-items: center; gap: 1.2rem;
   padding: 1.4rem 1.6rem; background: var(--cream); border: none;
   cursor: pointer; text-align: left; font-family: inherit;
+  color: var(--text);
   transition: background var(--duration) var(--ease);
 }
 .platform-toggle:hover { background: var(--bg-alt2); }
@@ -636,15 +638,15 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 .platform-toggle__label {
   flex: 1; display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap;
 }
-.platform-toggle__name { font-size: 1.4rem; font-weight: 700; color: var(--charcoal); }
+.platform-toggle__name { font-size: 1.4rem; font-weight: 700; color: var(--text); }
 .platform-toggle__audience {
-  font-size: 1.2rem; color: var(--c400); font-weight: 400; font-style: italic;
+  font-size: 1.2rem; color: var(--text-3); font-weight: 400; font-style: italic;
 }
 .platform-toggle__count {
-  font-size: 1.2rem; color: var(--c300); white-space: nowrap;
+  font-size: 1.2rem; color: var(--text-4); white-space: nowrap;
 }
 .platform-toggle__chevron {
-  width: 1.6rem; height: 1.6rem; flex-shrink: 0; color: var(--c300);
+  width: 1.6rem; height: 1.6rem; flex-shrink: 0; color: var(--text-4);
   transition: transform var(--duration) var(--ease);
 }
 .platform-toggle[aria-expanded="true"] .platform-toggle__chevron { transform: rotate(180deg); }
@@ -1116,21 +1118,21 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
   padding: 1.4rem 1.6rem;
   background: var(--bg-alt);
   border-bottom: 1px solid var(--border);
-  font-size: 1.3rem; color: var(--text-3); font-style: italic;
+  font-size: 1.3rem; color: var(--text-2); font-style: italic;
   line-height: 1.5;
 }
 .iq-group { padding: 1.6rem 1.6rem 0.8rem; border-bottom: 1px solid var(--border); }
 .iq-group:last-child { border-bottom: none; }
 .iq-group__title {
   font-size: 1.1rem; font-weight: 700; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--text-4);
+  text-transform: uppercase; color: var(--text-3);
   margin-bottom: 1.2rem;
 }
 .iq-card {
   margin-bottom: 1.4rem;
   padding: 1.2rem 1.4rem;
   border-left: 3px solid var(--blue);
-  background: var(--bg);
+  background: var(--bg-alt2);
   border-radius: 0 var(--radius) var(--radius) 0;
 }
 .iq-card__q {
@@ -1138,7 +1140,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
   margin-bottom: 0.5rem;
 }
 .iq-card__tip {
-  font-size: 1.3rem; color: var(--text-3); line-height: 1.55;
+  font-size: 1.3rem; color: var(--text-2); line-height: 1.55;
 }
 </style>
 </head>
@@ -1384,7 +1386,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
     </div>
 
     <div class="progress-label">
-      <span id="cv-progress-text" data-fr-template="0 / 19 complété" data-en-template="0 / 19 completed">0 / 18 complété</span>
+      <span id="cv-progress-text" data-fr-template="0 / 19 complété" data-en-template="0 / 19 completed">0 / 21 complété</span>
     </div>
     <div class="progress-bar-wrap"><div class="progress-bar" id="cv-bar" style="width:0%"></div></div>
 
@@ -2823,7 +2825,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
     </div>
 
     <div class="progress-label">
-      <span id="iv-progress-text" data-fr-template="0 / 18 complété" data-en-template="0 / 18 completed">0 / 18 complété</span>
+      <span id="iv-progress-text" data-fr-template="0 / 21 complété" data-en-template="0 / 21 completed">0 / 21 complété</span>
     </div>
     <div class="progress-bar-wrap"><div class="progress-bar" id="iv-bar" style="width:0%"></div></div>
 
@@ -2981,6 +2983,27 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
         <div class="item-text">
           <div class="item-label"><span data-fr="Salaire : fourchette du marché recherchée avant l’entretien, plancher personnel décidé" data-en="Salary: market range researched before the interview, personal floor decided">Salaire : fourchette du marché recherchée avant l’entretien, plancher personnel décidé</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
           <div class="item-hint" data-fr="Connaître la fourchette de marché avant l’entretien vous place en position de force. Sources : Glassdoor, LinkedIn Salary, Indeed, l’offre d’emploi elle-même si le salaire y est affiché (de plus en plus courant au Québec). Décidez à l’avance votre plancher : le salaire minimum en dessous duquel vous ne prendrez pas le poste. En entretien, si l’employeur demande vos attentes salariales : donnez une fourchette ancrée sur le marché plutôt qu’un chiffre exact. Ne donnez jamais votre plancher comme point de départ — c’est votre réserve, pas votre offre d’ouverture. Un premier salaire se négocie ; ne pas négocier du tout est la norme pour beaucoup d’étudiants, mais c’est souvent de l’argent laissé sur la table." data-en="Knowing the market range before the interview puts you in a stronger position. Sources: Glassdoor, LinkedIn Salary, Indeed, the job posting itself if salary is listed (increasingly common in Québec). Decide your floor in advance: the minimum salary below which you will not take the role. In the interview, if the employer asks about your salary expectations: give a market-anchored range rather than a single number. Never give your floor as your starting point — it is your reserve, not your opening offer. A first salary is negotiable; not negotiating at all is the norm for many students, but it often means leaving money on the table.">Recherchez la fourchette de marché (Glassdoor, LinkedIn Salary, l’offre elle-même). Décidez votre plancher à l’avance. En entretien : donnez une fourchette ancrée sur le marché, jamais votre plancher comme point de départ.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-19">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Pas d’objet à manipuler pendant l’entretien : stylo, téléphone, bijoux, cheveux" data-en="Nothing to fidget with during the interview: pen, phone, jewellery, hair">Pas d’objet à manipuler pendant l’entretien : stylo, téléphone, bijoux, cheveux</span></div>
+          <div class="item-hint" data-fr="Les gestes répétitifs — cliquer un stylo, tripoter une bague, se toucher les cheveux, faire tourner son téléphone — sont une source de distraction visible et signalent de l’nervosité ou un manque d’écoute. Posez votre stylo, rangez votre téléphone, et gardez les mains calmément sur la table ou sur vos genoux." data-en="Repetitive gestures — clicking a pen, fiddling with a ring, touching your hair, spinning your phone — are visibly distracting and signal nervousness or inattention. Set your pen down, put your phone away, and keep your hands calmly on the table or in your lap.">Les gestes répétitifs distraient et signalent la nervosité. Posez le stylo, rangez le téléphone, mains sur la table.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-20">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="Éviter les mots de remplissage : « genre», « euh», « tu sais», « comme», « basically»" data-en="Avoid filler words: ‘like’, ‘um’, ‘you know’, ‘basically’, ‘so yeah’">Éviter les mots de remplissage : « genre», « euh», « tu sais», « comme», « basically»</span></div>
+          <div class="item-hint" data-fr="Les mots de remplissage fréquents créent une impression de manque de préparation ou de confiance, même quand le contenu est bon. Le remède : le silence. Une pause de deux secondes pour réfléchir est bien plus professionnelle qu’un « euh». Identifiez vos mots de remplissage habituels en vous enregistrant à voix haute — la plupart des gens ne réalisent pas à quel point ils les utilisent avant de s’entendre." data-en="Frequent filler words create an impression of lack of preparation or confidence, even when the content is good. The remedy: silence. A two-second pause to think is far more professional than an ‘um’. Identify your habitual fillers by recording yourself speaking out loud — most people do not realise how often they use them until they hear themselves.">Les mots de remplissage fréquents signalent un manque de préparation. Le remède : le silence. Enregistrez-vous pour identifier vos habitudes.</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="iv-21">
+        <div class="check-box"></div>
+        <div class="item-text">
+          <div class="item-label"><span data-fr="S’entraîner à voix haute : réponses minutées, devant un miroir ou en enregistrement" data-en="Practise out loud: timed answers, in front of a mirror or recorded">S’entraîner à voix haute : réponses minutées, devant un miroir ou en enregistrement</span><span class="tag tag-tip" data-fr="Conseil" data-en="Tip">Conseil</span></div>
+          <div class="item-hint" data-fr="Lire des réponses dans sa tête n’est pas la même chose que les prononcer à voix haute. L’entraînement oral révèle les mots de remplissage, les phrases trop longues, les hésitations, et les réponses qui s’éloignent de la question. Chronométrez-vous : visez 60–90 secondes pour les questions générales, 2–3 minutes pour les questions STAR. Demandez à un·e ami·e ou un·e camarade de jouer l’intervieweur." data-en="Reading answers in your head is not the same as saying them out loud. Oral practice reveals filler words, overly long sentences, hesitations, and answers that drift from the question. Time yourself: aim for 60–90 seconds for general questions, 2–3 minutes for STAR questions. Ask a friend or classmate to play the interviewer.">Lire dans sa tête ≠ prononcer à voix haute. Chronométrez-vous : 60–90 s (général), 2–3 min (STAR). Enregistrez-vous ou faites-vous interviewer par un·e ami·e.</div>
         </div>
       </div>
     </div>
@@ -3216,7 +3239,7 @@ input[type="range"]#profile-slider:focus::-webkit-slider-thumb {
 // CONFIG
 // ================================================================
 const TABS   = ['cv', 'portfolio', 'cl', 'op', 'net', 'iv', 'vg'];
-const TOTALS = { cv: 22, portfolio: 21, cl: 13, op: 24, net: 9, iv: 18, vg: 5 };
+const TOTALS = { cv: 22, portfolio: 21, cl: 13, op: 24, net: 9, iv: 21, vg: 5 };
 const COOKIE_KEY = 'lci_career_checklist_v3';
 let currentLang = 'fr';
 let profileValue = 50; // 0=tech … 100=design
