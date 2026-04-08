@@ -201,6 +201,8 @@ function saveContextAndNext() {
     start_date: startDate,
     scheduled_end_date: endDate,
     week_end_day: parseInt(document.getElementById("ctx-week-end-day").value ?? "5"),
+    hours_per_day: parseFloat(document.getElementById("ctx-hours-per-day").value) || 7,
+    total_hours_target: parseFloat(document.getElementById("ctx-total-hours").value) || null,
     skills_to_develop: [],
     apprehensions: "",
     personal_success_definition: "",

@@ -3,26 +3,127 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hub — Tableau de bord superviseur·e</title>
+  <title>Hub — Tableau de bord</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="alternate icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPCEtLSBCYWNrZ3JvdW5kIGNpcmNsZSAtLT4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0iIzAwNTg3YyIvPgogIDwhLS0gQnJpZWZjYXNlIGJvZHkgLS0+CiAgPHJlY3QgeD0iNSIgeT0iMTMiIHdpZHRoPSIyMiIgaGVpZ2h0PSIxNCIgcng9IjIuNSIgZmlsbD0id2hpdGUiLz4KICA8IS0tIEJyaWVmY2FzZSBoYW5kbGUgLS0+CiAgPHBhdGggZD0iTTExIDEzdi0yLjVhMSAxIDAgMCAxIDEtMWg4YTEgMSAwIDAgMSAxIDFWMTMiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPCEtLSBDZW50ZXIgY2xhc3AgLS0+CiAgPHJlY3QgeD0iMTMuNSIgeT0iMTcuNSIgd2lkdGg9IjUiIGhlaWdodD0iMyIgcng9IjEiIGZpbGw9IiMwMDU4N2MiLz4KICA8IS0tIEhvcml6b250YWwgYmFuZCAtLT4KICA8cmVjdCB4PSI1IiB5PSIxOC41IiB3aWR0aD0iMjIiIGhlaWdodD0iMi41IiBmaWxsPSJyZ2JhKDAsODgsMTI0LDAuMTUpIi8+Cjwvc3ZnPg==">
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Hub-specific table styles */
-    .hub-table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
-    #hub-table { width:100%; border-collapse:collapse; font-size:1.4rem; }
-    #hub-table th, #hub-table td { padding:var(--sp-3) var(--sp-4); border-bottom:1px solid var(--border); vertical-align:middle; text-align:left; }
-    #hub-table th { background:var(--bg-subtle); font-size:1.2rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-subtle); position:sticky; top:0; z-index:1; }
+    /* ── Hub layout ─────────────────────────────────────── */
+    .hub-upload-strip {
+      display:flex;align-items:center;gap:var(--sp-4);
+      padding:var(--sp-4) var(--sp-5);
+      background:var(--bg-card);border-radius:var(--r-xl);
+      box-shadow:var(--shadow-sm);margin-bottom:var(--sp-5);
+    }
+    .hub-stat-grid {
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));
+      gap:var(--sp-3);margin-bottom:var(--sp-5);
+    }
+    .hub-stat {
+      background:var(--bg-card);border-radius:var(--r-xl);
+      padding:var(--sp-5);box-shadow:var(--shadow-sm);
+      text-align:center;
+    }
+    .hub-stat-val {
+      font-size:3rem;font-weight:700;letter-spacing:-0.05em;
+      color:var(--accent);line-height:1;margin-bottom:var(--sp-1);
+    }
+    .hub-stat-label {
+      font-size:1.2rem;color:var(--text-subtle);
+      text-transform:uppercase;letter-spacing:0.07em;
+    }
+    .hub-charts {
+      display:grid;grid-template-columns:1fr 28rem;
+      gap:var(--sp-4);margin-bottom:var(--sp-5);
+    }
+    .hub-filter-bar {
+      display:flex;flex-wrap:wrap;gap:var(--sp-3);align-items:flex-end;
+      background:var(--bg-card);border-radius:var(--r-xl);
+      padding:var(--sp-4) var(--sp-5);box-shadow:var(--shadow-sm);
+      margin-bottom:var(--sp-4);
+    }
+    .hub-filter-bar select, .hub-filter-bar input {
+      font-size:1.3rem;padding:var(--sp-1) var(--sp-3);
+      border:1.5px solid var(--border);border-radius:var(--r-md);
+      background:var(--bg-input);color:var(--text);
+      height:3.4rem;
+    }
+    .hub-filter-label {
+      font-size:1.1rem;font-weight:600;text-transform:uppercase;
+      letter-spacing:0.07em;color:var(--text-subtle);
+      display:block;margin-bottom:var(--sp-1);
+    }
+    .hub-table-outer {
+      background:var(--bg-card);border-radius:var(--r-xl);
+      box-shadow:var(--shadow-sm);overflow:hidden;
+    }
+    .hub-table-scroll {
+      overflow-x:auto;-webkit-overflow-scrolling:touch;
+    }
+    #hub-table {
+      width:100%;border-collapse:collapse;font-size:1.4rem;
+      min-width:96rem;
+    }
+    #hub-table th {
+      background:var(--bg-subtle);
+      padding:var(--sp-3) var(--sp-4);
+      font-size:1.1rem;font-weight:600;text-transform:uppercase;
+      letter-spacing:0.06em;color:var(--text-subtle);
+      border-bottom:1px solid var(--border);
+      position:sticky;top:0;z-index:2;
+      white-space:nowrap;cursor:pointer;user-select:none;
+    }
     #hub-table th:hover { color:var(--accent); }
-    #hub-table tbody tr:hover td { background:var(--bg-subtle); }
-    #hub-table tbody tr.hidden { display:none; }
-    .hub-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--sp-4); margin-bottom:var(--sp-6); }
-    .hub-title { font-size:2.8rem; font-weight:600; letter-spacing:-0.03em; }
-    .hub-subtitle { font-size:1.4rem; color:var(--text-muted); margin-top:var(--sp-1); }
+    #hub-table td {
+      padding:var(--sp-3) var(--sp-4);
+      border-bottom:1px solid var(--border);
+      vertical-align:middle;white-space:nowrap;
+    }
+    #hub-table tbody tr:last-child td { border-bottom:none; }
+    #hub-table tbody tr.data-row { cursor:pointer; }
+    #hub-table tbody tr.data-row:hover td { background:var(--bg-subtle); }
+    #hub-table tbody tr.detail-row td { white-space:normal;cursor:default; }
+    .track-pill {
+      display:inline-block;padding:0.2rem var(--sp-2);border-radius:var(--r-pill);
+      font-size:1.15rem;font-weight:600;letter-spacing:0.03em;
+    }
+    .track-green  { background:rgba(126,200,80,.18);color:#3a6e00; }
+    .track-amber  { background:rgba(230,184,48,.2); color:#8a5c00; }
+    .track-red    { background:rgba(255,107,112,.18);color:#a00; }
+    .track-none   { background:var(--bg-subtle);color:var(--text-subtle); }
+    [data-theme="dark"] .track-green { color:#8ab840; }
+    [data-theme="dark"] .track-amber { color:#e6b830; }
+    [data-theme="dark"] .track-red   { color:#ff6b70; }
+    .bar-chart-wrap { position:relative;overflow:hidden; }
+    .bar-chart-bars { display:flex;align-items:flex-end;gap:3px;height:16rem; }
+    .bar-item {
+      flex:1;min-width:1.6rem;max-width:4rem;
+      border-radius:3px 3px 0 0;position:relative;cursor:pointer;
+      transition:filter var(--dur-fast);
+    }
+    .bar-item:hover { filter:brightness(1.15); }
+    .bar-label {
+      position:absolute;bottom:-2rem;left:50%;transform:translateX(-50%);
+      font-size:0.9rem;color:var(--text-subtle);white-space:nowrap;
+    }
+    .bar-value {
+      position:absolute;top:-1.8rem;left:50%;transform:translateX(-50%);
+      font-size:1rem;font-weight:600;color:var(--text-muted);white-space:nowrap;
+    }
+    .legend-dot {
+      display:inline-block;width:0.9rem;height:0.9rem;
+      border-radius:50%;margin-right:0.4rem;flex-shrink:0;
+    }
+    .hub-empty {
+      text-align:center;padding:var(--sp-10);color:var(--text-subtle);
+      font-size:1.6rem;
+    }
+    @media (max-width:900px) {
+      .hub-charts { grid-template-columns:1fr; }
+    }
     @media print {
       .no-print { display:none !important; }
-      #hub-table th { background:white; }
-      @page { size:A3 landscape; margin:1cm; }
+      @page { size:A3 landscape;margin:1cm; }
     }
   </style>
 </head>
@@ -31,81 +132,176 @@
 
   <header class="site-header">
     <div class="header-inner">
-      <div class="site-title">
-        <span>Hub superviseur·e</span>
-      </div>
-      <nav class="header-nav">
-        <a href="index.html" class="nav-link" data-i18n="nav.setup">Configuration</a>
-        <a href="log.html" class="nav-link" data-i18n="nav.log">Journal</a>
-        <a href="weekly.html" class="nav-link" data-i18n="nav.weekly">Bilan hebdo</a>
-        <a href="report.html" class="nav-link" data-i18n="nav.report">Suivi</a>
-      </nav>
+      <div class="site-title">Hub superviseur·e</div>
+      <!-- no student nav in admin view -->
       <div class="header-actions">
         <button class="btn btn--ghost btn--sm lang-toggle-btn" data-lang-target="en-CA">EN</button>
-        <button class="btn btn--ghost btn--sm theme-toggle-btn" aria-label="Toggle theme" style="padding:var(--sp-2);line-height:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg></button>
+        <button class="btn btn--ghost btn--sm theme-toggle-btn" aria-label="Toggle theme"
+          style="padding:var(--sp-2);line-height:0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
+          </svg>
+        </button>
       </div>
     </div>
   </header>
 
-  <main class="main-content">
+  <main class="main-content" style="padding-bottom:var(--sp-12)">
     <div class="container container--wide">
 
-      <!-- Upload phase -->
-      <div id="phase-upload">
-        <div class="hub-header">
-          <div>
-            <div class="hub-title">Tableau de bord superviseur·e</div>
-            <div class="hub-subtitle">Téléverse les fichiers JSON des étudiant·e·s pour voir leur progression.<br>
-            Aucune donnée n'est conservée — tout disparaît au rechargement de la page.</div>
+      <!-- ── Upload strip (always visible) ─────────────────── -->
+      <div class="hub-upload-strip no-print">
+        <div style="flex:1">
+          <div style="font-size:1.6rem;font-weight:600;margin-bottom:var(--sp-1)">
+            Tableau de bord des stages
+          </div>
+          <div id="hub-status-text" style="font-size:1.3rem;color:var(--text-subtle)">
+            Aucun fichier chargé — dépose les JSON des étudiant·e·s ici.
           </div>
         </div>
-
-        <div class="upload-zone" id="hub-drop-zone"
-          ondragover="event.preventDefault();this.classList.add('drag-over')"
-          ondragleave="this.classList.remove('drag-over')"
-          ondrop="event.preventDefault();this.classList.remove('drag-over');loadFiles(event.dataTransfer.files)">
-          <div class="upload-zone-icon">📂</div>
-          <p style="font-size:1.6rem;margin-bottom:var(--sp-2)">Dépose les fichiers JSON ici</p>
-          <p class="text-muted" style="font-size:1.3rem">Tu peux déposer plusieurs fichiers à la fois, un par étudiant·e.</p>
-          <input type="file" id="file-input" accept=".json" multiple style="display:none" onchange="loadFiles(this.files)">
-          <button class="btn btn--primary mt-4" onclick="document.getElementById('file-input').click()">
-            Sélectionner des fichiers
-          </button>
+        <div id="hub-drop-inline"
+          style="border:2px dashed var(--border);border-radius:var(--r-lg);
+                 padding:var(--sp-3) var(--sp-5);text-align:center;cursor:pointer;
+                 min-width:20rem;transition:border-color var(--dur-fast)"
+          ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+          ondragleave="this.style.borderColor=''"
+          ondrop="event.preventDefault();this.style.borderColor='';loadFiles(event.dataTransfer.files)"
+          onclick="document.getElementById('file-input-hub').click()">
+          <div style="font-size:1.4rem;color:var(--text-muted)">📂 Déposer des fichiers JSON</div>
+          <div style="font-size:1.2rem;color:var(--text-subtle)">ou cliquer pour sélectionner</div>
         </div>
-        <div id="hub-status" class="mt-4"></div>
+        <input type="file" id="file-input-hub" accept=".json" multiple style="display:none"
+          onchange="loadFiles(this.files)">
+        <div class="flex gap-2">
+          <button class="btn btn--ghost btn--sm" onclick="exportCSV()" id="btn-csv"
+            style="display:none">⬇ CSV</button>
+          <button class="btn btn--ghost btn--sm" onclick="clearAll()" id="btn-clear"
+            style="display:none">✕ Vider</button>
+        </div>
       </div>
 
-      <!-- Dashboard phase -->
-      <div id="phase-dashboard" class="hidden">
-        <div class="hub-header">
+      <!-- ── Dashboard (hidden until data loaded) ───────────── -->
+      <div id="hub-dashboard" style="display:none">
+
+        <!-- Stat tiles -->
+        <div class="hub-stat-grid" id="hub-stats"></div>
+
+        <!-- AWOL alerts -->
+        <div id="awol-section" style="display:none;margin-bottom:var(--sp-5)">
+          <div style="background:rgba(255,107,112,.1);border:1.5px solid var(--danger);
+                      border-radius:var(--r-xl);padding:var(--sp-5)">
+            <div style="display:flex;align-items:center;justify-content:space-between;
+                        flex-wrap:wrap;gap:var(--sp-3);margin-bottom:var(--sp-4)">
+              <div style="display:flex;align-items:center;gap:var(--sp-3)">
+                <span style="font-size:2rem">🚨</span>
+                <div>
+                  <div style="font-size:1.6rem;font-weight:600;color:var(--danger)"
+                    id="awol-title">Étudiant·e·s sans nouvelles</div>
+                  <div style="font-size:1.3rem;color:var(--text-muted)"
+                    id="awol-subtitle"></div>
+                </div>
+              </div>
+              <div class="flex gap-2 no-print">
+                <button class="btn btn--sm" id="btn-copy-emails"
+                  style="background:var(--danger);color:white;border-color:var(--danger)"
+                  onclick="copyAWOLEmails()">
+                  📋 Copier les adresses e-mail
+                </button>
+                <button class="btn btn--ghost btn--sm" id="btn-mailto"
+                  onclick="openMailto()">
+                  ✉ Ouvrir dans Outlook / Teams
+                </button>
+              </div>
+            </div>
+            <div id="awol-list"></div>
+          </div>
+        </div>
+
+        <!-- Charts row -->
+        <div class="hub-charts">
+          <!-- Hours bar chart -->
+          <div style="background:var(--bg-card);border-radius:var(--r-xl);
+                      padding:var(--sp-5);box-shadow:var(--shadow-sm)">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;
+                        margin-bottom:var(--sp-5)">
+              <div style="font-size:1.6rem;font-weight:600">Heures documentées</div>
+              <div style="display:flex;gap:var(--sp-4);font-size:1.2rem">
+                <span><span class="legend-dot" style="background:#3a6e00"></span>En avance / Dans les temps</span>
+                <span><span class="legend-dot" style="background:#8a5c00"></span>Légèrement en retard</span>
+                <span><span class="legend-dot" style="background:#a00"></span>En retard</span>
+              </div>
+            </div>
+            <div class="bar-chart-wrap">
+              <div class="bar-chart-bars" id="hours-chart"></div>
+              <div style="margin-top:2.8rem"></div>
+            </div>
+          </div>
+          <!-- Program pie -->
+          <div style="background:var(--bg-card);border-radius:var(--r-xl);
+                      padding:var(--sp-5);box-shadow:var(--shadow-sm)">
+            <div style="font-size:1.6rem;font-weight:600;margin-bottom:var(--sp-4)">
+              Programmes
+            </div>
+            <div id="program-chart"></div>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="hub-filter-bar no-print">
           <div>
-            <div class="hub-title">Progression des stagiaires</div>
-            <div class="hub-subtitle" id="student-count"></div>
+            <span class="hub-filter-label">Programme</span>
+            <select id="filter-program" onchange="applyFilters()">
+              <option value="">Tous</option>
+            </select>
           </div>
-          <div class="flex gap-3 no-print" style="flex-wrap:wrap">
-            <button class="btn btn--ghost btn--sm" onclick="exportCSV()">
-              ⬇ CSV
-            </button>
-            <input type="file" id="file-input-more" accept=".json" multiple style="display:none" onchange="loadFiles(this.files)">
-            <button class="btn btn--secondary btn--sm" onclick="loadMore()">
-              + Ajouter des fichiers
-            </button>
-            <button class="btn btn--ghost btn--sm" onclick="students=[];renderTable();document.getElementById('phase-upload').classList.remove('hidden');document.getElementById('phase-dashboard').classList.add('hidden')">
-              Réinitialiser
-            </button>
+          <div>
+            <span class="hub-filter-label">Superviseur·e</span>
+            <select id="filter-teacher" onchange="applyFilters()">
+              <option value="">Tous</option>
+            </select>
+          </div>
+          <div>
+            <span class="hub-filter-label">Type</span>
+            <select id="filter-pathway" onchange="applyFilters()">
+              <option value="">Tous</option>
+              <option value="hub">Hub</option>
+              <option value="company">Entreprise</option>
+            </select>
+          </div>
+          <div>
+            <span class="hub-filter-label">Progression</span>
+            <select id="filter-track" onchange="applyFilters()">
+              <option value="">Tous</option>
+              <option value="green">Dans les temps (≥90%)</option>
+              <option value="amber">Légèrement en retard (70-90%)</option>
+              <option value="red">En retard (&lt;70%)</option>
+              <option value="none">Non défini</option>
+            </select>
+          </div>
+          <div>
+            <span class="hub-filter-label">Recherche</span>
+            <input type="text" id="filter-search" placeholder="Nom, ID…"
+              oninput="applyFilters()" style="width:16rem">
+          </div>
+          <button class="btn btn--ghost btn--sm" onclick="clearFilters()">✕ Réinitialiser</button>
+          <div style="margin-left:auto;font-size:1.3rem;color:var(--text-subtle)" id="filter-count"></div>
+        </div>
+
+        <!-- Table -->
+        <div class="hub-table-outer">
+          <div class="hub-table-scroll">
+            <table id="hub-table">
+              <thead id="hub-thead"></thead>
+              <tbody id="hub-tbody"></tbody>
+            </table>
+          </div>
+          <div id="hub-empty" class="hub-empty" style="display:none">
+            Aucun étudiant·e ne correspond aux filtres sélectionnés.
           </div>
         </div>
 
-        <div id="hub-status" class="mb-4"></div>
-
-        <div class="hub-table-wrap card" style="padding:0;overflow:hidden">
-          <table id="hub-table"></table>
-        </div>
-
-        <div class="mt-4 no-print" style="font-size:1.2rem;color:var(--text-subtle)">
-          Clique sur une ligne pour voir le détail. · Clic sur un en-tête de colonne pour trier.
-        </div>
-      </div>
+      </div><!-- /hub-dashboard -->
 
     </div>
   </main>
@@ -114,7 +310,7 @@
     <div class="making-of">
       <div class="making-of-inner">
         <button class="making-of-toggle" onclick="toggleMakingOf(this)" aria-expanded="false">
-          <span class="making-of-label" data-i18n="making.label">Comment cet outil a été créé</span>
+          <span class="making-of-label" data-i18n="making.label"></span>
           <span class="making-of-chevron" aria-hidden="true">›</span>
         </button>
         <div class="making-of-body" hidden>
@@ -127,7 +323,7 @@
     </div>
   </footer>
 
-</div><!-- /page-wrap -->
+</div>
 
 <script src="lang.js"></script>
 <script src="app.js"></script>
