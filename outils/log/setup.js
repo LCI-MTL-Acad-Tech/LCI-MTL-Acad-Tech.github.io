@@ -360,6 +360,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cont.classList.remove("hidden");
     // Show the start-over link beneath the continue card
     document.getElementById("reset-link-row")?.classList.remove("hidden");
+  document.getElementById("export-config-row")?.classList.remove("hidden");
     const lang = getCurrentLang();
     document.getElementById("welcome-continue-name").textContent =
       lang === "fr-CA"

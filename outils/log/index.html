@@ -67,6 +67,19 @@
         </div>
 
         <!-- Start over — only shown when continue card is visible -->
+        <div id="export-config-row" class="hidden" style="text-align:center;margin-top:var(--sp-4);margin-bottom:var(--sp-2)">
+          <button onclick="exportConfig()"
+            style="background:none;border:none;cursor:pointer;font-family:inherit;
+                   font-size:1.3rem;color:var(--text-subtle);text-decoration:underline;padding:0"
+            data-i18n="welcome.export_config">💾 Exporter la configuration</button>
+          <span style="color:var(--text-subtle);margin:0 var(--sp-2)">·</span>
+          <label style="background:none;border:none;cursor:pointer;font-family:inherit;
+                        font-size:1.3rem;color:var(--text-subtle);text-decoration:underline;padding:0">
+            <input type="file" accept=".json" style="display:none"
+              onchange="importConfig(this.files[0])">
+            <span data-i18n="welcome.import_config">📥 Changer d'ordinateur</span>
+          </label>
+        </div>
         <div id="reset-link-row" class="hidden" style="text-align:right;margin-top:calc(-1 * var(--sp-2));margin-bottom:var(--sp-4)">
           <button onclick="openResetModal()"
             style="background:none;border:none;cursor:pointer;font-family:inherit;
@@ -93,6 +106,14 @@
 
           <button class="btn btn--primary btn--full btn--lg mt-6" id="onboard-cta" disabled
                   onclick="goToScreen('screen-pathway')" data-i18n="onboard.cta">C'est compris</button>
+
+          <div style="text-align:center;margin-top:var(--sp-5)">
+            <label style="cursor:pointer;font-size:1.3rem;color:var(--text-subtle)">
+              <input type="file" accept=".json" style="display:none"
+                onchange="importConfig(this.files[0])">
+              📥 <span data-i18n="welcome.import_config_hint">Tu as déjà un fichier de config d'un autre ordinateur ? Importe-le ici.</span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -127,7 +148,8 @@
             </div>
             <div class="form-group">
               <label data-i18n="field.student_id"></label>
-              <input type="text" id="profile-student-id" autocomplete="on" name="student-id" placeholder="ex. 12345678">
+              <input type="text" id="profile-student-id" required autocomplete="on" name="student-id" placeholder="ex. 12345678">
+              <div class="form-hint" style="color:var(--danger);font-size:1.1rem" data-i18n="field.required"></div>
             </div>
           </div>
           <div class="form-row">

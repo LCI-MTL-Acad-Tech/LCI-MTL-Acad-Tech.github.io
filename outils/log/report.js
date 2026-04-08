@@ -10,6 +10,13 @@ document.addEventListener("DOMContentLoaded", () => {
   initPage();
   setupDropZone();
 
+  // If we just did a reset, clear any stale localStorage the old code missed
+  if (sessionStorage.getItem("just_reset")) {
+    sessionStorage.removeItem("just_reset");
+    clearReportData();
+    clearAllData(true); // re-run to catch anything missed
+  }
+
   // Restore previously merged report data (survives tab navigation)
   const savedReport = loadReportData();
   if (savedReport) {
@@ -21,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ? `Session restaurée — ${logCount} journaux`
       : `Restored session — ${logCount} logs`, ok: true }]);
     document.getElementById("proceed-btn").classList.remove("hidden");
+    document.getElementById("clear-cache-row").style.display = "block";
     // If reflection was already complete, offer dashboard directly
     if (savedReport.reflection && Object.keys(savedReport.reflection).length > 0) {
       const skipDiv = document.createElement("div");
@@ -47,6 +55,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   applyLanguage(getCurrentLang());
 });
+
+// ── Clear cached session ──────────────────────────────────────
+function clearReportCache() {
+  clearReportData();
+  mergedData = null;
+  uploadedFiles = [];
+  // Reset UI
+  document.getElementById("upload-files-list").classList.add("hidden");
+  document.getElementById("upload-files-list").innerHTML = "";
+  document.getElementById("proceed-btn").classList.add("hidden");
+  document.getElementById("clear-cache-row").style.display = "none";
+  document.getElementById("upload-errors").classList.add("hidden");
+  document.getElementById("upload-conflicts").classList.add("hidden");
+  // Remove any "session restored" alert
+  document.querySelectorAll(".alert--success").forEach(el => el.remove());
+  applyLanguage(getCurrentLang());
+}
 
 // ── Phase navigation ──────────────────────────────────────────
 function goToPhase(id) {

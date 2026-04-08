@@ -39,6 +39,7 @@ const LANG = {
     "field.teacher":          "Enseignant·e responsable",
     "field.start_date":       "Date de début",
     "field.end_date":         "Date de fin prévue",
+    "field.required":         "Champ obligatoire",
     "field.hours_per_day":    "Heures de travail prévues par jour",
     "field.total_hours_target":      "Total d'heures à compléter (optionnel)",
     "field.total_hours_target_hint": "Si défini, le suivi de progression se base sur ce total plutôt que sur le rythme quotidien.",
@@ -63,6 +64,9 @@ const LANG = {
     "welcome.pathway_hub_desc":     "Tu réalises un ou plusieurs projets clients au hub d'innovation du collège, possiblement en équipe.",
     "welcome.cta_new":        "Commencer la configuration",
     "welcome.cta_continue":   "Continuer mon journal",
+    "welcome.export_config":      "Exporter la configuration",
+    "welcome.import_config":      "Changer d'ordinateur",
+    "welcome.import_config_hint": "Tu as déjà un fichier de config d'un autre ordinateur ? Importe-le ici.",
     "welcome.cta_weekly":     "Bilan de la semaine",
     "welcome.cta_report":     "Voir mon suivi de progression",
 
@@ -236,6 +240,7 @@ const LANG = {
     // ── Report / Final ───────────────────────────────────────
     "report.upload_title":    "Téléverser tes journaux",
     "report.upload_instructions": "Sélectionne tous les fichiers JSON de ton dossier de stage. L'application les fusionnera automatiquement.",
+    "report.clear_cache":     "Effacer la session en cache",
     "report.upload_cta":      "Choisir les fichiers",
     "report.upload_drop":     "Ou glisse les fichiers ici",
     "report.validation_ok":   "Fichiers validés",
@@ -333,6 +338,7 @@ const LANG = {
 
     // ── Validation & Errors ──────────────────────────────────
     "error.merge_uuid":       "Impossible de fusionner : les fichiers proviennent de comptes différents.",
+    "error.config_not_log":    "Ce fichier est une configuration, pas un journal. Utilise 'Changer d'ordinateur' sur la page de configuration.",
     "error.no_files":         "Aucun fichier sélectionné.",
 
     // ── Reset dialogue
@@ -428,6 +434,7 @@ const LANG = {
     "field.teacher":          "Responsible teacher",
     "field.start_date":       "Start date",
     "field.end_date":         "Scheduled end date",
+    "field.required":         "Required field",
     "field.hours_per_day":    "Expected working hours per day",
     "field.total_hours_target":      "Total hours to complete (optional)",
     "field.total_hours_target_hint": "If set, progress tracking is based on this total rather than the daily pace.",
@@ -452,6 +459,9 @@ const LANG = {
     "welcome.pathway_hub_desc":     "You are carrying out one or more client projects at the college's innovation hub, possibly as part of a team.",
     "welcome.cta_new":        "Start setup",
     "welcome.cta_continue":   "Continue my journal",
+    "welcome.export_config":      "Export configuration",
+    "welcome.import_config":      "Switch computer",
+    "welcome.import_config_hint": "Already have a config file from another computer? Import it here.",
     "welcome.cta_weekly":     "Weekly report",
     "welcome.cta_report":     "Open my progress tracker",
 
@@ -625,6 +635,7 @@ const LANG = {
     // ── Report / Final ───────────────────────────────────────
     "report.upload_title":    "Upload your logs",
     "report.upload_instructions": "Select all the JSON files from your internship folder. The app will merge them automatically.",
+    "report.clear_cache":     "Clear cached session",
     "report.upload_cta":      "Choose files",
     "report.upload_drop":     "Or drag files here",
     "report.validation_ok":   "Files validated",
@@ -722,6 +733,7 @@ const LANG = {
 
     // ── Validation & Errors ──────────────────────────────────
     "error.merge_uuid":       "Cannot merge: these files belong to different students.",
+    "error.config_not_log":    "Ce fichier est une configuration, pas un journal. Utilise 'Changer d'ordinateur' sur la page de configuration.",
     "error.no_files":         "No files selected.",
 
     // ── Reset dialogue

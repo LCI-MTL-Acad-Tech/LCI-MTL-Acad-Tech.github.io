@@ -293,8 +293,79 @@ function exportLogJSON(data, log) {
   saveData(data);
   updateCache(data);
 
-  const filename = `${data.profile.student_id || "stage"}_${log.date}_r${log.revision}.json`;
+  const nameSlug = (data.profile.student_id || slugify(data.profile.full_name) || "stage");
+  const filename = `${nameSlug}_${log.date}_r${log.revision}.json`;
   downloadJSON(data, filename);
+}
+
+// ── Config export / import (for switching computers) ─────────
+function exportConfig() {
+  const data = loadData();
+  if (!data?.profile?.full_name) return;
+
+  const config = {
+    meta: {
+      type:             "config",
+      schema_version:   data.meta?.schema_version || "1.2",
+      student_uuid:     data.meta?.student_uuid,
+      exported_at:      new Date().toISOString(),
+    },
+    profile:        data.profile,
+    pathway:        data.pathway,
+    context:        data.context,
+    people:         data.people        || [],
+    projects:       data.projects      || [],
+    activity_types: data.activity_types|| [],
+    tools:          data.tools         || [],
+  };
+
+  const slug = slugify(data.profile.full_name);
+  const lang = getCurrentLang();
+  const suffix = lang === "fr-CA" ? "config_journal-de-stage" : "config_internship-log";
+  downloadJSON(config, `${slug}_${suffix}.json`);
+}
+
+function importConfig(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const cfg = JSON.parse(e.target.result);
+      if (cfg.meta?.type !== "config" && !cfg.profile?.full_name) {
+        alert(t("error.not_config") || "Fichier de configuration non valide.");
+        return;
+      }
+      // Load existing data (if any) and overlay config fields
+      const existing = loadData() || {};
+      const merged = {
+        ...existing,
+        meta: {
+          ...existing.meta,
+          student_uuid:   cfg.meta?.student_uuid || existing.meta?.student_uuid,
+          schema_version: cfg.meta?.schema_version || "1.2",
+          last_modified:  new Date().toISOString(),
+        },
+        profile:        cfg.profile,
+        pathway:        cfg.pathway        || existing.pathway,
+        context:        cfg.context        || existing.context,
+        people:         cfg.people         || existing.people         || [],
+        projects:       cfg.projects       || existing.projects       || [],
+        activity_types: cfg.activity_types || existing.activity_types || [],
+        tools:          cfg.tools          || existing.tools          || [],
+        logs:           existing.logs      || [],  // keep existing logs
+        reflection:     existing.reflection|| null,
+        todos:          existing.todos     || [],
+      };
+      saveData(merged);
+      updateCache(merged);
+      // Signal success and redirect to log
+      sessionStorage.setItem("config_imported", "1");
+      window.location.href = "log.html";
+    } catch {
+      alert(t("error.not_config") || "Erreur lors de la lecture du fichier.");
+    }
+  };
+  reader.readAsText(file);
 }
 
 function downloadJSON(obj, filename) {
@@ -316,9 +387,15 @@ function mergeInternshipFiles(files) {
     return result;
   }
 
-  // Separate reflection-only files from full internship files
+  // Separate by file type
   const reflectionFiles = files.filter(f => f.meta?.type === "reflection");
-  const mainFiles = files.filter(f => f.meta?.type !== "reflection");
+  const configFiles     = files.filter(f => f.meta?.type === "config");
+  const mainFiles       = files.filter(f => !f.meta?.type || f.meta.type === "internship");
+
+  if (configFiles.length && !mainFiles.length) {
+    result.errors.push("error.config_not_log");
+    return result;
+  }
 
   // If only reflection files were uploaded, nothing to merge against
   if (!mainFiles.length && reflectionFiles.length) {
@@ -514,6 +591,13 @@ function setupAutocomplete(input, suggestions) {
 }
 
 // ── HTML escape utility ──────────────────────────────────────
+function slugify(str) {
+  return (str || "").toLowerCase()
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")  // strip accents
+    .replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "")
+    .slice(0, 24) || "stage";
+}
+
 function escHtml(str) {
   if (!str) return "";
   return String(str)
@@ -576,9 +660,11 @@ function clearAllData(keepPrefs = true) {
   const theme = localStorage.getItem(LS.THEME);
   const lang  = localStorage.getItem(LS.LANG);
 
-  // Clear all internship keys
+  // Clear all internship keys (explicit list covers any cached older versions)
   Object.values(LS).forEach(key => localStorage.removeItem(key));
-  clearReportData();
+  // Belt-and-suspenders: remove by hardcoded name in case LS object was cached
+  ["internship_data","internship_cache","internship_report",
+   "internship_settings","internship_tour_seen"].forEach(k => localStorage.removeItem(k));
 
   // Restore preferences if requested
   if (keepPrefs) {
@@ -620,7 +706,8 @@ function executeReset() {
   const keepPrefs = document.getElementById("reset-keep-prefs")?.checked !== false;
   clearAllData(keepPrefs);
   document.getElementById("reset-modal")?.classList.add("hidden");
-  // Redirect to index to start fresh
+  // Flag so any page can detect we just reset (sessionStorage survives redirect within tab)
+  sessionStorage.setItem("just_reset", "1");
   window.location.href = "index.html";
 }
 

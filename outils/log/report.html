@@ -69,6 +69,15 @@
 
           <div id="upload-files-list" class="upload-files-list hidden"></div>
 
+          <!-- Clear cached session — useful for testing / switching students -->
+          <div id="clear-cache-row" style="text-align:right;margin-top:var(--sp-3);display:none">
+            <button onclick="clearReportCache()"
+              style="background:none;border:none;cursor:pointer;font-family:inherit;
+                     font-size:1.3rem;color:var(--text-subtle);text-decoration:underline;padding:0">
+              ✕ <span data-i18n="report.clear_cache">Effacer la session en cache</span>
+            </button>
+          </div>
+
           <div id="upload-errors" class="hidden"></div>
           <div id="upload-conflicts" class="hidden"></div>
 

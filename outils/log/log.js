@@ -12,6 +12,19 @@ document.addEventListener("DOMContentLoaded", () => {
   initPage();
 
   logData = loadData();
+  // Config imported from another computer — show a brief confirmation
+  if (sessionStorage.getItem("config_imported")) {
+    sessionStorage.removeItem("config_imported");
+    const banner = document.createElement("div");
+    banner.className = "alert alert--success";
+    banner.style.cssText = "margin-bottom:var(--sp-4)";
+    banner.textContent = getCurrentLang() === "fr-CA"
+      ? "✓ Configuration importée avec succès. Tes journaux précédents sont conservés."
+      : "✓ Configuration imported successfully. Your previous logs are preserved.";
+    document.querySelector(".main-content")?.prepend(banner);
+    setTimeout(() => banner.remove(), 5000);
+  }
+
   if (!logData || !logData.profile?.full_name) {
     document.getElementById("no-data-warning").classList.remove("hidden");
     applyLanguage(getCurrentLang());
