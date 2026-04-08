@@ -21,7 +21,6 @@ const LANG = {
     "action.download":        "Télécharger le journal",
     "action.add":             "Ajouter",
     "action.delete":          "Supprimer",
-    "action.edit":            "Modifier",
     "action.cancel":          "Annuler",
     "action.confirm":         "Confirmer",
     "action.next":            "Suivant",
@@ -78,7 +77,6 @@ const LANG = {
     "onboard.cta":            "C'est compris — commencer",
 
     // ── Setup — Profile ──────────────────────────────────────
-    "setup.title":            "Configuration du stage",
     "setup.section_profile":  "Ton profil",
     "setup.section_internship":"Ton stage",
     "setup.section_expectations": "Tes attentes",
@@ -101,7 +99,6 @@ const LANG = {
     "setup.situation_before_company":    "Quelle était la situation dans l'organisation avant ton arrivée? Quel problème ou quelle opportunité ce stage vient-il adresser?",
 
     // Setup — Hub pathway
-    "setup.faculty_supervisor": "Enseignant·e responsable",
     "setup.add_project":      "Ajouter un projet",
     "setup.project_name":     "Nom du projet",
     "setup.client_name":      "Nom du client",
@@ -335,7 +332,6 @@ const LANG = {
     "dashboard.modality_unspecified": "Non précisé",
 
     // ── Validation & Errors ──────────────────────────────────
-    "error.grayzone":         "Il reste {pct}% de temps non documenté ({min} min). Décris comment tu l'as passé.",
     "error.merge_uuid":       "Impossible de fusionner : les fichiers proviennent de comptes différents.",
     "error.no_files":         "Aucun fichier sélectionné.",
 
@@ -344,7 +340,6 @@ const LANG = {
     "reset.warning":          "Cette action est irréversible. Toutes les données de ta configuration et tes journaux en cours dans ce navigateur seront effacées.",
     "reset.download_first":   "Tu devrais d'abord télécharger tes journaux si tu ne l'as pas encore fait.",
     "reset.confirm_label":    "Pour confirmer, écris RECOMMENCER dans le champ ci-dessous :",
-    "reset.confirm_word":     "RECOMMENCER",
     "reset.cta":              "Effacer définitivement",
     "reset.cancel":           "Annuler",
     "reset.keep_prefs":       "Conserver mes préférences de langue et de thème",
@@ -415,7 +410,6 @@ const LANG = {
     "action.download":        "Download log",
     "action.add":             "Add",
     "action.delete":          "Delete",
-    "action.edit":            "Edit",
     "action.cancel":          "Cancel",
     "action.confirm":         "Confirm",
     "action.next":            "Next",
@@ -472,7 +466,6 @@ const LANG = {
     "onboard.cta":            "Got it — let's begin",
 
     // ── Setup — Profile ──────────────────────────────────────
-    "setup.title":            "Internship Setup",
     "setup.section_profile":  "Your profile",
     "setup.section_internship":"Your internship",
     "setup.section_expectations": "Your expectations",
@@ -495,7 +488,6 @@ const LANG = {
     "setup.situation_before_company":    "What was the situation in the organization before you arrived? What problem or opportunity does this internship address?",
 
     // Setup — Hub pathway
-    "setup.faculty_supervisor": "Responsible teacher",
     "setup.add_project":      "Add a project",
     "setup.project_name":     "Project name",
     "setup.client_name":      "Client name",
@@ -729,7 +721,6 @@ const LANG = {
     "dashboard.modality_unspecified": "Unspecified",
 
     // ── Validation & Errors ──────────────────────────────────
-    "error.grayzone":         "{pct}% of your day is undocumented ({min} min). Please describe how you spent it.",
     "error.merge_uuid":       "Cannot merge: these files belong to different students.",
     "error.no_files":         "No files selected.",
 
@@ -738,7 +729,6 @@ const LANG = {
     "reset.warning":          "This cannot be undone. All your setup data and current logs stored in this browser will be erased.",
     "reset.download_first":   "You should download your logs first if you haven't already.",
     "reset.confirm_label":    "To confirm, type RESET in the field below:",
-    "reset.confirm_word":     "RESET",
     "reset.cta":              "Erase permanently",
     "reset.cancel":           "Cancel",
     "reset.keep_prefs":       "Keep my language and theme preferences",

@@ -22,7 +22,39 @@ function programColor(prog) {
 document.addEventListener("DOMContentLoaded", () => {
   initPage();
   applyLanguage(getCurrentLang());
+  setupHubDrop();
 });
+
+function setupHubDrop() {
+  // Prevent the browser from navigating away if files are dropped
+  // anywhere on the page (not just the drop zone)
+  document.addEventListener("dragover",  e => e.preventDefault());
+  document.addEventListener("drop",      e => e.preventDefault());
+
+  // Wire the drop zone properly via addEventListener
+  // (more reliable than inline handlers across all browsers)
+  const zone = document.getElementById("hub-drop-inline");
+  if (!zone) return;
+
+  zone.addEventListener("dragover", e => {
+    e.preventDefault();
+    e.stopPropagation();
+    zone.style.borderColor = "var(--accent)";
+    zone.style.background  = "var(--bg-subtle)";
+  });
+  zone.addEventListener("dragleave", e => {
+    e.preventDefault();
+    zone.style.borderColor = "";
+    zone.style.background  = "";
+  });
+  zone.addEventListener("drop", e => {
+    e.preventDefault();
+    e.stopPropagation();
+    zone.style.borderColor = "";
+    zone.style.background  = "";
+    loadFiles(e.dataTransfer.files);
+  });
+}
 
 // ── File loading ──────────────────────────────────────────────
 function loadFiles(fileList) {

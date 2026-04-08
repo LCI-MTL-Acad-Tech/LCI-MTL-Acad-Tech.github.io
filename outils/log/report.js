@@ -674,10 +674,23 @@ function buildTimeline(logs, data) {
     };
   });
 
-  // Calculate pixel heights after render using ResizeObserver
-  // Build HTML first with data attributes, then size after paint
+  // Compute column heights BEFORE building HTML so segments get definite px heights.
+  // This avoids the flex-children-in-auto-height-parent problem where
+  // segments collapse to min-height:2px because the parent has no definite height.
+  const PX_PER_MIN = 1 / 5;
+  const MIN_TALLEST_PX = 380; // tallest bar minimum height in px (~4cm at 96dpi)
+  const rawH = Math.round(maxMinutes * PX_PER_MIN);
+  const targetH = Math.min(
+    Math.max(rawH, MIN_TALLEST_PX),
+    Math.round(window.innerHeight * 0.80)
+  );
+  const usable = Math.max(targetH - 32, MIN_TALLEST_PX - 32); // 32px for date label + padding
+  chart.style.height = (targetH + 32) + "px"; // extra room for date labels
+
   chart.innerHTML = logs.map(log => {
     const dayTotal = log.day_duration_minutes || log.task_total_minutes || 0;
+    // Column height in px — tallest day fills usable height
+    const colH = dayTotal ? Math.max(Math.round((dayTotal / maxMinutes) * usable), 2) : 2;
 
     // Group minutes by activity type
     const byType = {};
@@ -689,11 +702,12 @@ function buildTimeline(logs, data) {
       byType["sys-gray"] = (byType["sys-gray"] || 0) + log.grayzone_minutes;
     }
 
+    // Segments as explicit px heights so they work regardless of parent layout state
     const segments = Object.entries(byType).map(([tid, mins]) => {
       const color = actMap[tid]?.color || "#9ca3a5";
-      const segPct = dayTotal ? (mins / dayTotal) * 100 : 0;
+      const segH  = dayTotal ? Math.max(Math.round((mins / dayTotal) * colH), 1) : 0;
       return `<div class="timeline-segment"
-        style="flex:${segPct};background:${color};min-height:2px"
+        style="height:${segH}px;background:${color};flex-shrink:0"
         title="${actMap[tid]?.label || tid}: ${mins}min"></div>`;
     }).join("");
 
@@ -702,25 +716,14 @@ function buildTimeline(logs, data) {
 
     return `
       <div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:1.4rem;max-width:3.2rem;">
-        <div class="timeline-col" data-minutes="${dayTotal}" style="opacity:${opacity}">
+        <div class="timeline-col" style="height:${colH}px;opacity:${opacity}">
           ${segments}
         </div>
         <div class="timeline-date">${log.date.slice(5)}</div>
       </div>
     `;
   }).join("");
-
-  // Set container height from data (1px per 5min, min 24rem, max 56rem)
-  // This avoids relying on getBoundingClientRect which fails on hidden parents.
-  const PX_PER_MIN = 1 / 5;
-  const targetH = Math.min(
-    Math.max(Math.round(maxMinutes * PX_PER_MIN), 240),
-    Math.round(window.innerHeight * 0.75)
-  );
-  chart.style.height = targetH + "px";
-
-  // Size columns synchronously against the known height
-  sizeTimelineColumns(chart, maxMinutes, targetH);
+  // data-minutes no longer needed on columns — heights are now set directly in HTML
 
   // Legend — only types actually used
   const usedIds = new Set();
@@ -744,17 +747,16 @@ function buildTimeline(logs, data) {
 // Sets column heights in pixels so the tallest bar always fills
 // the available container height, regardless of its CSS height.
 function sizeTimelineColumns(container, maxMinutes, knownHeight) {
+  // On resize: recompute column heights from data-colh attributes
   if (!container || !maxMinutes) return;
-  // Use knownHeight if provided (avoids getBoundingClientRect on hidden parents)
-  // Fall back to getBoundingClientRect for resize events (container is visible then)
   const availH = knownHeight || container.getBoundingClientRect().height || 0;
   if (!availH) return;
-  const usable = Math.max(availH - 16, 80); // 16px padding top+bottom
-  container.querySelectorAll(".timeline-col[data-minutes]").forEach(col => {
-    const mins = parseInt(col.dataset.minutes) || 0;
-    const h = mins ? Math.max(Math.round((mins / maxMinutes) * usable), 2) : 2;
-    col.style.height = h + "px";
-  });
+  const usable = Math.max(availH - 32, 80);
+  // Heights are baked into inline styles during build; on resize just scale them
+  // by re-running buildTimeline if mergedData is available
+  if (typeof mergedData !== "undefined" && mergedData?.logs?.length) {
+    buildTimeline(mergedData.logs, mergedData);
+  }
 }
 
 
@@ -765,13 +767,9 @@ window.addEventListener("resize", () => {
   clearTimeout(_resizeTimer);
   _resizeTimer = setTimeout(() => {
     if (typeof mergedData !== "undefined" && mergedData?.logs?.length) {
-      const logs = mergedData.logs;
-      const maxM = Math.max(...logs.map(l => l.day_duration_minutes || l.task_total_minutes || 0), 1);
-      const chart = document.getElementById("timeline-chart");
-      if (chart) sizeTimelineColumns(chart, maxM);
-
+      buildTimeline(mergedData.logs, mergedData);
     }
-  }, 120);
+  }, 150);
 });
 
 // ── SVG Pie chart helper ──────────────────────────────────────
@@ -1329,12 +1327,8 @@ function printReport() {
 
   // Re-size timeline charts for print (they need a moment to render)
   if (typeof mergedData !== "undefined" && mergedData?.logs?.length) {
-    const logs = mergedData.logs;
-    const maxM = Math.max(...logs.map(l => l.day_duration_minutes || l.task_total_minutes || 0), 1);
     setTimeout(() => {
-      const chart = document.getElementById("timeline-chart");
-      if (chart) sizeTimelineColumns(chart, maxM);
-
+      buildTimeline(mergedData.logs, mergedData);
       window.print();
       // Restore after print dialog closes
       setTimeout(restoreAfterPrint, 800);

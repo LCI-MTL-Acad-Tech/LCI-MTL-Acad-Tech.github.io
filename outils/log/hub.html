@@ -163,10 +163,7 @@
         <div id="hub-drop-inline"
           style="border:2px dashed var(--border);border-radius:var(--r-lg);
                  padding:var(--sp-3) var(--sp-5);text-align:center;cursor:pointer;
-                 min-width:20rem;transition:border-color var(--dur-fast)"
-          ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
-          ondragleave="this.style.borderColor=''"
-          ondrop="event.preventDefault();this.style.borderColor='';loadFiles(event.dataTransfer.files)"
+                 min-width:20rem;transition:border-color var(--dur-fast),background var(--dur-fast)"
           onclick="document.getElementById('file-input-hub').click()">
           <div style="font-size:1.4rem;color:var(--text-muted)">📂 Déposer des fichiers JSON</div>
           <div style="font-size:1.2rem;color:var(--text-subtle)">ou cliquer pour sélectionner</div>
