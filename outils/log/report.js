@@ -665,13 +665,15 @@ function buildTimeline(logs, data) {
     ...logs.map(l => l.day_duration_minutes || l.task_total_minutes || 0), 1
   );
 
-  // Build activity lookup
+  // Build activity lookup and stable sort order
   const actMap = {};
-  (data.activity_types || []).forEach(at => {
+  const actOrder = {};  // type_id → index for consistent segment stacking
+  (data.activity_types || []).forEach((at, i) => {
     actMap[at.type_id] = {
       color: at.color,
       label: at.label_key ? t(at.label_key) : at.label,
     };
+    actOrder[at.type_id] = i;
   });
 
   // Compute column heights BEFORE building HTML so segments get definite px heights.
@@ -703,7 +705,9 @@ function buildTimeline(logs, data) {
     }
 
     // Segments as explicit px heights so they work regardless of parent layout state
-    const segments = Object.entries(byType).map(([tid, mins]) => {
+    const segments = Object.entries(byType)
+      .sort(([a], [b]) => (actOrder[a] ?? 999) - (actOrder[b] ?? 999))
+      .map(([tid, mins]) => {
       const color = actMap[tid]?.color || "#9ca3a5";
       const segH  = dayTotal ? Math.max(Math.round((mins / dayTotal) * colH), 1) : 0;
       return `<div class="timeline-segment"

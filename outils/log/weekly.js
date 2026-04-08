@@ -138,6 +138,9 @@ function renderWeekStats(logs) {
 function renderWeekDays(logs) {
   const container = document.getElementById("week-days");
   const maxMins = Math.max(...logs.map(l => l.task_total_minutes || l.day_duration_minutes || 0), 1);
+  // Stable segment order: follow the activity_types array index
+  const actOrder = {};
+  (weeklyData.activity_types || []).forEach((at, i) => { actOrder[at.type_id] = i; });
   const PX_PER_MIN = 1/5;
   const targetH = Math.max(Math.round(maxMins * PX_PER_MIN), 120);
   container.style.height = targetH + "px";
@@ -155,7 +158,9 @@ function renderWeekDays(logs) {
       const tid = t.activity_type_id || "sys-gray";
       byType[tid] = (byType[tid] || 0) + (t.duration_minutes || 0);
     });
-    const segments = Object.entries(byType).map(([tid, m]) => {
+    const segments = Object.entries(byType)
+      .sort(([a], [b]) => (actOrder[a] ?? 999) - (actOrder[b] ?? 999))
+      .map(([tid, m]) => {
       const color = getActivityTypeColor(weeklyData, tid);
       return `<div style="flex:${m};background:${color};min-height:2px"></div>`;
     }).join("");
