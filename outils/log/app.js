@@ -6,7 +6,7 @@
 const SETTINGS = {
   GRAYZONE_THRESHOLD_PCT: 20,      // % of day that triggers undocumented prompt
   IDLE_REMINDER_MINUTES: 120,       // minutes before idle save reminder
-  SCHEMA_VERSION: "1.3",
+  SCHEMA_VERSION: "1.4",
 };
 
 // ── Default activity types ───────────────────────────────────
@@ -63,6 +63,7 @@ const LS = {
   SETTINGS:    "internship_settings", // user-overridden settings
   THEME:       "internship_theme",
   LANG:        "lang",
+  DOWNLOADS:   "internship_downloads", // { "YYYY-MM-DD": ["d"|"w"|"f"] } — survives reset
 };
 
 // ── Storage helpers ──────────────────────────────────────────
@@ -126,11 +127,31 @@ function migrateData(data) {
   }
 
   // v1.2 → v1.3: add internship_course_code if missing (default: "generic")
-  // Also normalize profile.program: old data may have a free-text string like
-  // "420.BX Programmation de jeux vidéo" — keep as-is; the UI will show it
-  // as-is if it doesn't match a known PROGRAMS code, which is harmless.
   if (data.context && data.context.internship_course_code === undefined) {
     data.context.internship_course_code = "generic";
+  }
+
+  // v1.3 → v1.4: work schedule fields
+  if (data.context) {
+    // hours_per_day (float) → work_hours { h, m }
+    if (data.context.work_hours === undefined) {
+      const hpd = parseFloat(data.context.hours_per_day) || 7;
+      data.context.work_hours = {
+        h: Math.floor(hpd),
+        m: Math.round((hpd % 1) * 60),
+      };
+      // Keep hours_per_day for backward compat with hub.js calculations
+      // but derive it from work_hours going forward
+    }
+    if (data.context.work_days === undefined) {
+      data.context.work_days = [1, 2, 3, 4, 5]; // Mon–Fri
+    }
+    if (data.context.planned_absences === undefined) {
+      data.context.planned_absences = [];
+    }
+    if (data.context.calendar_week_start === undefined) {
+      data.context.calendar_week_start = 1; // Monday
+    }
   }
 }
 
@@ -445,6 +466,53 @@ function downloadJSON(obj, filename) {
   a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+// ── Download history ─────────────────────────────────────────
+// Stored in LS.DOWNLOADS: { "YYYY-MM-DD": ["d"|"w"|"f"] }
+// Survives data resets (not cleared by executeReset).
+// "d" = daily log, "w" = weekly report, "f" = final/full report
+
+function getDownloads() {
+  try {
+    const raw = localStorage.getItem(LS.DOWNLOADS);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+
+function saveDownloads(obj) {
+  try { localStorage.setItem(LS.DOWNLOADS, JSON.stringify(obj)); } catch {}
+}
+
+// Stamps a download event for today's date.
+// type: "d" | "w" | "f"
+function stampDownload(type) {
+  const today = new Date().toISOString().slice(0, 10);
+  const dl = getDownloads();
+  if (!dl[today]) dl[today] = [];
+  if (!dl[today].includes(type)) dl[today].push(type);
+  saveDownloads(dl);
+}
+
+// ── Work hours helpers ────────────────────────────────────────
+// work_hours is stored as { h: 7, m: 30 }.
+// Returns total minutes.
+function workHoursToMinutes(wh) {
+  if (!wh) return 450; // 7h30 default
+  return (wh.h || 0) * 60 + (wh.m || 0);
+}
+
+// Returns a display string like "7h30" or "8h00".
+function workHoursToString(wh) {
+  if (!wh) return "7h30";
+  const h = wh.h || 0;
+  const m = wh.m || 0;
+  return `${h}h${String(m).padStart(2, "0")}`;
+}
+
+// Returns decimal hours for backward compatibility with hub.js expected_hours math.
+function workHoursToDecimal(wh) {
+  return workHoursToMinutes(wh) / 60;
 }
 
 // ── Merge logic ──────────────────────────────────────────────
