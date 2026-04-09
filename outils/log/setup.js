@@ -302,6 +302,18 @@ function finishSetup() {
   setupData.context.tools_known_at_start = [...setupData.toolsKnown];
   setupData.context.tools_to_learn = [...setupData.toolsToLearn];
 
+  // Teacher custom weekly field
+  const teacherLabel = document.getElementById("ctx-teacher-field-label")?.value.trim();
+  const teacherPH    = document.getElementById("ctx-teacher-field-placeholder")?.value.trim();
+  if (teacherLabel) {
+    setupData.context.teacher_custom_field = {
+      label:       teacherLabel,
+      placeholder: teacherPH || "",
+    };
+  } else {
+    setupData.context.teacher_custom_field = null;
+  }
+
   const data = createNewInternship(setupData.profile, currentPathway, setupData.context);
 
   // Add projects (hub)

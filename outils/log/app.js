@@ -368,6 +368,67 @@ function importConfig(file) {
   reader.readAsText(file);
 }
 
+
+// ── SVG Pie chart helper (shared) ───────────────────────────
+function buildPieChart(container, slices) {
+  // slices: [{label, value, color}]
+  if (!container) return;
+  const total = slices.reduce((s, x) => s + x.value, 0);
+  if (!total) { container.innerHTML = `<p class="text-muted">—</p>`; return; }
+
+  const R = 120, cx = 160, cy = 160;
+  let angle = -Math.PI / 2; // start at top
+  const paths = [];
+
+  slices.forEach(slice => {
+    if (!slice.value) return;
+    const sweep = (slice.value / total) * 2 * Math.PI;
+    const x1 = cx + R * Math.cos(angle);
+    const y1 = cy + R * Math.sin(angle);
+    const x2 = cx + R * Math.cos(angle + sweep);
+    const y2 = cy + R * Math.sin(angle + sweep);
+    const large = sweep > Math.PI ? 1 : 0;
+    // Label position
+    const midAngle = angle + sweep / 2;
+    const lr = R * 0.65;
+    const lx = cx + lr * Math.cos(midAngle);
+    const ly = cy + lr * Math.sin(midAngle);
+    const pct = Math.round((slice.value / total) * 100);
+
+    paths.push(`
+      <path d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)}
+               A${R},${R} 0 ${large},1 ${x2.toFixed(2)},${y2.toFixed(2)} Z"
+            fill="${slice.color}" stroke="var(--bg-card)" stroke-width="2">
+        <title>${escHtml(slice.label)}: ${pct}%</title>
+      </path>
+      ${pct >= 5 ? `<text x="${lx.toFixed(2)}" y="${ly.toFixed(2)}"
+        text-anchor="middle" dominant-baseline="middle"
+        font-size="13" font-weight="500" fill="${bestTextColor(slice.color)}"
+        style="pointer-events:none">${pct}%</text>` : ''}
+    `);
+    angle += sweep;
+  });
+
+  const legendItems = slices.filter(s => s.value > 0).map(s => {
+    const pct = Math.round((s.value / total) * 100);
+    return `<div class="legend-item">
+      <div class="legend-swatch" style="background:${s.color}"></div>
+      <span>${escHtml(s.label)}</span>
+      <span style="margin-left:auto;color:var(--text-muted);font-size:1.2rem">${s.sublabel || ''} · ${pct}%</span>
+    </div>`;
+  }).join("");
+
+  container.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:var(--sp-8);flex-wrap:wrap">
+      <svg viewBox="0 0 320 320" width="240" height="240" style="flex-shrink:0;overflow:visible">
+        ${paths.join("")}
+      </svg>
+      <div class="timeline-legend" style="flex:1;min-width:18rem;align-content:start;margin-top:var(--sp-3)">
+        ${legendItems}
+      </div>
+    </div>
+  `;
+}
 function downloadJSON(obj, filename) {
   const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);

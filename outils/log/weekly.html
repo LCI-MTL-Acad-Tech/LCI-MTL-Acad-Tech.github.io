@@ -72,70 +72,26 @@
         <div id="upload-status" class="mt-4"></div>
       </div>
 
-      <!-- Week selector + report -->
+      <!-- Report: accordion of all weeks -->
       <div id="phase-report" class="hidden">
-        <div class="flex items-center justify-between mb-6" style="flex-wrap:wrap;gap:var(--sp-4)">
+
+        <div class="flex items-center justify-between mb-6 no-print"
+          style="flex-wrap:wrap;gap:var(--sp-4)">
           <div>
-            <h1 style="font-size:2.8rem;margin-bottom:var(--sp-1)" data-i18n="weekly.title">Bilan hebdomadaire</h1>
+            <h1 style="font-size:2.8rem;margin-bottom:var(--sp-1)"
+              data-i18n="weekly.title">Bilan hebdomadaire</h1>
             <div id="student-label" style="font-size:1.6rem;color:var(--text-muted)"></div>
           </div>
-          <div class="flex gap-3 no-print" style="flex-wrap:wrap;align-items:center">
-            <label style="font-size:1.4rem;color:var(--text-muted)" data-i18n="weekly.week_select"></label>
-            <select id="week-select" class="btn btn--ghost" onchange="renderWeek(this.value)"
-              style="font-size:1.4rem;padding:var(--sp-2) var(--sp-3);cursor:pointer"></select>
-            <button class="btn btn--secondary" onclick="window.print()" data-i18n="weekly.print"></button>
-            <button class="btn btn--ghost btn--sm" onclick="resetWeekly()" data-i18n="action.back"></button>
+          <div class="flex gap-3" style="flex-wrap:wrap;align-items:center">
+            <button class="btn btn--secondary" onclick="window.print()"
+              data-i18n="weekly.print"></button>
+            <button class="btn btn--ghost btn--sm" onclick="resetWeekly()"
+              data-i18n="action.back"></button>
           </div>
         </div>
 
-        <!-- Stat grid -->
-        <div class="flex gap-4 mb-6" id="week-stats"
-          style="background:var(--bg-card);border-radius:var(--r-xl);padding:var(--sp-5);box-shadow:var(--shadow-sm)"></div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);margin-bottom:var(--sp-4)" id="week-top-row">
-          <!-- Day-by-day mini timeline -->
-          <div class="card" id="week-days-card">
-            <div class="section-title" data-i18n="weekly.section_days"></div>
-            <div id="week-days" style="display:flex;gap:var(--sp-2);align-items:flex-end;height:12rem;margin-top:var(--sp-3)"></div>
-          </div>
-          <!-- Activity pie -->
-          <div class="card" id="week-activity-card">
-            <div class="section-title" data-i18n="weekly.section_activity"></div>
-            <div id="week-activity"></div>
-          </div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);margin-bottom:var(--sp-4)">
-          <!-- Mood -->
-          <div class="card">
-            <div class="section-title" data-i18n="weekly.section_mood"></div>
-            <div id="week-mood"></div>
-          </div>
-          <!-- Wins -->
-          <div class="card">
-            <div class="section-title" data-i18n="weekly.section_wins"></div>
-            <div id="week-wins"></div>
-          </div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);margin-bottom:var(--sp-4)">
-          <!-- Obstacle -->
-          <div class="card" id="week-obstacle-card">
-            <div class="section-title" data-i18n="weekly.section_obstacle"></div>
-            <div id="week-obstacle"></div>
-          </div>
-          <!-- Weekly wrap -->
-          <div class="card">
-            <div class="section-title" data-i18n="weekly.section_wrap"></div>
-            <div id="week-wrap"></div>
-          </div>
-        </div>
-
-        <!-- Project status (hub only) -->
-        <div class="card mb-4 hidden" id="week-projects-card">
-          <div class="section-title" data-i18n="weekly.section_projects"></div>
-          <div id="week-projects"></div>
-        </div>
+        <!-- All weeks rendered here as accordion sections -->
+        <div id="weekly-accordion"></div>
 
       </div><!-- /phase-report -->
     </div>

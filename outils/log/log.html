@@ -286,6 +286,13 @@
               <label data-i18n="log.weekly_change"></label>
               <textarea id="log-weekly-change" rows="2" onchange="updateWeeklyWrap()"></textarea>
             </div>
+
+            <!-- Teacher-defined custom field (shown only if configured) -->
+            <div class="form-group hidden" id="weekly-teacher-field">
+              <label id="weekly-teacher-label"></label>
+              <textarea id="log-weekly-teacher-note" rows="3"
+                onchange="updateWeeklyWrap()"></textarea>
+            </div>
           </div>
 
           <!-- Download reminder at bottom -->

@@ -130,6 +130,8 @@ function restoreFields() {
     document.getElementById("log-weekly-highlight").value = currentLog.weekly_wrap.highlight || "";
     document.getElementById("log-weekly-learning").value  = currentLog.weekly_wrap.learning  || "";
     document.getElementById("log-weekly-change").value    = currentLog.weekly_wrap.change    || "";
+    const _ta = document.getElementById("log-weekly-teacher-note");
+    if (_ta) _ta.value = currentLog.weekly_wrap.teacher_note || "";
   }
 
   // Show tomorrow reminder if previous log had a plan
@@ -1079,18 +1081,32 @@ function checkWeeklyWrap() {
   const weekEndDay = getWeekEndDay();
   if (dow === weekEndDay || currentLog.weekly_wrap) {
     card.style.display = "block";
+    // Show teacher custom field if configured
+    const tcf = logData?.context?.teacher_custom_field;
+    const tfDiv = document.getElementById("weekly-teacher-field");
+    if (tfDiv && tcf?.label) {
+      tfDiv.classList.remove("hidden");
+      const lbl = document.getElementById("weekly-teacher-label");
+      if (lbl) lbl.textContent = tcf.label;
+      const ta = document.getElementById("log-weekly-teacher-note");
+      if (ta) {
+        ta.placeholder = tcf.placeholder || "";
+        ta.value = currentLog.weekly_wrap?.teacher_note || "";
+      }
+    }
   } else {
     card.style.display = "none";
   }
 }
 
 function updateWeeklyWrap() {
-  const highlight = document.getElementById("log-weekly-highlight")?.value.trim() || "";
-  const learning  = document.getElementById("log-weekly-learning")?.value.trim()  || "";
-  const change    = document.getElementById("log-weekly-change")?.value.trim()    || "";
+  const highlight    = document.getElementById("log-weekly-highlight")?.value.trim()     || "";
+  const learning     = document.getElementById("log-weekly-learning")?.value.trim()      || "";
+  const change       = document.getElementById("log-weekly-change")?.value.trim()        || "";
+  const teacher_note = document.getElementById("log-weekly-teacher-note")?.value.trim()  || "";
 
-  if (highlight || learning || change) {
-    currentLog.weekly_wrap = { highlight, learning, change };
+  if (highlight || learning || change || teacher_note) {
+    currentLog.weekly_wrap = { highlight, learning, change, teacher_note };
   } else {
     currentLog.weekly_wrap = null;
   }

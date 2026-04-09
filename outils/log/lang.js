@@ -378,7 +378,10 @@ const LANG = {
     "weekly.week_label":     "Semaine du",
     "weekly.no_logs":        "Aucun journal trouvé pour cette semaine.",
     "weekly.hours":          "Heures documentées",
+    "weekly.day":            "Jour",
     "weekly.days":           "Jours",
+    "weekly.completed_weeks": "Semaines complétées",
+    "weekly.open_print":      "Ouvrir pour impression",
     "weekly.avg_rating":     "Note moyenne",
     "weekly.section_days":   "Jours de la semaine",
     "weekly.section_activity": "Répartition des activités",
@@ -479,293 +482,12 @@ const LANG = {
     "setup.section_profile":  "Your profile",
     "setup.section_internship":"Your internship",
     "setup.section_expectations": "Your expectations",
-    "setup.section_tools":    "Tools and skills",
-
-    "setup.skills_to_develop":"Which skills do you most want to develop during this internship? (2 or 3)",
-    "setup.skills_placeholder":"E.g.: project management, UX design, client communication…",
-    "setup.apprehensions":    "Is there anything you're apprehensive about going into this internship?",
-    "setup.success":          "What does success look like for you, personally, by the end of this internship?",
-    "setup.tools_known":      "Which tools do you already know coming into this internship?",
-    "setup.tools_to_learn":   "Which tools do you expect to learn or improve on?",
-
-    // Setup — Company pathway
-    "setup.org_name":         "Organization name",
-    "setup.industry":         "Industry / sector",
-    "setup.city":             "City",
-    "setup.country":          "Country",
-    "setup.supervisor_name":  "Workplace supervisor's name",
-    "setup.supervisor_role":  "Supervisor's role",
-    "setup.situation_before_company":    "What was the situation in the organization before you arrived? What problem or opportunity does this internship address?",
-
-    // Setup — Hub pathway
-    "setup.add_project":      "Add a project",
-    "setup.project_name":     "Project name",
-    "setup.client_name":      "Client name",
-    "setup.brief":            "Project brief summary",
-    "setup.project_start":    "Project start date",
-    "setup.student_joined":   "Date you joined the project",
-    "setup.project_initial_impression": "What is your initial read on this project — scope, complexity, unknowns?",
-    "setup.project_challenges":         "What challenges do you anticipate?",
-    "setup.situation_before":            "What was the situation before you arrived? What problem or opportunity is this project addressing?",
-
-    // ── Daily Log ────────────────────────────────────────────
-    "log.time_start":         "Start time",
-    "log.time_end":           "End time",
-    "log.day_duration":       "Total duration",
-    "log.day_modality":       "Modality",
-    "log.day_type_onsite":    "On-site",
-    "log.day_type_remote":    "Remote",
-    "log.late_filing":        "Late filing — I'm writing this log after the fact",
-
-    "log.section_tasks":      "Tasks",
-    "log.add_task":           "Add a task",
-    "log.task_description":   "Task description",
-    "log.task_duration":      "Duration",
-    "log.task_type":          "Activity type",
-    "log.task_project":       "Which project?",
-    "log.task_topic":         "Topic / subject",
-    "log.task_learning":      "What did you learn or take away?",
-    "log.task_lesson_tags":   "Learning tags",
-    "log.task_tags_placeholder": "E.g.: communication, time management…",
-    "log.training_subtype":   "Training type",
-    "log.training_reading":   "Reading",
-    "log.training_video":     "Video",
-    "log.training_coaching":  "Coaching",
-    "log.training_workshop":  "Workshop",
-    "log.training_course":    "Course",
-    "log.training_other":     "Other",
-
-    "log.grayzone_info":      "Some time in your day is not accounted for in your tasks.",
-    "log.grayzone_prompt":    "How did you spend this time? (transitions, commuting, informal moments…)",
-    "log.grayzone_label":     "Undocumented",
-
-    "log.section_reflection": "End-of-day reflection",
-    "log.obstacle":           "Did you encounter a problem or obstacle today?",
-    "log.obstacle_response":  "How did you handle it, or how do you plan to?",
-    "log.win":                "What was your biggest win, coolest discovery, or proudest moment today?",
-    "log.section_project_status": "Active project status",
-    "log.project_status_prompt":  "Quick check-in on each active project.",
-    "log.project_status_label":   "Status",
-    "log.project_status_notes":   "Notes",
-        "log.morning_energy":     "How are you arriving this morning? (energy, motivation)",
-    "log.morning_energy_hint": "This rating shows on the mood chart alongside your end-of-day score.",
-    "log.day_rating":         "How would you rate today?",
-    "log.rating_1":           "Rough",
-    "log.rating_2":           "Slow",
-    "log.rating_3":           "Okay",
-    "log.rating_4":           "Good",
-    "log.rating_5":           "Excellent",
-    "log.closing_word":       "One word or short phrase to describe how you're leaving today",
-    "log.plan_tomorrow":      "What do you plan to do tomorrow?",
-    "log.plan_tomorrow_hint": "These notes will appear as a reminder when you open the next log.",
-    "log.tomorrow_reminder":  "Yesterday you planned:",
-    "log.section_weekly":     "Weekly wrap-up",
-    "log.weekly_highlight":   "What was the best thing about this week?",
-    "log.weekly_learning":    "What would you keep as a good practice going forward?",
-    "log.weekly_change":      "What would you do differently next week?",
-    "log.weekly_prompt":      "This is the end of your work week. Take two minutes to reflect.",
-
-    "log.section_todos":      "To-do list",
-    "log.todos_morning_prompt": "What are your priorities for today?",
-    "log.todos_eod_prompt":     "Anything to add before you wrap up?",
-    "log.todo_description":   "Task to do",
-
-    "log.download_reminder":  "Remember to download your log before closing this tab.",
-    "log.download_cta":       "Download today's log",
-    "log.upload_form_title":  "Send your log to your supervisor",
-    "log.end_of_internship_title": "Your internship ends today! 🎓",
-    "log.end_of_internship_hint":  "It's time to generate your final progress report. Upload your log first, then open the progress tracker.",
-    "log.end_of_internship_cta":   "Open progress tracker →",
-    "log.weekly_report_reminder_title": "End of your work week",
-    "log.weekly_report_reminder_hint":  "Remember to generate and print your weekly report — your supervising teacher may request it.",
-    "log.weekly_report_reminder_cta":   "Generate weekly report →",
-    "log.weekly_report_print_hint":     "Generate the report, then use the Print / PDF button to keep a copy.",
-    "log.upload_form_hint":   "After downloading your file, upload it through the form below. Also keep the file in your personal folder — you will need it for the progress tracker.",
-    "log.upload_form_cta":    "Open the submission form →",
-    "log.idle_reminder":      "You've had the log open for a while. Consider saving a backup.",
-    "log.summary_hours":      "Documented hours",
-    "log.summary_tasks":      "Tasks",
-    "log.summary_grayzone":   "Undocumented time",
-
-    // ── Drawers ──────────────────────────────────────────────
-    "drawer.people_title":    "People",
-    "drawer.people_add":      "Add a person",
-    "drawer.people_name":     "Name",
-    "drawer.people_role":     "Role",
-    "drawer.people_role_placeholder": "E.g.: supervisor, client, colleague, coach…",
-    "drawer.people_org":      "Organization",
-    "drawer.people_drag":     "Drag a person onto a task to associate them",
-
-    "drawer.projects_title":  "Projects",
-    "drawer.projects_add":    "Add a project",
-    "drawer.projects_status_active":    "Active",
-    "drawer.projects_status_completed": "Completed",
-    "drawer.projects_status_paused":    "Paused",
-    "drawer.projects_status_cancelled": "Cancelled",
-
-    "drawer.types_title":     "Activity types",
-    "drawer.types_add":       "Add a type",
-    "drawer.types_label":     "Label",
-    "drawer.types_color":     "Colour",
-    "drawer.types_system":    "System (not editable)",
-
-    "drawer.tools_title":     "Tools",
-    "drawer.tools_add":       "Add a tool",
-    "drawer.tools_name":      "Tool name",
-    "drawer.tools_category":  "Category",
-    "drawer.tools_category_placeholder": "E.g.: Design, Development, Communication…",
-
-    // ── Default activity types ───────────────────────────────
-    "activity.programming":   "Programming",
-    "activity.design":         "Design",
-    "activity.research":       "Research",
-    "activity.planning":       "Planning",
-    "activity.data_analysis":  "Data analysis",
-    "activity.debugging":      "Debugging",
-    "activity.production":     "Production",
-    "activity.testing":        "Testing",
-    "activity.documentation":  "Documentation",
-    "activity.client_work":    "Client work",
-    "activity.meeting":       "Meeting",
-    "activity.training":      "Training",
-    "activity.admin":         "Administrative",
-    "activity.break":         "Break",
-    "activity.other":          "Other / Unspecified",
-
-    // ── Report / Final ───────────────────────────────────────
-    "report.upload_title":    "Upload your logs",
-    "report.upload_instructions": "Select all the JSON files from your internship folder. The app will merge them automatically.",
-    "report.clear_cache":     "Clear cached session",
-    "report.upload_cta":      "Choose files",
-    "report.upload_drop":     "Or drag files here",
-    "report.validation_ok":   "Files validated",
-    "report.validation_warning_time": "Some logs appear to have been created in less time than the declared hours.",
-    "report.validation_conflict":     "Two versions of the same log were found. Which one should be kept?",
-    "report.keep_newer":      "Keep the newer one",
-    "report.keep_older":      "Keep the older one",
-    "report.download_reflection": "Download my responses (JSON)",
-    "report.edit_reflection":     "Edit my responses",
-    "report.reflection_saved":    "Responses saved — you can re-upload this file in a future session.",
-
-    "report.section_reflection":     "Final reflection",
-    "report.reality_vs_expectation": "In a few sentences, describe what this internship was actually about — now that you've lived it — compared to what you expected at the start.",
-    "report.significant_work":       "What were the two or three most significant things you worked on? Why?",
-    "report.proud_moment":           "Describe a moment you're genuinely proud of.",
-    "report.failure_moment":         "Describe a moment where something went wrong or didn't go as planned.",
-    "report.failure_lesson":         "What did you learn from it?",
-    "report.env_lesson":             "What did you learn about working in a professional environment that school hadn't fully prepared you for?",
-    "report.supervisor_rel":         "How was your relationship with your supervisor and colleagues?",
-    "report.advice":                 "What advice would you give a student starting this same internship?",
-    "report.would_do_differently":   "If you could do it again, what would you do differently?",
-    "report.comments":               "Additional comments",
-    "report.suggestions_school":       "Suggestions for the program",
-    "report.suggestions_school_q":     "What does this internship reveal about gaps in your training? Which courses, tools, methods, or experiences would have better prepared you?",
-
-    "report.tools_reflection_title":   "Tools reflection",
-    "report.tools_proficiency_start":  "Level at start",
-    "report.tools_proficiency_end":    "Level at end",
-    "report.tools_notes":              "Notes",
-    "report.proficiency_none":         "None",
-    "report.proficiency_beginner":     "Beginner",
-    "report.proficiency_intermediate": "Intermediate",
-    "report.proficiency_advanced":     "Advanced",
-
-    "report.collab_title":      "Collaborator appreciation",
-    "report.collab_note":       "This is private. It will appear in your report but will not be shared automatically.",
-    "report.collab_placeholder":"What you appreciated, learned from, or took away from this person…",
-
-    "report.competencies_title":    "Competency reflection",
-    "report.competencies_helpful":  "Helpful skills",
-    "report.competencies_helpful_q":"Which skills or knowledge from your coursework turned out to be genuinely useful? In what context?",
-    "report.competencies_gaps":     "Gaps identified",
-    "report.competencies_gaps_q":   "Where did you feel underprepared? What did that look like in practice?",
-    "report.competencies_improve":  "What you could have done differently",
-    "report.competencies_improve_q":"If you could go back — either before or during the internship — what would you do differently to better prepare yourself?",
-    "report.competency_field":      "Competency",
-    "report.competency_context":    "Course or context",
-    "report.competency_how":        "How it helped",
-    "report.gap_how":               "How it manifested",
-    "report.gap_impact":            "Impact on your work",
-    "report.improve_what":          "What",
-    "report.improve_when_before":   "Before the internship",
-    "report.improve_when_during":   "During the internship",
-    "report.improve_how":           "How",
-
-    "report.future_title":          "What's next?",
-    "report.future_direction":      "How does this internship shape your direction — in your studies, your career, or both?",
-    "report.future_next_steps":     "What are your concrete next steps?",
-    "report.future_skills":         "Which skills or areas do you want to develop further based on this experience?",
-
-    "report.project_outcomes_title":   "Project outcomes",
-    "report.project_delivered":        "Project delivered",
-    "report.project_client_feedback":  "Summary of client feedback",
-    "report.project_contribution":     "Your personal contribution",
-    "report.project_collab_reflection":"Reflection on collaboration",
-    "report.project_final_impression": "Final impression of this project",
-    "report.project_appreciation":     "What you appreciated about this project or its team",
-
-    // ── Dashboard ────────────────────────────────────────────
-    "dashboard.title":              "Dashboard",
-    "dashboard.section_timeline":   "Timeline",
-    "dashboard.section_breakdown":  "Time breakdown",
-    "dashboard.section_tools":      "Tools used",
-    "dashboard.section_lessons":    "Learning",
-    "dashboard.section_reflection": "Reflection",
-    "dashboard.total_days":         "Days worked",
-    "dashboard.total_hours":        "Documented hours",
-    "dashboard.avg_rating":         "Average rating",
-    "dashboard.top_activity":       "Top activity",
-    "dashboard.settings_note":      "This report was generated with settings that differ from the defaults.",
-    "dashboard.section_mood":       "Mood and energy",
-    "dashboard.mood_timeline":      "Mood curve over the internship",
-    "dashboard.section_weekly":     "Weekly wrap-ups",
-    "dashboard.weekly_highlight":   "Best thing of the week",
-    "dashboard.weekly_learning":    "Good practice to keep",
-    "dashboard.weekly_change":      "To do differently",
-    "dashboard.hide_appreciation":  "Hide appreciations",
-    "dashboard.show_appreciation":  "Show appreciations",
-    "dashboard.print_report":       "Printable version",
-    "dashboard.section_modality":   "Work modality",
-    "dashboard.modality_onsite":    "On-site days",
-    "dashboard.modality_remote":    "Remote days",
-    "dashboard.modality_both":      "Hybrid days",
-    "dashboard.modality_unspecified": "Unspecified",
-
-    // ── Validation & Errors ──────────────────────────────────
-    "error.merge_uuid":       "Cannot merge: these files belong to different students.",
-    "error.config_not_log":    "Ce fichier est une configuration, pas un journal. Utilise 'Changer d'ordinateur' sur la page de configuration.",
-    "error.no_files":         "No files selected.",
-
-    // ── Reset dialogue
-    "reset.title":            "Erase all data?",
-    "reset.warning":          "This cannot be undone. All your setup data and current logs stored in this browser will be erased.",
-    "reset.download_first":   "You should download your logs first if you haven't already.",
-    "reset.confirm_label":    "To confirm, type RESET in the field below:",
-    "reset.cta":              "Erase permanently",
-    "reset.cancel":           "Cancel",
-    "reset.keep_prefs":       "Keep my language and theme preferences",
-
-
-    // ── Intro tour ───────────────────────────────────────────────
-    "tour.skip":          "Skip",
-    "tour.prev":          "Back",
-    "tour.next":          "Next",
-    "tour.finish":        "Let's start!",
-    "tour.step1.title":   "Welcome to your daily log",
-    "tour.step1.text":    "This is your daily workspace. You document your day, tasks, learnings, and mood here. Everything is auto-saved.",
-    "tour.step2.title":   "Start with your morning energy",
-    "tour.step2.text":    "Before you begin, rate your morning energy. This score will appear on your mood curve in the final report.",
-    "tour.step3.title":   "Your priorities for today",
-    "tour.step3.text":    "Check your to-do list at the top — these are things you planned yesterday or added previously. You can add new ones.",
-    "tour.step4.title":   "Document your tasks",
-    "tour.step4.text":    "Add a task for each thing you work on. Specify the type, duration, tools, and people involved by dragging from the drawers, or clicking the + buttons under each task.",
-    "tour.step5.title":   "Drawers: people, tools, types",
-    "tour.step5.text":    "The buttons on the right (or below each task on mobile) open drawers. Define your collaborators, tools, and activity types first — then drag them onto your tasks.",
-    "tour.step6.title":   "End-of-day reflection",
-    "tour.step6.text":    "At the bottom: an obstacle you faced, your win of the day, a rating, and a word to describe your day. And what you plan for tomorrow.",
-    "tour.step7.title":   "Download your log",
-    "tour.step7.text":    "Before closing this tab, download your log as JSON. Create a folder on your computer and keep all your files. You will need them to generate the final report.",
-
+    "setup.teacher_field_title":       "Champ demandé par ton·ta superviseur·e pédagogique",
+    "setup.teacher_field_hint":        "Si ton·ta superviseur·e pédagogique demande un champ spécifique dans ton bilan hebdomadaire, définis-le ici. Il apparaîtra dans la carte de bilan du journal.",
+    "setup.teacher_field_label":       "Intitulé du champ",
+    "setup.teacher_field_placeholder": "Texte indicatif (optionnel)",
+    "setup.teacher_field_label_placeholder":       "ex. : Compétences démontrées cette semaine",
+    "setup.teacher_field_placeholder_placeholder": "ex. : Décris en 2-3 phrases…",
     // ── Weekly report page ───────────────────────────────────────
     "weekly.title":          "Weekly report",
     "weekly.upload_prompt":  "Upload your log file to generate the weekly report.",
@@ -773,7 +495,10 @@ const LANG = {
     "weekly.week_label":     "Week of",
     "weekly.no_logs":        "No logs found for this week.",
     "weekly.hours":          "Hours logged",
+    "weekly.day":            "Day",
     "weekly.days":           "Days",
+    "weekly.completed_weeks": "Completed weeks",
+    "weekly.open_print":      "Open for printing",
     "weekly.avg_rating":     "Average rating",
     "weekly.section_days":   "Days of the week",
     "weekly.section_activity": "Activity breakdown",
@@ -787,51 +512,104 @@ const LANG = {
     "weekly.morning":        "Morning energy",
     "weekly.evening":        "End-of-day rating",
 
-    // ── Making-of footer ────────────────────────────────────
-    "making.label":    "How this tool was made",
-    "making.p1":       "This tool was built through iterative collaboration between Elisa Schaeffer, Dean of Technology and Design at Collège LaSalle Montréal, and Claude (Anthropic), an AI assistant. The pedagogical content, structure, features, priorities, and editorial choices were defined, questioned, and refined by Elisa at every step. Claude generated the code, proposed phrasings, and flagged inconsistencies — but every substantive decision was made by a human.",
-    "making.p2":       "This is not one-shot AI content. It is the result of a prolonged review dialogue: every session was read, critiqued, and corrected. The tool evolves.",
-    "making.p3":       "Thoughtful AI use — Generative AI is a work tool, not a substitute for professional judgment. This project illustrates an approach where the human remains the author: AI amplifies production capacity, but editorial, pedagogical, and ethical responsibility remains entirely human.",
-    "making.updated":  "Last updated: April 2026.",
-  }
-};
+    // ── Making-of footer ─────────────────────────────────────────
+    "making.label":   "How this tool was made",
+    "making.p1":      "This internship journal was designed and built at Collège LaSalle Montréal as an open educational tool.",
+    "making.p2":      "It runs entirely in your browser. No data is sent anywhere. Everything stays on your device.",
+    "making.p3":      "Built with Claude (Anthropic) · Collège LaSalle Montréal",
+    "making.updated": "April 2026",
 
-// ── i18n engine ──────────────────────────────────────────────
+    // ── Dashboard ────────────────────────────────────────────────
+    "dashboard.weekly_highlight": "Highlight",
+    "dashboard.weekly_learning":  "Learning",
+    "dashboard.weekly_change":    "Change",
+    "dashboard.settings_note":    "This report was generated with non-default settings.",
+    "dashboard.print_report":     "Print / Save PDF",
 
-function t(key, replacements = {}) {
-  const lang = localStorage.getItem("lang") || "fr-CA";
-  let str = LANG[lang]?.[key] ?? LANG["fr-CA"]?.[key] ?? key;
-  for (const [k, v] of Object.entries(replacements)) {
-    str = str.replace(`{${k}}`, v);
-  }
-  return str;
+    // ── Report page ──────────────────────────────────────────────
+    "report.upload_title":        "Progress tracker",
+    "report.upload_instructions": "Upload all your daily JSON files to generate your progress report.",
+    "report.upload_cta":          "Choose files",
+    "report.upload_drop":         "or drag and drop here",
+    "report.upload_btn":          "Choose files",
+    "report.clear_cache":         "Clear cached session",
+    "report.section_reflection":  "Final reflection",
+    "report.collab_note":         "This field is private. It will appear in your report but will not be shared automatically.",
+    "report.project_final_impression": "Final impression of this project",
+    "report.competencies_helpful_q": "Which competencies from your program were most useful?",
+    "report.competencies_improve_q": "Which competencies do you wish had been stronger?",
+    "report.project_collab_reflection": "How did collaboration on this project go?",
+    "report.proficiency_none":        "None",
+    "report.proficiency_beginner":    "Beginner",
+    "report.proficiency_intermediate":"Intermediate",
+    "report.proficiency_advanced":    "Advanced",
+
+    // ── Actions ──────────────────────────────────────────────────
+    "action.next":      "Next",
+    "action.back":      "Back",
+    "action.confirm":   "Finish setup",
+    "action.add":       "Add",
+    "action.download":  "Download",
+    "action.open_log":  "Open today's log",
+
+    // ── Errors ───────────────────────────────────────────────────
+    "error.no_files":         "No valid files found. Make sure you are uploading internship JSON files.",
+    "error.merge_uuid":       "These files belong to different students. Upload files for one student at a time.",
+    "error.config_not_log":   "This file is a configuration, not a log. Use \'Switch computer\' on the setup page.",
+    "error.not_config":       "This file is not a valid configuration file.",
+
+    // ── Reset modal ──────────────────────────────────────────────
+    "reset.title":         "Start over",
+    "reset.warning":       "This will permanently delete all your internship data from this browser.",
+    "reset.download_first":"Make sure you have downloaded your log files first.",
+    "reset.confirm_label": "Type RESET to confirm",
+    "reset.keep_prefs":    "Keep my language and theme preferences",
+    "reset.cancel":        "Cancel",
+    "reset.cta":           "Delete everything and start over",
+
+    // ── Setup — Teacher field ─────────────────────────────────────
+    "setup.teacher_field_title":       "Field requested by your supervising teacher",
+    "setup.teacher_field_hint":        "If your supervising teacher requires a specific field in your weekly report, define it here. It will appear in the weekly wrap card in your log.",
+    "setup.teacher_field_label":       "Field label",
+    "setup.teacher_field_placeholder": "Placeholder text (optional)",
+    "setup.teacher_field_label_placeholder":       "e.g. Competencies demonstrated this week",
+    "setup.teacher_field_placeholder_placeholder": "e.g. Describe in 2-3 sentences…",
+
+    // ── Field labels ─────────────────────────────────────────────
+
+  }  // end en-CA
+};   // end LANG
+
+// ── Translation lookup ────────────────────────────────────────
+function t(key) {
+  const lang = getCurrentLang();
+  const val = LANG[lang]?.[key] ?? LANG["fr-CA"]?.[key];
+  return val !== undefined ? val : key;
 }
 
-function applyLanguage(lang) {
-  localStorage.setItem("lang", lang);
+function getCurrentLang() {
+  return localStorage.getItem("lang") || "fr-CA";
+}
+
+function applyLanguage(lang, persist = true) {
+  if (persist) localStorage.setItem("lang", lang);
+
   document.querySelectorAll("[data-i18n]").forEach(el => {
     const key = el.getAttribute("data-i18n");
-    const attr = el.getAttribute("data-i18n-attr");
     const val = t(key);
-    if (attr) {
-      el.setAttribute(attr, val);
-    } else {
+    if (val && val !== key) {
       el.textContent = val;
     }
   });
   document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
     el.placeholder = t(el.getAttribute("data-i18n-placeholder"));
   });
-  // Update lang toggle button — show the OTHER language as label
+  // Update lang toggle button label
   document.querySelectorAll(".lang-toggle-btn").forEach(btn => {
-    btn.textContent = lang === "fr-CA" ? "EN" : "FR";
     btn.setAttribute("data-lang-target", lang === "fr-CA" ? "en-CA" : "fr-CA");
+    btn.textContent = lang === "fr-CA" ? "EN" : "FR";
   });
   document.documentElement.lang = lang === "fr-CA" ? "fr" : "en";
-}
-
-function getCurrentLang() {
-  return localStorage.getItem("lang") || "fr-CA";
 }
 
 function formatDate(isoString) {
@@ -845,11 +623,11 @@ function formatTime(isoString) {
 }
 
 function formatDuration(minutes) {
+  if (!minutes) return "0 min";
   const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
+  const m = Math.round(minutes % 60);
   const lang = getCurrentLang();
-  if (lang === "fr-CA") {
-    return h > 0 ? `${h}h${m > 0 ? String(m).padStart(2,"0") : ""}` : `${m} min`;
-  }
-  return h > 0 ? `${h}h ${m > 0 ? m + "m" : ""}`.trim() : `${m}m`;
+  if (h === 0) return lang === "fr-CA" ? `${m} min` : `${m} min`;
+  if (m === 0) return lang === "fr-CA" ? `${h} h` : `${h} h`;
+  return lang === "fr-CA" ? `${h} h ${m} min` : `${h} h ${m} min`;
 }
