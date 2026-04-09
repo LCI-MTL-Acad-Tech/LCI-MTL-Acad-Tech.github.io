@@ -6,7 +6,7 @@
 const SETTINGS = {
   GRAYZONE_THRESHOLD_PCT: 20,      // % of day that triggers undocumented prompt
   IDLE_REMINDER_MINUTES: 120,       // minutes before idle save reminder
-  SCHEMA_VERSION: "1.1",
+  SCHEMA_VERSION: "1.3",
 };
 
 // ── Default activity types ───────────────────────────────────
@@ -123,6 +123,14 @@ function migrateData(data) {
         }
       });
     });
+  }
+
+  // v1.2 → v1.3: add internship_course_code if missing (default: "generic")
+  // Also normalize profile.program: old data may have a free-text string like
+  // "420.BX Programmation de jeux vidéo" — keep as-is; the UI will show it
+  // as-is if it doesn't match a known PROGRAMS code, which is harmless.
+  if (data.context && data.context.internship_course_code === undefined) {
+    data.context.internship_course_code = "generic";
   }
 }
 

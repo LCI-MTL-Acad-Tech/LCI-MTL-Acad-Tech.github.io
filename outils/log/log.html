@@ -267,6 +267,10 @@
               style="font-size:1.3rem;text-align:center;padding:var(--sp-2) 0;display:none">—</div>
           </div>
 
+          <!-- Daily competency reflection (optional, always shown when course has competencies) -->
+          <!-- Container is populated by renderCompetencyFields() in log.js -->
+          <div id="daily-competency-fields" class="card mb-4"></div>
+
           <!-- Weekly wrap-up (shown on Fridays / last day of work week) -->
           <div class="card mb-4 card--accent" id="weekly-wrap-card" style="display:none">
             <div class="section-title" data-i18n="log.section_weekly"></div>
@@ -286,6 +290,9 @@
               <label data-i18n="log.weekly_change"></label>
               <textarea id="log-weekly-change" rows="2" onchange="updateWeeklyWrap()"></textarea>
             </div>
+
+            <!-- Mandatory competency reflection (populated by renderCompetencyFields()) -->
+            <div id="weekly-competency-fields"></div>
 
             <!-- Teacher-defined custom field (shown only if configured) -->
             <div class="form-group hidden" id="weekly-teacher-field">
@@ -625,6 +632,7 @@
 
 <script src="lang.js"></script>
 <script src="app.js"></script>
+<script src="courses.js"></script>
 <script src="log.js"></script>
 </body>
 </html>

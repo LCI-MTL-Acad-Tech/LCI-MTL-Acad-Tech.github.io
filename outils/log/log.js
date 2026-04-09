@@ -132,6 +132,7 @@ function restoreFields() {
     document.getElementById("log-weekly-change").value    = currentLog.weekly_wrap.change    || "";
     const _ta = document.getElementById("log-weekly-teacher-note");
     if (_ta) _ta.value = currentLog.weekly_wrap.teacher_note || "";
+    // Competency notes are restored inside renderCompetencyFields() called by checkWeeklyWrap()
   }
 
   // Show tomorrow reminder if previous log had a plan
@@ -1073,16 +1074,66 @@ function getWeekEndDay() {
   return parseInt(logData?.context?.week_end_day ?? 5);
 }
 
+// Returns competencies for the current student, or [] if courses.js not loaded
+// or no course code is set.
+function _getCurrentCompetencies() {
+  if (typeof getStudentCompetencies !== "function") return [];
+  const courseCode  = logData?.context?.internship_course_code || "generic";
+  const programCode = logData?.profile?.program || "";
+  return getStudentCompetencies(courseCode, programCode);
+}
+
+// Renders the competency reflection textareas inside a given container element.
+// mode: "daily" (optional, collapsible) | "weekly" (mandatory, always visible)
+// Saved notes are read from currentLog.weekly_wrap.competency_notes (keyed by
+// competency code) for weekly, and from currentLog.competency_notes for daily.
+function renderCompetencyFields(container, mode) {
+  const competencies = _getCurrentCompetencies();
+  if (!competencies.length) { container.innerHTML = ""; return; }
+
+  const lang     = getCurrentLang();
+  const isWeekly = mode === "weekly";
+  const savedNotes = isWeekly
+    ? (currentLog.weekly_wrap?.competency_notes || {})
+    : (currentLog.competency_notes             || {});
+
+  const hintKey = isWeekly ? "log.competency_weekly_hint" : "log.competency_daily_hint";
+
+  container.innerHTML = `
+    <div class="section-title" style="margin-top:var(--sp-5)">${t("log.competency_section")}</div>
+    <p class="form-hint" style="margin-bottom:var(--sp-4)">${t(hintKey)}</p>
+    ${competencies.map(comp => `
+      <div class="form-group" style="margin-bottom:var(--sp-5)">
+        <label style="font-weight:600">
+          ${escHtml(comp.code)}
+          <span style="font-weight:400;color:var(--text-muted)"> — ${escHtml(comp.title[lang] || comp.title["fr-CA"])}</span>
+        </label>
+        <textarea
+          class="competency-note-ta"
+          data-comp-code="${escHtml(comp.code)}"
+          data-mode="${mode}"
+          rows="3"
+          ${isWeekly ? "required" : ""}
+          oninput="${isWeekly ? "updateWeeklyWrap()" : "updateDailyCompetencyNotes()"}"
+          placeholder="${isWeekly ? escHtml(t("log.competency_weekly_hint")) : escHtml(t("log.competency_daily_hint"))}"
+        >${escHtml(savedNotes[comp.code] || "")}</textarea>
+      </div>
+    `).join("")}
+  `;
+}
+
 function checkWeeklyWrap() {
   const card = document.getElementById("weekly-wrap-card");
   if (!card) return;
   const d = new Date(currentLog.date + "T12:00:00");
   const dow = d.getDay();
   const weekEndDay = getWeekEndDay();
+
   if (dow === weekEndDay || currentLog.weekly_wrap) {
     card.style.display = "block";
-    // Show teacher custom field if configured
-    const tcf = logData?.context?.teacher_custom_field;
+
+    // Teacher custom field
+    const tcf   = logData?.context?.teacher_custom_field;
     const tfDiv = document.getElementById("weekly-teacher-field");
     if (tfDiv && tcf?.label) {
       tfDiv.classList.remove("hidden");
@@ -1094,22 +1145,51 @@ function checkWeeklyWrap() {
         ta.value = currentLog.weekly_wrap?.teacher_note || "";
       }
     }
+
+    // Competency reflection (mandatory on wrap day)
+    const compContainer = document.getElementById("weekly-competency-fields");
+    if (compContainer) renderCompetencyFields(compContainer, "weekly");
+
   } else {
     card.style.display = "none";
   }
+
+  // Daily competency section (optional, always visible when course has competencies)
+  const dailyContainer = document.getElementById("daily-competency-fields");
+  if (dailyContainer) renderCompetencyFields(dailyContainer, "daily");
+}
+
+// Collects all competency note textareas for a given mode and returns
+// an object keyed by competency code, e.g. { "00SE": "...", "00SH": "..." }
+function _collectCompetencyNotes(mode) {
+  const notes = {};
+  document.querySelectorAll(`.competency-note-ta[data-mode="${mode}"]`).forEach(ta => {
+    const code = ta.dataset.compCode;
+    const val  = ta.value.trim();
+    if (code && val) notes[code] = val;
+  });
+  return notes;
 }
 
 function updateWeeklyWrap() {
-  const highlight    = document.getElementById("log-weekly-highlight")?.value.trim()     || "";
-  const learning     = document.getElementById("log-weekly-learning")?.value.trim()      || "";
-  const change       = document.getElementById("log-weekly-change")?.value.trim()        || "";
-  const teacher_note = document.getElementById("log-weekly-teacher-note")?.value.trim()  || "";
+  const highlight    = document.getElementById("log-weekly-highlight")?.value.trim()    || "";
+  const learning     = document.getElementById("log-weekly-learning")?.value.trim()     || "";
+  const change       = document.getElementById("log-weekly-change")?.value.trim()       || "";
+  const teacher_note = document.getElementById("log-weekly-teacher-note")?.value.trim() || "";
+  const competency_notes = _collectCompetencyNotes("weekly");
 
-  if (highlight || learning || change || teacher_note) {
-    currentLog.weekly_wrap = { highlight, learning, change, teacher_note };
+  if (highlight || learning || change || teacher_note || Object.keys(competency_notes).length) {
+    currentLog.weekly_wrap = { highlight, learning, change, teacher_note, competency_notes };
   } else {
     currentLog.weekly_wrap = null;
   }
+  updateLog();
+}
+
+// Saves daily (optional) competency notes directly onto the log object.
+function updateDailyCompetencyNotes() {
+  const notes = _collectCompetencyNotes("daily");
+  currentLog.competency_notes = Object.keys(notes).length ? notes : undefined;
   updateLog();
 }
 

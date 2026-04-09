@@ -102,6 +102,10 @@ const LANG = {
     "setup.supervisor_role":  "Rôle du·de la superviseur·e",
     "setup.situation_before_company":    "Quelle était la situation dans l'organisation avant ton arrivée? Quel problème ou quelle opportunité ce stage vient-il adresser?",
 
+    // Setup — Course selector
+    "setup.course_code":      "Cours de stage",
+    "setup.course_code_hint": "Le cours associé à ton stage détermine les compétences que tu devras développer et documenter.",
+
     // Setup — Hub pathway
     "setup.add_project":      "Ajouter un projet",
     "setup.project_name":     "Nom du projet",
@@ -169,6 +173,12 @@ const LANG = {
     "log.weekly_learning":    "Qu'est-ce que tu garderais comme bonne pratique pour la semaine prochaine?",
     "log.weekly_change":      "Qu'est-ce que tu ferais différemment la semaine prochaine?",
     "log.weekly_prompt":      "C'est la fin de ta semaine de travail. Prends deux minutes pour faire un bilan.",
+
+    // Competency reflection — daily (optional) and weekly (mandatory)
+    "log.competency_section":        "Réflexion sur les compétences",
+    "log.competency_daily_hint":     "Optionnel — note ce que tu as observé aujourd'hui en lien avec cette compétence.",
+    "log.competency_weekly_hint":    "Obligatoire — décris comment tu as développé cette compétence cette semaine.",
+    "log.competency_weekly_missing": "Veuillez remplir la réflexion pour chaque compétence avant de terminer.",
 
     "log.section_todos":      "Liste de tâches",
     "log.todos_morning_prompt": "Quelles sont tes priorités pour aujourd'hui?",
@@ -482,6 +492,11 @@ const LANG = {
     "setup.section_profile":  "Your profile",
     "setup.section_internship":"Your internship",
     "setup.section_expectations": "Your expectations",
+
+    // Setup — Course selector
+    "setup.course_code":      "Internship course",
+    "setup.course_code_hint": "The course associated with your internship determines the competencies you will need to develop and document.",
+
     "setup.teacher_field_title":       "Champ demandé par ton·ta superviseur·e pédagogique",
     "setup.teacher_field_hint":        "Si ton·ta superviseur·e pédagogique demande un champ spécifique dans ton bilan hebdomadaire, définis-le ici. Il apparaîtra dans la carte de bilan du journal.",
     "setup.teacher_field_label":       "Intitulé du champ",

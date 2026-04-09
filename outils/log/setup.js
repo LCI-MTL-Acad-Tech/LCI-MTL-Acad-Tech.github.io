@@ -50,12 +50,22 @@ function prefillFromCache() {
     setVal("profile-name", data.profile.full_name);
     setVal("profile-student-id", data.profile.student_id);
     setVal("profile-email", data.profile.email);
-    setVal("profile-program", data.profile.program);
     setVal("profile-cohort", data.profile.cohort);
     setVal("profile-professor", data.profile.supervising_professor);
+    // Re-select program and trigger cascade if we have existing data
+    if (data.profile.program) {
+      const programSel = document.getElementById("profile-program-select");
+      if (programSel) {
+        programSel.value = data.profile.program;
+        onProgramChange();
+      }
+    }
+    if (data.context?.internship_course_code) {
+      const courseSel = document.getElementById("ctx-course-select");
+      if (courseSel) courseSel.value = data.context.internship_course_code;
+    }
   }
 
-  // Autocomplete suggestions
   if (cache.known_orgs.length) {
     setupAutocomplete(document.getElementById("ctx-org-name"), cache.known_orgs);
   }
@@ -64,6 +74,71 @@ function prefillFromCache() {
 function setVal(id, val) {
   const el = document.getElementById(id);
   if (el && val) el.value = val;
+}
+
+// ── Program dropdown ─────────────────────────────────────────
+// Builds the program <select> from PROGRAMS (courses.js).
+// Called once on DOMContentLoaded.
+function buildProgramDropdown() {
+  const sel = document.getElementById("profile-program-select");
+  if (!sel) return;
+  const lang = getCurrentLang();
+
+  sel.innerHTML = `<option value="">${lang === "fr-CA" ? "— Choisir un programme —" : "— Select a program —"}</option>`;
+
+  PROGRAMS.forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = p.code;
+    opt.textContent = getProgramLabel(p.code, lang);
+    sel.appendChild(opt);
+  });
+
+  // "Other" option
+  const other = document.createElement("option");
+  other.value = "other";
+  other.textContent = lang === "fr-CA" ? "Autre / Other" : "Other / Autre";
+  sel.appendChild(other);
+}
+
+// Called when the program dropdown changes.
+// Updates the course dropdown to show only courses for that program.
+function onProgramChange() {
+  const programSel = document.getElementById("profile-program-select");
+  const courseRow  = document.getElementById("ctx-course-row");
+  const courseSel  = document.getElementById("ctx-course-select");
+  if (!programSel || !courseRow || !courseSel) return;
+
+  const programCode = programSel.value;
+  const lang = getCurrentLang();
+
+  if (!programCode) {
+    courseRow.classList.add("hidden");
+    courseSel.innerHTML = "";
+    return;
+  }
+
+  // Build course options for this program
+  const courseCodes = programCode === "other"
+    ? ["generic"]
+    : getCoursesForProgram(programCode);  // always ends with "generic"
+
+  courseSel.innerHTML = "";
+
+  courseCodes.forEach(code => {
+    const opt = document.createElement("option");
+    opt.value = code;
+    opt.textContent = getCourseLabel(code, lang);
+    courseSel.appendChild(opt);
+  });
+
+  // Auto-select if only one real course (plus generic fallback)
+  if (courseCodes.length === 2 && courseCodes[0] !== "generic") {
+    courseSel.value = courseCodes[0];
+  } else if (courseCodes.length === 1) {
+    courseSel.value = courseCodes[0];
+  }
+
+  courseRow.classList.remove("hidden");
 }
 
 // ── Step indicator ───────────────────────────────────────────
@@ -86,25 +161,31 @@ function renderSteps(containerId, activeIdx) {
 
 // ── Save profile ─────────────────────────────────────────────
 function saveProfileAndNext() {
-  const name = document.getElementById("profile-name").value.trim();
+  const name      = document.getElementById("profile-name").value.trim();
   const studentId = document.getElementById("profile-student-id").value.trim();
-  const email = document.getElementById("profile-email").value.trim();
+  const email     = document.getElementById("profile-email").value.trim();
+  const programSel = document.getElementById("profile-program-select");
+  const programCode = programSel ? programSel.value : "";
 
-  if (!name) { showFieldError("profile-name"); return; }
+  if (!name)      { showFieldError("profile-name");       return; }
   if (!studentId) { showFieldError("profile-student-id"); return; }
 
   setupData.profile = {
-    full_name: name,
-    student_id: studentId,
+    full_name:             name,
+    student_id:            studentId,
     email,
-    program: document.getElementById("profile-program").value.trim(),
-    cohort: document.getElementById("profile-cohort").value.trim(),
+    program:               programCode,          // controlled code, e.g. "420.BR" or "other"
+    cohort:                document.getElementById("profile-cohort").value.trim(),
     supervising_professor: document.getElementById("profile-professor").value.trim(),
   };
 
+  // Resolve course code: read the course dropdown (already filtered to this program)
+  const courseSel = document.getElementById("ctx-course-select");
+  setupData._selectedCourseCode = (courseSel && courseSel.value) ? courseSel.value : "generic";
+
   // Show correct context fields
   const companyFields = document.getElementById("ctx-company-fields");
-  const hubFields = document.getElementById("ctx-hub-fields");
+  const hubFields     = document.getElementById("ctx-hub-fields");
   if (currentPathway === "hub") {
     companyFields.classList.add("hidden");
     hubFields.classList.remove("hidden");
@@ -119,7 +200,7 @@ function saveProfileAndNext() {
 
 // ── Project blocks (hub pathway) ─────────────────────────────
 function addProjectBlock(existing = null) {
-  const id = generateUUID();
+  const id   = generateUUID();
   const list = document.getElementById("ctx-projects-list");
   const block = document.createElement("div");
   block.className = "repeatable-block";
@@ -175,49 +256,51 @@ function removeProjectBlock(id) {
 function collectProjects() {
   const blocks = document.querySelectorAll("#ctx-projects-list .repeatable-block");
   return Array.from(blocks).map(b => ({
-    project_id: b.dataset.id,
-    project_name: b.querySelector(".proj-name")?.value.trim() || "",
-    client_name: b.querySelector(".proj-client")?.value.trim() || "",
-    brief_summary: b.querySelector(".proj-brief")?.value.trim() || "",
-    project_start_date: b.querySelector(".proj-start")?.value || null,
-    student_joined_date: b.querySelector(".proj-joined")?.value || new Date().toISOString().slice(0, 10),
-    student_left_date: null,
-    project_end_date: null,
-    initial_impression: b.querySelector(".proj-impression")?.value.trim() || "",
+    project_id:          b.dataset.id,
+    project_name:        b.querySelector(".proj-name")?.value.trim()        || "",
+    client_name:         b.querySelector(".proj-client")?.value.trim()      || "",
+    brief_summary:       b.querySelector(".proj-brief")?.value.trim()       || "",
+    project_start_date:  b.querySelector(".proj-start")?.value              || null,
+    student_joined_date: b.querySelector(".proj-joined")?.value             || new Date().toISOString().slice(0, 10),
+    student_left_date:   null,
+    project_end_date:    null,
+    initial_impression:  b.querySelector(".proj-impression")?.value.trim()  || "",
     anticipated_challenges: b.querySelector(".proj-challenges")?.value.trim() || "",
-    situation_before: b.querySelector(".proj-situation-before")?.value.trim() || "",
-    status: "active",
-    client_person_id: null,
-    added_date: new Date().toISOString().slice(0, 10),
+    situation_before:    b.querySelector(".proj-situation-before")?.value.trim() || "",
+    status:              "active",
+    client_person_id:    null,
+    added_date:          new Date().toISOString().slice(0, 10),
   }));
 }
 
 // ── Save context ──────────────────────────────────────────────
 function saveContextAndNext() {
   const startDate = document.getElementById("ctx-start-date").value;
-  const endDate = document.getElementById("ctx-end-date").value;
+  const endDate   = document.getElementById("ctx-end-date").value;
 
   setupData.context = {
-    start_date: startDate,
-    scheduled_end_date: endDate,
-    week_end_day: parseInt(document.getElementById("ctx-week-end-day").value ?? "5"),
-    hours_per_day: parseFloat(document.getElementById("ctx-hours-per-day").value) || 7,
-    total_hours_target: parseFloat(document.getElementById("ctx-total-hours").value) || null,
-    skills_to_develop: [],
-    apprehensions: "",
+    start_date:           startDate,
+    scheduled_end_date:   endDate,
+    week_end_day:         parseInt(document.getElementById("ctx-week-end-day").value ?? "5"),
+    hours_per_day:        parseFloat(document.getElementById("ctx-hours-per-day").value) || 7,
+    total_hours_target:   parseFloat(document.getElementById("ctx-total-hours").value) || null,
+    skills_to_develop:    [],
+    apprehensions:        "",
     personal_success_definition: "",
+    // Course code resolved earlier in saveProfileAndNext (stored in _selectedCourseCode)
+    internship_course_code: setupData._selectedCourseCode || "generic",
   };
 
   if (currentPathway === "company") {
     setupData.context.company = {
       organization_name: document.getElementById("ctx-org-name").value.trim(),
-      industry: document.getElementById("ctx-industry").value.trim(),
-      city: document.getElementById("ctx-city").value.trim(),
-      country: document.getElementById("ctx-country").value.trim(),
+      industry:          document.getElementById("ctx-industry").value.trim(),
+      city:              document.getElementById("ctx-city").value.trim(),
+      country:           document.getElementById("ctx-country").value.trim(),
     };
-    setupData.context.supervisor_name = document.getElementById("ctx-sup-name").value.trim();
-    setupData.context.supervisor_role = document.getElementById("ctx-sup-role").value.trim();
-    setupData.context.situation_before = document.getElementById("ctx-situation-before").value.trim();
+    setupData.context.supervisor_name    = document.getElementById("ctx-sup-name").value.trim();
+    setupData.context.supervisor_role    = document.getElementById("ctx-sup-role").value.trim();
+    setupData.context.situation_before   = document.getElementById("ctx-situation-before").value.trim();
   } else {
     setupData.context.faculty_supervisor = setupData.profile.supervising_professor || "";
     setupData.projects = collectProjects();
@@ -230,7 +313,7 @@ function saveContextAndNext() {
 // ── Skills and tools tags ────────────────────────────────────
 function addSkillTag() {
   const input = document.getElementById("skill-input");
-  const val = input.value.trim();
+  const val   = input.value.trim();
   if (!val) return;
   setupData.skills.push(val);
   renderTags("skills-tags", setupData.skills, "removeSkill");
@@ -245,7 +328,7 @@ function removeSkill(idx) {
 
 function addToolKnown() {
   const input = document.getElementById("tool-known-input");
-  const val = input.value.trim();
+  const val   = input.value.trim();
   if (!val) return;
   setupData.toolsKnown.push(val);
   renderTags("tools-known-tags", setupData.toolsKnown, "removeToolKnown");
@@ -260,7 +343,7 @@ function removeToolKnown(idx) {
 
 function addToolToLearn() {
   const input = document.getElementById("tool-learn-input");
-  const val = input.value.trim();
+  const val   = input.value.trim();
   if (!val) return;
   setupData.toolsToLearn.push(val);
   renderTags("tools-learn-tags", setupData.toolsToLearn, "removeToolToLearn");
@@ -286,7 +369,11 @@ function renderTags(containerId, arr, removeFn) {
 
 // Enter key support for tag inputs
 document.addEventListener("DOMContentLoaded", () => {
-  ["skill-input", "tool-known-input", "tool-learn-input"].forEach(id => {
+  [
+    ["skill-input",      null],
+    ["tool-known-input", null],
+    ["tool-learn-input", null],
+  ].forEach(([id]) => {
     const el = document.getElementById(id);
     if (el) el.addEventListener("keydown", e => {
       if (e.key === "Enter") { e.preventDefault(); el.nextElementSibling?.click(); }
@@ -296,11 +383,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ── Finish setup ─────────────────────────────────────────────
 function finishSetup() {
-  setupData.context.skills_to_develop = [...setupData.skills];
-  setupData.context.apprehensions = document.getElementById("ctx-apprehensions").value.trim();
+  setupData.context.skills_to_develop          = [...setupData.skills];
+  setupData.context.apprehensions              = document.getElementById("ctx-apprehensions").value.trim();
   setupData.context.personal_success_definition = document.getElementById("ctx-success").value.trim();
-  setupData.context.tools_known_at_start = [...setupData.toolsKnown];
-  setupData.context.tools_to_learn = [...setupData.toolsToLearn];
+  setupData.context.tools_known_at_start       = [...setupData.toolsKnown];
+  setupData.context.tools_to_learn             = [...setupData.toolsToLearn];
 
   // Teacher custom weekly field
   const teacherLabel = document.getElementById("ctx-teacher-field-label")?.value.trim();
@@ -324,10 +411,10 @@ function finishSetup() {
   // Add supervisor as first person (company)
   if (currentPathway === "company" && setupData.context.supervisor_name) {
     addPerson(data, {
-      name: setupData.context.supervisor_name,
-      role_type: getCurrentLang() === "fr-CA" ? "Superviseur·e" : "Workplace supervisor",
+      name:         setupData.context.supervisor_name,
+      role_type:    getCurrentLang() === "fr-CA" ? "Superviseur·e" : "Workplace supervisor",
       organization: setupData.context.company?.organization_name || "",
-      notes: setupData.context.supervisor_role || "",
+      notes:        setupData.context.supervisor_role || "",
     });
   }
 
@@ -364,15 +451,15 @@ function showFieldError(id) {
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   initPage();
+  buildProgramDropdown();
 
   const data = loadData();
   if (data && data.profile?.full_name) {
     document.getElementById("welcome-options-new").classList.add("hidden");
     const cont = document.getElementById("welcome-options-continue");
     cont.classList.remove("hidden");
-    // Show the start-over link beneath the continue card
     document.getElementById("reset-link-row")?.classList.remove("hidden");
-  document.getElementById("export-config-row")?.classList.remove("hidden");
+    document.getElementById("export-config-row")?.classList.remove("hidden");
     const lang = getCurrentLang();
     document.getElementById("welcome-continue-name").textContent =
       lang === "fr-CA"
