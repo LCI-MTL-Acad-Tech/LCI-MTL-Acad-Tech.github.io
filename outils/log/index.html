@@ -284,6 +284,21 @@
                 + <span data-i18n="setup.add_project">Ajouter un projet</span>
               </button>
             </div>
+
+            <!-- Optional project JSON import -->
+            <div class="mt-6" style="border-top:1px solid var(--border);padding-top:var(--sp-5)">
+              <div class="section-title" data-i18n="setup.import_projects_title">Importer des projets (JSON)</div>
+              <p class="form-hint mb-4" data-i18n="setup.import_projects_hint"></p>
+              <div style="display:flex;gap:var(--sp-3);align-items:flex-start;flex-wrap:wrap">
+                <textarea id="ctx-project-json" rows="5"
+                  style="flex:1;min-width:24rem;font-family:monospace;font-size:1.2rem"
+                  data-i18n-placeholder="setup.import_projects_placeholder"></textarea>
+                <button class="btn btn--secondary" onclick="importProjectJSON()">
+                  <span data-i18n="setup.import_projects_cta">Importer</span>
+                </button>
+              </div>
+              <div id="ctx-project-import-status" style="font-size:1.3rem;margin-top:var(--sp-2)"></div>
+            </div>
           </div>
         </div>
 

@@ -439,7 +439,99 @@ function finishSetup() {
   goToScreen("screen-done");
 }
 
-// ── Error helpers ─────────────────────────────────────────────
+// ── Project JSON import (hub pathway) ────────────────────────
+// Accepts a JSON blob in the lci-stage-projects-v1 schema.
+// Converts each project + its tasks into project blocks and
+// optionally pre-populates todos from task descriptions.
+//
+// Expected schema:
+// {
+//   "schema": "lci-stage-projects-v1",
+//   "projects": [
+//     {
+//       "project_name": string,           // required
+//       "client_name": string,            // optional
+//       "brief_summary": string,          // optional
+//       "situation_before": string,       // optional
+//       "initial_impression": string,     // optional
+//       "anticipated_challenges": string, // optional
+//       "tasks": [                        // optional
+//         {
+//           "description": string,        // required
+//           "activity_type": string,      // optional — maps to sys-{type}
+//           "estimated_hours": number     // optional, informational
+//         }
+//       ]
+//     }
+//   ]
+// }
+//
+// activity_type values: programming, design, research, planning,
+// data-analysis, debugging, production, testing, documentation,
+// client-work, meeting, training, admin
+function importProjectJSON() {
+  const textarea = document.getElementById("ctx-project-json");
+  const status   = document.getElementById("ctx-project-import-status");
+  if (!textarea || !status) return;
+
+  const raw = textarea.value.trim();
+  if (!raw) {
+    status.style.color = "var(--danger)";
+    status.textContent = t("setup.import_projects_empty");
+    return;
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (e) {
+    status.style.color = "var(--danger)";
+    status.textContent = t("setup.import_projects_invalid_json");
+    return;
+  }
+
+  if (parsed.schema !== "lci-stage-projects-v1" || !Array.isArray(parsed.projects)) {
+    status.style.color = "var(--danger)";
+    status.textContent = t("setup.import_projects_wrong_schema");
+    return;
+  }
+
+  const projects = parsed.projects.filter(p => p.project_name?.trim());
+  if (!projects.length) {
+    status.style.color = "var(--danger)";
+    status.textContent = t("setup.import_projects_empty_list");
+    return;
+  }
+
+  // Build project blocks from imported data
+  projects.forEach(p => {
+    // Build a tasks summary for brief_summary if none provided
+    let brief = p.brief_summary || "";
+    if (!brief && p.tasks?.length) {
+      brief = p.tasks.map(t =>
+        `${t.description}${t.estimated_hours ? ` (${t.estimated_hours}h)` : ""}`
+      ).join(" · ");
+    }
+
+    addProjectBlock({
+      project_name:            p.project_name.trim(),
+      client_name:             p.client_name?.trim()             || "",
+      brief_summary:           brief,
+      situation_before:        p.situation_before?.trim()        || "",
+      initial_impression:      p.initial_impression?.trim()      || "",
+      anticipated_challenges:  p.anticipated_challenges?.trim()  || "",
+    });
+  });
+
+  // Clear the textarea and show success
+  textarea.value = "";
+  status.style.color = "var(--success)";
+  const lang = getCurrentLang();
+  status.textContent = lang === "fr-CA"
+    ? `✓ ${projects.length} projet${projects.length > 1 ? "s" : ""} importé${projects.length > 1 ? "s" : ""}.`
+    : `✓ ${projects.length} project${projects.length > 1 ? "s" : ""} imported.`;
+  setTimeout(() => { status.textContent = ""; }, 4000);
+}
 function showFieldError(id) {
   const el = document.getElementById(id);
   if (!el) return;

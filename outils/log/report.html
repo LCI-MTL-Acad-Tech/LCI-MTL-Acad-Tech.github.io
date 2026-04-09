@@ -226,6 +226,8 @@
         <div class="flex justify-between" style="flex-wrap:wrap;gap:var(--sp-3)">
           <button class="btn btn--ghost" onclick="goToPhase('phase-upload')" data-i18n="action.back"></button>
           <div class="flex gap-3" style="flex-wrap:wrap;">
+            <button class="btn btn--download" onclick="downloadFullJSON()" data-i18n="report.download_full_json"></button>
+            <button class="btn btn--download" onclick="downloadFullJSON()" data-i18n="report.download_full_json"></button>
             <button class="btn btn--secondary" onclick="downloadReflectionJSON()" data-i18n="report.download_reflection"></button>
             <button class="btn btn--primary btn--lg" onclick="generateDashboard()" data-i18n="action.confirm"></button>
           </div>
@@ -292,6 +294,11 @@
         <!-- Section: Weekly wraps -->
         <div class="report-section" id="section-weekly">
           <div id="weekly-wraps-content"></div>
+        </div>
+
+        <!-- Section: Competency progress -->
+        <div class="report-section" id="section-competencies">
+          <div id="competency-progress-content"></div>
         </div>
 
         <!-- Section: Tools -->
@@ -397,6 +404,7 @@
 
 <script src="lang.js"></script>
 <script src="app.js"></script>
+<script src="courses.js"></script>
 <script src="report.js"></script>
 </body>
 </html>

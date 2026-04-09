@@ -576,7 +576,26 @@ function downloadReflectionJSON() {
   }
 }
 
-// ── Generate dashboard ────────────────────────────────────────
+// ── Download full journal JSON ────────────────────────────────
+// Exports the complete merged dataset (all logs + current reflection state).
+// This file can be re-uploaded to report.html, weekly.html, or hub.html.
+function downloadFullJSON() {
+  if (!mergedData) return;
+  try { mergedData.reflection = collectReflection(); } catch (_) {}
+  mergedData.meta.last_modified = new Date().toISOString();
+  mergedData.meta.type          = "full";
+  const studentId = mergedData.profile?.student_id || "stage";
+  const date      = new Date().toISOString().slice(0, 10);
+  downloadJSON(mergedData, `${studentId}_journal_complet_${date}.json`);
+
+  const btn = document.querySelector('[onclick="downloadFullJSON()"]');
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = "✓";
+    btn.disabled = true;
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 3000);
+  }
+}
 function generateDashboard() {
   mergedData.reflection = collectReflection();
   saveReportData(mergedData); // persist updated reflection
@@ -604,15 +623,14 @@ function buildDashboard() {
   buildModality(logs);
   buildMoodTimeline(logs);
   buildWeeklyWraps(logs);
+  buildCompetencyProgress(logs, data);
   buildToolsChart(logs, data);
   buildLessonsCloud(logs);
   buildReflectionSection(data);
 
-  // Name
   const nameEl = document.getElementById("dashboard-name");
   if (nameEl) nameEl.textContent = data.profile?.full_name || t("dashboard.title");
 
-  // Settings note
   if (data.meta?.settings_snapshot?.defaults_modified) {
     const note = document.createElement("div");
     note.className = "alert alert--warning mb-4";
@@ -653,14 +671,15 @@ function buildStatGrid(logs, data) {
 
 function buildNav() {
   const sections = [
-    { id: "section-timeline",   key: "dashboard.section_timeline" },
-    { id: "section-breakdown",  key: "dashboard.section_breakdown" },
-    { id: "section-modality",   key: "dashboard.section_modality" },
-    { id: "section-mood",       key: "dashboard.section_mood" },
-    { id: "section-weekly",     key: "dashboard.section_weekly" },
-    { id: "section-tools",      key: "dashboard.section_tools" },
-    { id: "section-lessons",    key: "dashboard.section_lessons" },
-    { id: "section-reflection", key: "dashboard.section_reflection" },
+    { id: "section-timeline",      key: "dashboard.section_timeline" },
+    { id: "section-breakdown",     key: "dashboard.section_breakdown" },
+    { id: "section-modality",      key: "dashboard.section_modality" },
+    { id: "section-mood",          key: "dashboard.section_mood" },
+    { id: "section-weekly",        key: "dashboard.section_weekly" },
+    { id: "section-competencies",  key: "dashboard.section_competencies" },
+    { id: "section-tools",         key: "dashboard.section_tools" },
+    { id: "section-lessons",       key: "dashboard.section_lessons" },
+    { id: "section-reflection",    key: "dashboard.section_reflection" },
   ];
   const nav = document.getElementById("report-nav");
   nav.innerHTML = sections.map((s, i) =>
@@ -1225,6 +1244,164 @@ function buildWeeklyWraps(logs) {
 }
 
 // escHtml is defined in app.js
+
+// ── Competency progress ───────────────────────────────────────
+// Per-competency coverage card: weekly reflections timeline +
+// engagement score (daily-note count overrides weekly baseline).
+// Signals which competencies need more attention.
+function buildCompetencyProgress(logs, data) {
+  const container = document.getElementById("competency-progress-content");
+  if (!container) return;
+
+  if (typeof getStudentCompetencies !== "function") {
+    container.innerHTML = `<div class="chart-wrap"><p class="text-muted">—</p></div>`;
+    return;
+  }
+
+  const courseCode   = data.context?.internship_course_code || "generic";
+  const programCode  = data.profile?.program || "";
+  const competencies = getStudentCompetencies(courseCode, programCode);
+
+  if (!competencies.length) {
+    container.innerHTML = `<div class="chart-wrap"><p class="text-muted">—</p></div>`;
+    return;
+  }
+
+  const lang = getCurrentLang();
+
+  // Helper: ISO week key (Monday)
+  const toWeekKey = dateStr => {
+    const d   = new Date(dateStr + "T12:00:00");
+    const day = d.getDay() || 7;
+    d.setDate(d.getDate() - day + 1);
+    return d.toISOString().slice(0, 10);
+  };
+
+  // All elapsed week keys in chronological order
+  const weekKeys = [...new Set(logs.map(l => toWeekKey(l.date)))].sort();
+  const totalWeeks = weekKeys.length;
+
+  // Course label for header
+  const course = (typeof getCourseData === "function") ? getCourseData(courseCode) : null;
+  const courseLabel = course
+    ? `${courseCode} — ${course.title[lang] || course.title["fr-CA"]}`
+    : courseCode;
+
+  const cards = competencies.map(comp => {
+    // Per-week tallies
+    let totalEngagement = 0;
+    let weeklyCount     = 0;
+    let dailyCount      = 0;
+    const weekDotData   = [];  // { wk, score, hasWeekly, dailyN, lastNote }
+
+    weekKeys.forEach(wk => {
+      const weekLogs  = logs.filter(l => toWeekKey(l.date) === wk);
+      const dailyDays = weekLogs.filter(l => l.competency_notes?.[comp.code]);
+      const d         = dailyDays.length;
+      const hasWeekly = weekLogs.some(l => l.weekly_wrap?.competency_notes?.[comp.code]);
+      const lastNote  = hasWeekly
+        ? weekLogs.find(l => l.weekly_wrap?.competency_notes?.[comp.code])?.weekly_wrap.competency_notes[comp.code]
+        : (dailyDays[dailyDays.length - 1]?.competency_notes?.[comp.code] || "");
+
+      if (hasWeekly) weeklyCount++;
+      dailyCount += d;
+      const score = d > 0 ? d : (hasWeekly ? 1 : 0);
+      totalEngagement += score;
+      weekDotData.push({ wk, score, hasWeekly, dailyN: d, lastNote });
+    });
+
+    const pct      = totalWeeks > 0
+      ? Math.min(100, Math.round((totalEngagement / totalWeeks) * 100)) : 0;
+    const barColor = pct >= 75 ? "var(--success)"
+      : pct >= 40 ? "var(--color-gold-500,#e6b830)" : "var(--danger)";
+    // Fix 7: amber gold (#e6b830) has only 2.1:1 contrast on white — use dark text token instead
+    const pctTextColor = pct >= 40 && pct < 75 ? "var(--text)" : barColor;
+
+    // Dot timeline: colour encodes engagement level
+    const dots = weekDotData.map(({ wk, score, hasWeekly, dailyN, lastNote }) => {
+      const dotColor = score === 0   ? "var(--bg-subtle)"
+        : score >= 3                  ? "var(--success)"
+        : score === 2                 ? "var(--accent)"
+        : /* score === 1 */ hasWeekly ? "var(--text-muted)"
+        :                               "var(--accent)";
+      const border   = score === 0   ? "1px solid var(--border)" : "none";
+      const tip      = score === 0
+        ? (lang === "fr-CA" ? "Aucune réflexion cette semaine" : "No reflection this week")
+        : (lastNote ? lastNote.slice(0, 120) + (lastNote.length > 120 ? "…" : "") : "");
+      const shortDate = wk.slice(5);
+      return `
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:2.4rem">
+          <div title="${escHtml(tip)}"
+            style="width:1.2rem;height:1.2rem;border-radius:50%;background:${dotColor};
+                   border:${border};flex-shrink:0;cursor:${score > 0 ? "help" : "default"}"></div>
+          <span style="font-size:1rem;color:var(--text-subtle)">${shortDate}</span>
+        </div>`;
+    }).join("");
+
+    // Most recent note for preview
+    const lastNote = [...weekDotData].reverse().map(d => d.lastNote).find(Boolean) || "";
+
+    return `
+      <div class="chart-wrap" style="margin-bottom:var(--sp-4)">
+        <div class="flex items-center justify-between mb-3" style="flex-wrap:wrap;gap:var(--sp-3)">
+          <div>
+            <span style="font-weight:700;font-size:1.5rem">${escHtml(comp.code)}</span>
+            <span style="color:var(--text-muted);font-size:1.4rem;margin-left:var(--sp-2)">
+              ${escHtml(comp.title[lang] || comp.title["fr-CA"])}
+            </span>
+          </div>
+          <div style="display:flex;gap:var(--sp-5);align-items:center;flex-shrink:0">
+            <span style="font-size:1.3rem;color:var(--text-muted)">
+              ${lang === "fr-CA" ? "Bilans hebdo" : "Weekly"} : <strong>${weeklyCount}/${totalWeeks}</strong>
+            </span>
+            <span style="font-size:1.3rem;color:var(--text-muted)">
+              ${lang === "fr-CA" ? "Obs. quotidiennes" : "Daily obs."} : <strong>${dailyCount}</strong>
+            </span>
+            <span style="font-size:1.3rem;font-weight:700;color:${pctTextColor}">${pct}%</span>
+          </div>
+        </div>
+
+        <!-- Coverage bar -->
+        <div style="height:6px;border-radius:3px;background:var(--bg-subtle);
+                    margin-bottom:var(--sp-4);overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${barColor};
+                      border-radius:3px;transition:width .4s ease"></div>
+        </div>
+
+        <!-- Weekly dot timeline -->
+        ${totalWeeks > 0 ? `
+          <div style="display:flex;gap:var(--sp-1);align-items:flex-end;
+                      margin-bottom:var(--sp-2);overflow-x:auto;
+                      padding-bottom:var(--sp-3);padding-top:var(--sp-1)">
+            ${dots}
+          </div>
+          <p style="font-size:1.1rem;color:var(--text-subtle);margin-bottom:var(--sp-3)">
+            ${lang === "fr-CA"
+              ? "Teinte = engagement (blanc = aucun · gris = bilan seul · bleu = observation · vert = 3+ obs.)"
+              : "Shade = engagement (white = none · grey = weekly only · blue = daily · green = 3+ obs.)"}
+          </p>` : ""}
+
+        <!-- Most recent note preview -->
+        ${lastNote ? `
+          <div class="reflection-block" style="margin-bottom:0">
+            <div class="reflection-label">
+              ${lang === "fr-CA" ? "Dernière réflexion" : "Most recent reflection"}
+            </div>
+            <div class="reflection-text">${escHtml(lastNote)}</div>
+          </div>` : `
+          <p class="text-muted" style="font-size:1.3rem">
+            ${lang === "fr-CA" ? "Aucune réflexion enregistrée pour cette compétence." : "No reflections recorded for this competency yet."}
+          </p>`}
+      </div>`;
+  });
+
+  container.innerHTML = `
+    <div class="chart-wrap" style="margin-bottom:var(--sp-5)">
+      <h4 style="margin-bottom:var(--sp-1)">${t("dashboard.section_competencies")}</h4>
+      <p style="font-size:1.3rem;color:var(--text-muted)">${escHtml(courseLabel)}</p>
+    </div>
+    ${cards.join("")}`;
+}
 
 // ── Modality breakdown ────────────────────────────────────────
 function buildModality(logs) {

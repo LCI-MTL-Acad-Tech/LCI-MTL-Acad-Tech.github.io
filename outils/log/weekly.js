@@ -80,6 +80,31 @@ function resetWeekly() {
   document.getElementById("upload-status").innerHTML = "";
 }
 
+// Downloads the current merged weekly data as a JSON file.
+// This file can be re-uploaded to weekly.html later, or submitted to the hub.
+function downloadWeeklyJSON() {
+  if (!weeklyData) return;
+  const p    = weeklyData.profile;
+  const slug = (p?.full_name || "etudiant").toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "");
+  const date  = new Date().toISOString().slice(0, 10);
+  const fname = `${p?.student_id || slug}_weekly_${date}.json`;
+
+  // Stamp type so hub.js detectFileType() classifies this correctly
+  const payload = JSON.parse(JSON.stringify(weeklyData));
+  payload.meta.type          = "weekly";
+  payload.meta.last_modified = new Date().toISOString();
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = fname;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 // ── Week helpers ──────────────────────────────────────────────
 function getWeekKey(dateStr) {
   const d = new Date(dateStr + "T12:00:00");
@@ -451,17 +476,45 @@ function buildObstacleHTML(logs) {
 function buildWrapHTML(logs) {
   const wrap = logs.find(l =>
     l.weekly_wrap?.highlight || l.weekly_wrap?.learning ||
-    l.weekly_wrap?.change    || l.weekly_wrap?.teacher_note)?.weekly_wrap;
+    l.weekly_wrap?.change    || l.weekly_wrap?.teacher_note ||
+    l.weekly_wrap?.competency_notes)?.weekly_wrap;
   if (!wrap) return `<p class="text-muted">${t("weekly.no_wrap")}</p>`;
 
-  const tcf = weeklyData?.context?.teacher_custom_field;
+  const lang = getCurrentLang();
+  const tcf  = weeklyData?.context?.teacher_custom_field;
+
+  // Competency notes section — rendered if present
+  let compHTML = "";
+  if (wrap.competency_notes && typeof getStudentCompetencies === "function") {
+    const courseCode  = weeklyData?.context?.internship_course_code || "generic";
+    const programCode = weeklyData?.profile?.program || "";
+    const comps       = getStudentCompetencies(courseCode, programCode);
+    const notesWithData = comps.filter(c => wrap.competency_notes[c.code]);
+    if (notesWithData.length) {
+      compHTML = `<div style="margin-top:var(--sp-4);padding:var(--sp-3);
+        background:rgba(var(--accent-rgb),.05);border-radius:var(--r-md);
+        border-left:3px solid var(--accent)">
+        <div style="font-size:1.2rem;font-weight:600;text-transform:uppercase;
+          letter-spacing:0.05em;color:var(--text-subtle);margin-bottom:var(--sp-3)">
+          ${lang === "fr-CA" ? "Réflexion sur les compétences" : "Competency reflection"}
+        </div>
+        ${notesWithData.map(c => `
+          <div style="margin-bottom:var(--sp-4)">
+            <div style="font-size:1.2rem;font-weight:600;color:var(--text-muted);margin-bottom:var(--sp-1)">
+              ${escHtml(c.code)} — ${escHtml(c.title[lang] || c.title["fr-CA"])}
+            </div>
+            <div style="font-size:1.4rem">${escHtml(wrap.competency_notes[c.code])}</div>
+          </div>`).join("")}
+      </div>`;
+    }
+  }
+
   return [
-    wrap.highlight   && { label: t("dashboard.weekly_highlight"), text: wrap.highlight },
-    wrap.learning    && { label: t("dashboard.weekly_learning"),  text: wrap.learning  },
-    wrap.change      && { label: t("dashboard.weekly_change"),    text: wrap.change    },
+    wrap.highlight && { label: t("dashboard.weekly_highlight"), text: wrap.highlight },
+    wrap.learning  && { label: t("dashboard.weekly_learning"),  text: wrap.learning  },
+    wrap.change    && { label: t("dashboard.weekly_change"),    text: wrap.change    },
     (wrap.teacher_note && tcf?.label)
-                     && { label: tcf.label,                       text: wrap.teacher_note,
-                          highlight: true },
+                   && { label: tcf.label, text: wrap.teacher_note, highlight: true },
   ].filter(Boolean).map(item => `
     <div style="margin-bottom:var(--sp-4)${item.highlight
       ? ";padding:var(--sp-3);background:rgba(var(--accent-rgb),.07);border-radius:var(--r-md);border-left:3px solid var(--accent)" : ""}">
@@ -469,7 +522,7 @@ function buildWrapHTML(logs) {
                   letter-spacing:0.05em;color:var(--text-subtle);margin-bottom:var(--sp-1)">
         ${escHtml(item.label)}</div>
       <div style="font-size:1.4rem">${escHtml(item.text)}</div>
-    </div>`).join("");
+    </div>`).join("") + compHTML;
 }
 
 function buildProjectsHTML(logs) {
@@ -508,7 +561,8 @@ function openWeekPrint(weekStart) {
 
   const wrap = logs.find(l =>
     l.weekly_wrap?.highlight || l.weekly_wrap?.learning ||
-    l.weekly_wrap?.change    || l.weekly_wrap?.teacher_note)?.weekly_wrap;
+    l.weekly_wrap?.change    || l.weekly_wrap?.teacher_note ||
+    l.weekly_wrap?.competency_notes)?.weekly_wrap;
 
   const wins = logs.filter(l => l.win)
     .map(l => `<li><span style="color:#666;font-size:11px">${l.date.slice(5)} </span>${escHtml(l.win)}</li>`)
@@ -588,6 +642,31 @@ function openWeekPrint(weekStart) {
                   color:#4a38d4;margin-bottom:4px">${escHtml(tcf.label)}</div>
       <div style="font-size:13px;white-space:pre-wrap">${escHtml(wrap.teacher_note)}</div>
     </div>` : "";
+
+  // Competency reflection section for print
+  let compPrintSection = "";
+  if (wrap?.competency_notes && typeof getStudentCompetencies === "function") {
+    const courseCode  = weeklyData?.context?.internship_course_code || "generic";
+    const programCode = weeklyData?.profile?.program || "";
+    const comps       = getStudentCompetencies(courseCode, programCode);
+    const notesWithData = comps.filter(c => wrap.competency_notes[c.code]);
+    if (notesWithData.length) {
+      const lbl = lang === "fr-CA" ? "Réflexion sur les compétences" : "Competency reflection";
+      compPrintSection = `
+    <div style="margin-top:14px;padding:12px;border:1.5px solid #00587c;border-radius:6px;
+                background:#f0f8fc">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+                  color:#00587c;margin-bottom:8px">${lbl}</div>
+      ${notesWithData.map(c => `
+        <div style="margin-bottom:10px">
+          <div style="font-size:10px;font-weight:600;color:#555;margin-bottom:2px">
+            ${escHtml(c.code)} — ${escHtml(c.title[lang] || c.title["fr-CA"])}
+          </div>
+          <div style="font-size:13px;white-space:pre-wrap">${escHtml(wrap.competency_notes[c.code])}</div>
+        </div>`).join("")}
+    </div>`;
+    }
+  }
 
   const html = `<!DOCTYPE html>
 <html lang="${lang}">
@@ -678,6 +757,7 @@ ${wrap ? `<div class="card" style="margin-bottom:12px">
   ${wrap.learning  ? `<div class="wrap-item"><div class="wrap-lbl">${lang==="fr-CA"?"Apprentissage":"Learning"}</div><div class="wrap-val">${escHtml(wrap.learning)}</div></div>` : ""}
   ${wrap.change    ? `<div class="wrap-item"><div class="wrap-lbl">${lang==="fr-CA"?"À changer":"Change"}</div><div class="wrap-val">${escHtml(wrap.change)}</div></div>` : ""}
   ${teacherSection}
+  ${compPrintSection}
 </div>` : ""}
 
 </body></html>`;

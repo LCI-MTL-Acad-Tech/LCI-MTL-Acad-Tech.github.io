@@ -106,6 +106,16 @@ const LANG = {
     "setup.course_code":      "Cours de stage",
     "setup.course_code_hint": "Le cours associé à ton stage détermine les compétences que tu devras développer et documenter.",
 
+    // Setup — Project JSON import (hub pathway only)
+    "setup.import_projects_title":       "Importer des projets (JSON)",
+    "setup.import_projects_hint":        "Si ton superviseur·e t'a fourni un fichier JSON de projets au format lci-stage-projects-v1, colle son contenu ici pour préremplir ta liste de projets.",
+    "setup.import_projects_placeholder": "{ \"schema\": \"lci-stage-projects-v1\", \"projects\": [ … ] }",
+    "setup.import_projects_cta":         "Importer",
+    "setup.import_projects_empty":       "Le champ est vide.",
+    "setup.import_projects_invalid_json":"JSON invalide — vérifie la syntaxe.",
+    "setup.import_projects_wrong_schema":"Format non reconnu. Utilise le schéma lci-stage-projects-v1.",
+    "setup.import_projects_empty_list":  "Aucun projet valide trouvé dans le JSON.",
+
     // Setup — Hub pathway
     "setup.add_project":      "Ajouter un projet",
     "setup.project_name":     "Nom du projet",
@@ -259,6 +269,7 @@ const LANG = {
     "report.keep_newer":      "Garder la plus récente",
     "report.keep_older":      "Garder la plus ancienne",
     "report.download_reflection": "Télécharger mes réponses (JSON)",
+    "report.download_full_json":  "Télécharger le journal complet (JSON)",
     "report.edit_reflection":     "Modifier mes réponses",
     "report.reflection_saved":    "Réponses sauvegardées — tu peux les réimporter lors d'une prochaine session.",
 
@@ -326,6 +337,7 @@ const LANG = {
     "dashboard.section_tools":      "Outils utilisés",
     "dashboard.section_lessons":    "Apprentissages",
     "dashboard.section_reflection": "Réflexion",
+    "dashboard.section_competencies": "Suivi des compétences",
     "dashboard.total_days":         "Jours travaillés",
     "dashboard.total_hours":        "Heures documentées",
     "dashboard.avg_rating":         "Évaluation moyenne",
@@ -345,6 +357,15 @@ const LANG = {
     "dashboard.modality_remote":    "Jours à distance",
     "dashboard.modality_both":      "Jours hybrides",
     "dashboard.modality_unspecified": "Non précisé",
+
+    // Hub view modes and competency labels
+    "hub.view_students":     "Par étudiant·e",
+    "hub.view_course":       "Par cours",
+    "hub.view_competency":   "Par compétence",
+    "hub.comp_coverage_label": "Réflexions hebdo / semaines écoulées",
+    "hub.comp_daily_label":  "Observations quotidiennes",
+    "hub.no_course":         "(Aucun cours enregistré)",
+    "hub.filter_course":     "Cours",
 
     // ── Validation & Errors ──────────────────────────────────
     "error.merge_uuid":       "Impossible de fusionner : les fichiers proviennent de comptes différents.",
@@ -402,6 +423,7 @@ const LANG = {
     "weekly.section_projects": "État des projets",
     "weekly.no_wrap":        "(Aucun bilan hebdomadaire rempli pour cette semaine.)",
     "weekly.print":          "Imprimer / PDF",
+    "weekly.download_json":  "Télécharger JSON",
     "weekly.morning":        "Énergie matinale",
     "weekly.evening":        "Bilan de journée",
 
@@ -497,6 +519,16 @@ const LANG = {
     "setup.course_code":      "Internship course",
     "setup.course_code_hint": "The course associated with your internship determines the competencies you will need to develop and document.",
 
+    // Setup — Project JSON import (hub pathway only)
+    "setup.import_projects_title":       "Import projects (JSON)",
+    "setup.import_projects_hint":        "If your supervisor provided a project JSON file in lci-stage-projects-v1 format, paste its contents here to pre-fill your project list.",
+    "setup.import_projects_placeholder": "{ \"schema\": \"lci-stage-projects-v1\", \"projects\": [ … ] }",
+    "setup.import_projects_cta":         "Import",
+    "setup.import_projects_empty":       "The field is empty.",
+    "setup.import_projects_invalid_json":"Invalid JSON — check the syntax.",
+    "setup.import_projects_wrong_schema":"Unrecognized format. Use the lci-stage-projects-v1 schema.",
+    "setup.import_projects_empty_list":  "No valid projects found in the JSON.",
+
     "setup.teacher_field_title":       "Champ demandé par ton·ta superviseur·e pédagogique",
     "setup.teacher_field_hint":        "Si ton·ta superviseur·e pédagogique demande un champ spécifique dans ton bilan hebdomadaire, définis-le ici. Il apparaîtra dans la carte de bilan du journal.",
     "setup.teacher_field_label":       "Intitulé du champ",
@@ -524,6 +556,7 @@ const LANG = {
     "weekly.section_projects": "Project status",
     "weekly.no_wrap":        "(No weekly wrap-up filled in for this week.)",
     "weekly.print":          "Print / PDF",
+    "weekly.download_json":  "Download JSON",
     "weekly.morning":        "Morning energy",
     "weekly.evening":        "End-of-day rating",
 
@@ -535,11 +568,21 @@ const LANG = {
     "making.updated": "April 2026",
 
     // ── Dashboard ────────────────────────────────────────────────
-    "dashboard.weekly_highlight": "Highlight",
-    "dashboard.weekly_learning":  "Learning",
-    "dashboard.weekly_change":    "Change",
-    "dashboard.settings_note":    "This report was generated with non-default settings.",
-    "dashboard.print_report":     "Print / Save PDF",
+    "dashboard.weekly_highlight":     "Highlight",
+    "dashboard.weekly_learning":      "Learning",
+    "dashboard.weekly_change":        "Change",
+    "dashboard.settings_note":        "This report was generated with non-default settings.",
+    "dashboard.print_report":         "Print / Save PDF",
+    "dashboard.section_competencies": "Competency tracking",
+
+    // Hub view modes
+    "hub.view_students":       "By student",
+    "hub.view_course":         "By course",
+    "hub.view_competency":     "By competency",
+    "hub.comp_coverage_label": "Weekly reflections / weeks elapsed",
+    "hub.comp_daily_label":    "Daily observations",
+    "hub.no_course":           "(No course on file)",
+    "hub.filter_course":       "Course",
 
     // ── Report page ──────────────────────────────────────────────
     "report.upload_title":        "Progress tracker",
@@ -548,6 +591,10 @@ const LANG = {
     "report.upload_drop":         "or drag and drop here",
     "report.upload_btn":          "Choose files",
     "report.clear_cache":         "Clear cached session",
+    "report.download_reflection": "Download my answers (JSON)",
+    "report.download_full_json":  "Download full journal (JSON)",
+    "report.edit_reflection":     "Edit my answers",
+    "report.reflection_saved":    "Answers saved — you can re-import them in a future session.",
     "report.section_reflection":  "Final reflection",
     "report.collab_note":         "This field is private. It will appear in your report but will not be shared automatically.",
     "report.project_final_impression": "Final impression of this project",
