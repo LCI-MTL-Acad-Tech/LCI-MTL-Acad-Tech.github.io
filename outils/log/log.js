@@ -982,6 +982,7 @@ function updateLog() {
 function saveAndDownload() {
   updateLog();
   exportLogJSON(logData, currentLog);
+  stampDownload("d"); // record daily download for calendar view
   lastDownloaded = true;
   hideDownloadBanner();
   updateFooterStatus(true);

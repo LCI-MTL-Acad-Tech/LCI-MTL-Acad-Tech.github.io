@@ -103,6 +103,7 @@ function downloadWeeklyJSON() {
   a.download = fname;
   a.click();
   URL.revokeObjectURL(url);
+  stampDownload("w"); // record weekly download for calendar view
 }
 
 // ── Week helpers ──────────────────────────────────────────────

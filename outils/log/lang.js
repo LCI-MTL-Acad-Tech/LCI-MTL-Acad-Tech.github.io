@@ -10,6 +10,7 @@ const LANG = {
     // ── Global / Navigation ──────────────────────────────────
     "nav.setup":              "Configuration",
     "nav.log":                "Journal",
+    "nav.calendar":           "Calendrier",
     "nav.weekly":             "Bilan hebdo",
     "nav.report":             "Suivi de progression",
     "nav.toggle_dark":        "Mode sombre",
@@ -105,6 +106,41 @@ const LANG = {
     // Setup — Course selector
     "setup.course_code":      "Cours de stage",
     "setup.course_code_hint": "Le cours associé à ton stage détermine les compétences que tu devras développer et documenter.",
+
+    // Setup — Schedule / work hours
+    "setup.schedule_title":         "Horaire de travail",
+    "setup.work_days":              "Jours de travail",
+    "setup.work_hours":             "Heures par jour",
+    "setup.work_hours_hint":        "Utilisé pour calculer les heures attendues chaque jour de travail.",
+    "setup.calendar_week_start":    "Début de semaine (calendrier)",
+    "setup.calendar_week_start_hint": "Détermine comment les rangées du calendrier sont découpées. N'affecte pas le jour de bilan hebdomadaire.",
+
+    // Calendar page
+    "cal.title":              "Calendrier de stage",
+    "cal.hours_done":         "Heures réalisées",
+    "cal.hours_planned":      "Heures prévues (jours restants)",
+    "cal.hours_target":       "Objectif total",
+    "cal.margin":             "Marge",
+    "cal.margin_ahead":       "En avance",
+    "cal.margin_behind":      "En retard",
+    "cal.absences_title":     "Absences planifiées",
+    "cal.absence_add":        "Ajouter une absence",
+    "cal.absence_reason":     "Raison (optionnel)",
+    "cal.absence_remove":     "Retirer",
+    "cal.legend_work":        "Jour de travail",
+    "cal.legend_nonwork":     "Congé / weekend",
+    "cal.legend_absence":     "Absence planifiée",
+    "cal.legend_today":       "Aujourd'hui",
+    "cal.legend_daily":       "Journal téléchargé",
+    "cal.legend_weekly":      "Bilan hebdo téléchargé",
+    "cal.legend_weekly_due":  "Bilan hebdo à faire",
+    "cal.legend_final":       "Rapport final téléchargé",
+    "cal.no_data":            "Aucune donnée de stage trouvée. Téléverse ton fichier JSON ou configure ton stage d'abord.",
+    "cal.upload_cta":         "Charger un fichier JSON",
+    "cal.week_start_label":   "Début de semaine",
+    "cal.settings_title":     "Paramètres du calendrier",
+    "cal.click_to_toggle":    "Clique sur un jour pour marquer une absence ou retirer le marquage.",
+    "cal.absence_note_placeholder": "Ex. : Congé férié, examen, rendez-vous…",
 
     // Setup — Project JSON import (hub pathway only)
     "setup.import_projects_title":       "Importer des projets (JSON)",
@@ -440,6 +476,7 @@ const LANG = {
     // ── Global / Navigation ──────────────────────────────────
     "nav.setup":              "Setup",
     "nav.log":                "Daily Log",
+    "nav.calendar":           "Calendar",
     "nav.weekly":             "Weekly report",
     "nav.report":             "Progress tracker",
     "nav.toggle_dark":        "Dark mode",
@@ -518,6 +555,41 @@ const LANG = {
     // Setup — Course selector
     "setup.course_code":      "Internship course",
     "setup.course_code_hint": "The course associated with your internship determines the competencies you will need to develop and document.",
+
+    // Setup — Schedule / work hours
+    "setup.schedule_title":         "Work schedule",
+    "setup.work_days":              "Working days",
+    "setup.work_hours":             "Hours per day",
+    "setup.work_hours_hint":        "Used to calculate expected hours for each working day.",
+    "setup.calendar_week_start":    "Calendar week start",
+    "setup.calendar_week_start_hint": "Controls how rows are split in the calendar view. Does not affect the weekly wrap-up day.",
+
+    // Calendar page
+    "cal.title":              "Internship calendar",
+    "cal.hours_done":         "Hours logged",
+    "cal.hours_planned":      "Planned hours (remaining days)",
+    "cal.hours_target":       "Total target",
+    "cal.margin":             "Margin",
+    "cal.margin_ahead":       "Ahead",
+    "cal.margin_behind":      "Behind",
+    "cal.absences_title":     "Planned absences",
+    "cal.absence_add":        "Add absence",
+    "cal.absence_reason":     "Reason (optional)",
+    "cal.absence_remove":     "Remove",
+    "cal.legend_work":        "Working day",
+    "cal.legend_nonwork":     "Day off / weekend",
+    "cal.legend_absence":     "Planned absence",
+    "cal.legend_today":       "Today",
+    "cal.legend_daily":       "Daily log downloaded",
+    "cal.legend_weekly":      "Weekly report downloaded",
+    "cal.legend_weekly_due":  "Weekly report due",
+    "cal.legend_final":       "Final report downloaded",
+    "cal.no_data":            "No internship data found. Upload your JSON file or complete setup first.",
+    "cal.upload_cta":         "Load a JSON file",
+    "cal.week_start_label":   "Week starts on",
+    "cal.settings_title":     "Calendar settings",
+    "cal.click_to_toggle":    "Click a day to mark or unmark a planned absence.",
+    "cal.absence_note_placeholder": "e.g. Public holiday, exam, appointment…",
 
     // Setup — Project JSON import (hub pathway only)
     "setup.import_projects_title":       "Import projects (JSON)",

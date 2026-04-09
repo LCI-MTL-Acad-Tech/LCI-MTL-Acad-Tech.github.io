@@ -44,7 +44,7 @@ function selectPathway(pathway) {
 // ── Prefill from cache ───────────────────────────────────────
 function prefillFromCache() {
   const cache = loadCache();
-  const data = loadData();
+  const data  = loadData();
 
   if (data && data.profile) {
     setVal("profile-name", data.profile.full_name);
@@ -52,13 +52,9 @@ function prefillFromCache() {
     setVal("profile-email", data.profile.email);
     setVal("profile-cohort", data.profile.cohort);
     setVal("profile-professor", data.profile.supervising_professor);
-    // Re-select program and trigger cascade if we have existing data
     if (data.profile.program) {
       const programSel = document.getElementById("profile-program-select");
-      if (programSel) {
-        programSel.value = data.profile.program;
-        onProgramChange();
-      }
+      if (programSel) { programSel.value = data.profile.program; onProgramChange(); }
     }
     if (data.context?.internship_course_code) {
       const courseSel = document.getElementById("ctx-course-select");
@@ -66,7 +62,25 @@ function prefillFromCache() {
     }
   }
 
-  if (cache.known_orgs.length) {
+  if (data && data.context) {
+    const ctx = data.context;
+    // Work hours
+    if (ctx.work_hours) {
+      setVal("ctx-work-hours-h", ctx.work_hours.h);
+      setVal("ctx-work-hours-m", ctx.work_hours.m);
+    }
+    // Work days — check the right checkboxes
+    if (ctx.work_days) {
+      document.querySelectorAll(".ctx-work-day").forEach(cb => {
+        cb.checked = ctx.work_days.includes(parseInt(cb.value));
+      });
+    }
+    // Wrap-up day and calendar week start
+    if (ctx.week_end_day !== undefined) setVal("ctx-week-end-day", ctx.week_end_day);
+    if (ctx.calendar_week_start !== undefined) setVal("ctx-cal-week-start", ctx.calendar_week_start);
+  }
+
+  if (cache.known_orgs?.length) {
     setupAutocomplete(document.getElementById("ctx-org-name"), cache.known_orgs);
   }
 }
@@ -278,16 +292,30 @@ function saveContextAndNext() {
   const startDate = document.getElementById("ctx-start-date").value;
   const endDate   = document.getElementById("ctx-end-date").value;
 
+  // Work hours: read H and M as separate integers
+  const workH = parseInt(document.getElementById("ctx-work-hours-h").value) || 7;
+  const workM = parseInt(document.getElementById("ctx-work-hours-m").value) || 30;
+
+  // Work days: collect checked checkboxes
+  const workDays = [];
+  document.querySelectorAll(".ctx-work-day:checked").forEach(cb => {
+    workDays.push(parseInt(cb.value));
+  });
+
   setupData.context = {
     start_date:           startDate,
     scheduled_end_date:   endDate,
     week_end_day:         parseInt(document.getElementById("ctx-week-end-day").value ?? "5"),
-    hours_per_day:        parseFloat(document.getElementById("ctx-hours-per-day").value) || 7,
+    calendar_week_start:  parseInt(document.getElementById("ctx-cal-week-start").value ?? "1"),
+    work_days:            workDays.length ? workDays : [1,2,3,4,5],
+    work_hours:           { h: workH, m: workM },
+    hours_per_day:        (workH * 60 + workM) / 60, // kept for hub.js compat
     total_hours_target:   parseFloat(document.getElementById("ctx-total-hours").value) || null,
+    planned_absences:     [],
     skills_to_develop:    [],
     apprehensions:        "",
     personal_success_definition: "",
-    // Course code resolved earlier in saveProfileAndNext (stored in _selectedCourseCode)
+    // Course code resolved in saveProfileAndNext
     internship_course_code: setupData._selectedCourseCode || "generic",
   };
 

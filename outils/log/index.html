@@ -13,16 +13,18 @@
 
   <!-- Header -->
   <header class="site-header">
-    <div class="container">
+    <div class="container container--wide">
       <div class="header-inner">
         <div class="site-title" data-i18n="welcome.title">Journal de stage<span></span></div>
         <nav class="site-nav">
           <a href="index.html" class="nav-link active" data-i18n="nav.setup">Configuration</a>
+          <a href="calendar.html" class="nav-link" data-i18n="nav.calendar">Calendrier</a>
           <a href="log.html" class="nav-link" data-i18n="nav.log">Journal</a>
           <a href="weekly.html" class="nav-link" data-i18n="nav.weekly">Bilan hebdo</a>
           <a href="report.html" class="nav-link" data-i18n="nav.report">Suivi</a>
         </nav>
         <div class="header-actions">
+          <button class="btn btn--ghost btn--sm lang-toggle-btn" data-lang-target="fr-CA">FR</button>
           <button class="btn btn--ghost btn--sm lang-toggle-btn" data-lang-target="en-CA">EN</button>
           <button class="btn btn--ghost btn--sm theme-toggle-btn" aria-label="Toggle theme" style="padding:var(--sp-2);line-height:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg></button>
           <button class="btn btn--ghost btn--sm reset-trigger-btn" onclick="openResetModal()" data-i18n="nav.reset" title="" style="opacity:.6"></button>
@@ -209,31 +211,76 @@
             </div>
           </div>
 
-          <div class="form-row" style="max-width:56rem">
-            <div class="form-group">
-              <label data-i18n="field.hours_per_day"></label>
-              <input type="number" id="ctx-hours-per-day" min="1" max="12" step="0.5" value="7"
-                style="max-width:10rem">
+          <!-- Schedule card -->
+          <div class="card card--flat mt-5 mb-4" style="padding:var(--sp-4)">
+            <div class="section-title mb-4" data-i18n="setup.schedule_title">Horaire de travail</div>
+
+            <!-- Work days checkboxes -->
+            <div class="form-group mb-4">
+              <label data-i18n="setup.work_days">Jours de travail</label>
+              <div style="display:flex;flex-wrap:wrap;gap:var(--sp-3);margin-top:var(--sp-2)">
+                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="1" checked><span data-i18n="field.day_mon">Lundi</span></label>
+                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="2" checked><span data-i18n="field.day_tue">Mardi</span></label>
+                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="3" checked><span data-i18n="field.day_wed">Mercredi</span></label>
+                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="4" checked><span data-i18n="field.day_thu">Jeudi</span></label>
+                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="5" checked><span data-i18n="field.day_fri">Vendredi</span></label>
+                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="6"><span data-i18n="field.day_sat">Samedi</span></label>
+                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="0"><span data-i18n="field.day_sun">Dimanche</span></label>
+              </div>
             </div>
-            <div class="form-group">
-              <label data-i18n="field.total_hours_target"></label>
-              <input type="number" id="ctx-total-hours" min="0" max="1000" step="10" placeholder="ex. 240"
-                style="max-width:10rem">
-              <div class="form-hint" data-i18n="field.total_hours_target_hint"></div>
-              <div class="form-hint" data-i18n="field.hours_per_day_hint"></div>
-            </div>
-            <div class="form-group">
-            <label data-i18n="field.week_end_day"></label>
-            <select id="ctx-week-end-day">
-              <option value="1" data-i18n="field.day_mon">Lundi</option>
-              <option value="2" data-i18n="field.day_tue">Mardi</option>
-              <option value="3" data-i18n="field.day_wed">Mercredi</option>
-              <option value="4" data-i18n="field.day_thu">Jeudi</option>
-              <option value="5" selected data-i18n="field.day_fri">Vendredi</option>
-              <option value="6" data-i18n="field.day_sat">Samedi</option>
-              <option value="0" data-i18n="field.day_sun">Dimanche</option>
-            </select>
-            <div class="form-hint" data-i18n="field.week_end_day_hint"></div>
+
+            <div class="form-row" style="max-width:72rem">
+              <!-- Work hours H + M -->
+              <div class="form-group">
+                <label data-i18n="setup.work_hours">Heures par jour</label>
+                <div style="display:flex;align-items:center;gap:var(--sp-2)">
+                  <input type="number" id="ctx-work-hours-h" min="0" max="12" value="7"
+                    style="max-width:6rem" aria-label="Heures">
+                  <span style="font-size:1.4rem;color:var(--text-muted)">h</span>
+                  <input type="number" id="ctx-work-hours-m" min="0" max="59" step="5" value="30"
+                    style="max-width:6rem" aria-label="Minutes">
+                  <span style="font-size:1.4rem;color:var(--text-muted)">min</span>
+                </div>
+                <div class="form-hint" data-i18n="setup.work_hours_hint"></div>
+              </div>
+
+              <!-- Total hours target -->
+              <div class="form-group">
+                <label data-i18n="field.total_hours_target"></label>
+                <input type="number" id="ctx-total-hours" min="0" max="1000" step="10" placeholder="ex. 240"
+                  style="max-width:10rem">
+                <div class="form-hint" data-i18n="field.total_hours_target_hint"></div>
+              </div>
+
+              <!-- Weekly wrap-up day -->
+              <div class="form-group">
+                <label data-i18n="field.week_end_day"></label>
+                <select id="ctx-week-end-day">
+                  <option value="1" data-i18n="field.day_mon">Lundi</option>
+                  <option value="2" data-i18n="field.day_tue">Mardi</option>
+                  <option value="3" data-i18n="field.day_wed">Mercredi</option>
+                  <option value="4" data-i18n="field.day_thu">Jeudi</option>
+                  <option value="5" selected data-i18n="field.day_fri">Vendredi</option>
+                  <option value="6" data-i18n="field.day_sat">Samedi</option>
+                  <option value="0" data-i18n="field.day_sun">Dimanche</option>
+                </select>
+                <div class="form-hint" data-i18n="field.week_end_day_hint"></div>
+              </div>
+
+              <!-- Calendar week start -->
+              <div class="form-group">
+                <label data-i18n="setup.calendar_week_start">Début de semaine (calendrier)</label>
+                <select id="ctx-cal-week-start">
+                  <option value="1" selected data-i18n="field.day_mon">Lundi</option>
+                  <option value="2" data-i18n="field.day_tue">Mardi</option>
+                  <option value="3" data-i18n="field.day_wed">Mercredi</option>
+                  <option value="4" data-i18n="field.day_thu">Jeudi</option>
+                  <option value="5" data-i18n="field.day_fri">Vendredi</option>
+                  <option value="6" data-i18n="field.day_sat">Samedi</option>
+                  <option value="0" data-i18n="field.day_sun">Dimanche</option>
+                </select>
+                <div class="form-hint" data-i18n="setup.calendar_week_start_hint"></div>
+              </div>
             </div>
           </div>
 
