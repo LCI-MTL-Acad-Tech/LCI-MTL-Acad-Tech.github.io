@@ -1313,9 +1313,11 @@ function buildCompetencyProgress(logs, data) {
     const pct      = totalWeeks > 0
       ? Math.min(100, Math.round((totalEngagement / totalWeeks) * 100)) : 0;
     const barColor = pct >= 75 ? "var(--success)"
-      : pct >= 40 ? "var(--color-gold-500,#e6b830)" : "var(--danger)";
-    // Fix 7: amber gold (#e6b830) has only 2.1:1 contrast on white — use dark text token instead
-    const pctTextColor = pct >= 40 && pct < 75 ? "var(--text)" : barColor;
+      : pct >= 40 ? "var(--comp-amber-bar,#b38a00)" : "var(--danger)";
+    // pctTextColor: amber range uses --text (safe on any bg); red uses a darker shade for 4.5:1
+    const pctTextColor = pct >= 75 ? "var(--success)"
+      : pct >= 40 ? "var(--text)"
+      : "var(--comp-danger-text,#d41f29)";
 
     // Dot timeline: colour encodes engagement level
     const dots = weekDotData.map(({ wk, score, hasWeekly, dailyN, lastNote }) => {

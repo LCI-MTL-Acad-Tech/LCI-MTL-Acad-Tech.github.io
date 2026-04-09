@@ -20,10 +20,27 @@ function programColor(prog) {
 }
 
 // ── Init ──────────────────────────────────────────────────────
+// Active quick-filter values (program / teacher buttons)
+let activeProgram = "";
+let activeTeacher = "";
+
 document.addEventListener("DOMContentLoaded", () => {
   initPage();
   applyLanguage(getCurrentLang());
   setupHubDrop();
+
+  // Re-render JS-generated content when language changes
+  document.querySelectorAll(".lang-toggle-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      // Wait one tick for applyLanguage (wired in app.js) to finish
+      setTimeout(() => {
+        if (students.length) {
+          populateFilterOptions();
+          applyFilters();
+        }
+      }, 50);
+    });
+  });
 });
 
 function setupHubDrop() {
@@ -367,6 +384,10 @@ function applyFilters() {
   const course  = document.getElementById("filter-course")?.value || "";
   const search  = document.getElementById("filter-search").value.toLowerCase().trim();
 
+  // Keep quick-filter state in sync with dropdowns
+  activeProgram = prog;
+  activeTeacher = teacher;
+
   filtered = students.filter(s => {
     if (prog    && s.program !== prog)          return false;
     if (teacher && s.teacher !== teacher)       return false;
@@ -397,6 +418,7 @@ function applyFilters() {
 }
 
 function clearFilters() {
+  activeProgram = ""; activeTeacher = "";
   ["filter-program","filter-teacher","filter-pathway","filter-track","filter-course"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = "";
@@ -438,26 +460,67 @@ function renderCurrentView() {
 // ── Stat tiles ────────────────────────────────────────────────
 function renderStats() {
   const f = filtered;
-  const total = f.length;
-  const onTrack = f.filter(s => s.track_band === "green").length;
-  const behind  = f.filter(s => s.track_band === "red").length;
-  const avgH    = total ? (f.reduce((s, r) => s + r.actual_hours, 0) / total).toFixed(1) : "—";
-  const reflCount = f.filter(s => s.has_reflection).length;
-
-  const programs = new Set(f.map(s => s.program?.slice(0,6))).size;
+  const total      = f.length;
+  const onTrack    = f.filter(s => s.track_band === "green").length;
+  const behind     = f.filter(s => s.track_band === "red").length;
+  const avgH       = total ? (f.reduce((s, r) => s + r.actual_hours, 0) / total).toFixed(1) : "—";
+  const reflCount  = f.filter(s => s.has_reflection).length;
+  const programs   = new Set(f.map(s => s.program?.slice(0,6))).size;
 
   document.getElementById("hub-stats").innerHTML = [
-    { val: total,                      label: "Étudiant·e·s", color: "var(--accent)" },
-    { val: onTrack + " / " + total,    label: "Dans les temps", color: "#3a6e00" },
-    { val: behind + " / " + total,     label: "En retard",     color: "#a00" },
-    { val: avgH + " h",                label: "Moy. heures",   color: "var(--accent)" },
-    { val: reflCount + " / " + total,  label: "Réflexions",    color: "var(--accent)" },
-    { val: programs,                   label: "Programmes",    color: "var(--accent)" },
+    { val: total,                     label: "Étudiant·e·s",    color: "var(--accent)" },
+    { val: onTrack + " / " + total,   label: "Dans les temps",  color: "#3a6e00" },
+    { val: behind  + " / " + total,   label: "En retard",       color: "#a00" },
+    { val: avgH + " h",               label: "Moy. heures",     color: "var(--accent)" },
+    { val: reflCount + " / " + total, label: "Réflexions",      color: "var(--accent)" },
+    { val: programs,                  label: "Programmes",       color: "var(--accent)" },
   ].map(s => `
     <div class="hub-stat">
       <div class="hub-stat-val" style="color:${s.color}">${s.val}</div>
       <div class="hub-stat-label">${s.label}</div>
     </div>`).join("");
+
+  renderQuickFilters();
+}
+
+// ── Quick-filter buttons (program + teacher) ──────────────────
+function renderQuickFilters() {
+  renderQuickFilterGroup("hub-qf-programs", "program",  activeProgram);
+  renderQuickFilterGroup("hub-qf-teachers", "teacher",  activeTeacher);
+}
+
+function renderQuickFilterGroup(containerId, field, activeVal) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const vals = [...new Set(students.map(s => s[field]))].filter(Boolean).sort();
+  if (!vals.length) { el.innerHTML = ""; return; }
+
+  el.innerHTML = vals.map(v => {
+    const count   = students.filter(s => s[field] === v).length;
+    const isActive = v === activeVal;
+    const short   = field === "program" ? v : v.split(" ")[0] + (v.split(" ").length > 1 ? " " + v.split(" ")[1] : "");
+    return `<button
+      onclick="toggleQuickFilter('${field}','${escHtml(v)}')"
+      title="${escHtml(v)}"
+      style="padding:var(--sp-1) var(--sp-3);border-radius:var(--r-pill);font-size:1.2rem;
+             font-family:inherit;cursor:pointer;border:1.5px solid ${isActive ? 'var(--accent)' : 'var(--border)'};
+             background:${isActive ? 'var(--accent)' : 'var(--bg-card)'};
+             color:${isActive ? 'var(--comp-toggle-text,#fff)' : 'var(--text-muted)'};
+             font-weight:${isActive ? '600' : '400'};transition:all var(--dur-fast)">
+      ${escHtml(short)} <span style="font-size:1.1rem;opacity:.7">${count}</span>
+    </button>`;
+  }).join("");
+}
+
+function toggleQuickFilter(field, val) {
+  if (field === "program") {
+    activeProgram = activeProgram === val ? "" : val;
+    document.getElementById("filter-program").value = activeProgram;
+  } else if (field === "teacher") {
+    activeTeacher = activeTeacher === val ? "" : val;
+    document.getElementById("filter-teacher").value = activeTeacher;
+  }
+  applyFilters();
 }
 
 // ── AWOL alerts ──────────────────────────────────────────────
@@ -657,9 +720,23 @@ function renderTable() {
       <tr class="data-row" onclick="toggleDetail(${i})">
         <td><strong>${escHtml(s.name)}</strong></td>
         <td style="color:var(--text-subtle);font-size:1.2rem">${escHtml(s.student_id)}</td>
-        <td style="max-width:20rem;overflow:hidden;text-overflow:ellipsis"
-          title="${escHtml(s.program)}">${escHtml(s.program)}</td>
-        <td>${escHtml(s.teacher)}</td>
+        <td style="max-width:20rem;overflow:hidden;text-overflow:ellipsis">
+          <button onclick="event.stopPropagation();filterByProgram('${escHtml(s.program)}')"
+            title="${escHtml(s.program)}"
+            style="background:none;border:none;cursor:pointer;font:inherit;font-size:inherit;
+                   padding:0;color:var(--accent);text-decoration:underline;
+                   text-underline-offset:3px;text-align:left">
+            ${escHtml(s.program)}
+          </button>
+        </td>
+        <td>
+          <button onclick="event.stopPropagation();filterByTeacher('${escHtml(s.teacher)}')"
+            style="background:none;border:none;cursor:pointer;font:inherit;font-size:inherit;
+                   padding:0;color:var(--accent);text-decoration:underline;
+                   text-underline-offset:3px;text-align:left">
+            ${escHtml(s.teacher)}
+          </button>
+        </td>
         <td>${pathwayTag}</td>
         <td style="text-align:center">${s.days_logged}</td>
         <td style="text-align:right;color:var(--text-muted)">${s.expected_hours}h</td>
@@ -681,9 +758,52 @@ function renderTable() {
   }).join("");
 }
 
+// ── Navigation helpers ────────────────────────────────────────
+// Switch to student table view and open that student's detail row.
+function openStudentPanel(uuid) {
+  setHubView("students");
+  // Wait for renderTable to run, then find and open the row
+  requestAnimationFrame(() => {
+    const idx = filtered.findIndex(s => s.uuid === uuid);
+    if (idx >= 0) {
+      const row = document.getElementById(`detail-${idx}`);
+      if (row) {
+        row.style.display = "";
+        row.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  });
+}
+
+// Filter to a single program and switch to student view
+function filterByProgram(prog) {
+  activeProgram = prog;
+  document.getElementById("filter-program").value = prog;
+  setHubView("students");
+  applyFilters();
+}
+
+// Filter to a single teacher and switch to student view
+function filterByTeacher(teacher) {
+  activeTeacher = teacher;
+  document.getElementById("filter-teacher").value = teacher;
+  setHubView("students");
+  applyFilters();
+}
+
+// Filter to a single course and switch to course view
+function filterByCourse(courseCode) {
+  const sel = document.getElementById("filter-course");
+  if (sel) sel.value = courseCode;
+  setHubView("course");
+  applyFilters();
+}
+
 // ── Competency view ───────────────────────────────────────────
 // Groups all visible students by course, then by competency.
-// Shows each student's engagement score as a mini progress bar.
+// Each competency block is collapsible.
+// Shows OK/total count (OK = pct >= 40).
+// Student names are colour-coded by AWOL status with explicit legend.
 function renderCompetencyView() {
   const container = document.getElementById("hub-comp-section");
   if (!container) return;
@@ -691,7 +811,34 @@ function renderCompetencyView() {
 
   const lang = getCurrentLang();
 
-  // Group students by course_code
+  // AWOL legend — explain the colour coding once at the top
+  const legend = `
+    <div style="display:flex;gap:var(--sp-4);flex-wrap:wrap;align-items:center;
+                font-size:1.2rem;margin-bottom:var(--sp-4);padding:var(--sp-3) var(--sp-4);
+                background:var(--bg-subtle);border-radius:var(--r-md)">
+      <span style="font-weight:600">${lang === "fr-CA" ? "Couleur du nom :" : "Name colour:"}</span>
+      <span>
+        <span style="display:inline-block;width:1rem;height:1rem;border-radius:50%;
+                     background:var(--text);margin-right:4px;vertical-align:middle"></span>
+        ${lang === "fr-CA" ? "À jour (journal récent)" : "Up to date (recent log)"}
+      </span>
+      <span>
+        <span style="display:inline-block;width:1rem;height:1rem;border-radius:50%;
+                     background:var(--warning);margin-right:4px;vertical-align:middle"></span>
+        ${lang === "fr-CA" ? "3–6 jours sans journal" : "3–6 days without a log"}
+      </span>
+      <span>
+        <span style="display:inline-block;width:1rem;height:1rem;border-radius:50%;
+                     background:var(--danger);margin-right:4px;vertical-align:middle"></span>
+        ${lang === "fr-CA" ? "7+ jours sans journal (AWOL)" : "7+ days without a log (AWOL)"}
+      </span>
+      <span style="color:var(--text-subtle)">
+        ${lang === "fr-CA" ? "Barre : % engagement compétence" : "Bar: competency engagement %"}
+        · ${lang === "fr-CA" ? "Seuil OK : ≥40%" : "OK threshold: ≥40%"}
+      </span>
+    </div>`;
+
+  // Group by course
   const byCourse = {};
   filtered.forEach(s => {
     const cc = s.course_code || "generic";
@@ -699,11 +846,10 @@ function renderCompetencyView() {
   });
 
   const sections = Object.entries(byCourse).map(([cc, cohort]) => {
-    const courseLabel = (typeof getCourseLabel === "function")
-      ? getCourseLabel(cc, lang) : cc;
+    const courseLabel = (typeof getCourseLabel === "function") ? getCourseLabel(cc, lang) : cc;
 
-    // Gather all competency codes seen in this course group
-    const compMap = {}; // code → { title, students: [] }
+    // Build competency map
+    const compMap = {};
     cohort.forEach(s => {
       (s.competency_coverage || []).forEach(c => {
         if (!compMap[c.code]) compMap[c.code] = { title: c.title, rows: [] };
@@ -713,27 +859,52 @@ function renderCompetencyView() {
 
     if (!Object.keys(compMap).length) {
       return `<div class="chart-wrap mb-4">
-        <div class="section-title mb-3">${escHtml(courseLabel)}</div>
-        <p class="text-muted" style="font-size:1.3rem">Aucune donnée de compétence.</p>
+        <div class="section-title mb-3">
+          <button onclick="filterByCourse('${escHtml(cc)}')"
+            style="background:none;border:none;cursor:pointer;font:inherit;
+                   font-size:inherit;color:var(--accent);text-decoration:underline;
+                   text-underline-offset:3px;padding:0">
+            ${escHtml(courseLabel)}
+          </button>
+        </div>
+        <p class="text-muted" style="font-size:1.3rem">
+          ${lang === "fr-CA" ? "Aucune donnée de compétence." : "No competency data."}
+        </p>
       </div>`;
     }
 
+    const uid_course = cc.replace(/[^a-z0-9]/gi,"_");
+
     const compBlocks = Object.entries(compMap).map(([code, { title, rows }]) => {
-      const titleStr = title[lang] || title["fr-CA"];
+      const titleStr  = title[lang] || title["fr-CA"];
+      const total     = rows.length;
+      const okCount   = rows.filter(({ c }) => c.pct >= 40).length;
+      const allOk     = okCount === total;
+      const noneOk    = okCount === 0;
+      const countColor = allOk ? "var(--success)" : noneOk ? "var(--danger)" : "var(--warning)";
+      const blockId   = `comp-block-${uid_course}-${code}`;
 
       const studentRows = rows.map(({ s, c }) => {
-        const pct         = c.pct;
-        const barColor    = pct >= 75 ? "var(--success)"
-          : pct >= 40 ? "var(--color-gold-500,#e6b830)" : "var(--danger)";
-        const pctTextColor = pct >= 40 && pct < 75 ? "var(--text)" : barColor;
-        const awolClass = s.days_since >= 7 ? "color:var(--danger);font-weight:600"
+        const pct          = c.pct;
+        const barColor     = pct >= 75 ? "var(--success)"
+          : pct >= 40 ? "var(--comp-amber-bar,#b38a00)" : "var(--danger)";
+        const pctTextColor = pct >= 75 ? "var(--success)"
+          : pct >= 40 ? "var(--text)"
+          : "var(--comp-danger-text,#d41f29)";
+        const nameColor    = s.days_since >= 7 ? "color:var(--danger);font-weight:600"
           : s.days_since >= 3 ? "color:var(--warning);font-weight:500" : "";
 
         return `
           <div style="display:flex;align-items:center;gap:var(--sp-3);
                       padding:var(--sp-2) 0;border-bottom:1px solid var(--border)">
             <div style="flex:1;min-width:0">
-              <span style="font-size:1.3rem;${awolClass}">${escHtml(s.name)}</span>
+              <button onclick="openStudentPanel('${escHtml(s.uuid)}')"
+                style="background:none;border:none;cursor:pointer;font:inherit;
+                       font-size:1.3rem;padding:0;text-align:left;${nameColor}
+                       text-decoration:underline;text-underline-offset:3px;
+                       color:${s.days_since >= 7 ? 'var(--danger)' : s.days_since >= 3 ? 'var(--warning)' : 'var(--accent)'}">
+                ${escHtml(s.name)}
+              </button>
               <span style="font-size:1.1rem;color:var(--text-subtle);margin-left:var(--sp-2)">${escHtml(s.student_id)}</span>
             </div>
             <div style="display:flex;align-items:center;gap:var(--sp-3);flex-shrink:0">
@@ -751,26 +922,58 @@ function renderCompetencyView() {
       }).join("");
 
       return `
-        <div style="margin-bottom:var(--sp-5)">
-          <div style="font-size:1.3rem;font-weight:700;margin-bottom:var(--sp-2);
-                      padding-bottom:var(--sp-1);border-bottom:2px solid var(--border)">
-            ${escHtml(code)}
-            <span style="font-weight:400;color:var(--text-muted);margin-left:var(--sp-2)">
+        <div style="margin-bottom:var(--sp-4);border:1px solid var(--border);
+                    border-radius:var(--r-md);overflow:hidden">
+          <!-- Competency header — clickable to collapse -->
+          <button onclick="toggleCompBlock('${blockId}')"
+            style="width:100%;display:flex;align-items:center;gap:var(--sp-3);
+                   padding:var(--sp-3) var(--sp-4);background:var(--bg-subtle);
+                   border:none;cursor:pointer;font:inherit;text-align:left">
+            <span style="font-size:1.3rem;font-weight:700">${escHtml(code)}</span>
+            <span style="font-size:1.3rem;font-weight:400;color:var(--text-muted);flex:1">
               ${escHtml(titleStr)}
             </span>
+            <!-- OK/total count badge -->
+            <span style="font-size:1.2rem;font-weight:700;color:${countColor};
+                         background:${countColor}22;border:1px solid ${countColor};
+                         border-radius:var(--r-pill);padding:1px 8px;flex-shrink:0">
+              ${okCount}/${total} OK
+            </span>
+            <span class="comp-block-chevron" id="${blockId}-chevron"
+              style="font-size:1.4rem;color:var(--text-subtle);transition:transform .2s;
+                     flex-shrink:0">▾</span>
+          </button>
+          <!-- Collapsible body -->
+          <div id="${blockId}" style="padding:0 var(--sp-4) var(--sp-2)">
+            ${studentRows}
           </div>
-          ${studentRows}
         </div>`;
     }).join("");
 
     return `
       <div class="chart-wrap mb-4">
-        <div class="section-title mb-4">${escHtml(courseLabel)}</div>
+        <div class="section-title mb-4">
+          <button onclick="filterByCourse('${escHtml(cc)}')"
+            style="background:none;border:none;cursor:pointer;font:inherit;
+                   font-size:inherit;color:var(--accent);text-decoration:underline;
+                   text-underline-offset:3px;padding:0">
+            ${escHtml(courseLabel)}
+          </button>
+        </div>
         ${compBlocks}
       </div>`;
   }).join("");
 
-  container.innerHTML = sections || `<p class="text-muted">Aucun étudiant·e visible.</p>`;
+  container.innerHTML = legend + (sections || `<p class="text-muted">Aucun étudiant·e visible.</p>`);
+}
+
+function toggleCompBlock(id) {
+  const body     = document.getElementById(id);
+  const chevron  = document.getElementById(id + "-chevron");
+  if (!body) return;
+  const hidden = body.style.display === "none";
+  body.style.display    = hidden ? "" : "none";
+  if (chevron) chevron.style.transform = hidden ? "" : "rotate(-90deg)";
 }
 
 // ── Course view ───────────────────────────────────────────────
@@ -815,10 +1018,12 @@ function renderCourseView() {
         const cov = s.competency_coverage?.find(c => c.code === code);
         if (!cov) return `<div style="text-align:center;color:var(--text-subtle)">—</div>`;
         const pct = cov.pct;
-        // Fix 6: amber needs dark text for contrast (#e6b830 bg → 2.1:1 with white, 8.1:1 with #1a1a1a)
-        const bg       = pct >= 75 ? "var(--success)"
-          : pct >= 40 ? "var(--color-gold-500,#e6b830)" : "var(--danger)";
-        const textCol  = pct >= 40 && pct < 75 ? "#3a3000" : "white";
+        const bg      = pct >= 75 ? "var(--success)"
+          : pct >= 40 ? "var(--comp-amber-bar,#b38a00)" : "var(--danger)";
+        // Use CSS tokens for pill text — theme-aware contrast
+        const textCol = pct >= 75 ? "var(--comp-success-pill,#fff)"
+          : pct >= 40 ? "var(--comp-amber-text,#2a2200)"
+          : "var(--comp-danger-pill,#1a0000)";
         const tip = `${cov.weekly_count}W + ${cov.daily_count}J (engagement: ${cov.total_engagement})`;
         return `
           <div style="text-align:center" title="${escHtml(tip)}">
@@ -830,11 +1035,17 @@ function renderCourseView() {
       }).join("");
 
       return `
-        <div style="display:grid;grid-template-columns:18rem repeat(${compCodes.length},minmax(6rem,1fr));
-                    gap:var(--sp-2);padding:var(--sp-2) 0;
-                    border-bottom:1px solid var(--border);align-items:center">
+      <div style="display:grid;grid-template-columns:18rem repeat(${compCodes.length},minmax(6rem,1fr));
+                  gap:var(--sp-2);padding:var(--sp-2) 0;
+                  border-bottom:1px solid var(--border);align-items:center">
           <div>
-            <div style="font-size:1.3rem;${awolStyle}">${escHtml(s.name)}</div>
+            <button onclick="openStudentPanel('${escHtml(s.uuid)}')"
+              style="background:none;border:none;cursor:pointer;font:inherit;
+                     font-size:1.3rem;padding:0;text-align:left;
+                     color:${s.days_since >= 7 ? 'var(--danger)' : s.days_since >= 3 ? 'var(--warning)' : 'var(--accent)'};
+                     text-decoration:underline;text-underline-offset:3px">
+              ${escHtml(s.name)}
+            </button>
             <div style="font-size:1.1rem;color:var(--text-subtle)">${escHtml(s.student_id)}</div>
           </div>
           ${pills}
@@ -850,7 +1061,14 @@ function renderCourseView() {
 
     return `
       <div class="chart-wrap mb-4">
-        <div class="section-title mb-3">${escHtml(courseLabel)}</div>
+        <div class="section-title mb-3">
+          <button onclick="filterByCourse('${escHtml(cc)}')"
+            style="background:none;border:none;cursor:pointer;font:inherit;
+                   font-size:inherit;color:var(--accent);text-decoration:underline;
+                   text-underline-offset:3px;padding:0">
+            ${escHtml(courseLabel)}
+          </button>
+        </div>
         ${compCodes.length
           ? `<div class="hub-comp-grid-scroll">${header + rows + legend}</div>`
           : `<p class="text-muted" style="font-size:1.3rem">Aucune donnée de compétence.</p>`}
@@ -890,17 +1108,18 @@ function buildDetailHTML(s) {
     ? getCourseLabel(s.course_code, lang) : (s.course_code || "—");
 
   // File type counts badge row
+  // border and bg-tint use the accent colour; count and label use --text for contrast safety
   const ftc = s.file_type_counts || {};
   const fileTypeBadges = [
-    { key: "daily",      label: "Quotidien",   color: "var(--accent)" },
-    { key: "weekly",     label: "Hebdo",        color: "var(--success)" },
-    { key: "full",       label: "Complet",      color: "#7341a0" },
-    { key: "reflection", label: "Réflexion",    color: "var(--color-gold-500,#e6b830)" },
+    { key: "daily",      label: "Quotidien",  color: "var(--accent)" },
+    { key: "weekly",     label: "Hebdo",      color: "var(--success)" },
+    { key: "full",       label: "Complet",    color: "#7341a0" },
+    { key: "reflection", label: "Réflexion",  color: "var(--comp-amber-bar,#b38a00)" },
   ].filter(b => ftc[b.key] > 0).map(b =>
     `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;
                   border-radius:var(--r-sm);background:${b.color}2e;
                   border:1px solid ${b.color};font-size:1.1rem">
-       <span style="color:${b.color};font-weight:700">${ftc[b.key]}</span>
+       <span style="color:var(--text);font-weight:700">${ftc[b.key]}</span>
        <span style="color:var(--text-muted)">${b.label}</span>
      </span>`
   ).join(" ");
@@ -917,8 +1136,10 @@ function buildDetailHTML(s) {
   const compRows = (s.competency_coverage || []).map(c => {
     const pct          = c.pct;
     const barColor     = pct >= 75 ? "var(--success)"
-      : pct >= 40 ? "var(--color-gold-500,#e6b830)" : "var(--danger)";
-    const pctTextColor = pct >= 40 && pct < 75 ? "var(--text)" : barColor;
+      : pct >= 40 ? "var(--comp-amber-bar,#b38a00)" : "var(--danger)";
+    const pctTextColor = pct >= 75 ? "var(--success)"
+      : pct >= 40 ? "var(--text)"
+      : "var(--comp-danger-text,#d41f29)";
     const titleStr     = c.title[lang] || c.title["fr-CA"];
     return `
       <div style="margin-bottom:var(--sp-3)">
