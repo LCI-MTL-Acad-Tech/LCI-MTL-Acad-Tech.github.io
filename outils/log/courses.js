@@ -146,6 +146,146 @@ const SHARED_COMPETENCIES = {
         ]
       }
     ]
+  },
+
+  // ── 00Q1 — Installation et gestion d'ordinateurs ─────────────────────────
+  "00Q1": {
+    code: "00Q1",
+    title: {
+      "fr-CA": "Effectuer l'installation et la gestion d'ordinateurs",
+      "en-CA": "Install and manage computers"
+    },
+    elements: [
+      {
+        id: "00Q1-1",
+        title: { "fr-CA": "Installer et configurer des postes de travail", "en-CA": "Install and configure workstations" },
+        criteria: [
+          { id: "00Q1-1.1", text: { "fr-CA": "Installation correcte des composants matériels et logiciels", "en-CA": "Correct installation of hardware and software components" } },
+          { id: "00Q1-1.2", text: { "fr-CA": "Configuration adéquate des paramètres système", "en-CA": "Adequate configuration of system parameters" } },
+          { id: "00Q1-1.3", text: { "fr-CA": "Vérification du bon fonctionnement des systèmes installés", "en-CA": "Verification of proper operation of installed systems" } }
+        ]
+      },
+      {
+        id: "00Q1-2",
+        title: { "fr-CA": "Assurer la gestion et la maintenance des ordinateurs", "en-CA": "Ensure computer management and maintenance" },
+        criteria: [
+          { id: "00Q1-2.1", text: { "fr-CA": "Application rigoureuse des procédures de maintenance préventive", "en-CA": "Rigorous application of preventive maintenance procedures" } },
+          { id: "00Q1-2.2", text: { "fr-CA": "Mise à jour régulière des systèmes d'exploitation et des logiciels", "en-CA": "Regular updating of operating systems and software" } },
+          { id: "00Q1-2.3", text: { "fr-CA": "Documentation précise des interventions effectuées", "en-CA": "Accurate documentation of work performed" } }
+        ]
+      }
+    ]
+  },
+
+  // ── 00Q2 — Langages de programmation ─────────────────────────────────────
+  "00Q2": {
+    code: "00Q2",
+    title: {
+      "fr-CA": "Utiliser des langages de programmation",
+      "en-CA": "Use programming languages"
+    },
+    elements: [
+      {
+        id: "00Q2-1",
+        title: { "fr-CA": "Analyser les besoins et concevoir des solutions", "en-CA": "Analyze requirements and design solutions" },
+        criteria: [
+          { id: "00Q2-1.1", text: { "fr-CA": "Analyse rigoureuse des besoins fonctionnels", "en-CA": "Rigorous analysis of functional requirements" } },
+          { id: "00Q2-1.2", text: { "fr-CA": "Conception adéquate de l'algorithme ou de la solution", "en-CA": "Adequate design of the algorithm or solution" } }
+        ]
+      },
+      {
+        id: "00Q2-2",
+        title: { "fr-CA": "Coder et tester des programmes", "en-CA": "Code and test programs" },
+        criteria: [
+          { id: "00Q2-2.1", text: { "fr-CA": "Application correcte des règles de codage et des bonnes pratiques", "en-CA": "Correct application of coding rules and best practices" } },
+          { id: "00Q2-2.2", text: { "fr-CA": "Tests appropriés assurant la qualité du code produit", "en-CA": "Appropriate testing ensuring the quality of the produced code" } },
+          { id: "00Q2-2.3", text: { "fr-CA": "Documentation claire du code", "en-CA": "Clear documentation of the code" } }
+        ]
+      }
+    ]
+  },
+
+  // ── 00Q8 — Sécurité de l'information ─────────────────────────────────────
+  "00Q8": {
+    code: "00Q8",
+    title: {
+      "fr-CA": "Effectuer des opérations de prévention en matière de sécurité de l'information",
+      "en-CA": "Carry out prevention operations with regard to information security"
+    },
+    elements: [
+      {
+        id: "00Q8-1",
+        title: { "fr-CA": "Évaluer les risques liés à la sécurité de l'information", "en-CA": "Assess information security risks" },
+        criteria: [
+          { id: "00Q8-1.1", text: { "fr-CA": "Identification précise des vulnérabilités et des menaces", "en-CA": "Accurate identification of vulnerabilities and threats" } },
+          { id: "00Q8-1.2", text: { "fr-CA": "Évaluation juste du niveau de risque pour l'organisation", "en-CA": "Accurate assessment of the level of risk to the organization" } }
+        ]
+      },
+      {
+        id: "00Q8-2",
+        title: { "fr-CA": "Appliquer des mesures de prévention", "en-CA": "Apply preventive measures" },
+        criteria: [
+          { id: "00Q8-2.1", text: { "fr-CA": "Mise en place correcte des mesures de sécurité appropriées", "en-CA": "Correct implementation of appropriate security measures" } },
+          { id: "00Q8-2.2", text: { "fr-CA": "Respect des politiques et des normes de sécurité en vigueur", "en-CA": "Compliance with applicable security policies and standards" } },
+          { id: "00Q8-2.3", text: { "fr-CA": "Sensibilisation adéquate des utilisatrices et utilisateurs aux bonnes pratiques", "en-CA": "Adequate awareness of best practices among users" } }
+        ]
+      }
+    ]
+  },
+
+  // ── 00SF — Évaluation de composants logiciels et matériels ───────────────
+  "00SF": {
+    code: "00SF",
+    title: {
+      "fr-CA": "Évaluer des composants logiciels et matériels",
+      "en-CA": "Evaluate software and hardware components"
+    },
+    elements: [
+      {
+        id: "00SF-1",
+        title: { "fr-CA": "Analyser les besoins en composants", "en-CA": "Analyze component requirements" },
+        criteria: [
+          { id: "00SF-1.1", text: { "fr-CA": "Collecte rigoureuse des besoins fonctionnels et techniques", "en-CA": "Rigorous collection of functional and technical requirements" } },
+          { id: "00SF-1.2", text: { "fr-CA": "Comparaison pertinente des options disponibles", "en-CA": "Relevant comparison of available options" } }
+        ]
+      },
+      {
+        id: "00SF-2",
+        title: { "fr-CA": "Formuler des recommandations", "en-CA": "Make recommendations" },
+        criteria: [
+          { id: "00SF-2.1", text: { "fr-CA": "Recommandation justifiée et adaptée au contexte organisationnel", "en-CA": "Justified recommendation adapted to the organizational context" } },
+          { id: "00SF-2.2", text: { "fr-CA": "Communication claire des avantages et des limites des solutions proposées", "en-CA": "Clear communication of the advantages and limitations of the proposed solutions" } }
+        ]
+      }
+    ]
+  },
+
+  // ── 00SG — Soutien informatique aux utilisateurs ─────────────────────────
+  "00SG": {
+    code: "00SG",
+    title: {
+      "fr-CA": "Fournir du soutien informatique aux utilisatrices et utilisateurs",
+      "en-CA": "Provide users with technical support"
+    },
+    elements: [
+      {
+        id: "00SG-1",
+        title: { "fr-CA": "Diagnostiquer les problèmes techniques", "en-CA": "Diagnose technical problems" },
+        criteria: [
+          { id: "00SG-1.1", text: { "fr-CA": "Collecte appropriée des informations sur le problème signalé", "en-CA": "Appropriate collection of information on the reported problem" } },
+          { id: "00SG-1.2", text: { "fr-CA": "Identification correcte de la cause du problème", "en-CA": "Correct identification of the cause of the problem" } }
+        ]
+      },
+      {
+        id: "00SG-2",
+        title: { "fr-CA": "Résoudre les problèmes et accompagner les utilisateurs", "en-CA": "Resolve problems and support users" },
+        criteria: [
+          { id: "00SG-2.1", text: { "fr-CA": "Application efficace de la solution retenue", "en-CA": "Effective application of the chosen solution" } },
+          { id: "00SG-2.2", text: { "fr-CA": "Communication claire et adaptée au niveau technique de l'utilisateur", "en-CA": "Clear communication adapted to the user's technical level" } },
+          { id: "00SG-2.3", text: { "fr-CA": "Vérification de la satisfaction de l'utilisateur après l'intervention", "en-CA": "Verification of user satisfaction after the intervention" } }
+        ]
+      }
+    ]
   }
 
 };
@@ -165,6 +305,8 @@ const PROGRAMS = [
   { code: "420.BP", name: { "fr-CA": "Techniques de l'informatique — Programmation",            "en-CA": "Computer Science Technology — Programming" } },
   { code: "420.BR", name: { "fr-CA": "Techniques de l'informatique — Réseaux",                  "en-CA": "Computer Science Technology — Network Management and Security" } },
   { code: "420.BX", name: { "fr-CA": "Techniques de l'informatique — Jeux vidéo",               "en-CA": "Computer Science Technology — Video Game Technology" } },
+  // ── Programmer-analyst (AEC) ──────────────────────────────────────────
+  { code: "LEA.3Q", name: { "fr-CA": "Programmeur-analyste en technologies de l'information",   "en-CA": "Information Technology Programmer-Analyst" } },
   // ── AI & ML (AEC) ─────────────────────────────────────────────────────
   { code: "LEA.DQ", name: { "fr-CA": "Intelligence artificielle et apprentissage machine",       "en-CA": "Artificial Intelligence and Machine Learning" } },
   // ── Accounting ────────────────────────────────────────────────────────
@@ -176,6 +318,12 @@ const PROGRAMS = [
   // ── Interior design ───────────────────────────────────────────────────
   { code: "570.E0", name: { "fr-CA": "Design d'intérieur",                                       "en-CA": "Interior Design" } },
   { code: "NTA.21", name: { "fr-CA": "Design d'intérieur (AEC)",                                 "en-CA": "Interior Design (AEC)" } },
+  // ── Fashion (DEC) ─────────────────────────────────────────────────────
+  { code: "571.A0", name: { "fr-CA": "Design de la mode",                                        "en-CA": "Fashion Design" } },
+  { code: "571.C0", name: { "fr-CA": "Commercialisation de la mode",                             "en-CA": "Fashion Marketing" } },
+  // ── Fashion (AEC) ─────────────────────────────────────────────────────
+  { code: "NTC.0Q", name: { "fr-CA": "Design de la mode (AEC)",                                  "en-CA": "Fashion Design (AEC)" } },
+  { code: "NTC.1W", name: { "fr-CA": "Commercialisation de la mode (AEC)",                       "en-CA": "Fashion Marketing (AEC)" } },
   // ── Logistics ─────────────────────────────────────────────────────────
   { code: "LCA.5G", name: { "fr-CA": "Techniques de la logistique du transport (AEC)",           "en-CA": "Transportation Logistics Technology (AEC)" } },
   // ── Social media strategy (AEC) ───────────────────────────────────────
@@ -920,6 +1068,129 @@ const COURSES = {
             criteria: [
               { id: "01HY-5.1", text: { "fr-CA": "Autoévaluation honnête de sa performance en stage", "en-CA": "Honest self-assessment of internship performance" } },
               { id: "01HY-5.2", text: { "fr-CA": "Identification pertinente des axes d'amélioration", "en-CA": "Relevant identification of areas for improvement" } }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ── LEA.3Q — Programmeur-analyste en technologies de l'information ─────────
+  // Source: FR + EN course outlines received. 255h, pondération 1-16-2.
+  // 00SE and 00SH are shared with 420.BP/BR/BX.
+  // 00Q1, 00Q2, 00Q8, 00SF, 00SG added to SHARED_COMPETENCIES above.
+  "420-SG4-AS": {
+    title: {
+      "fr-CA": "Stage en technologies de l'information",
+      "en-CA": "Internship in Information Technology"
+    },
+    programs: ["LEA.3Q"],
+    hours: 255,
+    competencies: [
+      { ...SHARED_COMPETENCIES["00Q1"] },
+      { ...SHARED_COMPETENCIES["00Q2"] },
+      { ...SHARED_COMPETENCIES["00Q8"] },
+      { ...SHARED_COMPETENCIES["00SE"] },
+      { ...SHARED_COMPETENCIES["00SF"] },
+      { ...SHARED_COMPETENCIES["00SG"] },
+      { ...SHARED_COMPETENCIES["00SH"] },
+    ]
+  },
+
+  // ── 571.A0 / NTC.0Q — Design de la mode ───────────────────────────────────
+  // Source: FR + EN course outlines received. 120h, pondération 1-7-2.
+  "571-KY7-AS": {
+    title: {
+      "fr-CA": "Intégration design de mode (stage)",
+      "en-CA": "Fashion Design Integration (Internship)"
+    },
+    programs: ["571.A0", "NTC.0Q"],
+    hours: 120,
+    competencies: [
+      {
+        code: "00TW",
+        title: {
+          "fr-CA": "Élaborer des projets de collection pour des marchés visés",
+          "en-CA": "Develop collection projects for target markets"
+        },
+        elements: [
+          {
+            id: "00TW-1",
+            title: {
+              "fr-CA": "Analyser les marchés cibles et les tendances",
+              "en-CA": "Analyze target markets and trends"
+            },
+            criteria: [
+              { id: "00TW-1.1", text: { "fr-CA": "Identification précise des caractéristiques des marchés visés", "en-CA": "Accurate identification of target market characteristics" } },
+              { id: "00TW-1.2", text: { "fr-CA": "Analyse pertinente des tendances de la mode et du contexte commercial", "en-CA": "Relevant analysis of fashion trends and commercial context" } }
+            ]
+          },
+          {
+            id: "00TW-2",
+            title: {
+              "fr-CA": "Concevoir et développer la collection",
+              "en-CA": "Design and develop the collection"
+            },
+            criteria: [
+              { id: "00TW-2.1", text: { "fr-CA": "Cohérence de la collection avec l'identité de la marque et le marché cible", "en-CA": "Coherence of the collection with the brand identity and target market" } },
+              { id: "00TW-2.2", text: { "fr-CA": "Application rigoureuse des techniques de design de mode", "en-CA": "Rigorous application of fashion design techniques" } },
+              { id: "00TW-2.3", text: { "fr-CA": "Respect des contraintes de production et de budget", "en-CA": "Compliance with production and budget constraints" } }
+            ]
+          },
+          {
+            id: "00TW-3",
+            title: {
+              "fr-CA": "Présenter et défendre les projets de collection",
+              "en-CA": "Present and defend collection projects"
+            },
+            criteria: [
+              { id: "00TW-3.1", text: { "fr-CA": "Présentation claire et professionnelle de la collection", "en-CA": "Clear and professional presentation of the collection" } },
+              { id: "00TW-3.2", text: { "fr-CA": "Argumentation convaincante des choix créatifs et commerciaux", "en-CA": "Convincing argumentation of creative and commercial choices" } }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ── 571.C0 / NTC.1W — Commercialisation de la mode ────────────────────────
+  // Source: FR + EN course outlines received. 120h, pondération 1-7-1.
+  "571-KQ9-AS": {
+    title: {
+      "fr-CA": "Stage en commercialisation de la mode",
+      "en-CA": "Internship in Fashion Marketing"
+    },
+    programs: ["571.C0", "NTC.1W"],
+    hours: 120,
+    competencies: [
+      {
+        code: "00X1",
+        title: {
+          "fr-CA": "Relier les activités de commercialisation au fonctionnement d'une entreprise de mode",
+          "en-CA": "Link marketing activities to the operations of a fashion business"
+        },
+        elements: [
+          {
+            id: "00X1-1",
+            title: {
+              "fr-CA": "Analyser le fonctionnement de l'entreprise de mode",
+              "en-CA": "Analyze the operations of the fashion business"
+            },
+            criteria: [
+              { id: "00X1-1.1", text: { "fr-CA": "Compréhension juste de la structure organisationnelle et des processus internes", "en-CA": "Accurate understanding of the organizational structure and internal processes" } },
+              { id: "00X1-1.2", text: { "fr-CA": "Identification précise des liens entre les différentes fonctions de l'entreprise", "en-CA": "Accurate identification of links between the various business functions" } }
+            ]
+          },
+          {
+            id: "00X1-2",
+            title: {
+              "fr-CA": "Relier les activités de commercialisation aux opérations de l'entreprise",
+              "en-CA": "Link marketing activities to business operations"
+            },
+            criteria: [
+              { id: "00X1-2.1", text: { "fr-CA": "Intégration cohérente des activités de commercialisation dans les opérations globales de l'entreprise", "en-CA": "Coherent integration of marketing activities into the overall operations of the business" } },
+              { id: "00X1-2.2", text: { "fr-CA": "Application appropriée des stratégies de commercialisation adaptées au contexte de la mode", "en-CA": "Appropriate application of marketing strategies adapted to the fashion context" } },
+              { id: "00X1-2.3", text: { "fr-CA": "Évaluation rigoureuse des résultats des actions de commercialisation", "en-CA": "Rigorous evaluation of the results of marketing actions" } }
             ]
           }
         ]

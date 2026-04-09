@@ -738,10 +738,19 @@ function applyLanguage(lang, persist = true) {
   document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
     el.placeholder = t(el.getAttribute("data-i18n-placeholder"));
   });
-  // Update lang toggle button label
+  // Update lang toggle buttons — support both single-cycle and dual FR/EN pattern
   document.querySelectorAll(".lang-toggle-btn").forEach(btn => {
-    btn.setAttribute("data-lang-target", lang === "fr-CA" ? "en-CA" : "fr-CA");
-    btn.textContent = lang === "fr-CA" ? "EN" : "FR";
+    const target = btn.getAttribute("data-lang-target");
+    if (target) {
+      // Dedicated button (data-lang-target="fr-CA" or "en-CA"):
+      // highlight the active one, keep labels as-is
+      btn.style.opacity     = target === lang ? "0.4" : "1";
+      btn.style.fontWeight  = target === lang ? "400" : "600";
+      btn.style.pointerEvents = target === lang ? "none" : "";
+    } else {
+      // Legacy single-cycle button: update label to show what clicking will switch TO
+      btn.textContent = lang === "fr-CA" ? "EN" : "FR";
+    }
   });
   document.documentElement.lang = lang === "fr-CA" ? "fr" : "en";
 }

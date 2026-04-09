@@ -8,10 +8,20 @@ document.addEventListener("DOMContentLoaded", () => {
   initPage();
   setupWeeklyDropZone();
 
-  // Pre-load current session data if available
+  // Restore from main data (single-file students)
   const existing = loadData();
   if (existing?.profile?.full_name) {
     weeklyData = existing;
+  }
+
+  // Override with persisted merged session if fresher (multi-file students)
+  const saved = loadReportData();
+  if (saved?.profile?.full_name &&
+      saved.logs?.length >= (weeklyData?.logs?.length ?? 0)) {
+    weeklyData = saved;
+  }
+
+  if (weeklyData?.profile?.full_name) {
     renderAllWeeks();
     showReport();
   }
@@ -57,6 +67,7 @@ function handleWeeklyFiles(fileList) {
       showUploadError(t("error.no_files")); return;
     }
     weeklyData = result.data;
+    saveReportData(weeklyData); // persist so tab navigation doesn't lose the merge
     renderAllWeeks();
     showReport();
   });
@@ -74,6 +85,7 @@ function showReport() {
 
 function resetWeekly() {
   weeklyData = null;
+  clearReportData(); // clear persisted session
   document.getElementById("weekly-accordion").innerHTML = "";
   document.getElementById("phase-upload").classList.remove("hidden");
   document.getElementById("phase-report").classList.add("hidden");

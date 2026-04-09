@@ -26,21 +26,19 @@ let activeTeacher = "";
 
 document.addEventListener("DOMContentLoaded", () => {
   initPage();
-  applyLanguage(getCurrentLang());
   setupHubDrop();
 
-  // Re-render JS-generated content when language changes
-  document.querySelectorAll(".lang-toggle-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      // Wait one tick for applyLanguage (wired in app.js) to finish
-      setTimeout(() => {
-        if (students.length) {
-          populateFilterOptions();
-          applyFilters();
-        }
-      }, 50);
-    });
+  // applyLanguage is wired by initPage() in app.js.
+  // Hub additionally needs to re-render all JS-generated content on lang change.
+  // We do this by observing the html[lang] attribute which applyLanguage updates.
+  const observer = new MutationObserver(() => {
+    if (students.length) {
+      populateFilterOptions();
+      renderStats();          // re-renders quick-filter buttons
+      renderCurrentView();    // re-renders table / course / competency view
+    }
   });
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
 });
 
 function setupHubDrop() {
