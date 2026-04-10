@@ -170,10 +170,10 @@ function renderAllWeeks() {
   const accordion = document.getElementById("weekly-accordion");
   accordion.innerHTML = "";
 
-  // Current/in-progress week (not collapsible, just shown)
+  // Current/in-progress week — collapsible, open by default, marked as current
   if (current.length) {
     current.forEach(w => {
-      accordion.appendChild(buildWeekSection(w, weekMap[w], true, false));
+      accordion.appendChild(buildWeekSection(w, weekMap[w], true, true, true));
     });
   }
 
@@ -188,8 +188,8 @@ function renderAllWeeks() {
       accordion.appendChild(divider);
     }
     completed.forEach((w, i) => {
-      // First completed week open by default (most recent completed)
-      accordion.appendChild(buildWeekSection(w, weekMap[w], i === 0, true));
+      // Most recent completed week open by default
+      accordion.appendChild(buildWeekSection(w, weekMap[w], i === 0, true, false));
     });
   }
 
@@ -200,7 +200,7 @@ function renderAllWeeks() {
 }
 
 // ── Build one week section ────────────────────────────────────
-function buildWeekSection(weekStart, logs, defaultOpen, collapsible) {
+function buildWeekSection(weekStart, logs, defaultOpen, collapsible, isCurrent = false) {
   logs = [...logs].sort((a, b) => a.date.localeCompare(b.date));
 
   const weekEnd   = getWeekEnd(weekStart);
@@ -217,14 +217,16 @@ function buildWeekSection(weekStart, logs, defaultOpen, collapsible) {
   section.className = "weekly-section";
   section.style.cssText =
     "background:var(--bg-card);border-radius:var(--r-xl);" +
-    "box-shadow:var(--shadow-sm);margin-bottom:var(--sp-4);overflow:hidden";
+    "box-shadow:var(--shadow-sm);margin-bottom:var(--sp-4);overflow:hidden;" +
+    (isCurrent ? "border-left:3px solid var(--accent)" : "");
 
-  // Header
+  // Header — always collapsible now; cursor only when collapsible
   const header = document.createElement("div");
   header.style.cssText =
     "display:flex;align-items:center;gap:var(--sp-4);padding:var(--sp-4) var(--sp-5);" +
-    (collapsible ? "cursor:pointer;user-select:none;" : "");
-  header.setAttribute("role", collapsible ? "button" : "presentation");
+    "cursor:pointer;user-select:none;";
+  header.setAttribute("role", "button");
+  header.setAttribute("aria-expanded", defaultOpen ? "true" : "false");
 
   const weekLabel = `${t("weekly.week_label")} ${formatDate(weekStart + "T12:00:00")}`;
   const daysLabel = `${logs.length} ${logs.length > 1 ? (t("weekly.days") || "jours") : (t("weekly.day") || "jour")}`;
@@ -232,39 +234,44 @@ function buildWeekSection(weekStart, logs, defaultOpen, collapsible) {
     ? `<span style="font-size:1.1rem;background:var(--success);color:white;
                    border-radius:var(--r-pill);padding:0.1rem 0.6rem">✓ bilan</span>`
     : "";
+  const currentBadge = isCurrent
+    ? `<span style="font-size:1.1rem;background:var(--accent);color:white;
+                   border-radius:var(--r-pill);padding:0.1rem 0.6rem"
+        data-i18n="weekly.current_week">${t("weekly.current_week") || "en cours"}</span>`
+    : "";
 
   header.innerHTML = `
     <div style="flex:1;min-width:0">
       <div style="font-size:1.6rem;font-weight:600">${weekLabel}</div>
-      <div style="font-size:1.3rem;color:var(--text-subtle);margin-top:2px">
+      <div style="font-size:1.3rem;color:var(--text-subtle);margin-top:2px;
+                  display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2)">
         ${daysLabel} · ${formatDuration(totalMins)} · ${avgRating}/5
-        ${wrapBadge}
+        ${wrapBadge}${currentBadge}
       </div>
     </div>
     <button class="btn btn--ghost btn--sm no-print"
       onclick="event.stopPropagation();openWeekPrint('${weekStart}')"
       title="${t('weekly.open_print') || 'Ouvrir pour impression'}"
       style="flex-shrink:0;font-size:1.3rem">🖨</button>
-    ${collapsible ? `<span class="weekly-chevron" style="font-size:1.6rem;color:var(--text-subtle);
+    <span class="weekly-chevron" style="font-size:1.6rem;color:var(--text-subtle);
       transition:transform var(--dur-mod);transform:rotate(${defaultOpen ? "90deg" : "0deg"})"
-      aria-hidden="true">›</span>` : ""}`;
+      aria-hidden="true">›</span>`;
 
   // Body
   const body = document.createElement("div");
   body.style.cssText =
     "padding:0 var(--sp-5) var(--sp-5);" +
-    (collapsible && !defaultOpen ? "display:none" : "");
+    (!defaultOpen ? "display:none" : "");
 
   body.appendChild(buildWeekBody(logs, weekStart));
 
-  if (collapsible) {
-    header.addEventListener("click", () => {
-      const open = body.style.display !== "none";
-      body.style.display = open ? "none" : "";
-      const chevron = header.querySelector(".weekly-chevron");
-      if (chevron) chevron.style.transform = open ? "rotate(0deg)" : "rotate(90deg)";
-    });
-  }
+  header.addEventListener("click", () => {
+    const open = body.style.display !== "none";
+    body.style.display = open ? "none" : "";
+    header.setAttribute("aria-expanded", open ? "false" : "true");
+    const chevron = header.querySelector(".weekly-chevron");
+    if (chevron) chevron.style.transform = open ? "rotate(0deg)" : "rotate(90deg)";
+  });
 
   section.appendChild(header);
   section.appendChild(body);
@@ -379,7 +386,9 @@ function renderDayBarsInto(logs, container) {
     ...logs.map(l => l.task_total_minutes || l.day_duration_minutes || 0), 1);
   const PX_PER_MIN = 1/5;
   const targetH = Math.max(Math.round(maxMins * PX_PER_MIN), 80);
-  container.style.height = targetH + "px";
+  // Don't set a height on the container — let each column's inner wrapper do it
+  // so there's no dead space above the bars.
+  container.style.height = "";
 
   const actOrder = {};
   (weeklyData.activity_types || []).forEach((at, i) => { actOrder[at.type_id] = i; });
@@ -407,14 +416,19 @@ function renderDayBarsInto(logs, container) {
 
     return `
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center">
-        <div style="height:${colH}px;width:80%;display:flex;flex-direction:column-reverse;
-                    border-radius:3px 3px 0 0;overflow:hidden">${segments}</div>
+        <div style="height:${targetH}px;width:100%;display:flex;flex-direction:column;
+                    justify-content:flex-end;align-items:center">
+          <div style="height:${colH}px;width:80%;display:flex;flex-direction:column-reverse;
+                      border-radius:3px 3px 0 0;overflow:hidden">${segments}</div>
+        </div>
         <div style="width:0.8rem;height:0.8rem;border-radius:50%;
                     background:${ratingColor};margin:var(--sp-1) auto 0"
           title="${rating}/5"></div>
         <div style="font-size:1rem;color:var(--text-subtle);text-align:center;
                     margin-top:2px">${log.date.slice(5)}</div>
       </div>`;
+  }).join("");
+}
   }).join("");
 }
 

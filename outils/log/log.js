@@ -1099,7 +1099,12 @@ function _getCurrentCompetencies() {
 // competency code) for weekly, and from currentLog.competency_notes for daily.
 function renderCompetencyFields(container, mode) {
   const competencies = _getCurrentCompetencies();
-  if (!competencies.length) { container.innerHTML = ""; return; }
+  if (!competencies.length) {
+    container.innerHTML = "";
+    container.style.display = "none";
+    return;
+  }
+  container.style.display = "";
 
   const lang     = getCurrentLang();
   const isWeekly = mode === "weekly";
