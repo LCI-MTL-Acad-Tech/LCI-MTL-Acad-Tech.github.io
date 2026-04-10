@@ -312,6 +312,9 @@ const PROGRAMS = [
   // ── Accounting ────────────────────────────────────────────────────────
   { code: "410.B0", name: { "fr-CA": "Techniques de comptabilité et de gestion",                 "en-CA": "Accounting and Management Technology" } },
   { code: "LCA.71", name: { "fr-CA": "Comptabilité (AEC)",                                       "en-CA": "Accounting (AEC)" } },
+  // ── Business management ───────────────────────────────────────────────
+  { code: "410.D0", name: { "fr-CA": "Gestion de commerces",                                     "en-CA": "Business Management" } },
+  { code: "LCA.70", name: { "fr-CA": "Gestion de commerces (AEC)",                               "en-CA": "Business Management (AEC)" } },
   // ── Hospitality ───────────────────────────────────────────────────────
   { code: "430.A0", name: { "fr-CA": "Gestion d'un établissement de restauration",               "en-CA": "Food Service Management" } },
   { code: "430.B0", name: { "fr-CA": "Gestion hôtelière",                                        "en-CA": "Hotel Management" } },
@@ -632,6 +635,57 @@ const COURSES = {
             criteria: [
               { id: "01HY-5.1", text: { "fr-CA": "Autoévaluation honnête de sa performance en stage", "en-CA": "Honest self-assessment of internship performance" } },
               { id: "01HY-5.2", text: { "fr-CA": "Identification pertinente des axes d'amélioration", "en-CA": "Relevant identification of areas for improvement" } }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  // ── 410.D0 / LCA.70 — Business Management ─────────────────────────────────
+  // Source: Ministerial programme 410.D0 (2012, updated 2019).
+  // Competency 01JK is the internship competency for both DEC and AEC streams.
+  "410-DZ4-AS": {
+    title: {
+      "fr-CA": "Stage en gestion de commerces",
+      "en-CA": "Internship in Business Management"
+    },
+    programs: ["410.D0", "LCA.70"],
+    hours: 105,
+    competencies: [
+      {
+        code: "01JK",
+        title: {
+          "fr-CA": "Assumer les fonctions d'un poste de travail",
+          "en-CA": "Perform the functions of a work position"
+        },
+        elements: [
+          {
+            id: "01JK-1",
+            title: { "fr-CA": "S'intégrer en milieu de travail", "en-CA": "Integrate into the workplace" },
+            criteria: [
+              { id: "01JK-1.1", text: { "fr-CA": "Respect des politiques, règlements et procédures de l'entreprise", "en-CA": "Compliance with company policies, rules and procedures" } },
+              { id: "01JK-1.2", text: { "fr-CA": "Adaptation rapide à la culture organisationnelle", "en-CA": "Rapid adaptation to the organizational culture" } },
+              { id: "01JK-1.3", text: { "fr-CA": "Établissement de relations professionnelles constructives", "en-CA": "Establishment of constructive professional relationships" } }
+            ]
+          },
+          {
+            id: "01JK-2",
+            title: { "fr-CA": "Exercer les activités liées au poste", "en-CA": "Carry out position-related activities" },
+            criteria: [
+              { id: "01JK-2.1", text: { "fr-CA": "Exécution adéquate des tâches confiées selon les standards de qualité attendus", "en-CA": "Adequate completion of assigned tasks according to expected quality standards" } },
+              { id: "01JK-2.2", text: { "fr-CA": "Gestion efficace des priorités et du temps de travail", "en-CA": "Effective management of priorities and working time" } },
+              { id: "01JK-2.3", text: { "fr-CA": "Résolution autonome des problèmes courants liés au poste", "en-CA": "Autonomous resolution of common position-related problems" } },
+              { id: "01JK-2.4", text: { "fr-CA": "Prise d'initiative appropriée dans l'exercice des fonctions", "en-CA": "Appropriate initiative in carrying out duties" } }
+            ]
+          },
+          {
+            id: "01JK-3",
+            title: { "fr-CA": "Analyser son expérience de travail", "en-CA": "Analyze the work experience" },
+            criteria: [
+              { id: "01JK-3.1", text: { "fr-CA": "Identification des compétences développées et des lacunes à combler", "en-CA": "Identification of developed competencies and gaps to address" } },
+              { id: "01JK-3.2", text: { "fr-CA": "Évaluation honnête de sa contribution à l'organisation", "en-CA": "Honest assessment of contribution to the organization" } },
+              { id: "01JK-3.3", text: { "fr-CA": "Formulation d'objectifs de développement professionnel pertinents", "en-CA": "Formulation of relevant professional development objectives" } }
             ]
           }
         ]
