@@ -1809,6 +1809,14 @@ body { overflow-x: hidden; }
   justify-content: center;
 }
 
+/* Active language button — dimmed and non-interactive */
+.lang-toggle-btn--active {
+  opacity: 0.4;
+  font-weight: 400;
+  pointer-events: none;
+  cursor: default;
+}
+
 .theme-toggle-btn svg {
   flex-shrink: 0;
   transition: transform var(--dur-mod) var(--ease-exp);

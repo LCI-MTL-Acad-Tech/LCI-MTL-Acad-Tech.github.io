@@ -116,6 +116,8 @@ function downloadWeeklyJSON() {
   a.click();
   URL.revokeObjectURL(url);
   stampDownload("w"); // record weekly download for calendar view
+  // Show upload reminder (respects snooze)
+  setTimeout(() => showUploadReminder("w"), 400);
 }
 
 // ── Week helpers ──────────────────────────────────────────────

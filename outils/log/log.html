@@ -2,6 +2,7 @@
 <html lang="fr" data-theme="light">
 <head>
   <meta charset="UTF-8">
+  <meta name="upload-form-url" content="https://forms.cloud.microsoft/r/LE4Dc2gZaE">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Journal du jour</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -312,16 +313,24 @@
             </div>
           </div>
 
-          <!-- Upload reminder -->
-          <div class="card mt-4" style="border-left:4px solid var(--accent)">
+          <!-- Upload reminder: static fallback for students who dismiss the toast -->
+          <!-- The dynamic toast (showUploadReminder) fires after each download.   -->
+          <!-- This card covers the config file specifically, always visible.       -->
+          <div class="card mt-4 card--flat" style="border-left:4px solid var(--accent)">
             <div style="display:flex;align-items:flex-start;gap:var(--sp-4)">
-              <span style="font-size:2.4rem;flex-shrink:0">📤</span>
+              <span style="font-size:2rem;flex-shrink:0">📤</span>
               <div>
-                <div style="font-weight:600;font-size:1.5rem;margin-bottom:var(--sp-2)" data-i18n="log.upload_form_title"></div>
-                <p style="font-size:1.4rem;color:var(--text-muted);margin-bottom:var(--sp-3)" data-i18n="log.upload_form_hint"></p>
-                <a href="https://forms.cloud.microsoft/r/LE4Dc2gZaE" target="_blank" rel="noopener"
-                  class="btn btn--primary" data-i18n="log.upload_form_cta">
-                </a>
+                <div style="font-size:1.4rem;font-weight:600;margin-bottom:var(--sp-1)"
+                  data-i18n="log.upload_form_title"></div>
+                <p style="font-size:1.3rem;color:var(--text-muted);margin-bottom:var(--sp-3)"
+                  data-i18n="log.upload_form_hint"></p>
+                <div style="display:flex;flex-wrap:wrap;gap:var(--sp-3)">
+                  <a id="log-form-link" href="https://forms.cloud.microsoft/r/LE4Dc2gZaE"
+                    target="_blank" rel="noopener"
+                    class="btn btn--primary btn--sm" data-i18n="log.upload_form_cta"></a>
+                  <a href="index.html"
+                    class="btn btn--ghost btn--sm" data-i18n="remind.config_export_btn">💾 Config</a>
+                </div>
               </div>
             </div>
           </div>

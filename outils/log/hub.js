@@ -28,17 +28,27 @@ document.addEventListener("DOMContentLoaded", () => {
   initPage();
   setupHubDrop();
 
-  // applyLanguage is wired by initPage() in app.js.
-  // Hub additionally needs to re-render all JS-generated content on lang change.
-  // We do this by observing the html[lang] attribute which applyLanguage updates.
-  const observer = new MutationObserver(() => {
+  // Re-render all JS-generated content when language changes
+  const langObserver = new MutationObserver(() => {
     if (students.length) {
       populateFilterOptions();
-      renderStats();          // re-renders quick-filter buttons
-      renderCurrentView();    // re-renders table / course / competency view
+      renderStats();
+      renderHoursChart();
+      renderProgramPie();
+      renderCurrentView();
     }
   });
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
+  langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
+
+  // Re-render hours chart when the card resizes (responsive bar widths)
+  const chartWrap = document.querySelector(".bar-chart-wrap");
+  if (chartWrap && window.ResizeObserver) {
+    let resizeTimer;
+    new ResizeObserver(() => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => { if (students.length) renderHoursChart(); }, 60);
+    }).observe(chartWrap);
+  }
 });
 
 function setupHubDrop() {
@@ -106,22 +116,74 @@ function loadFiles(fileList) {
       .filter(p => p?.data)
       .map(p => ({ ...p, type: detectFileType(p.data) }));
 
+    // Separate config files from log/report files
+    const configFiles = enriched.filter(p => p.type === "config");
     const valid = enriched.filter(p =>
       p.data.profile?.full_name && p.type !== "config" && p.type !== "unknown"
     );
-    if (!valid.length) {
+
+    // Build config context map: uuid → context (planned_absences, work_days, work_hours)
+    // Config files take precedence over context embedded in log files
+    const configByUUID = {};
+    configFiles.forEach(({ data: d }) => {
+      const uid = d.meta?.student_uuid || d.profile?.student_id;
+      if (uid && d.context) configByUUID[uid] = d.context;
+    });
+
+    if (!valid.length && !configFiles.length) {
       setStatus("Aucun fichier valide trouvé.", "error"); return;
     }
+    if (!valid.length && configFiles.length) {
+      // Only configs uploaded — merge context into existing rows and rebuild
+      Object.entries(configByUUID).forEach(([uid, ctx]) => {
+        const existing = students.findIndex(s => s.uuid === uid);
+        if (existing < 0) return;
 
-    // Group by UUID; track file types per student
-    const byUUID     = {}; // uuid → [data, ...]
-    const typesByUUID = {}; // uuid → { daily, weekly, full, reflection }
+        // Preserve existing file type counts before rebuilding
+        const prevCounts = students[existing].file_type_counts || {};
+
+        // Rebuild row with overlaid config context
+        // .raw holds the original data object — we need to deep-merge context
+        const mergedData = {
+          ...students[existing].raw,
+          context: {
+            ...students[existing].raw.context,
+            planned_absences:    ctx.planned_absences    ?? students[existing].raw.context?.planned_absences    ?? [],
+            work_days:           ctx.work_days           ?? students[existing].raw.context?.work_days           ?? [1,2,3,4,5],
+            work_hours:          ctx.work_hours          ?? students[existing].raw.context?.work_hours,
+            calendar_week_start: ctx.calendar_week_start ?? students[existing].raw.context?.calendar_week_start ?? 1,
+          },
+        };
+        students[existing] = buildRow(mergedData);
+        students[existing].file_type_counts = {
+          ...prevCounts,
+          config: (prevCounts.config || 0) + 1,
+        };
+      });
+      const nC = configFiles.length;
+      setStatus(`${nC} fichier${nC > 1 ? "s" : ""} de configuration traité${nC > 1 ? "s" : ""}.`);
+      populateFilterOptions();
+      applyFilters();
+      return;
+    }
+
+    // Group log files by UUID
+    const byUUID     = {};
+    const typesByUUID = {};
 
     valid.forEach(({ data: d, type }) => {
       const uid = d.meta?.student_uuid || d.profile?.student_id || Math.random().toString();
       (byUUID[uid] = byUUID[uid] || []).push(d);
-      const c = (typesByUUID[uid] = typesByUUID[uid] || { daily:0, weekly:0, full:0, reflection:0 });
+      const c = (typesByUUID[uid] = typesByUUID[uid] || { daily:0, weekly:0, full:0, reflection:0, config:0 });
       if (type in c) c[type]++;
+    });
+
+    // Count config files per UUID
+    configFiles.forEach(({ data: d }) => {
+      const uid = d.meta?.student_uuid || d.profile?.student_id;
+      if (!uid) return;
+      const c = (typesByUUID[uid] = typesByUUID[uid] || { daily:0, weekly:0, full:0, reflection:0, config:0 });
+      c.config++;
     });
 
     const newRows = Object.entries(byUUID).map(([uid, grp]) => {
@@ -132,8 +194,24 @@ function loadFiles(fileList) {
         const merged = mergeInternshipFiles(grp);
         base = merged.valid ? merged.data : grp[0];
       }
+
+      // If a config file was uploaded for this student, overlay its context fields
+      // (planned_absences, work_days, work_hours take priority over what's in log files)
+      if (configByUUID[uid]) {
+        base = {
+          ...base,
+          context: {
+            ...base.context,
+            planned_absences:    configByUUID[uid].planned_absences    ?? base.context?.planned_absences    ?? [],
+            work_days:           configByUUID[uid].work_days           ?? base.context?.work_days           ?? [1,2,3,4,5],
+            work_hours:          configByUUID[uid].work_hours          ?? base.context?.work_hours,
+            calendar_week_start: configByUUID[uid].calendar_week_start ?? base.context?.calendar_week_start ?? 1,
+          },
+        };
+      }
+
       const row = buildRow(base);
-      row.file_type_counts = typesByUUID[uid] || { daily:0, weekly:0, full:0, reflection:0 };
+      row.file_type_counts = typesByUUID[uid] || { daily:0, weekly:0, full:0, reflection:0, config:0 };
       return row;
     });
 
@@ -141,12 +219,13 @@ function loadFiles(fileList) {
     newRows.forEach(r => {
       const existing = students.findIndex(s => s.uuid === r.uuid);
       if (existing >= 0) {
-        const prev = students[existing].file_type_counts || { daily:0, weekly:0, full:0, reflection:0 };
+        const prev = students[existing].file_type_counts || { daily:0, weekly:0, full:0, reflection:0, config:0 };
         r.file_type_counts = {
           daily:      prev.daily      + r.file_type_counts.daily,
           weekly:     prev.weekly     + r.file_type_counts.weekly,
           full:       prev.full       + r.file_type_counts.full,
           reflection: prev.reflection + r.file_type_counts.reflection,
+          config:     prev.config     + r.file_type_counts.config,
         };
         students[existing] = r;
       } else {
@@ -156,10 +235,11 @@ function loadFiles(fileList) {
 
     const nS = students.length;
     const nF = valid.length;
-    setStatus(
-      `${nS} étudiant·e${nS > 1 ? "·s" : ""} chargé·e${nS > 1 ? "·s" : ""} — ` +
-      `${nF} fichier${nF > 1 ? "s" : ""} traité${nF > 1 ? "s" : ""}.`
-    );
+    const nC = configFiles.length;
+    let statusMsg = `${nS} étudiant·e${nS > 1 ? "·s" : ""} chargé·e${nS > 1 ? "·s" : ""} — ${nF} fichier${nF > 1 ? "s" : ""} traité${nF > 1 ? "s" : ""}`;
+    if (nC > 0) statusMsg += ` + ${nC} config`;
+    setStatus(statusMsg + ".");
+
     document.getElementById("btn-csv").style.display   = "";
     document.getElementById("btn-clear").style.display = "";
     document.getElementById("hub-dashboard").style.display = "block";
@@ -176,7 +256,7 @@ function clearAll() {
   document.getElementById("btn-csv").style.display = "none";
   document.getElementById("btn-clear").style.display = "none";
   document.getElementById("hub-upload-strip")?.classList.remove("hub-upload-strip--loaded");
-  setStatus("Aucun fichier chargé — dépose les JSON des étudiant·e·s ici.");
+  setStatus("Dépose les JSON des étudiant·e·s ici — journaux, bilans et fichiers de configuration.");
 }
 
 function setStatus(msg) {
@@ -184,30 +264,105 @@ function setStatus(msg) {
   if (el) el.textContent = msg;
 }
 
+// ── Work-day helpers (hub-side) ───────────────────────────────
+// Count expected working days in [fromDate, toDate] inclusive,
+// respecting work_days schedule and excluding planned_absences.
+// Count expected working days in [fromISO, toISO] inclusive,
+// respecting work_days schedule and excluding planned_absences.
+// Optimized: full weeks (Mon→Sun or configured boundaries) are counted
+// in bulk; only the partial weeks at each end are iterated day-by-day.
+function countWorkDays(fromISO, toISO, workDays, absenceDates) {
+  if (!fromISO || !toISO || fromISO > toISO) return 0;
+
+  const absent    = new Set(absenceDates || []);
+  const workSet   = new Set(workDays || [1,2,3,4,5]);
+  const daysPerWk = workSet.size; // how many days/week are work days
+
+  let from = new Date(fromISO + "T12:00:00");
+  const to = new Date(toISO   + "T12:00:00");
+  let count = 0;
+
+  // Advance to the next Monday (start of a full ISO week boundary)
+  while (from <= to && from.getDay() !== 1) {
+    if (workSet.has(from.getDay()) && !absent.has(from.toISOString().slice(0,10)))
+      count++;
+    from.setDate(from.getDate() + 1);
+  }
+
+  // Count full weeks in bulk, then subtract absences that fall within them
+  if (from <= to) {
+    const msLeft      = to - from + 86400000; // inclusive
+    const fullWeeks   = Math.floor(msLeft / (7 * 86400000));
+    const fullWeekEnd = new Date(from.getTime() + fullWeeks * 7 * 86400000 - 86400000);
+
+    if (fullWeeks > 0) {
+      count += fullWeeks * daysPerWk;
+      // Subtract planned absences that fall within the full-weeks block
+      absent.forEach(iso => {
+        const ad = new Date(iso + "T12:00:00");
+        if (ad >= from && ad <= fullWeekEnd && workSet.has(ad.getDay())) count--;
+      });
+      from = new Date(fullWeekEnd.getTime() + 86400000);
+    }
+  }
+
+  // Remaining partial week — day-by-day
+  while (from <= to) {
+    if (workSet.has(from.getDay()) && !absent.has(from.toISOString().slice(0,10)))
+      count++;
+    from.setDate(from.getDate() + 1);
+  }
+
+  return Math.max(count, 0);
+}
+
+// Count expected working days that have no log and are not planned absences,
+// from the day after lastLogDate up to and including today.
+function countWorkingDaysAbsent(lastLogISO, todayISO, workDays, absenceDates) {
+  if (!lastLogISO) return null;
+  const d = new Date(lastLogISO + "T12:00:00");
+  d.setDate(d.getDate() + 1); // start the day after last log
+  const from = d.toISOString().slice(0, 10);
+  if (from > todayISO) return 0;
+  return countWorkDays(from, todayISO, workDays, absenceDates);
+}
+
 // ── Build row data from one student JSON ──────────────────────
 function buildRow(data) {
   const logs  = (data.logs || []).sort((a, b) => a.date.localeCompare(b.date));
   const today = new Date().toISOString().slice(0, 10);
   const ctx   = data.context || {};
-  const startDate   = ctx.start_date;
-  const hoursPerDay = parseFloat(ctx.hours_per_day) || 7;
 
-  // Days elapsed since start (work days only, rough 5/7)
-  const calDays = startDate
-    ? Math.max(Math.floor((new Date(today) - new Date(startDate)) / 86400000), 0)
-    : 0;
-  const workDaysElapsed = Math.round(calDays * 5 / 7);
-  // Use fixed total target if set, otherwise estimate from daily pace
+  const startDate      = ctx.start_date;
+  const endDate        = ctx.scheduled_end_date;
+  const workDays       = ctx.work_days   || [1,2,3,4,5];
+  const workHours      = ctx.work_hours  || { h: 7, m: 30 };
+  const absenceDates   = (ctx.planned_absences || []).map(a => a.date);
+  const hoursPerDay    = (workHours.h * 60 + workHours.m) / 60;  // decimal for math
   const totalTarget    = parseFloat(ctx.total_hours_target) || null;
-  const expectedHours  = totalTarget
-    ? +(totalTarget * (calDays / Math.max(
-        Math.floor((new Date(ctx.scheduled_end_date || "2099-01-01") - new Date(startDate || "2099-01-01")) / 86400000),
-        1))).toFixed(1)
+
+  // Real work-days elapsed: start → yesterday (today not yet finished)
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayISO    = yesterday.toISOString().slice(0, 10);
+  const workDaysElapsed = startDate
+    ? countWorkDays(startDate, yesterdayISO, workDays, absenceDates)
+    : 0;
+
+  // Expected hours so far
+  const expectedHours = totalTarget
+    ? (() => {
+        const totalWorkDays = startDate && endDate
+          ? countWorkDays(startDate, endDate, workDays, absenceDates)
+          : 1;
+        return +(totalTarget * (workDaysElapsed / Math.max(totalWorkDays, 1))).toFixed(1);
+      })()
     : +(workDaysElapsed * hoursPerDay).toFixed(1);
-  const actualHours     = +(logs.reduce((s, l) =>
+
+  const actualHours = +(logs.reduce((s, l) =>
     s + (l.task_total_minutes || l.day_duration_minutes || 0), 0) / 60).toFixed(1);
 
-  const trackPct = expectedHours > 0 ? Math.round((actualHours / expectedHours) * 100) : null;
+  const trackPct  = expectedHours > 0 ? Math.round((actualHours / expectedHours) * 100) : null;
   const trackBand = trackPct === null ? "none"
     : trackPct >= 90 ? "green"
     : trackPct >= 70 ? "amber"
@@ -219,12 +374,16 @@ function buildRow(data) {
     .filter(l => getWeekStartISO(l.date) === weekStart)
     .reduce((s, l) => s + (l.task_total_minutes || l.day_duration_minutes || 0), 0) / 60).toFixed(1);
 
-  const lastLog = logs[logs.length - 1]?.date || null;
-  const daysSince = lastLog
+  // AWOL: working days absent = expected work days since last log with no log and no planned absence
+  const lastLog    = logs[logs.length - 1]?.date || null;
+  const workingDaysAbsent = countWorkingDaysAbsent(lastLog, today, workDays, absenceDates);
+
+  // Keep calendar days_since for display only (date label)
+  const daysSince  = lastLog
     ? Math.floor((new Date(today) - new Date(lastLog)) / 86400000)
     : null;
 
-  const ratings = logs.filter(l => l.day_rating).map(l => l.day_rating);
+  const ratings   = logs.filter(l => l.day_rating).map(l => l.day_rating);
   const avgRating = ratings.length
     ? +(ratings.reduce((a, b) => a + b) / ratings.length).toFixed(1) : null;
 
@@ -234,23 +393,17 @@ function buildRow(data) {
     actTotals[tid] = (actTotals[tid] || 0) + (t.duration_minutes || 0);
   }));
 
-  // Enrich with last obstacle, plan_tomorrow, weekly wrap for hub display
   const lastWithObstacle = [...logs].reverse().find(l => l.obstacle);
   const lastWithPlan     = [...logs].reverse().find(l => l.plan_tomorrow);
   const lastWrap         = [...logs].reverse().find(l => l.weekly_wrap?.highlight);
 
   // ── Competency coverage ───────────────────────────────────────
-  // For each competency in the student's course, count:
-  //   weekly_notes: number of distinct weeks with a weekly_wrap.competency_notes entry
-  //   daily_notes:  number of distinct days with a log.competency_notes entry
-  // Requires courses.js to be loaded.
   let competency_coverage = [];
   const courseCode  = ctx.internship_course_code || "generic";
   const programCode = data.profile?.program || "";
   if (typeof getStudentCompetencies === "function") {
     const comps = getStudentCompetencies(courseCode, programCode);
 
-    // Build week-key helper inline (same logic as getWeekStartISO)
     const toWeekKey = dateStr => {
       const d = new Date(dateStr + "T12:00:00");
       const day = d.getDay() || 7;
@@ -258,84 +411,61 @@ function buildRow(data) {
       return d.toISOString().slice(0, 10);
     };
 
-    // Count elapsed weeks with ≥1 log
-    const elapsedWeeks = new Set(logs.map(l => toWeekKey(l.date))).size;
-
     competency_coverage = comps.map(comp => {
-      // For each elapsed week, score = number of daily notes that week if any exist,
-      // otherwise 1 if a weekly note exists, otherwise 0.
-      // Total engagement = sum of weekly scores.
       const allWeeks = new Set(logs.map(l => toWeekKey(l.date)));
-
-      let totalEngagement = 0;
-      let weeklyCount     = 0; // weeks with a weekly note (for display)
-      let dailyCount      = 0; // total daily note days across all weeks
+      let totalEngagement = 0, weeklyCount = 0, dailyCount = 0;
 
       allWeeks.forEach(wk => {
-        // Logs in this week
-        const weekLogs = logs.filter(l => toWeekKey(l.date) === wk);
-
-        // Daily notes this week
+        const weekLogs  = logs.filter(l => toWeekKey(l.date) === wk);
         const dailyDays = weekLogs.filter(l => l.competency_notes?.[comp.code]);
-        const d = dailyDays.length;
-
-        // Weekly note this week (on the wrap day log)
+        const d         = dailyDays.length;
         const hasWeekly = weekLogs.some(l => l.weekly_wrap?.competency_notes?.[comp.code]);
         if (hasWeekly) weeklyCount++;
         dailyCount += d;
-
-        // Score: daily overrides if any daily notes exist
         totalEngagement += d > 0 ? d : (hasWeekly ? 1 : 0);
       });
 
       const elapsedWeeks = allWeeks.size;
-      // Max possible = elapsed_weeks (if only weekly notes) or higher (if daily notes)
-      // For display normalisation we use elapsed_weeks as baseline denominator
       const pct = elapsedWeeks > 0
         ? Math.min(100, Math.round((totalEngagement / elapsedWeeks) * 100))
         : 0;
 
-      return {
-        code:              comp.code,
-        title:             comp.title,
-        weekly_count:      weeklyCount,
-        daily_count:       dailyCount,
-        elapsed_weeks:     elapsedWeeks,
-        total_engagement:  totalEngagement,
-        pct,
-      };
+      return { code: comp.code, title: comp.title, weekly_count: weeklyCount,
+               daily_count: dailyCount, elapsed_weeks: elapsedWeeks,
+               total_engagement: totalEngagement, pct };
     });
   }
 
   return {
-    uuid:            data.meta?.student_uuid || data.profile?.student_id,
-    name:            data.profile?.full_name || "—",
-    student_id:      data.profile?.student_id || "—",
-    email:           data.profile?.email || "",
-    program:         data.profile?.program || "—",
-    teacher:         data.profile?.supervising_professor || "—",
-    cohort:          data.profile?.cohort || "—",
-    pathway:         data.pathway || "—",
-    course_code:     courseCode,
-    days_logged:     logs.length,
-    work_days_elapsed: workDaysElapsed,
-    expected_hours:  expectedHours,
-    actual_hours:    actualHours,
-    track_pct:       trackPct,
-    track_band:      trackBand,
-    week_hours:      weekHours,
-    last_log:        lastLog,
-    days_since:      daysSince,
-    avg_rating:      avgRating,
-    has_reflection:  !!(data.reflection && Object.keys(data.reflection).length > 0),
-    act_totals:      actTotals,
-    mood_points:     logs.map(l => l.day_rating).filter(Boolean),
-    last_obstacle:   lastWithObstacle ? { date: lastWithObstacle.date, text: lastWithObstacle.obstacle, response: lastWithObstacle.obstacle_response } : null,
-    last_plan:       lastWithPlan     ? { date: lastWithPlan.date,     text: lastWithPlan.plan_tomorrow } : null,
-    last_wrap:       lastWrap         ? { date: lastWrap.date,         wrap: lastWrap.weekly_wrap }       : null,
-    total_target:    parseFloat(ctx.total_hours_target) || null,
+    uuid:               data.meta?.student_uuid || data.profile?.student_id,
+    name:               data.profile?.full_name || "—",
+    student_id:         data.profile?.student_id || "—",
+    email:              data.profile?.email || "",
+    program:            data.profile?.program || "—",
+    teacher:            data.profile?.supervising_professor || "—",
+    cohort:             data.profile?.cohort || "—",
+    pathway:            data.pathway || "—",
+    course_code:        courseCode,
+    days_logged:        logs.length,
+    work_days_elapsed:  workDaysElapsed,
+    expected_hours:     expectedHours,
+    actual_hours:       actualHours,
+    track_pct:          trackPct,
+    track_band:         trackBand,
+    week_hours:         weekHours,
+    last_log:           lastLog,
+    days_since:         daysSince,
+    working_days_absent: workingDaysAbsent,
+    avg_rating:         avgRating,
+    has_reflection:     !!(data.reflection && Object.keys(data.reflection).length > 0),
+    act_totals:         actTotals,
+    mood_points:        logs.map(l => l.day_rating).filter(Boolean),
+    last_obstacle:      lastWithObstacle ? { date: lastWithObstacle.date, text: lastWithObstacle.obstacle, response: lastWithObstacle.obstacle_response } : null,
+    last_plan:          lastWithPlan     ? { date: lastWithPlan.date, text: lastWithPlan.plan_tomorrow } : null,
+    last_wrap:          lastWrap         ? { date: lastWrap.date, wrap: lastWrap.weekly_wrap }           : null,
+    total_target:       totalTarget,
     competency_coverage,
-    raw:             data,
+    raw:                data,
   };
 }
 
@@ -522,11 +652,16 @@ function toggleQuickFilter(field, val) {
 }
 
 // ── AWOL alerts ──────────────────────────────────────────────
-const AWOL_DAYS = 3; // flag after this many days without a log
+// AWOL thresholds in WORKING days (not calendar days):
+// 2+ working days absent without a log → MIA
+// 4+ working days absent              → AWOL
+const AWOL_WORK_DAYS = 4;
+const MIA_WORK_DAYS  = 2;
 
 function getAWOLStudents() {
-  return filtered.filter(s => s.days_since !== null && s.days_since >= AWOL_DAYS)
-    .sort((a, b) => b.days_since - a.days_since);
+  return filtered.filter(s =>
+    s.working_days_absent !== null && s.working_days_absent >= MIA_WORK_DAYS
+  ).sort((a, b) => b.working_days_absent - a.working_days_absent);
 }
 
 function renderAWOL() {
@@ -535,37 +670,60 @@ function renderAWOL() {
   if (!awol.length) { section.style.display = "none"; return; }
   section.style.display = "block";
 
-  document.getElementById("awol-title").textContent =
-    awol.length === 1
-      ? "1 étudiant·e sans journal depuis 3 jours ou plus"
-      : `${awol.length} étudiant·e·s sans journal depuis 3 jours ou plus`;
+  const lang = getCurrentLang();
+  const isFr = lang === "fr-CA";
+
+  document.getElementById("awol-title").textContent = awol.length === 1
+    ? (isFr ? "1 étudiant·e absent·e sans journal (jours ouvrables)" : "1 student absent without a log (working days)")
+    : (isFr ? `${awol.length} étudiant·e·s absent·e·s sans journal (jours ouvrables)` : `${awol.length} students absent without a log (working days)`);
 
   document.getElementById("awol-subtitle").textContent =
-    "Adresses e-mail disponibles pour un suivi rapide.";
+    isFr ? "Jours = jours ouvrables prévus sans entrée de journal (congés planifiés exclus)."
+          : "Days = scheduled working days with no log entry (planned absences excluded).";
 
   document.getElementById("awol-list").innerHTML = awol.map(s => {
-    const severity = s.days_since >= 7 ? "var(--danger)"
-      : s.days_since >= 5 ? "var(--warning)"
+    const wda = s.working_days_absent;
+    const severity = wda >= AWOL_WORK_DAYS ? "var(--danger)"
+      : wda >= 3                           ? "var(--warning)"
       : "var(--text-muted)";
-    const badge = s.days_since >= 7 ? "⛔ AWOL"
-      : s.days_since >= 5 ? "⚠ En retard"
-      : "⚠ MIA";
+    const badge = wda >= AWOL_WORK_DAYS
+      ? "⛔ AWOL"
+      : wda >= 3 ? "⚠ " + (isFr ? "En retard" : "Late")
+      :            "⚠ MIA";
+
+    // Show planned absences count if any — explains why fewer calendar days flagged
+    const absenceCtx  = s.raw?.context?.planned_absences;
+    const absenceNote = absenceCtx?.length
+      ? `<span style="font-size:1.1rem;color:var(--text-subtle)">
+           (${absenceCtx.length} ${isFr ? "congé·s planifié·s" : "planned absence·s"})
+         </span>` : "";
+
     const lastPlan = s.last_plan
-      ? `<span style="font-size:1.2rem;color:var(--text-subtle)"> · Planifié : ${escHtml(s.last_plan.text.slice(0,60))}${s.last_plan.text.length > 60 ? "…" : ""}</span>`
+      ? `<span style="font-size:1.2rem;color:var(--text-subtle)"> · ${isFr ? "Planifié" : "Planned"} : ${escHtml(s.last_plan.text.slice(0, 60))}${s.last_plan.text.length > 60 ? "…" : ""}</span>`
       : "";
+
     return `
       <div style="display:flex;align-items:center;gap:var(--sp-4);
                   padding:var(--sp-3) 0;border-bottom:1px solid rgba(255,107,112,.2)">
         <span style="color:${severity};font-weight:700;width:6rem;flex-shrink:0">${badge}</span>
-        <div style="flex:1">
-          <span style="font-weight:600">${escHtml(s.name)}</span>
-          <span style="color:var(--text-subtle);font-size:1.3rem"> · ${escHtml(s.program?.slice(0,20))}…</span>
-          ${lastPlan}
+        <div style="flex:1;min-width:0">
+          <button onclick="openStudentPanel('${escHtml(s.uuid)}')"
+            style="background:none;border:none;cursor:pointer;font:inherit;font-size:1.4rem;
+                   font-weight:600;padding:0;color:var(--accent);text-decoration:underline;
+                   text-underline-offset:3px;text-align:left">
+            ${escHtml(s.name)}
+          </button>
+          <span style="color:var(--text-subtle);font-size:1.3rem"> · ${escHtml(s.program)}</span>
+          ${absenceNote}${lastPlan}
         </div>
-        <span style="color:${severity};font-weight:700;font-size:1.5rem;flex-shrink:0">J-${s.days_since}</span>
-        <span style="color:var(--text-subtle);font-size:1.3rem;flex-shrink:0">
-          ${s.last_log || "jamais"}
-        </span>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="color:${severity};font-weight:700;font-size:1.5rem">
+            ${wda} ${isFr ? "j. ouv." : "work day·s"}
+          </div>
+          <div style="color:var(--text-subtle);font-size:1.2rem">
+            ${isFr ? "dernier" : "last"}: ${s.last_log || (isFr ? "jamais" : "never")}
+          </div>
+        </div>
         ${s.email ? `<a href="mailto:${escHtml(s.email)}" class="btn btn--ghost btn--sm" style="flex-shrink:0">✉</a>` : ""}
       </div>`;
   }).join("");
@@ -593,38 +751,66 @@ function renderHoursChart() {
   const el = document.getElementById("hours-chart");
   if (!filtered.length) { el.innerHTML = ""; return; }
 
-  const maxH = Math.max(...filtered.map(s => Math.max(s.actual_hours, s.expected_hours, 1)));
-  const barColors = { green: "#3a6e00", amber: "#9a6c00", red: "#a00", none: "var(--accent)" };
-  const darkColors = { green: "#8ab840", amber: "#e6b830", red: "#ff6b70", none: "var(--accent)" };
+  // Sort worst → best (lowest ratio of actual/expected first)
+  const sorted = [...filtered].sort((a, b) => {
+    const ra = a.expected_hours > 0 ? a.actual_hours / a.expected_hours : 0;
+    const rb = b.expected_hours > 0 ? b.actual_hours / b.expected_hours : 0;
+    return ra - rb;
+  });
 
-  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+  const isDark   = document.documentElement.getAttribute("data-theme") === "dark";
+  const barColors  = { green: "#3a6e00", amber: "#9a6c00", red: "#a00",    none: "var(--accent)" };
+  const darkColors = { green: "#8ab840", amber: "#e6b830", red: "#ff6b70", none: "var(--accent)" };
   const cols = isDark ? darkColors : barColors;
 
-  el.innerHTML = filtered.map(s => {
+  const maxH = Math.max(...sorted.map(s => Math.max(s.actual_hours, s.expected_hours, 1)));
+
+  // Dynamic bar sizing: fill the container width
+  // We read the wrap width after a short timeout if needed, but use offsetWidth now
+  const wrapEl  = el.parentElement;
+  const wrapW   = wrapEl ? (wrapEl.offsetWidth || 600) : 600;
+  const n       = sorted.length;
+  const minGap  = 2;
+  const barW    = Math.max(4, Math.floor((wrapW - minGap * (n - 1)) / n));
+  const gap     = Math.max(1, Math.floor((wrapW - barW * n) / Math.max(n - 1, 1)));
+  const showInitials = barW >= 14;   // only show label if bar is wide enough
+
+  const chartH  = 220; // px — matches .bar-chart-bars height via CSS
+
+  el.style.gap = gap + "px";
+
+  el.innerHTML = sorted.map((s, idx) => {
     const actualH  = Math.max(s.actual_hours, 0.1);
     const expectH  = Math.max(s.expected_hours, 0.1);
-    const actualPx = Math.max(Math.round((actualH / maxH) * 220), 4);
-    const expectPx = Math.max(Math.round((expectH / maxH) * 220), 4);
+    const actualPx = Math.max(Math.round((actualH / maxH) * chartH), 4);
+    const expectPx = Math.max(Math.round((expectH / maxH) * chartH), 4);
     const color    = cols[s.track_band] || cols.none;
-    const initials = s.name.split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase();
+    const initials = s.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+    const tip      = `${escHtml(s.name)}: ${s.actual_hours}h / ${s.expected_hours}h attendues`;
 
     return `
-      <div title="${escHtml(s.name)}: ${s.actual_hours}h / ${s.expected_hours}h attendues"
-        style="flex:1;min-width:1.6rem;max-width:4rem;position:relative;display:flex;
-               flex-direction:column;align-items:center;cursor:default">
-        <div style="font-size:1rem;color:var(--text-subtle);margin-bottom:2px">${s.actual_hours}h</div>
+      <div title="${tip}"
+        onclick="openStudentPanel('${escHtml(s.uuid)}')"
+        style="flex:0 0 ${barW}px;width:${barW}px;position:relative;display:flex;
+               flex-direction:column;align-items:center;cursor:pointer">
+        <div style="font-size:1rem;color:var(--text-subtle);margin-bottom:2px;
+                    white-space:nowrap;overflow:hidden;width:100%;text-align:center">
+          ${barW >= 24 ? s.actual_hours + "h" : ""}
+        </div>
         <div style="display:flex;flex-direction:column;align-items:center;width:100%;
-                    justify-content:flex-end;height:220px;position:relative">
-          <!-- Expected line -->
+                    justify-content:flex-end;height:${chartH}px;position:relative">
           <div style="position:absolute;bottom:${expectPx}px;left:0;right:0;
                       border-top:2px dashed rgba(100,100,100,.4);z-index:1"></div>
-          <!-- Actual bar -->
-          <div style="width:80%;background:${color};height:${actualPx}px;
-                      border-radius:3px 3px 0 0;position:relative;z-index:2"></div>
+          <div style="width:100%;background:${color};height:${actualPx}px;
+                      border-radius:3px 3px 0 0;position:relative;z-index:2;
+                      transition:filter var(--dur-fast)"
+               onmouseover="this.style.filter='brightness(1.2)'"
+               onmouseout="this.style.filter=''">
+          </div>
         </div>
-        <div style="font-size:0.9rem;color:var(--text-subtle);margin-top:3px;
-                    max-width:3.6rem;overflow:hidden;text-overflow:ellipsis;
-                    text-align:center">${initials}</div>
+        ${showInitials ? `<div style="font-size:${barW >= 20 ? 1 : 0.85}rem;color:var(--text-subtle);
+                    margin-top:3px;width:100%;overflow:hidden;text-overflow:ellipsis;
+                    text-align:center;white-space:nowrap">${initials}</div>` : ""}
       </div>`;
   }).join("");
 }
@@ -694,14 +880,14 @@ function renderTable() {
       ? `${s.actual_hours}h / ${s.expected_hours}h att.`
       : "Pas de date de début définie";
 
-    // Last log freshness
-    const logColor = s.days_since === null ? "var(--text-subtle)"
-      : s.days_since <= 2 ? "var(--success)"
-      : s.days_since <= 6 ? "var(--warning)"
+    // Last log freshness — use working_days_absent for colour, days_since for label
+    const logColor = s.working_days_absent === null ? "var(--text-subtle)"
+      : s.working_days_absent === 0 ? "var(--success)"
+      : s.working_days_absent < MIA_WORK_DAYS ? "var(--warning)"
       : "var(--danger)";
     const logCell = s.last_log
       ? `<span style="color:${logColor};font-weight:500">${s.last_log}</span>
-         <span style="font-size:1.1rem;color:var(--text-subtle)"> J-${s.days_since}</span>`
+         <span style="font-size:1.1rem;color:var(--text-subtle)"> (${s.working_days_absent ?? "—"} j.ouv.)</span>`
       : "—";
 
     const pathwayTag = s.pathway === "hub"
@@ -889,8 +1075,8 @@ function renderCompetencyView() {
         const pctTextColor = pct >= 75 ? "var(--success)"
           : pct >= 40 ? "var(--text)"
           : "var(--comp-danger-text,#d41f29)";
-        const nameColor    = s.days_since >= 7 ? "color:var(--danger);font-weight:600"
-          : s.days_since >= 3 ? "color:var(--warning);font-weight:500" : "";
+        const nameColor    = s.working_days_absent >= AWOL_WORK_DAYS ? "color:var(--danger);font-weight:600"
+          : s.working_days_absent >= MIA_WORK_DAYS ? "color:var(--warning);font-weight:500" : "";
 
         return `
           <div style="display:flex;align-items:center;gap:var(--sp-3);
@@ -900,7 +1086,7 @@ function renderCompetencyView() {
                 style="background:none;border:none;cursor:pointer;font:inherit;
                        font-size:1.3rem;padding:0;text-align:left;${nameColor}
                        text-decoration:underline;text-underline-offset:3px;
-                       color:${s.days_since >= 7 ? 'var(--danger)' : s.days_since >= 3 ? 'var(--warning)' : 'var(--accent)'}">
+                       color:${s.working_days_absent >= AWOL_WORK_DAYS ? 'var(--danger)' : s.working_days_absent >= MIA_WORK_DAYS ? 'var(--warning)' : 'var(--accent)'}">
                 ${escHtml(s.name)}
               </button>
               <span style="font-size:1.1rem;color:var(--text-subtle);margin-left:var(--sp-2)">${escHtml(s.student_id)}</span>
@@ -1009,8 +1195,8 @@ function renderCourseView() {
       </div>`;
 
     const rows = cohort.map(s => {
-      const awolStyle = s.days_since >= 7 ? "color:var(--danger);font-weight:600"
-        : s.days_since >= 3 ? "color:var(--warning)" : "";
+      const awolStyle = s.working_days_absent >= AWOL_WORK_DAYS ? "color:var(--danger);font-weight:600"
+        : s.working_days_absent >= MIA_WORK_DAYS ? "color:var(--warning)" : "";
 
       const pills = compCodes.map(code => {
         const cov = s.competency_coverage?.find(c => c.code === code);
@@ -1040,7 +1226,7 @@ function renderCourseView() {
             <button onclick="openStudentPanel('${escHtml(s.uuid)}')"
               style="background:none;border:none;cursor:pointer;font:inherit;
                      font-size:1.3rem;padding:0;text-align:left;
-                     color:${s.days_since >= 7 ? 'var(--danger)' : s.days_since >= 3 ? 'var(--warning)' : 'var(--accent)'};
+                     color:${s.working_days_absent >= AWOL_WORK_DAYS ? 'var(--danger)' : s.working_days_absent >= MIA_WORK_DAYS ? 'var(--warning)' : 'var(--accent)'};
                      text-decoration:underline;text-underline-offset:3px">
               ${escHtml(s.name)}
             </button>
@@ -1109,6 +1295,7 @@ function buildDetailHTML(s) {
   // border and bg-tint use the accent colour; count and label use --text for contrast safety
   const ftc = s.file_type_counts || {};
   const fileTypeBadges = [
+    { key: "config",     label: "Config",     color: "var(--text-subtle)" },
     { key: "daily",      label: "Quotidien",  color: "var(--accent)" },
     { key: "weekly",     label: "Hebdo",      color: "var(--success)" },
     { key: "full",       label: "Complet",    color: "#7341a0" },
@@ -1122,10 +1309,19 @@ function buildDetailHTML(s) {
      </span>`
   ).join(" ");
 
+  // Work hours display
+  const wh = ctx.work_hours;
+  const whStr = wh ? `${wh.h}h${String(wh.m).padStart(2,"0")}` : null;
+
+  // Planned absences summary
+  const absCount = (ctx.planned_absences || []).length;
+  const absStr   = absCount > 0 ? `${absCount} congé${absCount > 1 ? "s" : ""} planifié${absCount > 1 ? "s" : ""}` : null;
+
   const info = [
     ctx.start_date         && `Début : ${ctx.start_date}`,
     ctx.scheduled_end_date && `Fin prévue : ${ctx.scheduled_end_date}`,
-    ctx.hours_per_day      && `${ctx.hours_per_day}h / jour prévues`,
+    whStr                  && `${whStr} / jour`,
+    absStr,
     s.raw.pathway === "hub" && s.raw.projects?.length &&
       `Projets : ${s.raw.projects.map(p => p.project_name).join(", ")}`,
   ].filter(Boolean).map(t => `<div style="font-size:1.3rem;margin-bottom:var(--sp-1)">${t}</div>`).join("");

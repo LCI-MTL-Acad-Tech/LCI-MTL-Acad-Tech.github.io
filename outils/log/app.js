@@ -57,13 +57,14 @@ function generateUUID() {
 
 // ── localStorage keys ────────────────────────────────────────
 const LS = {
-  CACHE:       "internship_cache",    // profile, known people/tools
-  DATA:        "internship_data",     // current internship JSON
-  REPORT_DATA: "internship_report",   // merged report data (survives page nav)
-  SETTINGS:    "internship_settings", // user-overridden settings
-  THEME:       "internship_theme",
-  LANG:        "lang",
-  DOWNLOADS:   "internship_downloads", // { "YYYY-MM-DD": ["d"|"w"|"f"] } — survives reset
+  CACHE:         "internship_cache",    // profile, known people/tools
+  DATA:          "internship_data",     // current internship JSON
+  REPORT_DATA:   "internship_report",   // merged report data (survives page nav)
+  SETTINGS:      "internship_settings", // user-overridden settings
+  THEME:         "internship_theme",
+  LANG:          "lang",
+  DOWNLOADS:     "internship_downloads",      // { "YYYY-MM-DD": ["c"|"d"|"w"|"f"] } — survives reset
+  UPLOAD_REMIND: "internship_upload_remind",  // { "c"|"d"|"w"|"f": "YYYY-MM-DD"|"always"|null }
 };
 
 // ── Storage helpers ──────────────────────────────────────────
@@ -352,6 +353,7 @@ function exportConfig() {
   const lang = getCurrentLang();
   const suffix = lang === "fr-CA" ? "config_journal-de-stage" : "config_internship-log";
   downloadJSON(config, `${slug}_${suffix}.json`);
+  stampDownload("c"); // record config export for calendar and reminder tracking
 }
 
 function importConfig(file) {
@@ -873,4 +875,161 @@ function toggleMakingOf(btn) {
       }, { once: true });
     });
   }
+}
+
+// ── Upload reminder system ────────────────────────────────────
+// Tracks when the student last dismissed the upload reminder per file type.
+// Format: { "c": "YYYY-MM-DD" | "always" | null, "d": ..., "w": ..., "f": ... }
+// "always"    → remind every time (user opted in)
+// "YYYY-MM-DD" → snoozed until 30 days after that date
+// null / absent → never dismissed → always show
+
+
+function getUploadReminders() {
+  try {
+    const raw = localStorage.getItem(LS.UPLOAD_REMIND);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+
+function saveUploadReminders(obj) {
+  try { localStorage.setItem(LS.UPLOAD_REMIND, JSON.stringify(obj)); } catch {}
+}
+
+// Returns true if the upload reminder for this type should be shown.
+// type: "c" | "d" | "w" | "f"
+function shouldShowUploadReminder(type) {
+  const reminders = getUploadReminders();
+  const val = reminders[type];
+
+  if (val === "always") return true;   // user explicitly wants it every time
+
+  // Suppress if already shown this session for this type (unless always-mode).
+  // We track this in sessionStorage to avoid spamming across multiple downloads
+  // in the same browser session.
+  const sessionKey = `remind_shown_${type}`;
+  if (sessionStorage.getItem(sessionKey)) return false;
+
+  if (!val) return true;               // never dismissed before
+
+  // Snoozed: check if 30-day window has passed
+  const snoozedOn = new Date(val);
+  const daysSince = (Date.now() - snoozedOn) / 86400000;
+  return daysSince >= 30;
+}
+
+// Snooze the reminder for 30 days.
+function snoozeUploadReminder(type) {
+  const r = getUploadReminders();
+  r[type] = new Date().toISOString().slice(0, 10);
+  saveUploadReminders(r);
+}
+
+// Set reminder to fire every time.
+function alwaysRemindUpload(type) {
+  const r = getUploadReminders();
+  r[type] = "always";
+  saveUploadReminders(r);
+}
+
+// ── Upload reminder modal ─────────────────────────────────────
+// Shows a dismissible card prompting the student to upload a file
+// to the supervisor's form. Respects snooze/always preferences.
+//
+// type:     "c" | "d" | "w" | "f"
+// isUpdate: true if this is a re-upload prompt (absences changed etc.)
+//
+// The form URL is read from a <meta name="upload-form-url"> tag so
+// it can be configured per deployment without touching JS.
+
+const UPLOAD_FORM_URL = "https://forms.cloud.microsoft/r/LE4Dc2gZaE";
+
+function getUploadFormUrl() {
+  const meta = document.querySelector('meta[name="upload-form-url"]');
+  return meta?.content || UPLOAD_FORM_URL;
+}
+
+function showUploadReminder(type, isUpdate = false) {
+  if (!shouldShowUploadReminder(type)) return;
+
+  // Mark as shown this session (suppresses repeat toasts unless always-mode)
+  sessionStorage.setItem(`remind_shown_${type}`, "1");
+
+  // Remove any existing reminder
+  document.getElementById("upload-reminder-overlay")?.remove();
+
+  const lang = getCurrentLang();
+  const isFr = lang === "fr-CA";
+
+  const titles = {
+    c: t("remind.config_title"),
+    d: t("remind.daily_title"),
+    w: t("remind.weekly_title"),
+    f: t("remind.final_title"),
+  };
+  const hints = {
+    c: isUpdate ? t("remind.config_hint_update") : t("remind.config_hint"),
+    d: t("remind.daily_hint"),
+    w: t("remind.weekly_hint"),
+    f: t("remind.final_hint"),
+  };
+  const icons = { c: "⚙️", d: "📄", w: "📅", f: "🏅" };
+
+  const title   = titles[type] || "";
+  const hint    = hints[type]  || "";
+  const icon    = icons[type]  || "📤";
+  const formUrl = getUploadFormUrl();
+
+  // For config update: add an export button first
+  const exportBtn = (type === "c" && isUpdate) ? `
+    <button class="btn btn--secondary"
+      onclick="exportConfig();document.getElementById('upload-reminder-overlay').remove()"
+      style="margin-bottom:var(--sp-3)">
+      ${t("remind.config_export_btn")}
+    </button>` : "";
+
+  const html = `
+    <div id="upload-reminder-overlay"
+      style="position:fixed;bottom:var(--sp-5);right:var(--sp-5);z-index:9000;
+             max-width:44rem;width:calc(100% - var(--sp-10))">
+      <div style="background:var(--bg-card);border-radius:var(--r-xl);
+                  box-shadow:var(--shadow-xl);border:1.5px solid var(--accent);
+                  padding:var(--sp-5);display:flex;gap:var(--sp-4)">
+        <span style="font-size:2.8rem;flex-shrink:0;line-height:1">${icon}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:1.5rem;font-weight:700;margin-bottom:var(--sp-2)">${title}</div>
+          <p style="font-size:1.3rem;color:var(--text-muted);margin-bottom:var(--sp-4)">${hint}</p>
+          ${exportBtn}
+          <div style="display:flex;flex-wrap:wrap;gap:var(--sp-3)">
+            <a href="${formUrl}" target="_blank" rel="noopener"
+               class="btn btn--primary btn--sm"
+               onclick="snoozeUploadReminder('${type}')"
+            >${t("remind.form_btn")}</a>
+            <button class="btn btn--ghost btn--sm"
+              onclick="snoozeUploadReminder('${type}');
+                       document.getElementById('upload-reminder-overlay').remove()">
+              ${t("remind.snooze")}
+            </button>
+            <button class="btn btn--ghost btn--sm"
+              style="color:var(--text-subtle)"
+              onclick="alwaysRemindUpload('${type}');
+                       document.getElementById('upload-reminder-overlay').remove()">
+              ${t("remind.always")}
+            </button>
+            <button class="btn btn--ghost btn--sm"
+              style="margin-left:auto;color:var(--text-subtle)"
+              onclick="document.getElementById('upload-reminder-overlay').remove()">
+              ${t("remind.dismiss")}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  document.body.insertAdjacentHTML("beforeend", html);
+
+  // Auto-dismiss after 90 seconds
+  setTimeout(() => {
+    document.getElementById("upload-reminder-overlay")?.remove();
+  }, 90000);
 }

@@ -12,8 +12,7 @@ let pendingAbsenceDate = null; // date being edited in the modal
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
-  initPage();
-  applyLanguage(getCurrentLang());
+  initPage(); // calls applyLanguage internally; MutationObserver re-renders on change
 
   calData      = loadData();
   calDownloads = getDownloads();
@@ -24,11 +23,12 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("cal-no-data").classList.remove("hidden");
   }
 
-  // Re-render on language change
-  document.querySelectorAll(".lang-toggle-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      setTimeout(() => { if (calData) renderAll(); }, 50);
-    });
+  // Re-render when language OR theme changes (both update html attributes)
+  new MutationObserver(() => {
+    if (calData) renderAll();
+  }).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["lang", "data-theme"],
   });
 
   // Drop zone on no-data screen
@@ -172,16 +172,18 @@ function renderGrid() {
       const hasDaily  = dl.includes("d");
       const hasWeekly = dl.includes("w");
       const hasFinal  = dl.includes("f");
+      const hasConfig = dl.includes("c");
       // Hollow star: future wrap days (not yet downloaded)
       const isFutureWrapDay = ds > today && dow === wrapDay && isIntern && isWork;
       // Past wrap day missed (no weekly download, no log with weekly_wrap)
       const hasMissedWrap = ds <= today && dow === wrapDay && !hasWeekly && isIntern;
 
       const badges = [];
-      if (hasLog || hasDaily) badges.push(`<span class="cal-badge" title="Journal téléchargé">✓</span>`);
-      if (hasWeekly)          badges.push(`<span class="cal-badge" title="Bilan hebdo téléchargé">⭐</span>`);
-      if (isFutureWrapDay)    badges.push(`<span class="cal-badge" title="Bilan hebdo à faire" style="opacity:.5">☆</span>`);
-      if (hasFinal)           badges.push(`<span class="cal-badge" title="Rapport final téléchargé">🏅</span>`);
+      if (hasConfig)          badges.push(`<span class="cal-badge" title="${t("cal.legend_config")}">⚙️</span>`);
+      if (hasLog || hasDaily) badges.push(`<span class="cal-badge" title="${t("cal.legend_daily")}">✓</span>`);
+      if (hasWeekly)          badges.push(`<span class="cal-badge" title="${t("cal.legend_weekly")}">⭐</span>`);
+      if (isFutureWrapDay)    badges.push(`<span class="cal-badge" title="${t("cal.legend_weekly_due")}" style="opacity:.5">☆</span>`);
+      if (hasFinal)           badges.push(`<span class="cal-badge" title="${t("cal.legend_final")}">🏅</span>`);
 
       // Absence note
       const absObj = isAbs ? (ctx.planned_absences || []).find(a => a.date === ds) : null;
@@ -333,6 +335,7 @@ function renderLegend() {
       key: "cal.legend_absence" },
     { swatch: "background:var(--bg-card);outline:2.5px solid var(--accent);outline-offset:-2px;border-radius:3px",
       key: "cal.legend_today" },
+    { badge: "⚙️", key: "cal.legend_config" },
     { badge: "✓",  key: "cal.legend_daily" },
     { badge: "⭐", key: "cal.legend_weekly" },
     { badge: "☆",  key: "cal.legend_weekly_due" },
@@ -409,11 +412,31 @@ function removeAbsenceByDate(date) {
 // ── Persist & refresh ─────────────────────────────────────────
 function persistAndRefresh() {
   // Only save back to localStorage if the data came from there
-  // (not from a file upload on a different device)
   const existing = loadData();
-  if (existing && existing.meta?.student_uuid === calData.meta?.student_uuid) {
+  const canPersist = existing && existing.meta?.student_uuid === calData.meta?.student_uuid;
+
+  if (canPersist) {
     saveData(calData);
+    // Remove any stale file-upload warning
+    document.getElementById("cal-no-persist-warn")?.remove();
+  } else {
+    // Data came from a file upload — changes exist in memory but won't survive reload.
+    // Show a persistent warning if not already shown.
+    if (!document.getElementById("cal-no-persist-warn")) {
+      const lang = getCurrentLang();
+      const warn = document.createElement("div");
+      warn.id = "cal-no-persist-warn";
+      warn.className = "alert alert--warning";
+      warn.style.cssText = "margin-bottom:var(--sp-4)";
+      warn.innerHTML = lang === "fr-CA"
+        ? "⚠ Les absences que tu ajoutes ici ne seront <strong>pas sauvegardées</strong> — les données viennent d'un fichier importé. Pour les conserver, exporte et réimporte ton fichier de configuration depuis la page de configuration."
+        : "⚠ Absences you add here will <strong>not be saved</strong> — data was loaded from an uploaded file. To keep them, export and re-import your config file from the setup page.";
+      document.querySelector(".cal-layout")?.before(warn);
+    }
   }
+
   calDownloads = getDownloads();
   renderAll();
+  // Prompt re-export config since absences changed (isUpdate=true)
+  setTimeout(() => showUploadReminder("c", true), 400);
 }

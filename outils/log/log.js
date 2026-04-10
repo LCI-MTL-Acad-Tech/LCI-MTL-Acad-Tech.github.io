@@ -11,6 +11,13 @@ let lastDownloaded = false;
 document.addEventListener("DOMContentLoaded", () => {
   initPage();
 
+  // Wire static form link to use the deployment-configurable meta tag URL
+  const formLink = document.getElementById("log-form-link");
+  if (formLink) {
+    const metaUrl = document.querySelector('meta[name="upload-form-url"]')?.content;
+    if (metaUrl) formLink.href = metaUrl;
+  }
+
   logData = loadData();
   // Config imported from another computer — show a brief confirmation
   if (sessionStorage.getItem("config_imported")) {
@@ -986,6 +993,8 @@ function saveAndDownload() {
   lastDownloaded = true;
   hideDownloadBanner();
   updateFooterStatus(true);
+  // Show upload reminder (respects snooze)
+  setTimeout(() => showUploadReminder("d"), 400);
   // Update FAB state
   const fab = document.getElementById("fab-download");
   if (fab) {

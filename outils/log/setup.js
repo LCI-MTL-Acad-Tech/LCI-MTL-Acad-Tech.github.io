@@ -309,7 +309,6 @@ function saveContextAndNext() {
     calendar_week_start:  parseInt(document.getElementById("ctx-cal-week-start").value ?? "1"),
     work_days:            workDays.length ? workDays : [1,2,3,4,5],
     work_hours:           { h: workH, m: workM },
-    hours_per_day:        (workH * 60 + workM) / 60, // kept for hub.js compat
     total_hours_target:   parseFloat(document.getElementById("ctx-total-hours").value) || null,
     planned_absences:     [],
     skills_to_develop:    [],
@@ -463,6 +462,13 @@ function finishSetup() {
     lang === "fr-CA"
       ? `Bonjour, ${setupData.profile.full_name}. Tout est prêt.`
       : `Welcome, ${setupData.profile.full_name}. Everything is set up.`;
+
+  // Wire form link to deployment-configurable meta tag URL
+  const formLink = document.getElementById("done-form-link");
+  if (formLink) {
+    const metaUrl = document.querySelector('meta[name="upload-form-url"]')?.content;
+    if (metaUrl) formLink.href = metaUrl;
+  }
 
   goToScreen("screen-done");
 }

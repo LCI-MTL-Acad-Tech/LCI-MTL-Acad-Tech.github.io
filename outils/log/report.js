@@ -588,6 +588,8 @@ function downloadFullJSON() {
   const date      = new Date().toISOString().slice(0, 10);
   downloadJSON(mergedData, `${studentId}_journal_complet_${date}.json`);
   stampDownload("f"); // record final report download for calendar view
+  // Show upload reminder (respects snooze)
+  setTimeout(() => showUploadReminder("f"), 400);
 
   const btn = document.querySelector('[onclick="downloadFullJSON()"]');
   if (btn) {
