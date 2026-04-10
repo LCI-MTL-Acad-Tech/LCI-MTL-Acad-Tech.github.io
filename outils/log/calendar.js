@@ -13,6 +13,7 @@ let pendingAbsenceDate = null; // date being edited in the modal
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   initPage(); // calls applyLanguage internally; MutationObserver re-renders on change
+  initFileSidebar();
 
   calData      = loadData();
   calDownloads = getDownloads();
@@ -57,10 +58,12 @@ function loadCalFile(file) {
     try {
       const d = JSON.parse(e.target.result);
       if (!d.context?.start_date) {
-        alert("Fichier non reconnu — assure-toi d'utiliser un fichier JSON de stage valide.");
+        alert(t("error.no_files") || "Fichier non reconnu — assure-toi d'utiliser un fichier JSON de stage valide.");
         return;
       }
+      // Config files have no logs — that's fine, renderAll handles it
       calData = d;
+      calDownloads = getDownloads();
       showCalendar();
     } catch { alert("Erreur de lecture du fichier JSON."); }
   };
@@ -439,4 +442,13 @@ function persistAndRefresh() {
   renderAll();
   // Prompt re-export config since absences changed (isUpdate=true)
   setTimeout(() => showUploadReminder("c", true), 400);
+}
+
+// ── Sidebar hook ─────────────────────────────────────────────
+function onSidebarLoad() {
+  calData      = loadData();
+  calDownloads = getDownloads();
+  if (calData?.context?.start_date) {
+    showCalendar();
+  }
 }

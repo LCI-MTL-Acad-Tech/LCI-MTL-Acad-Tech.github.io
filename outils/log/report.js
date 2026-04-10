@@ -8,6 +8,7 @@ let uploadedFiles = [];
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   initPage();
+  initFileSidebar();
   setupDropZone();
 
   // If we just did a reset, clear any stale localStorage the old code missed
@@ -1503,4 +1504,16 @@ function printReport() {
     });
     if (collab) collab.style.display = "none";
   }
+}
+
+// ── Sidebar hook ─────────────────────────────────────────────
+function onSidebarLoad() {
+  // Pull whatever the sidebar just merged into localStorage and
+  // feed it through the normal validate→merge→render pipeline.
+  const d = loadData();
+  if (!d) return;
+
+  uploadedFiles = [d];
+  renderFileList([{ name: d.profile?.full_name || "journal.json", ok: true }]);
+  validateAndMerge([d]);
 }

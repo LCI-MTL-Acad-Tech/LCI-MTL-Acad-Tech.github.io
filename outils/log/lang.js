@@ -253,6 +253,13 @@ const LANG = {
     "log.upload_form_hint":   "Après avoir téléchargé ton fichier, téléverse-le aussi via le formulaire ci-dessous. Garde aussi le fichier dans ton dossier personnel — tu en auras besoin pour le suivi de progression.",
     "log.upload_form_cta":    "Ouvrir le formulaire de dépôt →",
 
+    // File sidebar
+    "sidebar.tab_label":  "Charger",
+    "sidebar.title":      "Charger des fichiers",
+    "sidebar.hint":       "Dépose ici tes journaux, bilans, configs ou rapports JSON — peu importe la page.",
+    "sidebar.drop_label": "Glisser-déposer ou cliquer",
+    "sidebar.drop_hint":  "Journaux · Config · Bilan · Rapport",
+
     // Upload reminders — shown after each download type
     "remind.config_title":     "Dépose ta configuration chez ton·ta superviseur·e",
     "remind.config_hint":      "Tu viens d'exporter ta configuration. Pour que ton·ta superviseur·e voie tes jours de congé planifiés et ton horaire, dépose ce fichier via le formulaire ci-dessous.",
@@ -847,6 +854,13 @@ const LANG = {
     "log.upload_form_title":     "Send your files to your supervisor",
     "log.upload_form_hint":      "After downloading your file, submit it via the form below. Keep the file in your personal folder too — you'll need it for the progress tracker.",
     "log.upload_form_cta":       "Open the submission form →",
+    // File sidebar
+    "sidebar.tab_label":  "Load",
+    "sidebar.title":      "Load files",
+    "sidebar.hint":       "Drop your daily logs, weeklies, config, or reports here — from any page.",
+    "sidebar.drop_label": "Drag and drop or click",
+    "sidebar.drop_hint":  "Logs · Config · Weekly · Report",
+
     "remind.config_title":       "Submit your configuration to your supervisor",
     "remind.config_hint":        "You just exported your configuration. For your supervisor to see your planned days off and schedule, submit this file via the form below.",
     "remind.config_hint_update": "You've updated your planned absences. Re-export and re-submit your configuration so your supervisor has current data.",

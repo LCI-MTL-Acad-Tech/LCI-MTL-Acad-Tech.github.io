@@ -10,6 +10,7 @@ let lastDownloaded = false;
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   initPage();
+  initFileSidebar();
 
   // Wire static form link to use the deployment-configurable meta tag URL
   const formLink = document.getElementById("log-form-link");
@@ -1427,5 +1428,14 @@ function checkAutoTour() {
     setTimeout(() => startTour(true), 600);
   } else if (seen) {
     document.getElementById("help-btn")?.classList.remove("hidden");
+  }
+}
+
+// ── Sidebar hook ─────────────────────────────────────────────
+function onSidebarLoad() {
+  logData = loadData();
+  if (logData?.profile?.full_name) {
+    document.getElementById("no-data-warning")?.classList.add("hidden");
+    initLog();
   }
 }

@@ -6,6 +6,7 @@ let weeklyData = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   initPage();
+  initFileSidebar();
   setupWeeklyDropZone();
 
   // Restore from main data (single-file students)
@@ -795,4 +796,10 @@ ${wrap ? `<div class="card" style="margin-bottom:12px">
   if (!win) return;
   win.document.write(html);
   win.document.close();
+}
+
+// ── Sidebar hook ─────────────────────────────────────────────
+function onSidebarLoad() {
+  weeklyData = loadData();
+  if (weeklyData) renderAllWeeks();
 }

@@ -1033,3 +1033,253 @@ function showUploadReminder(type, isUpdate = false) {
     document.getElementById("upload-reminder-overlay")?.remove();
   }, 90000);
 }
+
+// ── Global file sidebar ───────────────────────────────────────
+// A collapsible right-side panel available on all student pages.
+// Drop any internship JSON (daily, weekly, config, full) here;
+// the sidebar detects the type, merges it into localStorage,
+// then calls the page-specific refresh hook onSidebarLoad().
+
+function initFileSidebar() {
+  const sidebar = document.getElementById("file-sidebar");
+  if (!sidebar) return;
+
+  const tab      = sidebar.querySelector(".file-sidebar__tab");
+  const dropzone = sidebar.querySelector(".file-sidebar__dropzone");
+  const input    = sidebar.querySelector(".file-sidebar__input");
+
+  // Toggle open/closed
+  tab.addEventListener("click", () => {
+    sidebar.classList.toggle("is-open");
+  });
+
+  // Drop zone interaction
+  dropzone.addEventListener("click", () => input.click());
+
+  dropzone.addEventListener("dragover", e => {
+    e.preventDefault();
+    dropzone.classList.add("drag-over");
+  });
+  dropzone.addEventListener("dragleave", () => {
+    dropzone.classList.remove("drag-over");
+  });
+  dropzone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropzone.classList.remove("drag-over");
+    sidebarLoadFiles(e.dataTransfer.files);
+  });
+
+  input.addEventListener("change", () => {
+    if (input.files.length) sidebarLoadFiles(input.files);
+    input.value = "";
+  });
+
+  // Also intercept page-level drops so students can drop anywhere
+  document.addEventListener("dragover",  e => e.preventDefault());
+  document.addEventListener("drop", e => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    if (files.length) {
+      sidebar.classList.add("is-open");
+      sidebarLoadFiles(files);
+    }
+  });
+
+  // Populate student info on load
+  _sidebarRefreshWho();
+}
+
+function _sidebarRefreshWho() {
+  const el = document.getElementById("sidebar-who");
+  if (!el) return;
+  const d = loadData();
+  if (!d?.profile?.full_name) {
+    el.textContent = "";
+    el.style.display = "none";
+    return;
+  }
+  const lang = getCurrentLang();
+  const isFr = lang === "fr-CA";
+  const ctx   = d.context || {};
+  el.style.display = "";
+  el.innerHTML = `
+    <div style="font-weight:600">${escHtml(d.profile.full_name)}</div>
+    <div style="font-size:1.1rem;color:var(--text-subtle)">
+      ${ctx.start_date || ""}${ctx.scheduled_end_date ? " → " + ctx.scheduled_end_date : ""}
+    </div>
+    <div style="font-size:1.1rem;color:var(--text-subtle)">
+      ${(d.logs||[]).length} ${isFr ? "journaux" : "logs"}
+      · ${isFr ? "dernier" : "last"}: ${(d.logs||[]).slice(-1)[0]?.date || "—"}
+    </div>`;
+}
+
+function _sidebarSetStatus(msg, type = "info") {
+  const el = document.getElementById("sidebar-status");
+  if (!el) return;
+  el.className = `file-sidebar__status status-${type}`;
+  el.innerHTML = msg;
+}
+
+function sidebarLoadFiles(fileList) {
+  const files = Array.from(fileList).filter(f => f.name.endsWith(".json"));
+  if (!files.length) {
+    _sidebarSetStatus(t("error.no_files") || "Aucun fichier JSON trouvé.", "err");
+    return;
+  }
+
+  _sidebarSetStatus("⏳ " + (getCurrentLang() === "fr-CA" ? "Chargement…" : "Loading…"), "info");
+
+  const readers = files.map(f => new Promise(res => {
+    const r = new FileReader();
+    r.onload = e => {
+      try { res({ name: f.name, data: JSON.parse(e.target.result) }); }
+      catch { res(null); }
+    };
+    r.readAsText(f);
+  }));
+
+  Promise.all(readers).then(parsed => {
+    const valid = parsed.filter(p => p?.data);
+    if (!valid.length) {
+      _sidebarSetStatus(t("error.no_files") || "Fichiers non reconnus.", "err");
+      return;
+    }
+
+    const isFr  = getCurrentLang() === "fr-CA";
+    const counts = { config: 0, log: 0, merged: 0, error: 0 };
+
+    // Separate config files from log files
+    const configs  = valid.filter(p => p.data.meta?.type === "config");
+    const logFiles = valid.filter(p => p.data.meta?.type !== "config");
+
+    // ── Process log/full files ────────────────────────────────
+    if (logFiles.length) {
+      const existing = loadData();
+
+      if (logFiles.length === 1 && !existing) {
+        // First load — no existing data — just save directly
+        const d = logFiles[0].data;
+        if (d.context?.start_date && d.profile?.full_name) {
+          saveData(d);
+          updateCache(d);
+          counts.log++;
+        } else {
+          counts.error++;
+        }
+      } else if (logFiles.length >= 1 && existing) {
+        // Merge incoming logs into existing data
+        const allData = [existing, ...logFiles.map(p => p.data)];
+        const merged  = mergeInternshipFiles(allData);
+        if (merged.valid) {
+          saveData(merged.data);
+          updateCache(merged.data);
+          counts.merged = logFiles.length;
+        } else {
+          counts.error++;
+        }
+      } else if (logFiles.length > 1 && !existing) {
+        // Multiple files, no existing — merge them together
+        const merged = mergeInternshipFiles(logFiles.map(p => p.data));
+        if (merged.valid) {
+          saveData(merged.data);
+          updateCache(merged.data);
+          counts.merged = logFiles.length;
+        } else {
+          counts.error++;
+        }
+      }
+    }
+
+    // ── Process config files ──────────────────────────────────
+    configs.forEach(({ data: cfg }) => {
+      if (!cfg.context?.start_date) { counts.error++; return; }
+
+      const existing = loadData();
+      if (existing) {
+        // Overlay config context fields onto existing data
+        const merged = {
+          ...existing,
+          meta: {
+            ...existing.meta,
+            student_uuid:   cfg.meta?.student_uuid || existing.meta?.student_uuid,
+            schema_version: cfg.meta?.schema_version || existing.meta?.schema_version,
+            last_modified:  new Date().toISOString(),
+          },
+          profile:        cfg.profile        || existing.profile,
+          pathway:        cfg.pathway        || existing.pathway,
+          context: {
+            ...existing.context,
+            planned_absences:    cfg.context.planned_absences    ?? existing.context?.planned_absences    ?? [],
+            work_days:           cfg.context.work_days           ?? existing.context?.work_days           ?? [1,2,3,4,5],
+            work_hours:          cfg.context.work_hours          ?? existing.context?.work_hours,
+            calendar_week_start: cfg.context.calendar_week_start ?? existing.context?.calendar_week_start ?? 1,
+            // Overlay non-schedule fields too
+            total_hours_target:  cfg.context.total_hours_target  ?? existing.context?.total_hours_target,
+            internship_course_code: cfg.context.internship_course_code || existing.context?.internship_course_code,
+          },
+          people:         cfg.people         || existing.people         || [],
+          projects:       cfg.projects       || existing.projects       || [],
+          activity_types: cfg.activity_types || existing.activity_types || [],
+          tools:          cfg.tools          || existing.tools          || [],
+          logs:           existing.logs      || [],
+          reflection:     existing.reflection || null,
+          todos:          existing.todos     || [],
+        };
+        saveData(merged);
+        updateCache(merged);
+      } else {
+        // No existing data — bootstrap from config (no logs yet)
+        const bootstrap = {
+          meta: {
+            schema_version: cfg.meta?.schema_version || "1.4",
+            student_uuid:   cfg.meta?.student_uuid   || generateUUID(),
+            created_at:     new Date().toISOString(),
+            last_modified:  new Date().toISOString(),
+            app_version:    "1.0.0",
+          },
+          profile:        cfg.profile || {},
+          pathway:        cfg.pathway || "company",
+          context:        cfg.context || {},
+          people:         cfg.people         || [],
+          projects:       cfg.projects       || [],
+          activity_types: cfg.activity_types || [],
+          tools:          cfg.tools          || [],
+          todos:          [],
+          logs:           [],
+          reflection:     null,
+        };
+        saveData(bootstrap);
+        updateCache(bootstrap);
+      }
+      counts.config++;
+    });
+
+    // ── Summary status ────────────────────────────────────────
+    const parts = [];
+    const total = counts.log + counts.merged + counts.config;
+    if (counts.log || counts.merged) {
+      const n = counts.log + counts.merged;
+      parts.push(`${n} ${isFr ? (n > 1 ? "journaux" : "journal") : (n > 1 ? "logs" : "log")}`);
+    }
+    if (counts.config) {
+      parts.push(`${counts.config} config`);
+    }
+    if (counts.error) {
+      parts.push(`⚠ ${counts.error} ${isFr ? "erreur(s)" : "error(s)"}`);
+    }
+
+    const statusType = counts.error && !total ? "err" : total ? "ok" : "err";
+    const verb = isFr ? "chargé·s" : "loaded";
+    _sidebarSetStatus(
+      parts.length ? `✓ ${parts.join(" + ")} ${verb}.` : (isFr ? "Aucun fichier valide." : "No valid files."),
+      statusType
+    );
+
+    _sidebarRefreshWho();
+
+    // ── Notify page ───────────────────────────────────────────
+    if (typeof onSidebarLoad === "function") {
+      onSidebarLoad();
+    }
+  });
+}

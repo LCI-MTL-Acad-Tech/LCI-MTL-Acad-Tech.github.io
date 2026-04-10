@@ -152,7 +152,7 @@
     .cal-upload-zone:hover { border-color: var(--accent); background: var(--tag-bg); }
   </style>
 </head>
-<body>
+<body class="has-file-sidebar">
 <div class="page-wrap">
 
   <header class="site-header">
@@ -320,5 +320,29 @@
 <script src="lang.js"></script>
 <script src="app.js"></script>
 <script src="calendar.js"></script>
+
+  <!-- Global file sidebar -->
+  <aside id="file-sidebar" class="file-sidebar" aria-label="Chargeur de fichiers">
+    <div class="file-sidebar__tab" role="button" aria-label="Ouvrir/fermer">
+      <span class="sidebar-tab-icon">📂</span>
+      <span data-i18n="sidebar.tab_label">Charger</span>
+    </div>
+    <div class="file-sidebar__inner">
+      <div>
+        <div class="file-sidebar__head" data-i18n="sidebar.title">Charger des fichiers</div>
+        <div class="file-sidebar__sub" data-i18n="sidebar.hint">Dépose ici tes journaux, bilans, configs ou rapports JSON.</div>
+      </div>
+      <div id="sidebar-who" class="file-sidebar__who" style="display:none"></div>
+      <div class="file-sidebar__dropzone" role="button" tabindex="0"
+           aria-label="Zone de dépôt de fichiers"
+           onkeydown="if(event.key==='Enter'||event.key===' ')this.click()">
+        <div class="file-sidebar__dropzone-icon">⬆️</div>
+        <div class="file-sidebar__dropzone-label" data-i18n="sidebar.drop_label">Glisser-déposer ou cliquer</div>
+        <div class="file-sidebar__dropzone-hint" data-i18n="sidebar.drop_hint">Journaux · Config · Bilan · Rapport</div>
+      </div>
+      <input class="file-sidebar__input" type="file" accept=".json" multiple style="display:none">
+      <div id="sidebar-status" class="file-sidebar__status status-info"></div>
+    </div>
+  </aside>
 </body>
 </html>
