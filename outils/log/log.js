@@ -36,6 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!logData || !logData.profile?.full_name) {
     document.getElementById("no-data-warning").classList.remove("hidden");
     applyLanguage(getCurrentLang());
+    sidebarOpenForData();
     return;
   }
 

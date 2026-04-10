@@ -7,7 +7,6 @@ let weeklyData = null;
 document.addEventListener("DOMContentLoaded", () => {
   initPage();
   initFileSidebar();
-  setupWeeklyDropZone();
 
   // Restore from main data (single-file students)
   const existing = loadData();
@@ -25,31 +24,14 @@ document.addEventListener("DOMContentLoaded", () => {
   if (weeklyData?.profile?.full_name) {
     renderAllWeeks();
     showReport();
+  } else {
+    sidebarOpenForData();
   }
 
   applyLanguage(getCurrentLang());
 });
 
 // ── Drop zone ─────────────────────────────────────────────────
-function setupWeeklyDropZone() {
-  // Document-level: prevent browser navigating away on mis-aimed drops
-  document.addEventListener("dragover", e => e.preventDefault());
-  document.addEventListener("drop",     e => e.preventDefault());
-
-  const zone = document.getElementById("upload-zone");
-  if (!zone) return;
-  zone.addEventListener("dragover", e => {
-    e.preventDefault(); e.stopPropagation();
-    zone.classList.add("drag-over");
-  });
-  zone.addEventListener("dragleave", () => zone.classList.remove("drag-over"));
-  zone.addEventListener("drop", e => {
-    e.preventDefault(); e.stopPropagation();
-    zone.classList.remove("drag-over");
-    handleWeeklyFiles(e.dataTransfer.files);
-  });
-}
-
 function handleWeeklyFiles(fileList) {
   const files = Array.from(fileList).filter(f => f.name.endsWith(".json"));
   if (!files.length) return;

@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showCalendar();
   } else {
     document.getElementById("cal-no-data").classList.remove("hidden");
+    sidebarOpenForData();
   }
 
   // Re-render when language OR theme changes (both update html attributes)
@@ -194,8 +195,7 @@ function renderGrid() {
         ? `<div class="cal-absence-chip" title="${escHtml(absObj.reason)}">✗ ${escHtml(absObj.reason)}</div>`
         : isAbs ? `<div class="cal-absence-chip">✗</div>` : "";
 
-      const clickable = isIntern && isWork && !outside;
-      const onclick   = (isIntern && (isWork || isAbs))
+      const onclick = (isIntern && (isWork || isAbs))
         ? `onclick="openAbsenceModal('${ds}', ${isAbs})"` : "";
 
       rowHTML += `

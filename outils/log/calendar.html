@@ -187,16 +187,10 @@
 
       <!-- No data: upload fallback -->
       <div id="cal-no-data" class="hidden">
-        <h2 style="margin-bottom:var(--sp-4)" data-i18n="cal.title">Calendrier de stage</h2>
-        <p class="text-muted mb-6" data-i18n="cal.no_data"></p>
-        <div class="cal-upload-zone" onclick="document.getElementById('cal-file-input').click()">
-          <div style="font-size:3rem;margin-bottom:var(--sp-3)">📂</div>
-          <div style="font-size:1.6rem;font-weight:600;color:var(--text-muted);margin-bottom:var(--sp-2)"
-            data-i18n="cal.upload_cta">Charger un fichier JSON</div>
-          <div style="font-size:1.3rem;color:var(--text-subtle)">ou glisser-déposer</div>
+        <div class="alert alert--info" style="margin-bottom:var(--sp-4)">
+          <span>📂</span>
+          <span data-i18n="cal.no_data"></span>
         </div>
-        <input type="file" id="cal-file-input" accept=".json" style="display:none"
-          onchange="loadCalFile(this.files[0])">
       </div>
 
       <!-- Calendar view -->

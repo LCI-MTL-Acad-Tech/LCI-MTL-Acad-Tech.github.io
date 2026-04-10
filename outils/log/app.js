@@ -1283,3 +1283,17 @@ function sidebarLoadFiles(fileList) {
     }
   });
 }
+
+// ── Auto-open sidebar when a page has no data ─────────────────
+// Call this from any page's DOMContentLoaded when data is absent.
+function sidebarOpenForData() {
+  const sidebar = document.getElementById("file-sidebar");
+  if (sidebar) sidebar.classList.add("is-open");
+  const isFr = getCurrentLang() === "fr-CA";
+  _sidebarSetStatus(
+    isFr
+      ? "📂 Charge un fichier JSON pour commencer."
+      : "📂 Load a JSON file to get started.",
+    "info"
+  );
+}

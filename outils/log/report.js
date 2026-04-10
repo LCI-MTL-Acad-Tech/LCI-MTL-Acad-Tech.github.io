@@ -9,7 +9,6 @@ let uploadedFiles = [];
 document.addEventListener("DOMContentLoaded", () => {
   initPage();
   initFileSidebar();
-  setupDropZone();
 
   // If we just did a reset, clear any stale localStorage the old code missed
   if (sessionStorage.getItem("just_reset")) {
@@ -51,6 +50,8 @@ document.addEventListener("DOMContentLoaded", () => {
       uploadedFiles = [existing];
       renderFileList([{ name: "session_actuelle.json", ok: true }]);
       document.getElementById("proceed-btn").classList.remove("hidden");
+    } else {
+      sidebarOpenForData();
     }
   }
 
@@ -81,19 +82,7 @@ function goToPhase(id) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// ── File upload / drop zone ───────────────────────────────────
-function setupDropZone() {
-  const zone = document.getElementById("upload-zone");
-  if (!zone) return;
-  zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("drag-active"); });
-  zone.addEventListener("dragleave", () => zone.classList.remove("drag-active"));
-  zone.addEventListener("drop", e => {
-    e.preventDefault();
-    zone.classList.remove("drag-active");
-    handleFiles(e.dataTransfer.files);
-  });
-}
-
+// ── File upload ───────────────────────────────────────────────
 function handleFiles(fileList) {
   const files = Array.from(fileList).filter(f => f.name.endsWith(".json"));
   if (!files.length) return;

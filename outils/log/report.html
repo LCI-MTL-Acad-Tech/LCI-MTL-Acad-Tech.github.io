@@ -61,13 +61,11 @@
       <div id="phase-upload">
         <div style="max-width:60rem; margin:0 auto;">
           <h2 data-i18n="report.upload_title" style="margin-bottom:var(--sp-3)"></h2>
-          <p class="text-muted" data-i18n="report.upload_instructions" style="margin-bottom:var(--sp-6)"></p>
+          <p class="text-muted" data-i18n="report.upload_instructions" style="margin-bottom:var(--sp-4)"></p>
 
-          <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
-            <div class="upload-icon">📂</div>
-            <p data-i18n="report.upload_cta" style="font-size:1.6rem;font-weight:500;margin-bottom:var(--sp-2)"></p>
-            <p class="text-muted" data-i18n="report.upload_drop" style="font-size:1.4rem"></p>
-            <input type="file" id="file-input" accept=".json" multiple style="display:none" onchange="handleFiles(this.files)">
+          <div class="alert alert--info" style="margin-bottom:var(--sp-5)">
+            <span>📂</span>
+            <span data-i18n="sidebar.hint"></span>
           </div>
 
           <div id="upload-files-list" class="upload-files-list hidden"></div>

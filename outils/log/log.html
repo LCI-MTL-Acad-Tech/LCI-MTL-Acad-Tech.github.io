@@ -59,12 +59,10 @@
     <div class="container container--wide">
 
       <!-- No data warning -->
-      <div id="no-data-warning" class="hidden">
-        <div class="card card--warning" style="max-width:50rem; margin: var(--sp-10) auto; text-align:center;">
-          <div style="font-size:3rem; margin-bottom:var(--sp-3)">⚠</div>
-          <h3 id="no-data-title" style="margin-bottom:var(--sp-3)">Aucune configuration trouvée</h3>
-          <p class="text-muted" style="margin-bottom:var(--sp-5)" id="no-data-msg">Configure d'abord ton profil de stage.</p>
-          <a href="index.html" class="btn btn--primary" data-i18n="welcome.cta_new">Commencer la configuration</a>
+            <div id="no-data-warning" class="hidden">
+        <div class="alert alert--info" style="margin-bottom:var(--sp-4)">
+          <span>📂</span>
+          <span id="no-data-msg">Charge un fichier JSON via le panneau à droite pour commencer.</span>
         </div>
       </div>
 

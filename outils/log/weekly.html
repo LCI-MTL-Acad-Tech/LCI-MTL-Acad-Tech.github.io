@@ -61,22 +61,12 @@
 
       <!-- Upload phase -->
       <div id="phase-upload">
-        <h1 style="font-size:2.8rem;margin-bottom:var(--sp-2)" data-i18n="weekly.title">Bilan hebdomadaire</h1>
-        <p class="text-muted mb-6" data-i18n="weekly.upload_prompt"></p>
-
-        <div class="upload-zone" id="upload-zone"
-          ondragover="event.preventDefault();this.classList.add('drag-over')"
-          ondragleave="this.classList.remove('drag-over')"
-          ondrop="event.preventDefault();this.classList.remove('drag-over');handleWeeklyFiles(event.dataTransfer.files)">
-          <div class="upload-zone-icon">📁</div>
-          <p data-i18n="report.upload_cta"></p>
-          <input type="file" id="file-input" accept=".json" style="display:none" onchange="handleWeeklyFiles(this.files)">
-          <button class="btn btn--secondary mt-4 no-print" onclick="document.getElementById('file-input').click()" data-i18n="report.upload_cta"></button>
+        <div class="alert alert--info" style="margin-bottom:var(--sp-4)">
+          <span>📂</span>
+          <span data-i18n="weekly.upload_prompt"></span>
         </div>
-        <div id="upload-status" class="mt-4"></div>
       </div>
 
-      <!-- Report: accordion of all weeks -->
       <div id="phase-report" class="hidden">
 
         <div class="flex items-center justify-between mb-6 no-print"
