@@ -240,6 +240,9 @@ int main() {
                 <div class="code-cmd">winget install MSYS2.MSYS2</div>
                 <p class="step-note" id="ws1-note"></p>
                 <div class="code-cmd">pacman -S mingw-w64-ucrt-x86_64-gcc</div>
+                <p class="step-note" id="ws1-note2"></p>
+                <div class="code-cmd">g++ --version</div>
+                <p class="step-note" id="ws1-verify"></p>
               </div>
             </div>
             <div class="setup-step">
@@ -419,8 +422,10 @@ const SETUP = {
     me3_body:'Pour Unreal sur Mac, VS Code ou Rider sont recommandés (Xcode fonctionne aussi). Dans Unreal : Edit → Editor Preferences → Source Code → Source Code Editor → Visual Studio Code.',
     // Windows IDE
     ws1_title:'Installe g++ via MSYS2',
-    ws1_body:'Ouvre PowerShell en tant qu\'administrateur et installe MSYS2 via winget. Puis ouvre le terminal MSYS2 (UCRT64) et installe g++ :',
-    ws1_note:'Après installation, ajoute C:\\msys64\\ucrt64\\bin à la variable d\'environnement PATH (Paramètres → Variables d\'environnement).',
+    ws1_body:'Dans PowerShell (administrateur), installe MSYS2 :',
+    ws1_note:'Une fois installé, ouvre le terminal MSYS2 UCRT64 (cherche "MSYS2 UCRT64" dans le menu Démarrer — pas PowerShell) et installe g++ :',
+    ws1_note2:'Ajoute C:\\msys64\\ucrt64\\bin à la variable PATH (Paramètres → Variables d\'environnement → Path → Nouveau). Ferme et rouvre un terminal PowerShell, puis vérifie :',
+    ws1_verify:'Tu devrais voir le numéro de version de g++. Si tu vois une erreur, vérifie que le chemin est bien dans le PATH et que le terminal a été rouvert.',
     win_ide_note:'g++ via MSYS2 est utilisé uniquement pour le Parcours IDE (exercices C++ purs). Le Parcours moteur utilise Visual Studio 2022, dans la colonne de droite.',
     ws2_title:'Ajoute g++ au PATH',
     ws2_body:'Pour que VS Code trouve g++, son chemin doit être dans le PATH système.',
@@ -434,7 +439,7 @@ const SETUP = {
     // Windows Engine
     we1_title:'Installe Visual Studio 2022 Community (requis par Unreal)',
     we1_body:'Unreal Engine sous Windows utilise MSVC comme compilateur. Installe Visual Studio 2022 Community avec la charge de travail "Développement Desktop en C++" :',
-    we1_note:'Important : coche "Développement de jeux avec C++" dans l\'installeur. Cela installe aussi les composants Unreal nécessaires.',
+    we1_note:'Important : coche "Développement de jeux avec C++" dans l\'installeur. Cela installe aussi les composants Unreal nécessaires. Tu verras aussi "Développement de jeux avec Unity" — tu peux ignorer cette option pour ce cours.',
     we2_title:'Installe Unreal Engine',
     we2_body:'Dans le launcher Epic, va dans l\'onglet Unreal Engine → Library, puis installe Unreal Engine 5.x. La première installation prend 30–60 min.',
     we3_title:'Installe Unity Hub',
@@ -496,8 +501,10 @@ const SETUP = {
     me3_body:'For Unreal on Mac, VS Code or Rider are recommended (Xcode also works). In Unreal: Edit → Editor Preferences → Source Code → Source Code Editor → Visual Studio Code.',
     // Windows IDE
     ws1_title:'Install g++ via MSYS2',
-    ws1_body:'Open PowerShell as administrator and install MSYS2 via winget. Then open the MSYS2 terminal (UCRT64) and install g++:',
-    ws1_note:'After installation, add C:\\msys64\\ucrt64\\bin to the PATH environment variable (Settings → Environment Variables).',
+    ws1_body:'In PowerShell (administrator), install MSYS2:',
+    ws1_note:'Once installed, open the MSYS2 UCRT64 terminal (search "MSYS2 UCRT64" in the Start menu — not PowerShell) and install g++:',
+    ws1_note2:'Add C:\\msys64\\ucrt64\\bin to the PATH variable (Settings → Environment Variables → Path → New). Close and reopen a PowerShell terminal, then verify:',
+    ws1_verify:'You should see the g++ version number. If you get an error, check that the path is in PATH and that the terminal was reopened.',
     win_ide_note:'g++ via MSYS2 is only needed for the IDE Path (pure C++ exercises). The Engine Path uses Visual Studio 2022, in the right-hand column.',
     ws2_title:'Add g++ to PATH',
     ws2_body:'For VS Code to find g++, its path must be in the system PATH.',
@@ -511,7 +518,7 @@ const SETUP = {
     // Windows Engine
     we1_title:'Install Visual Studio 2022 Community (required by Unreal)',
     we1_body:'Unreal Engine on Windows uses MSVC as compiler. Install Visual Studio 2022 Community with the "Desktop development with C++" workload:',
-    we1_note:'Important: check "Game development with C++" in the installer. This also installs the necessary Unreal components.',
+    we1_note:'Important: check "Game development with C++" in the installer. This also installs the necessary Unreal components. You will also see "Game development with Unity" — you can ignore that option for this course.',
     we2_title:'Install Unreal Engine',
     we2_body:'In the Epic launcher, go to Unreal Engine → Library, then install Unreal Engine 5.x. First install takes 30–60 min.',
     we3_title:'Install Unity Hub',
@@ -600,6 +607,8 @@ function applySetupStrings(){
     setInner(id+'-body',s[id+'_body']);
   });
   setInner('ws1-note',s.ws1_note);
+  setInner('ws1-note2',s.ws1_note2);
+  setInner('ws1-verify',s.ws1_verify);
   setInner('ws2-note',s.ws2_note);
   setInner('win-ide-note',s.win_ide_note);
   // Windows Engine
@@ -645,7 +654,7 @@ function renderHome(){
     m0el.innerHTML=`
       <div class="snum">${L==='fr'?'Module 0 — Échauffement':'Module 0 — Warmup'}</div>
       <h3>${L==='fr'?'C# que tu connais déjà':'C# you already know'}</h3>
-      <p>${L==='fr'?'Quelques concepts côte à côte sans rien installer':'A few concepts side by side — no install needed'}</p>
+      <p>${L==='fr'?'Cinq concepts côte à côte sans rien installer':'Five concepts side by side — no install needed'}</p>
       <div class="scard-meta">
         <span class="sstatus ${statusClass}">${t(statusKey)}</span>
         <div class="adots">${dots}</div>
