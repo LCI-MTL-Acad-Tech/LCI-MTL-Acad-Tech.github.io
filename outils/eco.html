@@ -889,21 +889,21 @@ function processFile(file) {
 // Columns 0-5: system (ID, start, end, email, name, last modified)
 // Column 6 onwards: Q1..Q60 + student number at Q3 (index 8)
 const COL = {
-  role: 6,           // Q1
-  studentName: 7,    // Q2
-  studentNo: 8,      // Q3 (added in form — student number)
-  profile: 9,        // Q4
-  garmentCat: 10,    // Q5
-  intendedUse: 11,   // Q6
-  useDesc: 12,       // Q7
-  upcycledDesign: 13, // Q8
+  role: 6,             // Q1
+  studentName: 7,      // Q2
+  studentNo: 8,        // Q3
+  profile: 9,          // Q4
+  garmentCat: 10,      // Q5
+  intendedUse: 11,     // Q6
+  useDesc: 12,         // Q7
+  upcycledDesign: 13,  // Q8
   intentionalDesign: 14, // Q9
-  localSourcing: 15,  // Q10
-  digitalProto: 16,   // Q11
-  lowWasteCutting: 17,// Q12
+  localSourcing: 15,   // Q10
+  digitalProto: 16,    // Q11
+  lowWasteCutting: 17, // Q12
   lowImpactProcess: 18,// Q13
-  materialSelection: 19,// Q14 (note: construction research was merged/skipped)
-  multiMaterial: 20, // Q15
+  materialSelection: 19,// Q14
+  multiMaterial: 20,   // Q15
   part1: 21, part2: 22, part3: 23, part4: 24, part5: 25,
   mainFabricOrigin: 26,
   mainFabricSupplier: 27,
@@ -918,7 +918,7 @@ const COL = {
   fusingJustification: 38,
   fabricCertification: 39,
   liningSupplier: 40,
-  fabricPhotoPlan: 41,
+  fabricPhotoPlan: 41, // now a file upload — exports as filename/URL
   durableConstruction: 42,
   wasteStrategy: 43,
   wasteDescription: 44,
@@ -929,20 +929,19 @@ const COL = {
   threadComp: 49,
   seamJustification: 50,
   garmentPhoto: 51,
-  patternPhoto: 52,
-  reflection: 53,
-  // Q50 jury seam score — not present in student submissions; handled separately
-  easilyMended: 54,
-  easilyAltered: 55,
-  structurallySolid: 56,
-  materialsLastLong: 57,
-  accessibleCare: 58,
-  compostable: 59,
-  easyDisassemble: 60,
-  madeFromExisting: 61,
-  selfAssessment: 62, // was 62 based on export
-  additionalComments: 63, // may not be present
-  // jury seam score — injected manually, default 0
+  // patternPhoto removed from form — col 52 no longer exists
+  reflection: 52,      // shifted back by 1
+  easilyMended: 53,    // shifted back by 1
+  easilyAltered: 54,
+  structurallySolid: 55,
+  materialsLastLong: 56,
+  accessibleCare: 57,
+  compostable: 58,
+  easyDisassemble: 59,
+  selfAssessment: 60,
+  additionalComments: 61,
+  // madeFromExisting: removed from form
+  // jury seam score — entered manually in dashboard, not in student form
 };
 
 function cell(row, key) {
@@ -1096,7 +1095,7 @@ function parseRow(headers, row) {
   if (isYes(get('easilyAltered')))      s4raw += 5;
   if (isYes(get('compostable')))        s4raw += 10;
   if (isYes(get('easyDisassemble')))    s4raw += 7;
-  if (isYes(get('madeFromExisting')))   s4raw += 10;
+  // madeFromExisting removed from form
   const s4 = Math.min(s4raw, 10);
 
   const total = s1 + s2 + s3 + s4;
@@ -1156,7 +1155,7 @@ function parseRow(headers, row) {
     accessibleCare: isYes(get('accessibleCare')),
     compostable: isYes(get('compostable')),
     easyDisassemble: isYes(get('easyDisassemble')),
-    madeFromExisting: isYes(get('madeFromExisting')),
+    // madeFromExisting: removed from form
     selfAssessment: isYes(get('selfAssessment')),
     additionalComments: cell(r,'additionalComments'),
     garmentPhoto: get('garmentPhoto'),
@@ -1525,7 +1524,7 @@ function renderS2(s) {
 
     ${s.liningOrigin ? `<div style="margin-top:12px;font-size:12px;color:var(--text3)">${lang==='fr'?'Doublure':'Lining'}: ${esc(s.liningOrigin)} · ${esc(s.liningComp)}${s.liningSupplier?` · ${esc(s.liningSupplier)}`:''}</div>` : ''}
     ${s.combos.length ? `<div style="font-size:12px;color:var(--text3);margin-top:4px">${lang==='fr'?'Tissus compl.':'Combo fabrics'}: ${s.combos.map(esc).join(', ')}</div>` : ''}
-    ${s.fabricPhotoPlan ? `<div style="font-size:12px;color:var(--text3);margin-top:4px">${lang==='fr'?'Plan tissu':'Fabric plan'}: <a href="${esc(s.fabricPhotoPlan)}" style="color:var(--accent)" target="_blank">${lang==='fr'?'Voir le lien':'View link'}</a></div>` : ''}
+    ${s.fabricPhotoPlan ? `<div style="font-size:12px;color:var(--text3);margin-top:4px">${lang==='fr'?'Plan tissu':'Fabric plan'}: ${s.fabricPhotoPlan.startsWith('http') ? `<a href="${esc(s.fabricPhotoPlan)}" style="color:var(--accent)" target="_blank">${lang==='fr'?'Voir le fichier':'View file'}</a>` : `<span style="color:var(--text2)">${esc(s.fabricPhotoPlan)}</span>`}</div>` : ''}
   `);
 }
 
@@ -1540,7 +1539,7 @@ function renderS3(s, idx) {
     <div class="criterion-row">
       <div class="criterion-check yes">→</div>
       <div class="criterion-text">${esc(s.wasteStrategy)}</div>
-      <div class="criterion-pts ${s.s3WasteOverride?'pos':'pos'}">${s.s3WasteOverride?'+15':s.wasteStrategy&&(hasOption(s.wasteStrategy,'gérés')||hasOption(s.wasteStrategy,'managed'))?'+10':s.wasteStrategy&&(hasOption(s.wasteStrategy,'récupération')||hasOption(s.wasteStrategy,'upcycling'))&&s.upcycled?'+10':'0'}</div>
+      <div class="criterion-pts ${s.s3WasteOverride?'pos':wasteScore(s)>0?'pos':'zero'}">${s.s3WasteOverride?'+15':wasteScore(s)>0?'+'+wasteScore(s):'0'}</div>
     </div>
     ${s.wasteDescription?`<div class="qualitative-block"><div class="qualitative-label">${lang==='fr'?'Gestion des déchets':'Waste management'}</div><div class="qualitative-value">${esc(s.wasteDescription)}</div></div>`:''}
     ${s.s3WasteOverride?`<div class="override-notice" style="font-size:12px">✦ ${t('override15')}</div>`:''}
@@ -1576,7 +1575,7 @@ function renderS4(s) {
     ${crit(s.easilyAltered, lang==='fr'?'Facilement modifiable pour prolonger la durée de vie':'Easily altered to extend lifespan', s.easilyAltered?'+5':'0')}
     ${crit(s.compostable, lang==='fr'?'Compostable ou biodégradable':'Compostable or biodegradable', s.compostable?'+10':'0')}
     ${crit(s.easyDisassemble, lang==='fr'?'Facile à démonter (recyclage, transformation)':'Easy to disassemble for recycling', s.easyDisassemble?'+7':'0')}
-    ${crit(s.madeFromExisting, lang==='fr'?'Fabriqué à partir de vêtements et garnitures existants':'Made from existing garments and trim', s.madeFromExisting?'+10':'0')}
+
     ${s.selfAssessment!==undefined?`<div style="margin-top:12px;font-size:12px;color:var(--text3)">${lang==='fr'?'Auto-évaluation éco-conception':'Self-assessed eco-design'}: <strong style="color:${s.selfAssessment?'var(--pass)':'var(--fail)'}">${s.selfAssessment?(lang==='fr'?'Oui':'Yes'):(lang==='fr'?'Non':'No')}</strong></div>`:''}
     ${s.additionalComments?`<div class="qualitative-block" style="margin-top:8px"><div class="qualitative-label">${lang==='fr'?'Commentaires':'Comments'}</div><div class="qualitative-value">${esc(s.additionalComments)}</div></div>`:''}
   `);
@@ -1632,6 +1631,14 @@ function scoredOption(selected, label, ptsVal) {
 }
 
 function pts(n) { return n > 0 ? `+${n}` : String(n); }
+
+function wasteScore(s) {
+  const w = s.wasteStrategy || '';
+  if (s.s3WasteOverride) return 15;
+  if (hasOption(w,'gérés') || hasOption(w,'managed')) return 10;
+  if ((hasOption(w,'récupération') || hasOption(w,'upcycling') || hasOption(w,'Minimal waste')) && s.upcycled) return 10;
+  return 0; // 'Déchets non gérés', 'Waste not managed', bare 'Déchets' — all score 0
+}
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function setJuryScore(idx, val) {
