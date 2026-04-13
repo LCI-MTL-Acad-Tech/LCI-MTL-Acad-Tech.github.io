@@ -82,42 +82,6 @@ function goToPhase(id) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// ── File upload ───────────────────────────────────────────────
-function handleFiles(fileList) {
-  const files = Array.from(fileList).filter(f => f.name.endsWith(".json"));
-  if (!files.length) return;
-  clearReportData(); // clear stale session on new upload
-
-  const fileInfos = [];
-  const parsed = [];
-  let loaded = 0;
-
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      try {
-        const data = JSON.parse(e.target.result);
-        parsed.push(data);
-        fileInfos.push({ name: file.name, ok: true });
-      } catch {
-        fileInfos.push({ name: file.name, ok: false, error: "JSON invalide / Invalid JSON" });
-      }
-      loaded++;
-      if (loaded === files.length) {
-        // Combine with any existing session data
-        const all = [...parsed];
-        const existing = loadData();
-        if (existing && !all.find(f => f.meta?.student_uuid === existing.meta?.student_uuid)) {
-          // Only add if same student — checked in merge
-        }
-        uploadedFiles = all;
-        renderFileList(fileInfos);
-        validateAndMerge(all);
-      }
-    };
-    reader.readAsText(file);
-  });
-}
 
 function renderFileList(fileInfos) {
   const list = document.getElementById("upload-files-list");

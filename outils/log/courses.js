@@ -330,7 +330,7 @@ const PROGRAMS = [
   // ── Logistics ─────────────────────────────────────────────────────────
   { code: "LCA.5G", name: { "fr-CA": "Techniques de la logistique du transport (AEC)",           "en-CA": "Transportation Logistics Technology (AEC)" } },
   // ── Social media strategy (AEC) ───────────────────────────────────────
-  { code: "NWY.1X", name: { "fr-CA": "Stratégies de médias numériques (AEC)",                    "en-CA": "Digital Media Strategies (AEC)" } },
+  { code: "NWY.1X", name: { "fr-CA": "Stratégie sur les réseaux sociaux (AEC)",             "en-CA": "Social Media Strategy (AEC)" } },
 ];
 
 
@@ -643,49 +643,49 @@ const COURSES = {
   },
 
   // ── 410.D0 / LCA.70 — Business Management ─────────────────────────────────
-  // Source: Ministerial programme 410.D0 (2012, updated 2019).
-  // Competency 01JK is the internship competency for both DEC and AEC streams.
+  // Source: Official course outline (confirmed at programme office).
+  // Competency 01UG, 120h in-company (pondération 1-7-3).
   "410-DZ4-AS": {
     title: {
-      "fr-CA": "Stage en gestion de commerces",
-      "en-CA": "Internship in Business Management"
+      "fr-CA": "Stage en gestion commerciale",
+      "en-CA": "Internship in Commercial Management"
     },
     programs: ["410.D0", "LCA.70"],
-    hours: 105,
+    hours: 120,
     competencies: [
       {
-        code: "01JK",
+        code: "01UG",
         title: {
-          "fr-CA": "Assumer les fonctions d'un poste de travail",
-          "en-CA": "Perform the functions of a work position"
+          "fr-CA": "Assurer son intégration au marché de travail",
+          "en-CA": "Participate in integration into the job market"
         },
         elements: [
           {
-            id: "01JK-1",
+            id: "01UG-1",
             title: { "fr-CA": "S'intégrer en milieu de travail", "en-CA": "Integrate into the workplace" },
             criteria: [
-              { id: "01JK-1.1", text: { "fr-CA": "Respect des politiques, règlements et procédures de l'entreprise", "en-CA": "Compliance with company policies, rules and procedures" } },
-              { id: "01JK-1.2", text: { "fr-CA": "Adaptation rapide à la culture organisationnelle", "en-CA": "Rapid adaptation to the organizational culture" } },
-              { id: "01JK-1.3", text: { "fr-CA": "Établissement de relations professionnelles constructives", "en-CA": "Establishment of constructive professional relationships" } }
+              { id: "01UG-1.1", text: { "fr-CA": "Respect des politiques, règlements et procédures de l'entreprise", "en-CA": "Compliance with company policies, rules and procedures" } },
+              { id: "01UG-1.2", text: { "fr-CA": "Adaptation rapide à la culture organisationnelle", "en-CA": "Rapid adaptation to the organizational culture" } },
+              { id: "01UG-1.3", text: { "fr-CA": "Établissement de relations professionnelles constructives", "en-CA": "Establishment of constructive professional relationships" } }
             ]
           },
           {
-            id: "01JK-2",
+            id: "01UG-2",
             title: { "fr-CA": "Exercer les activités liées au poste", "en-CA": "Carry out position-related activities" },
             criteria: [
-              { id: "01JK-2.1", text: { "fr-CA": "Exécution adéquate des tâches confiées selon les standards de qualité attendus", "en-CA": "Adequate completion of assigned tasks according to expected quality standards" } },
-              { id: "01JK-2.2", text: { "fr-CA": "Gestion efficace des priorités et du temps de travail", "en-CA": "Effective management of priorities and working time" } },
-              { id: "01JK-2.3", text: { "fr-CA": "Résolution autonome des problèmes courants liés au poste", "en-CA": "Autonomous resolution of common position-related problems" } },
-              { id: "01JK-2.4", text: { "fr-CA": "Prise d'initiative appropriée dans l'exercice des fonctions", "en-CA": "Appropriate initiative in carrying out duties" } }
+              { id: "01UG-2.1", text: { "fr-CA": "Exécution adéquate des tâches confiées selon les standards de qualité attendus", "en-CA": "Adequate completion of assigned tasks according to expected quality standards" } },
+              { id: "01UG-2.2", text: { "fr-CA": "Gestion efficace des priorités et du temps de travail", "en-CA": "Effective management of priorities and working time" } },
+              { id: "01UG-2.3", text: { "fr-CA": "Résolution autonome des problèmes courants liés au poste", "en-CA": "Autonomous resolution of common position-related problems" } },
+              { id: "01UG-2.4", text: { "fr-CA": "Prise d'initiative appropriée dans l'exercice des fonctions", "en-CA": "Appropriate initiative in carrying out duties" } }
             ]
           },
           {
-            id: "01JK-3",
+            id: "01UG-3",
             title: { "fr-CA": "Analyser son expérience de travail", "en-CA": "Analyze the work experience" },
             criteria: [
-              { id: "01JK-3.1", text: { "fr-CA": "Identification des compétences développées et des lacunes à combler", "en-CA": "Identification of developed competencies and gaps to address" } },
-              { id: "01JK-3.2", text: { "fr-CA": "Évaluation honnête de sa contribution à l'organisation", "en-CA": "Honest assessment of contribution to the organization" } },
-              { id: "01JK-3.3", text: { "fr-CA": "Formulation d'objectifs de développement professionnel pertinents", "en-CA": "Formulation of relevant professional development objectives" } }
+              { id: "01UG-3.1", text: { "fr-CA": "Identification des compétences développées et des lacunes à combler", "en-CA": "Identification of developed competencies and gaps to address" } },
+              { id: "01UG-3.2", text: { "fr-CA": "Évaluation honnête de sa contribution à l'organisation", "en-CA": "Honest assessment of contribution to the organization" } },
+              { id: "01UG-3.3", text: { "fr-CA": "Formulation d'objectifs de développement professionnel pertinents", "en-CA": "Formulation of relevant professional development objectives" } }
             ]
           }
         ]
@@ -693,7 +693,7 @@ const COURSES = {
     ]
   },
 
-  // ── 430.A0 — Food Service Management ──────────────────────────────────────
+  // ── 430.A0  // ── 430.A0 — Food Service Management ──────────────────────────────────────
   // ── 430.B0 — Hotel Management ─────────────────────────────────────────────
   // Source: FR v1.10 (2024) + EN v1.9 (2018). One course, two programs,
   // each with its own competency. Students see only the one matching their program.
@@ -912,12 +912,13 @@ const COURSES = {
     ]
   },
 
-  // ── NWY.1X — Digital Media Strategies ────────────────────────────────────
-  // Source: FR course outline only. EN titles translated.
+  // ── NWY.1X — Stratégie sur les réseaux sociaux ───────────────────────────
+  // Source: course outline verified Apr 2026.
+  // Competencies: KR41, KR46, KR49, KR48 (in outline order).
   "589-N19-AS": {
     title: {
-      "fr-CA": "Stage en stratégies de médias numériques",
-      "en-CA": "Internship in Digital Media Strategies"
+      "fr-CA": "Stage",
+      "en-CA": "Internship"
     },
     programs: ["NWY.1X"],
     hours: 390,
@@ -925,8 +926,8 @@ const COURSES = {
       {
         code: "KR41",
         title: {
-          "fr-CA": "Analyser les tendances des médias numériques",
-          "en-CA": "Analyze digital media trends"
+          "fr-CA": "Concevoir et publier du contenu",
+          "en-CA": "Design and publish content"
         },
         elements: [
           {
@@ -950,8 +951,8 @@ const COURSES = {
       {
         code: "KR46",
         title: {
-          "fr-CA": "Concevoir des stratégies de contenu numérique",
-          "en-CA": "Design digital content strategies"
+          "fr-CA": "Gérer un projet en communication Web",
+          "en-CA": "Manage a Web communication project"
         },
         elements: [
           {
@@ -975,24 +976,32 @@ const COURSES = {
       {
         code: "KR49",
         title: {
-          "fr-CA": "Gérer des communautés en ligne",
-          "en-CA": "Manage online communities"
+          "fr-CA": "Analyser les indicateurs de performance",
+          "en-CA": "Analyze performance indicators"
         },
         elements: [
           {
-            id: "KR49-1",
-            title: { "fr-CA": "Animer la communauté", "en-CA": "Animate the community" },
+            id: "KR49-2",
+            title: { "fr-CA": "Créer du contenu multimédia", "en-CA": "Create multimedia content" },
             criteria: [
-              { id: "KR49-1.1", text: { "fr-CA": "Création de contenu engageant et adapté à la communauté", "en-CA": "Creation of engaging content adapted to the community" } },
-              { id: "KR49-1.2", text: { "fr-CA": "Interaction professionnelle et bienveillante avec les membres", "en-CA": "Professional and supportive interaction with members" } }
+              { id: "KR49-2.1", text: { "fr-CA": "Qualité technique satisfaisante des productions", "en-CA": "Satisfactory technical quality of productions" } },
+              { id: "KR49-2.2", text: { "fr-CA": "Cohérence avec l'identité visuelle de la marque", "en-CA": "Consistency with brand visual identity" } }
             ]
           },
           {
-            id: "KR49-2",
-            title: { "fr-CA": "Gérer les situations difficiles", "en-CA": "Manage difficult situations" },
+            id: "KR49-3",
+            title: { "fr-CA": "Optimiser le contenu pour les plateformes", "en-CA": "Optimize content for platforms" },
             criteria: [
-              { id: "KR49-2.1", text: { "fr-CA": "Gestion calme et professionnelle des commentaires négatifs", "en-CA": "Calm and professional handling of negative comments" } },
-              { id: "KR49-2.2", text: { "fr-CA": "Application des politiques de modération de façon cohérente", "en-CA": "Consistent application of moderation policies" } }
+              { id: "KR49-3.1", text: { "fr-CA": "Adaptation correcte des formats selon la plateforme", "en-CA": "Correct format adaptation by platform" } },
+              { id: "KR49-3.2", text: { "fr-CA": "Application des meilleures pratiques SEO et de référencement", "en-CA": "Application of SEO and referencing best practices" } }
+            ]
+          },
+          {
+            id: "KR49-6",
+            title: { "fr-CA": "Évaluer la performance du contenu", "en-CA": "Evaluate content performance" },
+            criteria: [
+              { id: "KR49-6.1", text: { "fr-CA": "Suivi régulier des indicateurs de performance clés", "en-CA": "Regular monitoring of key performance indicators" } },
+              { id: "KR49-6.2", text: { "fr-CA": "Utilisation des données pour optimiser les stratégies futures", "en-CA": "Use of data to optimize future strategies" } }
             ]
           }
         ]
@@ -1000,32 +1009,24 @@ const COURSES = {
       {
         code: "KR48",
         title: {
-          "fr-CA": "Produire du contenu numérique",
-          "en-CA": "Produce digital content"
+          "fr-CA": "Entretenir des liens avec la communauté",
+          "en-CA": "Maintain community relationships"
         },
         elements: [
           {
+            id: "KR48-1",
+            title: { "fr-CA": "Animer la communauté", "en-CA": "Engage the community" },
+            criteria: [
+              { id: "KR48-1.1", text: { "fr-CA": "Création de contenu engageant et adapté à la communauté", "en-CA": "Creation of engaging content adapted to the community" } },
+              { id: "KR48-1.2", text: { "fr-CA": "Interaction professionnelle et bienveillante avec les membres", "en-CA": "Professional and supportive interaction with members" } }
+            ]
+          },
+          {
             id: "KR48-2",
-            title: { "fr-CA": "Créer du contenu multimédia", "en-CA": "Create multimedia content" },
+            title: { "fr-CA": "Gérer les situations difficiles", "en-CA": "Manage difficult situations" },
             criteria: [
-              { id: "KR48-2.1", text: { "fr-CA": "Qualité technique satisfaisante des productions", "en-CA": "Satisfactory technical quality of productions" } },
-              { id: "KR48-2.2", text: { "fr-CA": "Cohérence avec l'identité visuelle de la marque", "en-CA": "Consistency with brand visual identity" } }
-            ]
-          },
-          {
-            id: "KR48-3",
-            title: { "fr-CA": "Optimiser le contenu pour les plateformes", "en-CA": "Optimize content for platforms" },
-            criteria: [
-              { id: "KR48-3.1", text: { "fr-CA": "Adaptation correcte des formats selon la plateforme", "en-CA": "Correct format adaptation by platform" } },
-              { id: "KR48-3.2", text: { "fr-CA": "Application des meilleures pratiques SEO et de référencement", "en-CA": "Application of SEO and referencing best practices" } }
-            ]
-          },
-          {
-            id: "KR48-6",
-            title: { "fr-CA": "Évaluer la performance du contenu", "en-CA": "Evaluate content performance" },
-            criteria: [
-              { id: "KR48-6.1", text: { "fr-CA": "Suivi régulier des indicateurs de performance clés", "en-CA": "Regular monitoring of key performance indicators" } },
-              { id: "KR48-6.2", text: { "fr-CA": "Utilisation des données pour optimiser les stratégies futures", "en-CA": "Use of data to optimize future strategies" } }
+              { id: "KR48-2.1", text: { "fr-CA": "Gestion calme et professionnelle des commentaires négatifs", "en-CA": "Calm and professional handling of negative comments" } },
+              { id: "KR48-2.2", text: { "fr-CA": "Application des politiques de modération de façon cohérente", "en-CA": "Consistent application of moderation policies" } }
             ]
           }
         ]

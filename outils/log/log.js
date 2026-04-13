@@ -1435,8 +1435,22 @@ function checkAutoTour() {
 // ── Sidebar hook ─────────────────────────────────────────────
 function onSidebarLoad() {
   logData = loadData();
-  if (logData?.profile?.full_name) {
-    document.getElementById("no-data-warning")?.classList.add("hidden");
-    initLog();
+  if (!logData?.profile?.full_name) return;
+
+  document.getElementById("no-data-warning")?.classList.add("hidden");
+  document.getElementById("log-main")?.classList.remove("hidden");
+
+  // Find or create today's log entry
+  const today = new Date().toISOString().slice(0, 10);
+  currentLog = getTodayLogId(logData);
+  if (!currentLog) {
+    currentLog = createNewLog(today);
+    logData.logs.push(currentLog);
+    saveData(logData);
   }
+
+  renderAll();
+  renderDrawerToggles?.();
+  checkWeeklyWrap?.();
+  applyLanguage(getCurrentLang());
 }

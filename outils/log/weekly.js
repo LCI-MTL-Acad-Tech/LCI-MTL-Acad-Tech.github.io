@@ -32,29 +32,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ── Drop zone ─────────────────────────────────────────────────
-function handleWeeklyFiles(fileList) {
-  const files = Array.from(fileList).filter(f => f.name.endsWith(".json"));
-  if (!files.length) return;
-
-  Promise.all(files.map(f => new Promise(res => {
-    const r = new FileReader();
-    r.onload = e => { try { res(JSON.parse(e.target.result)); } catch { res(null); } };
-    r.readAsText(f);
-  }))).then(parsed => {
-    const valid = parsed.filter(Boolean);
-    if (!valid.length) {
-      showUploadError(t("error.no_files")); return;
-    }
-    const result = mergeInternshipFiles(valid);
-    if (!result.valid) {
-      showUploadError(t("error.no_files")); return;
-    }
-    weeklyData = result.data;
-    saveReportData(weeklyData); // persist so tab navigation doesn't lose the merge
-    renderAllWeeks();
-    showReport();
-  });
-}
 
 function showUploadError(msg) {
   const el = document.getElementById("upload-status");
