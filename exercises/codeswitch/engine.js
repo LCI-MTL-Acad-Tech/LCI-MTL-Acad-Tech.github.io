@@ -281,6 +281,14 @@ function switchPath(path){
 }
 
 // ── Shared concept block (above path tabs) ────────────────────
+// Escape literal newlines inside string-literal spans so \n renders as text
+function fixCodeNewlines(html){
+  // Replace actual newline chars inside <span class="str">...</span> with \n text
+  return html.replace(/<span class="str">([\s\S]*?)<\/span>/g, (match, inner) =>
+    '<span class="str">' + inner.replace(/\n/g, '\\n') + '</span>'
+  );
+}
+
 function renderSharedConcept(S){
   let h=`<div class="shared-concept">
     <p class="concept-text">${S.tutor.concept[L]}</p>`;
@@ -337,13 +345,13 @@ function renderPathPanel(S, path){
   if(data.compare){
     if(path==='ide'){
       h+=`<div class="compare">
-        <div class="cpanel"><div class="cpanel-hdr cpp-std">C++ standard</div><pre>${data.compare.std}</pre></div>
-        <div class="cpanel"><div class="cpanel-hdr cpp">C++ — Unreal</div><pre>${data.compare.unreal}</pre></div>
+        <div class="cpanel"><div class="cpanel-hdr cpp-std">C++ standard</div><pre>${fixCodeNewlines(data.compare.std)}</pre></div>
+        <div class="cpanel"><div class="cpanel-hdr cpp">C++ — Unreal</div><pre>${fixCodeNewlines(data.compare.unreal)}</pre></div>
       </div>`;
     } else {
       h+=`<div class="compare">
-        <div class="cpanel"><div class="cpanel-hdr cs">C# — Unity</div><pre>${data.compare.cs}</pre></div>
-        <div class="cpanel"><div class="cpanel-hdr cpp">C++ — Unreal</div><pre>${data.compare.cpp}</pre></div>
+        <div class="cpanel"><div class="cpanel-hdr cs">C# — Unity</div><pre>${fixCodeNewlines(data.compare.cs)}</pre></div>
+        <div class="cpanel"><div class="cpanel-hdr cpp">C++ — Unreal</div><pre>${fixCodeNewlines(data.compare.cpp)}</pre></div>
       </div>`;
     }
   }
@@ -552,8 +560,9 @@ function updateActCheck(actId,done){
 
 function updateCompBtn(sessId,ns){
   const S=SESSION;
-  const data=ns==='ide'?S.ide:S.engine;
-  const acts=data?.activities||[];
+  let acts;
+  if(ns==='m0') acts=S.activities||[];
+  else { const data=ns==='ide'?S.ide:S.engine; acts=data?.activities||[]; }
   if(!acts.length) return;
   const done=pathDone(sessId,acts,ns);
   const isComplete=isPathComplete(sessId,ns);
@@ -769,11 +778,11 @@ function renderM0Concept(concept,sessId,ns,allActs){
         <div class="m0-side-by-side">
           <div class="m0-col">
             <div class="m0-lang-hdr cs-hdr">C# — Unity / .NET</div>
-            <div class="code-block" style="white-space:pre-wrap">${concept.cs}</div>
+            <div class="code-block" style="white-space:pre-wrap">${fixCodeNewlines(concept.cs)}</div>
           </div>
           <div class="m0-col">
             <div class="m0-lang-hdr cpp-hdr">C++ — équivalent</div>
-            <div class="code-block" style="white-space:pre-wrap">${concept.cpp}</div>
+            <div class="code-block" style="white-space:pre-wrap">${fixCodeNewlines(concept.cpp)}</div>
           </div>
         </div>`;
 
@@ -872,9 +881,9 @@ function renderDiff(act,sessId,ns){
   }).join('');
   return `<div class="m0-diff-pair">
     <div class="m0-diff-col"><div class="m0-diff-col-hdr cs-hdr">C#</div>
-      <div class="code-block" style="white-space:pre-wrap;font-size:1.25rem">${act.cs}</div></div>
+      <div class="code-block" style="white-space:pre-wrap;font-size:1.25rem">${fixCodeNewlines(act.cs)}</div></div>
     <div class="m0-diff-col"><div class="m0-diff-col-hdr cpp-hdr">C++</div>
-      <div class="code-block" style="white-space:pre-wrap;font-size:1.25rem">${act.cpp}</div></div>
+      <div class="code-block" style="white-space:pre-wrap;font-size:1.25rem">${fixCodeNewlines(act.cpp)}</div></div>
   </div>
   <p style="font-size:1.4rem;color:var(--ch2);margin-bottom:.8rem">${tm0('diffPrompt')}</p>
   <div class="choices">${choices}</div>

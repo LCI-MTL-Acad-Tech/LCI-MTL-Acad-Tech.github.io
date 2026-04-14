@@ -83,8 +83,8 @@ std::<span class="ty">string</span>  name   = <span class="str">"Héros"</span>;
 <span class="ty">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"Fini !"</span>);`,
       cpp:`<span class="kw2">int</span> score = <span class="num">42</span>;
 std::cout &lt;&lt; <span class="str">"Score : "</span>
-          &lt;&lt; score &lt;&lt; <span class="str">"\n"</span>;
-std::cout &lt;&lt; <span class="str">"Fini !\n"</span>;`,
+          &lt;&lt; score &lt;&lt; std::endl;  <span class="cm">// ou "\n"</span>
+std::cout &lt;&lt; <span class="str">"Fini !\n"</span>;       <span class="cm">// ou std::endl</span>`,
       runUrl: _OC,
       diff:{
         fr:[
@@ -148,8 +148,8 @@ std::cout &lt;&lt; <span class="str">"Fini !\n"</span>;`,
     {
       title:{ fr:'4 — Boucles', en:'4 — Loops' },
       body:{
-        fr:`La boucle for classique est identique. Le foreach devient un "range-based for" avec : au lieu de in. La boucle while aussi est identique. La seule vraie surprise : en C++, oublier un break dans un switch laisse l'exécution tomber dans le case suivant (S03 en détaille les conséquences).`,
-        en:`The classic for loop is identical. foreach becomes a "range-based for" with : instead of in. while is also identical. The only real surprise: in C++, forgetting break in a switch lets execution fall into the next case (S03 covers the consequences).`
+        fr:`La boucle for classique est identique. Le foreach devient un "range-based for" avec : au lieu de in. while et do-while sont aussi identiques. La seule vraie surprise : en C++, oublier un break dans un switch laisse l'exécution tomber dans le case suivant (S03 en détaille les conséquences).`,
+        en:`The classic for loop is identical. foreach becomes a "range-based for" with : instead of in. while and do-while are also identical. The only real surprise: in C++, forgetting break in a switch lets execution fall into the next case (S03 covers the consequences).`
       },
       cs:`<span class="cm">// for classique</span>
 <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">3</span>; i++)
@@ -162,7 +162,13 @@ std::cout &lt;&lt; <span class="str">"Fini !\n"</span>;`,
 
 <span class="cm">// while</span>
 <span class="kw">int</span> x = <span class="num">3</span>;
-<span class="kw">while</span> (x &gt; <span class="num">0</span>) x--;`,
+<span class="kw">while</span> (x &gt; <span class="num">0</span>) x--;
+
+<span class="cm">// do-while : s'exécute au moins une fois</span>
+<span class="kw">do</span> {
+    <span class="ty">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"tourne"</span>);
+    x--;
+} <span class="kw">while</span> (x &gt; <span class="num">0</span>);`,
       cpp:`<span class="cm">// for classique — identique</span>
 <span class="kw2">for</span> (<span class="kw2">int</span> i = <span class="num">0</span>; i &lt; <span class="num">3</span>; i++)
     std::cout &lt;&lt; i &lt;&lt; <span class="str">"\n"</span>;
@@ -174,17 +180,23 @@ std::cout &lt;&lt; <span class="str">"Fini !\n"</span>;`,
 
 <span class="cm">// while — identique</span>
 <span class="kw2">int</span> x = <span class="num">3</span>;
-<span class="kw2">while</span> (x &gt; <span class="num">0</span>) x--;`,
+<span class="kw2">while</span> (x &gt; <span class="num">0</span>) x--;
+
+<span class="cm">// do-while : s'exécute au moins une fois</span>
+<span class="kw2">do</span> {
+    std::cout &lt;&lt; <span class="str">"tourne\n"</span>;
+    x--;
+} <span class="kw2">while</span> (x &gt; <span class="num">0</span>);`,
       runUrl: _OC,
       diff:{
         fr:[
-          `<code>for</code> classique et <code>while</code> — <strong>identiques</strong>`,
+          `<code>for</code>, <code>while</code> et <code>do-while</code> — <strong>identiques</strong>`,
           `<code>foreach (var n in nums)</code> → <code>for (const auto& n : nums)</code>`,
           `<code>in</code> devient <code>:</code> et <code>var</code> devient <code>const auto&</code>`,
           `<code>const auto&</code> évite de copier chaque élément — bonne pratique C++`,
         ],
         en:[
-          `Classic <code>for</code> and <code>while</code> — <strong>identical</strong>`,
+          `Classic <code>for</code>, <code>while</code>, and <code>do-while</code> — <strong>identical</strong>`,
           `<code>foreach (var n in nums)</code> → <code>for (const auto& n : nums)</code>`,
           `<code>in</code> becomes <code>:</code> and <code>var</code> becomes <code>const auto&</code>`,
           `<code>const auto&</code> avoids copying each element — C++ best practice`,
