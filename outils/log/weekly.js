@@ -98,7 +98,8 @@ function getWeekEnd(weekStart) {
 }
 
 function isWeekComplete(weekStart) {
-  const today = new Date().toISOString().slice(0, 10);
+  // Use effective today so future-dated data loads render weeks correctly
+  const today = getEffectiveToday(weeklyData);
   const weekEnd = getWeekEnd(weekStart);
   return weekEnd < today;
 }
@@ -172,13 +173,15 @@ function buildWeekSection(weekStart, logs, defaultOpen, collapsible, isCurrent =
     : "—";
   const hasWrap = logs.some(l =>
     l.weekly_wrap?.highlight || l.weekly_wrap?.learning || l.weekly_wrap?.change);
+  const hasFutureFiled = logs.some(l => l.future_filing);
 
   const section = document.createElement("div");
   section.className = "weekly-section";
   section.style.cssText =
     "background:var(--bg-card);border-radius:var(--r-xl);" +
     "box-shadow:var(--shadow-sm);margin-bottom:var(--sp-4);overflow:hidden;" +
-    (isCurrent ? "border-left:3px solid var(--accent)" : "");
+    (isCurrent       ? "border-left:3px solid var(--accent)" :
+     hasFutureFiled  ? "border-left:3px solid var(--danger)"  : "");
 
   // Header — always collapsible now; cursor only when collapsible
   const header = document.createElement("div");
@@ -199,6 +202,12 @@ function buildWeekSection(weekStart, logs, defaultOpen, collapsible, isCurrent =
                    border-radius:var(--r-pill);padding:0.1rem 0.6rem"
         data-i18n="weekly.current_week">${t("weekly.current_week") || "en cours"}</span>`
     : "";
+  const futureBadge = hasFutureFiled
+    ? `<span style="font-size:1.1rem;background:var(--danger);color:white;
+                   border-radius:var(--r-pill);padding:0.1rem 0.6rem"
+        title="${getCurrentLang() === 'fr-CA' ? 'Journaux saisis avant la date' : 'Logs filed before the date'}">
+        ⚠ ${getCurrentLang() === "fr-CA" ? "future" : "future-filed"}</span>`
+    : "";
 
   header.innerHTML = `
     <div style="flex:1;min-width:0">
@@ -206,7 +215,7 @@ function buildWeekSection(weekStart, logs, defaultOpen, collapsible, isCurrent =
       <div style="font-size:1.3rem;color:var(--text-subtle);margin-top:2px;
                   display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2)">
         ${daysLabel} · ${formatDuration(totalMins)} · ${avgRating}/5
-        ${wrapBadge}${currentBadge}
+        ${wrapBadge}${currentBadge}${futureBadge}
       </div>
     </div>
     <button class="btn btn--ghost btn--sm no-print"

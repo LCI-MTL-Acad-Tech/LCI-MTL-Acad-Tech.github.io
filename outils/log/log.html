@@ -98,20 +98,33 @@
           <!-- Date and time header -->
           <div class="card mb-4">
             <div class="flex items-center justify-between mb-4" style="flex-wrap:wrap;gap:var(--sp-3)">
-              <!-- Normal date heading (hidden when late filing) -->
-              <h2 id="log-date-display" style="font-size:2.8rem"></h2>
-              <!-- Date picker (shown when late filing checked) -->
-              <div id="log-date-picker-wrap" style="display:none;align-items:center;gap:var(--sp-3)">
-                <input type="date" id="log-date-picker"
-                  style="font-size:2rem;font-weight:400;letter-spacing:-0.02em;border:none;
-                         background:transparent;color:var(--text);font-family:inherit;padding:0;width:auto"
-                  onchange="updateLogDate(this.value)">
-              </div>
-              <div class="flex gap-2 items-center">
-                <label style="margin:0; font-size:1.4rem;">
-                  <input type="checkbox" id="late-filing" onchange="toggleLateFiling(this.checked)" style="margin-right:var(--sp-2)">
-                  <span data-i18n="log.late_filing"></span>
-                </label>
+              <!-- Date display — clicking opens the inline date picker -->
+              <h2 id="log-date-display" style="font-size:2.8rem;cursor:pointer"
+                title="" onclick="toggleDatePicker(true)"></h2>
+
+              <div class="flex gap-2 items-center" style="flex-wrap:wrap">
+                <!-- Inline date picker (hidden by default) -->
+                <div id="log-date-picker-wrap" style="display:none;align-items:center;gap:var(--sp-3)">
+                  <label style="font-size:1.3rem;color:var(--text-muted);margin:0"
+                    data-i18n="log.date_pick_label"></label>
+                  <input type="date" id="log-date-picker"
+                    style="font-size:1.6rem;font-weight:400;border:1.5px solid var(--border);
+                           border-radius:var(--r-md);background:var(--bg-subtle);
+                           color:var(--text);font-family:inherit;padding:0.4rem 0.8rem"
+                    onchange="switchToDate(this.value)">
+                  <button class="btn btn--ghost btn--sm" onclick="toggleDatePicker(false)"
+                    data-i18n="action.cancel">✕</button>
+                </div>
+
+                <!-- Change date button (always visible) -->
+                <button class="btn btn--ghost btn--sm" onclick="toggleDatePicker(true)"
+                  id="change-date-btn" data-i18n="log.change_date"></button>
+
+                <!-- Today button — only shown when current log ≠ real today -->
+                <button class="btn btn--secondary btn--sm" id="go-to-today-btn"
+                  style="display:none"
+                  data-i18n="log.go_to_today"
+                  onclick="goToRealToday()"></button>
               </div>
             </div>
 

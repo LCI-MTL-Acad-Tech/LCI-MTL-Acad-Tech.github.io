@@ -42,9 +42,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("log-main").classList.remove("hidden");
 
-  // Load or create today's log
-  const today = new Date().toISOString().slice(0, 10);
-  currentLog = getTodayLogId(logData);
+  // Load or create the most recent log day
+  // Use getEffectiveToday so future-dated JSON loads work correctly
+  const today = getEffectiveToday(logData);
+  currentLog = getTodayLogId(logData, today);
   if (!currentLog) {
     currentLog = createNewLog(today);
     logData.logs.push(currentLog);
@@ -93,7 +94,19 @@ function renderHeader() {
   const lang = getCurrentLang();
   const dateStr = formatDate(currentLog.date + "T12:00:00");
   document.getElementById("log-date-display").textContent = dateStr;
-  document.getElementById("late-filing").checked = currentLog.late_filing || false;
+
+  // Show "Today" button when current log is not real today
+  const realToday = new Date().toISOString().slice(0, 10);
+  const todayBtn  = document.getElementById("go-to-today-btn");
+  if (todayBtn) todayBtn.style.display = currentLog.date !== realToday ? "" : "none";
+
+  // Sync date picker value and bounds
+  const picker = document.getElementById("log-date-picker");
+  if (picker) {
+    picker.value = currentLog.date;
+    picker.min   = logData?.context?.start_date || "";
+    picker.max   = logData?.context?.scheduled_end_date || "";
+  }
 
   if (currentLog.time_start) {
     document.getElementById("log-time-start").value = currentLog.time_start.slice(11, 16);
@@ -103,10 +116,6 @@ function renderHeader() {
   }
   document.getElementById("log-onsite").checked = currentLog.modality_onsite || false;
   document.getElementById("log-remote").checked = currentLog.modality_remote || false;
-  // Restore late-filing date picker state
-  if (currentLog.late_filing) {
-    toggleLateFiling(true);
-  }
   renderMorningEnergy();
 }
 
@@ -469,28 +478,57 @@ function removeLessonTag(taskId, idx) {
 }
 
 // ── Late filing date selector ────────────────────────────────
-function toggleLateFiling(checked) {
-  currentLog.late_filing = checked;
-  const heading = document.getElementById("log-date-display");
-  const pickerWrap = document.getElementById("log-date-picker-wrap");
-  const picker = document.getElementById("log-date-picker");
+function toggleDatePicker(show) {
+  document.getElementById("log-date-picker-wrap").style.display = show ? "flex" : "none";
+  const changeBtn = document.getElementById("change-date-btn");
+  if (changeBtn) changeBtn.style.display = show ? "none" : "";
+}
 
-  if (checked) {
-    heading.style.display = "none";
-    pickerWrap.style.display = "flex";
-    // Pre-fill with current log date
-    picker.value = currentLog.date;
-    picker.max = new Date().toISOString().slice(0, 10); // can't file late for the future
-  } else {
-    heading.style.display = "";
-    pickerWrap.style.display = "none";
-    // Restore to today's date
-    const today = new Date().toISOString().slice(0, 10);
-    currentLog.date = today;
-    document.getElementById("log-date-display").textContent =
-      formatDate(today + "T12:00:00");
+// Switch the active log to any date within the internship.
+// Loads existing log for that date, or creates a new one.
+function switchToDate(dateStr) {
+  if (!dateStr || !logData) return;
+  toggleDatePicker(false);
+
+  // Clamp to internship bounds if defined
+  const start = logData.context?.start_date;
+  const end   = logData.context?.scheduled_end_date;
+  if (start && dateStr < start) dateStr = start;
+  if (end   && dateStr > end)   dateStr = end;
+
+  updateLog(); // save current log first
+
+  let target = getTodayLogId(logData, dateStr);
+  if (!target) {
+    target = createNewLog(dateStr);
+    // createNewLog already sets late_filing and future_filing based on real date
+    logData.logs.push(target);
   }
-  updateLog();
+  currentLog = target;
+  saveData(logData);
+  renderAll();
+}
+
+// Force-navigate to real wall-clock today, bypassing getEffectiveToday.
+// Used when a student is on a machine with the wrong date/time setting.
+// Clamps to internship bounds so we never create a log outside the period.
+function goToRealToday() {
+  let realToday = new Date().toISOString().slice(0, 10);
+  const start = logData?.context?.start_date;
+  const end   = logData?.context?.scheduled_end_date;
+  if (start && realToday < start) realToday = start;
+  if (end   && realToday > end)   realToday = end;
+  switchToDate(realToday);
+}
+
+// Kept for backward compatibility with any calls from old HTML — delegates to switchToDate
+function toggleLateFiling(checked) {
+  if (checked) {
+    toggleDatePicker(true);
+  } else {
+    toggleDatePicker(false);
+    switchToDate(getEffectiveToday(logData));
+  }
 }
 
 function updateLogDate(newDate) {
@@ -510,7 +548,7 @@ function updateLogDate(newDate) {
 function updateTimings() {
   const startVal = document.getElementById("log-time-start").value;
   const endVal = document.getElementById("log-time-end").value;
-  const today = new Date().toISOString().slice(0, 10);
+  const today = currentLog.date; // use log's own date, not real today
 
   if (startVal) currentLog.time_start = `${today}T${startVal}:00`;
   if (endVal) currentLog.time_end = `${today}T${endVal}:00`;
@@ -1462,9 +1500,9 @@ function onSidebarLoad() {
   document.getElementById("no-data-warning")?.classList.add("hidden");
   document.getElementById("log-main")?.classList.remove("hidden");
 
-  // Find or create today's log entry
-  const today = new Date().toISOString().slice(0, 10);
-  currentLog = getTodayLogId(logData);
+  // Find or create the most recent log entry (respects future-dated data)
+  const today = getEffectiveToday(logData);
+  currentLog = getTodayLogId(logData, today);
   if (!currentLog) {
     currentLog = createNewLog(today);
     logData.logs.push(currentLog);

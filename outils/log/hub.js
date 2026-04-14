@@ -21,8 +21,9 @@ function programColor(prog) {
 
 // ── Init ──────────────────────────────────────────────────────
 // Active quick-filter values (program / teacher buttons)
-let activeProgram = "";
-let activeTeacher = "";
+let activeProgram   = "";
+let activeTeacher   = "";
+let activeIntegrity = false; // filter: show only students with integrity issues
 
 document.addEventListener("DOMContentLoaded", () => {
   initPage();
@@ -362,6 +363,9 @@ function buildRow(data) {
   const actualHours = +(logs.reduce((s, l) =>
     s + (l.task_total_minutes || l.day_duration_minutes || 0), 0) / 60).toFixed(1);
 
+  const futureHours = +(logs.filter(l => l.future_filing).reduce((s, l) =>
+    s + (l.task_total_minutes || l.day_duration_minutes || 0), 0) / 60).toFixed(1);
+
   const trackPct  = expectedHours > 0 ? Math.round((actualHours / expectedHours) * 100) : null;
   const trackBand = trackPct === null ? "none"
     : trackPct >= 90 ? "green"
@@ -459,6 +463,55 @@ function buildRow(data) {
     }));
   }
 
+  // ── Filing integrity analysis ─────────────────────────────────
+  // Detects patterns suggesting logs were not written in real time.
+  const integrity = (function() {
+    if (!logs.length) return { ok: true, future_count: 0, late_count: 0 };
+
+    const futureFiled = logs.filter(l => l.future_filing);
+    const lateFiled   = logs.filter(l => l.late_filing);
+
+    // Clustering: are created_at timestamps bunched in a suspiciously short window?
+    const createdDates = logs
+      .map(l => l.created_at || l.saved_at)
+      .filter(Boolean)
+      .map(ts => ts.slice(0, 10))
+      .sort();
+
+    let clusterFlag = false, clusterDetail = "";
+    if (createdDates.length >= 5 && startDate && endDate) {
+      const internSpan = Math.max(1,
+        (new Date(endDate) - new Date(startDate)) / 86400000);
+      const createdSpan = Math.max(0,
+        (new Date(createdDates[createdDates.length - 1]) - new Date(createdDates[0])) / 86400000);
+      if (createdSpan / internSpan < CLUSTER_THRESHOLD_PCT) {
+        clusterFlag   = true;
+        clusterDetail = `${Math.round(createdSpan)}j span / ${Math.round(internSpan)}j stage`;
+      }
+    }
+
+    // Export lag: file last_modified vs last log date
+    const lastModified = data.meta?.last_modified;
+    const lastLogDate  = logs[logs.length - 1]?.date;
+    let lagFlag = false, lagDays = 0;
+    if (lastModified && lastLogDate) {
+      lagDays = Math.round(
+        (new Date(lastModified.slice(0, 10)) - new Date(lastLogDate)) / 86400000);
+      if (lagDays > LAG_THRESHOLD_DAYS) lagFlag = true;
+    }
+
+    return {
+      ok:             futureFiled.length === 0 && !clusterFlag && !lagFlag,
+      future_count:   futureFiled.length,
+      future_dates:   futureFiled.map(l => l.date),
+      late_count:     lateFiled.length,
+      cluster_flag:   clusterFlag,
+      cluster_detail: clusterDetail,
+      lag_flag:       lagFlag,
+      lag_days:       lagDays,
+    };
+  })();
+
   return {
     uuid:               data.meta?.student_uuid || data.profile?.student_id,
     name:               data.profile?.full_name || "—",
@@ -473,6 +526,7 @@ function buildRow(data) {
     work_days_elapsed:  workDaysElapsed,
     expected_hours:     expectedHours,
     actual_hours:       actualHours,
+    future_hours:       futureHours,
     track_pct:          trackPct,
     track_band:         trackBand,
     week_hours:         weekHours,
@@ -489,6 +543,7 @@ function buildRow(data) {
     total_target:       totalTarget,
     competency_coverage,
     outcome_coverage,
+    integrity,
     raw:                data,
   };
 }
@@ -546,6 +601,7 @@ function applyFilters() {
     if (pathway && s.pathway !== pathway)       return false;
     if (track   && s.track_band !== track)      return false;
     if (course  && s.course_code !== course)    return false;
+    if (activeIntegrity && s.integrity?.ok !== false) return false;
     if (search  && !s.name.toLowerCase().includes(search)
                 && !s.student_id.toLowerCase().includes(search)) return false;
     return true;
@@ -570,7 +626,7 @@ function applyFilters() {
 }
 
 function clearFilters() {
-  activeProgram = ""; activeTeacher = "";
+  activeProgram = ""; activeTeacher = ""; activeIntegrity = false;
   ["filter-program","filter-teacher","filter-pathway","filter-track","filter-course"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = "";
@@ -639,6 +695,33 @@ function renderStats() {
 function renderQuickFilters() {
   renderQuickFilterGroup("hub-qf-programs", "program",  activeProgram);
   renderQuickFilterGroup("hub-qf-teachers", "teacher",  activeTeacher);
+  renderIntegrityFilter();
+}
+
+function renderIntegrityFilter() {
+  const el = document.getElementById("hub-qf-integrity");
+  if (!el) return;
+  const count = students.filter(s => s.integrity?.ok === false).length;
+  if (!count) { el.innerHTML = ""; return; }
+  const lang = getCurrentLang();
+  const label = lang === "fr-CA"
+    ? `⚠ Intégrité (${count})`
+    : `⚠ Integrity (${count})`;
+  el.innerHTML = `<button
+    onclick="toggleIntegrityFilter()"
+    style="padding:var(--sp-1) var(--sp-3);border-radius:var(--r-pill);font-size:1.2rem;
+           font-family:inherit;cursor:pointer;
+           border:1.5px solid ${activeIntegrity ? 'var(--danger)' : 'var(--border)'};
+           background:${activeIntegrity ? 'var(--danger)' : 'var(--bg-card)'};
+           color:${activeIntegrity ? 'white' : 'var(--danger)'};
+           font-weight:${activeIntegrity ? '600' : '400'};transition:all var(--dur-fast)">
+    ${label}
+  </button>`;
+}
+
+function toggleIntegrityFilter() {
+  activeIntegrity = !activeIntegrity;
+  applyFilters();
 }
 
 function renderQuickFilterGroup(containerId, field, activeVal) {
@@ -681,6 +764,8 @@ function toggleQuickFilter(field, val) {
 // 4+ working days absent              → AWOL
 const AWOL_WORK_DAYS = 4;
 const MIA_WORK_DAYS  = 2;
+const LAG_THRESHOLD_DAYS    = 7;    // integrity: days between last log and file export
+const CLUSTER_THRESHOLD_PCT = 0.20; // integrity: created_at span / internship span
 
 function getAWOLStudents() {
   return filtered.filter(s =>
@@ -812,6 +897,19 @@ function renderHoursChart() {
     const initials = s.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
     const tip      = `${escHtml(s.name)}: ${s.actual_hours}h / ${s.expected_hours}h attendues`;
 
+    // Hatched overlay for future-filed hours
+    const futureH  = Math.min(s.future_hours || 0, s.actual_hours);
+    const futurePx = futureH > 0 ? Math.max(Math.round((futureH / maxH) * chartH), 2) : 0;
+    const futureOverlay = futurePx > 0
+      ? `<div style="position:absolute;bottom:0;left:0;right:0;height:${futurePx}px;
+                     background:repeating-linear-gradient(
+                       45deg,
+                       rgba(255,255,255,.25) 0px, rgba(255,255,255,.25) 3px,
+                       transparent 3px, transparent 6px
+                     );border-radius:0 0 3px 3px;z-index:3"
+              title="${futureH}h future-filed"></div>`
+      : "";
+
     return `
       <div title="${tip}"
         onclick="openStudentPanel('${escHtml(s.uuid)}')"
@@ -830,6 +928,7 @@ function renderHoursChart() {
                       transition:filter var(--dur-fast)"
                onmouseover="this.style.filter='brightness(1.2)'"
                onmouseout="this.style.filter=''">
+            ${futureOverlay}
           </div>
         </div>
         ${showInitials ? `<div style="font-size:${barW >= 20 ? 1 : 0.85}rem;color:var(--text-subtle);
@@ -895,6 +994,7 @@ function renderTable() {
   empty.style.display = "none";
 
   tbody.innerHTML = filtered.map((s, i) => {
+    const lang = getCurrentLang();
     // Track pill
     const pillClass = { green:"track-green", amber:"track-amber", red:"track-red", none:"track-none" }[s.track_band];
     const pillLabel = s.track_pct !== null
@@ -924,9 +1024,20 @@ function renderTable() {
 
     const sparkline = moodSparkline(s.mood_points);
 
+    // Integrity badge — shown when any fabrication signal is detected
+    const integ = s.integrity || {};
+    const integBadge = !integ.ok
+      ? `<span title="${buildIntegrityTitle(s, lang)}"
+              style="display:inline-block;margin-left:var(--sp-2);font-size:1.1rem;
+                     background:var(--danger);color:white;border-radius:var(--r-pill);
+                     padding:0.1rem 0.5rem;vertical-align:middle;cursor:help">⚠ ${
+                       lang === 'fr-CA' ? 'intégrité' : 'integrity'
+                     }</span>`
+      : "";
+
     return `
       <tr class="data-row" onclick="toggleDetail(${i})">
-        <td><strong>${escHtml(s.name)}</strong></td>
+        <td><strong>${escHtml(s.name)}</strong>${integBadge}</td>
         <td style="color:var(--text-subtle);font-size:1.2rem">${escHtml(s.student_id)}</td>
         <td style="max-width:20rem;overflow:hidden;text-overflow:ellipsis">
           <button onclick="event.stopPropagation();filterByProgram('${escHtml(s.program)}')"
@@ -1413,6 +1524,7 @@ function buildDetailHTML(s) {
       <span style="font-size:1.2rem;color:var(--text-subtle)">Fichiers chargés :</span>
       ${fileTypeBadges || '<span style="font-size:1.2rem;color:var(--text-subtle)">—</span>'}
     </div>
+    ${buildIntegritySection(s, lang)}
     <div style="display:grid;grid-template-columns:1fr 1fr 22rem;gap:var(--sp-6)">
       <div>
         <div style="font-size:1.1rem;font-weight:700;text-transform:uppercase;
@@ -1460,6 +1572,144 @@ function buildDetailHTML(s) {
             ${s.last_wrap.wrap.change    ? `<div style="font-size:1.2rem;color:var(--text-muted)">→ ${escHtml(s.last_wrap.wrap.change)}</div>` : ""}
           </div>` : ""}
       </div>
+    </div>`;
+      <div>
+        <div style="font-size:1.1rem;font-weight:700;text-transform:uppercase;
+                    letter-spacing:0.08em;color:var(--text-subtle);margin-bottom:var(--sp-3)">
+          Activités
+        </div>
+        ${acts || "<span style='color:var(--text-subtle)'>—</span>"}
+        ${compSection}
+        ${outcomeSection}
+      </div>
+      <div>
+        <div style="font-size:1.1rem;font-weight:700;text-transform:uppercase;
+                    letter-spacing:0.08em;color:var(--text-subtle);margin-bottom:var(--sp-3)">
+          Contexte
+        </div>
+        ${info || "—"}
+      </div>
+      <div>
+        <div style="font-size:1.1rem;font-weight:700;text-transform:uppercase;
+                    letter-spacing:0.08em;color:var(--text-subtle);margin-bottom:var(--sp-3)">
+          Humeur (${s.mood_points.length} jours)
+        </div>
+        ${moodSparklineLarge(s.mood_points)}
+        ${s.last_obstacle ? `
+          <div style="margin-top:var(--sp-4);padding:var(--sp-3);background:rgba(255,107,112,.08);
+                      border-radius:var(--r-md);border-left:3px solid var(--danger)">
+            <div style="font-size:1.1rem;font-weight:700;color:var(--danger);margin-bottom:var(--sp-1)">
+              Dernier obstacle signalé (${s.last_obstacle.date})
+            </div>
+            <div style="font-size:1.3rem">${escHtml(s.last_obstacle.text)}</div>
+            ${s.last_obstacle.response ? `<div style="font-size:1.2rem;color:var(--text-subtle);margin-top:var(--sp-1)">→ ${escHtml(s.last_obstacle.response)}</div>` : ""}
+          </div>` : ""}
+        ${s.last_plan ? `
+          <div style="margin-top:var(--sp-3);font-size:1.3rem;color:var(--text-muted)">
+            <strong>Planifié :</strong> ${escHtml(s.last_plan.text)}
+            <span style="font-size:1.1rem;color:var(--text-subtle)"> (${s.last_plan.date})</span>
+          </div>` : ""}
+        ${s.last_wrap ? `
+          <div style="margin-top:var(--sp-3);padding:var(--sp-3);background:var(--bg-subtle);
+                      border-radius:var(--r-md)">
+            <div style="font-size:1.1rem;font-weight:700;color:var(--text-subtle);margin-bottom:var(--sp-1)">
+              Dernier bilan hebdo (${s.last_wrap.date})
+            </div>
+            ${s.last_wrap.wrap.highlight ? `<div style="font-size:1.3rem">🌟 ${escHtml(s.last_wrap.wrap.highlight)}</div>` : ""}
+            ${s.last_wrap.wrap.change    ? `<div style="font-size:1.2rem;color:var(--text-muted)">→ ${escHtml(s.last_wrap.wrap.change)}</div>` : ""}
+          </div>` : ""}
+      </div>
+    </div>`;
+}
+
+// ── Integrity helpers ─────────────────────────────────────────
+function buildIntegrityTitle(s, lang) {
+  const isFr = lang === "fr-CA";
+  const integ = s.integrity || {};
+  const parts = [];
+  if (integ.future_count > 0)
+    parts.push(isFr
+      ? `${integ.future_count} journal(aux) daté(s) dans le futur`
+      : `${integ.future_count} log(s) dated in the future`);
+  if (integ.cluster_flag)
+    parts.push(isFr
+      ? `Journaux créés sur une période comprimée (${integ.cluster_detail})`
+      : `Logs created in a compressed window (${integ.cluster_detail})`);
+  if (integ.lag_flag)
+    parts.push(isFr
+      ? `Fichier exporté ${integ.lag_days} jours après le dernier journal`
+      : `File exported ${integ.lag_days} days after the last log`);
+  return parts.join(" · ");
+}
+
+function buildIntegritySection(s, lang) {
+  const isFr = lang === "fr-CA";
+  const integ = s.integrity || {};
+  if (integ.ok) return "";
+
+  const rows = [];
+
+  if (integ.future_count > 0) {
+    rows.push(`
+      <div style="display:flex;gap:var(--sp-3);align-items:baseline;margin-bottom:var(--sp-2)">
+        <span style="color:var(--danger);font-size:1.3rem">⚠</span>
+        <div>
+          <div style="font-size:1.3rem;font-weight:600;color:var(--danger)">
+            ${isFr
+              ? `${integ.future_count} journal(aux) à date future`
+              : `${integ.future_count} future-dated log(s)`}
+          </div>
+          <div style="font-size:1.15rem;color:var(--text-muted)">
+            ${integ.future_dates?.join(", ") || ""}
+          </div>
+        </div>
+      </div>`);
+  }
+
+  if (integ.late_count > 0) {
+    rows.push(`
+      <div style="display:flex;gap:var(--sp-3);align-items:baseline;margin-bottom:var(--sp-2)">
+        <span style="color:var(--warning);font-size:1.3rem">◔</span>
+        <div style="font-size:1.3rem;color:var(--text-muted)">
+          ${isFr
+            ? `${integ.late_count} journal(aux) en saisie tardive`
+            : `${integ.late_count} late-filed log(s)`}
+        </div>
+      </div>`);
+  }
+
+  if (integ.cluster_flag) {
+    rows.push(`
+      <div style="display:flex;gap:var(--sp-3);align-items:baseline;margin-bottom:var(--sp-2)">
+        <span style="color:var(--danger);font-size:1.3rem">⚠</span>
+        <div>
+          <div style="font-size:1.3rem;font-weight:600;color:var(--danger)">
+            ${isFr ? "Journaux créés sur une fenêtre comprimée" : "Logs created in a compressed window"}
+          </div>
+          <div style="font-size:1.15rem;color:var(--text-muted)">${integ.cluster_detail}</div>
+        </div>
+      </div>`);
+  }
+
+  if (integ.lag_flag) {
+    rows.push(`
+      <div style="display:flex;gap:var(--sp-3);align-items:baseline;margin-bottom:var(--sp-2)">
+        <span style="color:var(--warning);font-size:1.3rem">⚠</span>
+        <div style="font-size:1.3rem;color:var(--text-muted)">
+          ${isFr
+            ? `Fichier exporté ${integ.lag_days} jours après le dernier journal`
+            : `File exported ${integ.lag_days} days after the last log`}
+        </div>
+      </div>`);
+  }
+
+  return `
+    <div style="margin-top:var(--sp-4);padding-top:var(--sp-3);border-top:1px solid var(--border)">
+      <div style="font-size:1.1rem;font-weight:700;text-transform:uppercase;
+                  letter-spacing:0.08em;color:var(--danger);margin-bottom:var(--sp-3)">
+        ${isFr ? "⚠ Signaux d'intégrité" : "⚠ Integrity signals"}
+      </div>
+      ${rows.join("")}
     </div>`;
 }
 

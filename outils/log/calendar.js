@@ -120,14 +120,15 @@ function renderGrid() {
 
   const startDate  = parseDate(ctx.start_date);
   const endDate    = parseDate(ctx.scheduled_end_date);
-  const today      = isoDate(new Date());
+  const today      = getEffectiveToday(calData); // respects future-dated data
   const workDays   = ctx.work_days   || [1,2,3,4,5];
   const weekStart  = ctx.calendar_week_start ?? 1;
   const wrapDay    = ctx.week_end_day ?? 5;
   const absences   = (ctx.planned_absences || []).map(a => a.date);
 
   // Build set of dates with logs
-  const logDates = new Set(logs.map(l => l.date));
+  const logDates      = new Set(logs.map(l => l.date));
+  const futureFiled   = new Set(logs.filter(l => l.future_filing).map(l => l.date));
 
   // Build the grid: find first day of the calendar display
   // (earliest weekStart day on or before startDate)
@@ -192,6 +193,7 @@ function renderGrid() {
       const badges = [];
       if (hasConfig)          badges.push(`<span class="cal-badge" title="${t("cal.legend_config")}">⚙️</span>`);
       if (hasLog || hasDaily) badges.push(`<span class="cal-badge" title="${t("cal.legend_daily")}">✓</span>`);
+      if (futureFiled.has(ds))badges.push(`<span class="cal-badge" title="${t("cal.legend_future_filed") || 'Future filing'}" style="color:var(--danger)">⚠</span>`);
       if (hasWeekly)          badges.push(`<span class="cal-badge" title="${t("cal.legend_weekly")}">⭐</span>`);
       if (isFutureWrapDay)    badges.push(`<span class="cal-badge" title="${t("cal.legend_weekly_due")}" style="opacity:.5">☆</span>`);
       if (hasFinal)           badges.push(`<span class="cal-badge" title="${t("cal.legend_final")}">🏅</span>`);
@@ -234,7 +236,7 @@ function renderHoursPanel() {
   const target     = parseFloat(ctx.total_hours_target) || null;
   const workDays   = ctx.work_days   || [1,2,3,4,5];
   const absences   = (ctx.planned_absences || []).map(a => a.date);
-  const today      = isoDate(new Date());
+  const today      = getEffectiveToday(calData); // respects future-dated data
 
   // Logged so far
   const loggedMins = logs.reduce((s, l) =>
@@ -348,6 +350,7 @@ function renderLegend() {
       key: "cal.legend_today" },
     { badge: "⚙️", key: "cal.legend_config" },
     { badge: "✓",  key: "cal.legend_daily" },
+    { badge: `<span style="color:var(--danger)">⚠</span>`, key: "cal.legend_future_filed" },
     { badge: "⭐", key: "cal.legend_weekly" },
     { badge: "☆",  key: "cal.legend_weekly_due" },
     { badge: "🏅", key: "cal.legend_final" },

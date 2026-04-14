@@ -581,6 +581,7 @@ function buildDashboard() {
   buildMoodTimeline(logs);
   buildWeeklyWraps(logs);
   buildCompetencyProgress(logs, data);
+  buildIntegritySummary(logs, data);
   buildOutcomeCoverage(logs, data);
   buildToolsChart(logs, data);
   buildLessonsCloud(logs);
@@ -635,6 +636,7 @@ function buildNav() {
     { id: "section-mood",          key: "dashboard.section_mood" },
     { id: "section-weekly",        key: "dashboard.section_weekly" },
     { id: "section-competencies",  key: "dashboard.section_competencies" },
+    { id: "section-integrity",     key: "dashboard.section_integrity" },
     { id: "section-tools",         key: "dashboard.section_tools" },
     { id: "section-lessons",       key: "dashboard.section_lessons" },
     { id: "section-reflection",    key: "dashboard.section_reflection" },
@@ -1555,5 +1557,128 @@ function buildOutcomeCoverage(logs, data) {
         </span>
       </div>
       ${rows}
+    </div>`;
+}
+
+// ── Filing integrity summary (student self-audit) ─────────────
+function buildIntegritySummary(logs, data) {
+  const container = document.getElementById("integrity-content");
+  if (!container) return;
+  const lang = getCurrentLang();
+  const isFr = lang === "fr-CA";
+
+  const futureFiled  = logs.filter(l => l.future_filing);
+  const lateFiled    = logs.filter(l => l.late_filing);
+  const noCreatedAt  = logs.filter(l => !l.created_at);
+
+  // Cluster detection
+  const createdDates = logs
+    .map(l => (l.created_at || l.saved_at || "").slice(0, 10))
+    .filter(Boolean).sort();
+  const startDate = data.context?.start_date;
+  const endDate   = data.context?.scheduled_end_date;
+  let clusterFlag = false, clusterDetail = "";
+  if (createdDates.length >= 5 && startDate && endDate) {
+    const internSpan  = Math.max(1, (new Date(endDate) - new Date(startDate)) / 86400000);
+    const createdSpan = Math.max(0,
+      (new Date(createdDates[createdDates.length - 1]) - new Date(createdDates[0])) / 86400000);
+    if (createdSpan / internSpan < 0.20) {
+      clusterFlag   = true;
+      clusterDetail = `${Math.round(createdSpan)}${isFr ? "j" : "d"} / ${Math.round(internSpan)}${isFr ? "j" : "d"}`;
+    }
+  }
+
+  const allOk = futureFiled.length === 0 && !clusterFlag;
+
+  const rows = [];
+
+  // Summary tile
+  const statusColor = allOk ? "var(--success)" : "var(--warning)";
+  const statusIcon  = allOk ? "✓" : "⚠";
+  const statusText  = allOk
+    ? (isFr ? "Aucun signal d'intégrité détecté." : "No integrity signals detected.")
+    : (isFr ? "Des signaux ont été détectés. Ton superviseur peut voir ces informations."
+             : "Signals were detected. Your supervisor can see this information.");
+
+  rows.push(`
+    <div style="padding:var(--sp-4);border-radius:var(--r-lg);margin-bottom:var(--sp-5);
+                background:${allOk ? "rgba(42,110,0,.08)" : "rgba(255,200,0,.08)"};
+                border:1.5px solid ${statusColor}">
+      <span style="font-size:1.8rem;margin-right:var(--sp-3)">${statusIcon}</span>
+      <span style="font-size:1.4rem">${statusText}</span>
+    </div>`);
+
+  // Future-filed logs
+  rows.push(`
+    <div style="margin-bottom:var(--sp-4)">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;
+                  margin-bottom:var(--sp-2)">
+        <span style="font-size:1.3rem;font-weight:600">
+          ${isFr ? "Journaux saisis à l'avance" : "Future-filed logs"}
+        </span>
+        <span style="font-size:1.4rem;font-weight:700;
+                     color:${futureFiled.length > 0 ? "var(--danger)" : "var(--success)"}">
+          ${futureFiled.length}
+        </span>
+      </div>
+      <div style="font-size:1.2rem;color:var(--text-muted)">
+        ${futureFiled.length > 0
+          ? (isFr ? "Journaux dont la date est postérieure à la date d'enregistrement : "
+                  : "Logs dated after their save timestamp: ")
+            + futureFiled.map(l => l.date).join(", ")
+          : (isFr ? "Aucun journal n'a été saisi avant sa date."
+                  : "No logs were saved before their date.")}
+      </div>
+    </div>`);
+
+  // Late-filed logs
+  rows.push(`
+    <div style="margin-bottom:var(--sp-4)">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;
+                  margin-bottom:var(--sp-2)">
+        <span style="font-size:1.3rem;font-weight:600">
+          ${isFr ? "Journaux en saisie tardive" : "Late-filed logs"}
+        </span>
+        <span style="font-size:1.4rem;font-weight:700;color:var(--text-muted)">
+          ${lateFiled.length}
+        </span>
+      </div>
+      <div style="font-size:1.2rem;color:var(--text-muted)">
+        ${isFr
+          ? "Journaux saisis après leur date (normal si oublié une journée)."
+          : "Logs saved after their date (normal if you forgot a day)."}
+      </div>
+    </div>`);
+
+  // Clustering signal
+  rows.push(`
+    <div style="margin-bottom:var(--sp-4)">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;
+                  margin-bottom:var(--sp-2)">
+        <span style="font-size:1.3rem;font-weight:600">
+          ${isFr ? "Répartition de la saisie" : "Logging spread"}
+        </span>
+        <span style="font-size:1.4rem;font-weight:700;
+                     color:${clusterFlag ? "var(--danger)" : "var(--success)"}">
+          ${clusterFlag ? (isFr ? "Comprimée" : "Compressed") : (isFr ? "Normale" : "Normal")}
+        </span>
+      </div>
+      <div style="font-size:1.2rem;color:var(--text-muted)">
+        ${clusterFlag
+          ? (isFr
+              ? `Les journaux ont été créés sur une période courte (${clusterDetail}) par rapport à la durée du stage.`
+              : `Logs were created in a short window (${clusterDetail}) relative to the internship duration.`)
+          : (isFr
+              ? "Les journaux semblent avoir été saisis régulièrement."
+              : "Logs appear to have been entered regularly.")}
+      </div>
+    </div>`);
+
+  container.innerHTML = `
+    <div class="chart-wrap">
+      <h4 style="margin-bottom:var(--sp-5)">
+        ${isFr ? "Intégrité de la saisie" : "Filing integrity"}
+      </h4>
+      ${rows.join("")}
     </div>`;
 }

@@ -155,13 +155,21 @@ function migrateData(data) {
     }
   }
 
-  // v1.4 → v1.5: add learning_refs to tasks that don't have it
+  // v1.4 → v1.5: backfill created_at, future_filing, and learning_refs
   if (data.logs) {
     data.logs.forEach(log => {
+      // Backfill created_at (use saved_at as best approximation)
+      if (!log.created_at) {
+        log.created_at = log.saved_at || new Date().toISOString();
+      }
+      // Backfill future_filing flag
+      if (log.future_filing === undefined) {
+        const savedDate = (log.saved_at || log.created_at || "").slice(0, 10);
+        log.future_filing = savedDate ? log.date > savedDate : false;
+      }
+      // Backfill learning_refs on tasks
       (log.tasks || []).forEach(task => {
-        if (task.learning_refs === undefined) {
-          task.learning_refs = [];
-        }
+        if (task.learning_refs === undefined) task.learning_refs = [];
       });
     });
   }
@@ -254,20 +262,25 @@ function createNewInternship(profile, pathway, context) {
 }
 
 // ── Daily log helpers ────────────────────────────────────────
-function getTodayLogId(data) {
-  const today = new Date().toISOString().slice(0, 10);
-  return data.logs.find(l => l.date === today) || null;
+function getTodayLogId(data, date) {
+  const target = date || new Date().toISOString().slice(0, 10);
+  return data.logs.find(l => l.date === target) || null;
 }
 
 function createNewLog(date) {
   const now = new Date();
+  const nowISO = now.toISOString();
+  const targetDate = date || nowISO.slice(0, 10);
+  const realDate   = nowISO.slice(0, 10);
   return {
     log_id: generateUUID(),
-    date: date || now.toISOString().slice(0, 10),
+    date: targetDate,
     revision: 0,
-    saved_at: now.toISOString(),
-    late_filing: false,
-    time_start: now.toISOString(),
+    created_at:    nowISO,           // immutable wall-clock creation timestamp
+    saved_at:      nowISO,
+    late_filing:   targetDate < realDate,   // true when logging a past date
+    future_filing: targetDate > realDate,   // true when logging a future date
+    time_start: nowISO,
     time_end: null,
     day_duration_minutes: 0,
     modality_onsite: false,
@@ -328,7 +341,17 @@ function greyzoneExceeded(log) {
 function exportLogJSON(data, log) {
   // Bump revision
   log.revision = (log.revision || 0) + 1;
-  log.saved_at = new Date().toISOString();
+  const nowISO = new Date().toISOString();
+  log.saved_at  = nowISO;
+
+  // Ensure created_at is set (backfill for logs created before this field existed)
+  if (!log.created_at) log.created_at = nowISO;
+
+  // Recompute filing flags based on wall-clock date at export time
+  const realDate = nowISO.slice(0, 10);
+  log.future_filing = log.date > realDate;
+  // late_filing: keep true if already set, or set if date is in the past
+  if (log.date < realDate) log.late_filing = true;
 
   // Upsert log in data
   const idx = data.logs.findIndex(l => l.log_id === log.log_id);
@@ -618,7 +641,14 @@ function mergeInternshipFiles(files) {
 
   // Validate time integrity
   for (const [, log] of logMap) {
-    if (!log.late_filing && log.time_start && log.saved_at) {
+    // Future filing: log date is ahead of when it was saved/created
+    const refTime = log.created_at || log.saved_at;
+    if (refTime && log.date > refTime.slice(0, 10)) {
+      log.future_filing = true;
+      result.warnings.push({ type: "future_filing", log_id: log.log_id, date: log.date, saved_at: refTime });
+    }
+    // Compressed filing: tasks claim more time than elapsed since time_start
+    if (!log.late_filing && !log.future_filing && log.time_start && log.saved_at) {
       const span = (new Date(log.saved_at) - new Date(log.time_start)) / 60000;
       if (span < log.task_total_minutes * 0.8) {
         result.warnings.push({ type: "time_integrity", log_id: log.log_id, date: log.date });
@@ -1311,4 +1341,24 @@ function sidebarOpenForData() {
       : "📂 Load a JSON file to get started.",
     "info"
   );
+}
+
+// ── Effective today ───────────────────────────────────────────
+// When a student loads data from a JSON file with future-dated logs
+// (e.g. a test dataset, or a computer with wrong date), all date
+// comparisons that drive UI state (past/current/future cells, week
+// completion, late-filing limit) should treat the most recent log
+// date as "now" rather than actual today.
+//
+// Returns the later of: real today | last log date in data.
+// When data is null or has no logs, returns real today.
+//
+// Call as: getEffectiveToday(logData)  or  getEffectiveToday(calData)  etc.
+function getEffectiveToday(data) {
+  const realToday = new Date().toISOString().slice(0, 10);
+  const logs = data?.logs;
+  if (!logs?.length) return realToday;
+  const lastLog = [...logs].sort((a, b) => b.date.localeCompare(a.date))[0]?.date;
+  if (!lastLog) return realToday;
+  return lastLog > realToday ? lastLog : realToday;
 }
