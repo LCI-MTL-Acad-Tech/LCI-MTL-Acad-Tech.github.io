@@ -610,7 +610,7 @@ input[type="checkbox"] { width: auto; accent-color: var(--accent); cursor: point
 /* ── Drawer toggle buttons (fixed left side) ──────────────── */
 .drawer-toggles {
   position: fixed;
-  right: 0;
+  left: 0;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -625,7 +625,7 @@ input[type="checkbox"] { width: auto; accent-color: var(--accent); cursor: point
   transform: rotate(180deg);
   background: var(--bg-card);
   border: 1.5px solid var(--border);
-  border-radius: var(--r-md) 0 0 var(--r-md);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
   padding: var(--sp-3) var(--sp-2);
   font-size: 1.2rem;
   font-weight: 500;
@@ -2073,6 +2073,12 @@ body { overflow-x: hidden; }
 @media (min-width: 900px) {
   .has-file-sidebar .main-content {
     padding-right: 3.8rem;
+  }
+}
+/* Offset log page content so it doesn't go under the left drawer toggle strip */
+@media (min-width: 900px) {
+  .has-drawer-toggles .main-content {
+    padding-left: 3.8rem;
   }
 }
 @media (max-width: 600px) {

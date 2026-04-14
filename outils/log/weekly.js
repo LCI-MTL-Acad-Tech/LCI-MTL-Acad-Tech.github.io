@@ -760,5 +760,8 @@ ${wrap ? `<div class="card" style="margin-bottom:12px">
 // ── Sidebar hook ─────────────────────────────────────────────
 function onSidebarLoad() {
   weeklyData = loadData();
-  if (weeklyData) renderAllWeeks();
+  if (weeklyData) {
+    renderAllWeeks();
+    showReport();
+  }
 }

@@ -90,6 +90,13 @@ function shortDay(dow, lang) {
   return (lang === "fr-CA" ? FR : EN)[dow];
 }
 
+// Abbreviated month label for cell bottom-right
+function shortMonth(date, lang) {
+  const FR = ["jan","fév","mar","avr","mai","jun","jul","aoû","sep","oct","nov","déc"];
+  const EN = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+  return (lang === "fr-CA" ? FR : EN)[date.getMonth()];
+}
+
 // Formatted date for display: "mer. 9 avr."
 function formatShortDate(d, lang) {
   try {
@@ -203,6 +210,7 @@ function renderGrid() {
           <div class="cal-day-num">${cur.getDate()}</div>
           ${badges.length ? `<div class="cal-badges">${badges.join("")}</div>` : ""}
           ${absNote}
+          <span class="cal-month-label">${shortMonth(cur, lang)}</span>
         </div>`;
 
       cur = addDays(cur, 1);

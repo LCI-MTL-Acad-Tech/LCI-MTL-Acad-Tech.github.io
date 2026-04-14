@@ -1382,11 +1382,12 @@ function endTour() {
 }
 
 function tourStep(dir) {
-  _tourStep = Math.max(0, Math.min(TOUR_STEPS.length - 1, _tourStep + dir));
-  if (dir > 0 && _tourStep === TOUR_STEPS.length - 1 + 1) {
+  // Check for finish BEFORE clamping — if on last step and going forward, end tour
+  if (dir > 0 && _tourStep === TOUR_STEPS.length - 1) {
     endTour();
     return;
   }
+  _tourStep = Math.max(0, Math.min(TOUR_STEPS.length - 1, _tourStep + dir));
   renderTourStep();
 }
 

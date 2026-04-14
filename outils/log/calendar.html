@@ -94,6 +94,21 @@
       line-height: 1;
     }
 
+    /* Month abbreviation — bottom-right of each cell */
+    .cal-month-label {
+      position: absolute;
+      bottom: var(--sp-1);
+      right: var(--sp-2);
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-subtle);
+      line-height: 1;
+      pointer-events: none;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .cal-day--outside .cal-month-label { opacity: 0.5; }
+
     /* Absence note chip */
     .cal-absence-chip {
       margin-top: var(--sp-1);
