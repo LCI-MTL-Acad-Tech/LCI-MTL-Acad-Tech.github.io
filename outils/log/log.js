@@ -227,6 +227,7 @@ function renderTaskBlock(task, idx) {
           <button class="task-assign-btn" onclick="openDrawerForTask(event,'drawer-tools','${task.task_id}')" data-i18n="drawer.tools_title"></button>
           ${logData.pathway === "hub" ? `<button class="task-assign-btn" onclick="openDrawerForTask(event,'drawer-projects','${task.task_id}')" data-i18n="drawer.projects_title"></button>` : ""}
           <button class="task-assign-btn" onclick="openDrawerForTask(event,'drawer-types','${task.task_id}')" data-i18n="drawer.types_title"></button>
+          ${_getTagPool().length > 0 ? `<button class="task-assign-btn" onclick="openDrawerForTask(event,'drawer-tags','${task.task_id}')" data-i18n="drawer.tags_title"></button>` : ""}
         </div>
       </div>
       <button class="btn btn--icon btn--sm task-remove" onclick="removeTask('${task.task_id}')" title="${t('action.delete')}">✕</button>
@@ -245,6 +246,7 @@ function renderTaskBlock(task, idx) {
     else if (type === "tool") addToolToTask(task.task_id, id);
     else if (type === "project") addProjectToTask(task.task_id, id);
     else if (type === "activity_type") setActivityType(task.task_id, id);
+    else if (type === "learning_ref") addLearningRef(task.task_id, id);
   });
 
   list.appendChild(block);
@@ -299,14 +301,6 @@ function renderTopicLearning(task) {
       <label data-i18n="log.task_learning"></label>
       <textarea rows="2" oninput="updateTaskField('${task.task_id}','learning',this.value)">${escHtml(task.learning || "")}</textarea>
     </div>
-    <div class="form-group" style="margin:var(--sp-2) 0 0 0">
-      <label data-i18n="log.task_lesson_tags"></label>
-      <div class="flex gap-2">
-        <input type="text" id="lesson-tag-input-${task.task_id}"
-          data-i18n-placeholder="log.task_tags_placeholder" placeholder="">
-        <button class="btn btn--ghost btn--sm" onclick="addLessonTag('${task.task_id}')">+</button>
-      </div>
-    </div>
   `;
 }
 
@@ -330,6 +324,23 @@ function renderTaskTags(task) {
   if (task.project_id) {
     const proj = logData.projects?.find(x => x.project_id === task.project_id);
     if (proj) tags.push(`<span class="tag" style="background:var(--color-chlorophyll-500);color:white;">📁 ${escHtml(proj.project_name)}<button class="tag-remove" onclick="updateTaskField('${task.task_id}','project_id','');renderTaskTags(logData.tasks?.find(t=>t.task_id==='${task.task_id}')||currentLog.tasks.find(t=>t.task_id==='${task.task_id}'))">✕</button></span>`);
+  }
+  if (task.learning_refs?.length) {
+    const lang = getCurrentLang();
+    const pool = _getTagPool();
+    task.learning_refs.forEach(ref => {
+      const item = pool.find(x => x.id === ref.id);
+      if (!item) return;
+      const label = item.label[lang] || item.label["fr-CA"];
+      const color = ref.type === "competency"
+        ? "var(--accent)"
+        : "var(--color-chlorophyll-500)";
+      const icon = ref.type === "competency" ? "🎓" : "📌";
+      tags.push(`<span class="tag" style="background:${color}20;border:1px solid ${color};color:var(--text)">`
+        + `${icon} <span style="font-weight:500;color:${color}">${escHtml(ref.id)}</span> `
+        + `<span style="font-size:1.1rem">${escHtml(label.slice(0, 45))}${label.length > 45 ? "…" : ""}</span>`
+        + `<button class="tag-remove" onclick="removeLearningRef('${task.task_id}','${ref.id}')">✕</button></span>`);
+    });
   }
   if (task.lesson_tags?.length) {
     task.lesson_tags.forEach((tag, i) => {
@@ -720,6 +731,7 @@ function renderDrawers() {
   renderToolsDrawer();
   renderTypesDrawer();
   if (logData.pathway === "hub") renderProjectsDrawer();
+  renderTagsDrawer();
 }
 
 function renderDrawerToggles() {
@@ -731,6 +743,13 @@ function renderDrawerToggles() {
   ];
   if (logData.pathway === "hub") {
     drawers.push({ id: "drawer-projects", key: "drawer.projects_title" });
+  }
+  // Tags drawer: only show if this program/course has competencies or outcomes
+  const tagPool = _getTagPool();
+  if (tagPool.length > 0) {
+    drawers.push({ id: "drawer-tags", key: "drawer.tags_title" });
+    const mobileBtn = document.getElementById("mobile-tags-btn");
+    if (mobileBtn) mobileBtn.style.display = "";
   }
   container.innerHTML = drawers.map(d =>
     `<button class="drawer-toggle" onclick="openDrawer('${d.id}')" data-i18n="${d.key}"></button>`
@@ -860,6 +879,7 @@ function openDrawerForTask(event, drawerId, taskId) {
         else if (type === "tool")     addToolToTask(_pendingTaskId, id);
         else if (type === "project")  addProjectToTask(_pendingTaskId, id);
         else if (type === "activity_type") setActivityType(_pendingTaskId, id);
+        else if (type === "learning_ref")  addLearningRef(_pendingTaskId, id);
         _pendingTaskId = null;
         closeAllDrawers();
       };
@@ -1434,6 +1454,7 @@ function checkAutoTour() {
 
 // ── Sidebar hook ─────────────────────────────────────────────
 function onSidebarLoad() {
+  _invalidateTagPool(); // new data may mean different program/course → rebuild pool
   logData = loadData();
   if (!logData?.profile?.full_name) return;
 
@@ -1453,4 +1474,114 @@ function onSidebarLoad() {
   renderDrawerToggles?.();
   checkWeeklyWrap?.();
   applyLanguage(getCurrentLang());
+}
+
+// ── Competencies & learning outcomes drawer ───────────────────
+
+let _tagPoolCache = null;
+
+function _getTagPool() {
+  if (_tagPoolCache) return _tagPoolCache;
+  if (typeof getStudentTagPool !== "function") return [];
+  const courseCode  = logData?.context?.internship_course_code || "generic";
+  const programCode = logData?.profile?.program || "";
+  _tagPoolCache = getStudentTagPool(courseCode, programCode, getCurrentLang());
+  return _tagPoolCache;
+}
+
+function _invalidateTagPool() { _tagPoolCache = null; }
+
+function renderTagsDrawer(filter = "") {
+  const list = document.getElementById("tags-drawer-list");
+  if (!list) return;
+
+  const lang = getCurrentLang();
+  const isFr = lang === "fr-CA";
+  const pool = _getTagPool();
+
+  if (!pool.length) {
+    list.innerHTML = `<p class="text-muted" style="font-size:1.3rem">${
+      isFr ? "Aucune compétence ou résultat d'apprentissage défini pour ce programme."
+            : "No competencies or learning outcomes defined for this program."
+    }</p>`;
+    return;
+  }
+
+  const q = filter.toLowerCase().trim();
+
+  const matches = pool.filter(item => {
+    if (!q) return true;
+    const label = item.label[lang] || item.label["fr-CA"];
+    return item.id.toLowerCase().includes(q) || label.toLowerCase().includes(q);
+  });
+
+  if (!matches.length) {
+    list.innerHTML = `<p class="text-muted" style="font-size:1.3rem" data-i18n="drawer.tags_empty">${t("drawer.tags_empty")}</p>`;
+    return;
+  }
+
+  const competencies = matches.filter(x => x.type === "competency");
+  const outcomes     = matches.filter(x => x.type === "outcome");
+
+  let html = "";
+
+  if (competencies.length) {
+    html += `<div style="font-size:1.1rem;font-weight:700;text-transform:uppercase;
+                         letter-spacing:.06em;color:var(--text-subtle);
+                         margin-bottom:var(--sp-2)">${t("drawer.tags_competency")}</div>`;
+    html += competencies.map(item => _tagDrawerItem(item, lang, "var(--accent)")).join("");
+  }
+  if (outcomes.length) {
+    html += `<div style="font-size:1.1rem;font-weight:700;text-transform:uppercase;
+                         letter-spacing:.06em;color:var(--text-subtle);
+                         margin:var(--sp-4) 0 var(--sp-2)">${t("drawer.tags_outcome")}</div>`;
+    html += outcomes.map(item => _tagDrawerItem(item, lang, "var(--color-chlorophyll-500)")).join("");
+  }
+
+  list.innerHTML = html;
+}
+
+function _tagDrawerItem(item, lang, color) {
+  const label = item.label[lang] || item.label["fr-CA"];
+  const icon  = item.type === "competency" ? "🎓" : "📌";
+  return `
+    <div class="drawer-item" draggable="true"
+      data-assign-type="learning_ref" data-assign-id="${escHtml(item.id)}"
+      ondragstart="startDrag(event,'learning_ref','${escHtml(item.id)}')"
+      style="cursor:pointer">
+      <div class="drawer-item-dot" style="background:${color}"></div>
+      <div style="min-width:0">
+        <div class="drawer-item-label" style="color:${color};font-size:1.2rem;
+             font-weight:700;margin-bottom:2px">${escHtml(item.id)}</div>
+        <div class="drawer-item-sub" style="font-size:1.2rem;line-height:1.4;
+             white-space:normal">${escHtml(label)}</div>
+      </div>
+    </div>`;
+}
+
+function filterTagsDrawer(query) {
+  renderTagsDrawer(query);
+}
+
+function addLearningRef(taskId, refId) {
+  const task = currentLog.tasks.find(t => t.task_id === taskId);
+  if (!task) return;
+  if (!task.learning_refs) task.learning_refs = [];
+  // Determine type from pool
+  const pool = _getTagPool();
+  const item = pool.find(x => x.id === refId);
+  if (!item) return;
+  // Don't add duplicates
+  if (task.learning_refs.some(r => r.id === refId)) return;
+  task.learning_refs.push({ type: item.type, id: refId });
+  updateLog();
+  renderTaskTags(task);
+}
+
+function removeLearningRef(taskId, refId) {
+  const task = currentLog.tasks.find(t => t.task_id === taskId);
+  if (!task) return;
+  task.learning_refs = (task.learning_refs || []).filter(r => r.id !== refId);
+  updateLog();
+  renderTaskTags(task);
 }

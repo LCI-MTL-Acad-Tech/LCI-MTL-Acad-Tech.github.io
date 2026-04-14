@@ -86,6 +86,7 @@
         <button class="mobile-drawer-btn" onclick="openDrawer('drawer-tools')">🔧 <span data-i18n="drawer.tools_title"></span></button>
         <button class="mobile-drawer-btn" onclick="openDrawer('drawer-types')">🏷 <span data-i18n="drawer.types_title"></span></button>
         <button class="mobile-drawer-btn" id="mobile-projects-btn" onclick="openDrawer('drawer-projects')" style="display:none">📁 <span data-i18n="drawer.projects_title"></span></button>
+        <button class="mobile-drawer-btn" id="mobile-tags-btn" onclick="openDrawer('drawer-tags')" style="display:none">🎓 <span data-i18n="drawer.tags_title"></span></button>
       </div>
 
       <!-- Main log layout -->
@@ -643,6 +644,24 @@
 <script src="app.js"></script>
 <script src="courses.js"></script>
 <script src="log.js"></script>
+
+  <!-- Competencies & learning outcomes drawer -->
+  <div class="drawer-panel" id="drawer-tags">
+    <div class="drawer-header">
+      <div class="drawer-title" data-i18n="drawer.tags_title">Compétences &amp; apprentissages</div>
+      <button class="btn btn--icon" onclick="closeAllDrawers()">✕</button>
+    </div>
+    <div class="drawer-body" style="padding-top:var(--sp-3)">
+      <p class="text-muted" style="font-size:1.2rem;margin-bottom:var(--sp-3)"
+        data-i18n="drawer.tags_hint"></p>
+      <input type="search" id="tags-drawer-search"
+        data-i18n-placeholder="drawer.tags_search"
+        placeholder="Chercher…"
+        style="width:100%;margin-bottom:var(--sp-4)"
+        oninput="filterTagsDrawer(this.value)">
+      <div id="tags-drawer-list"></div>
+    </div>
+  </div>
 
   <!-- Global file sidebar -->
   <aside id="file-sidebar" class="file-sidebar" aria-label="Chargeur de fichiers">

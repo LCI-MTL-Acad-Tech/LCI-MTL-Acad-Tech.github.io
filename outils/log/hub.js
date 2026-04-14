@@ -436,6 +436,29 @@ function buildRow(data) {
     });
   }
 
+  // ── Outcome coverage (learning_refs on tasks) ─────────────────
+  let outcome_coverage = [];
+  if (typeof getStudentOutcomes === "function") {
+    const outcomes = getStudentOutcomes(programCode);
+    // Count how many tasks reference each outcome across all logs
+    const refCounts = {};
+    logs.forEach(log => {
+      (log.tasks || []).forEach(task => {
+        (task.learning_refs || []).forEach(ref => {
+          if (ref.type === "outcome") {
+            refCounts[ref.id] = (refCounts[ref.id] || 0) + 1;
+          }
+        });
+      });
+    });
+    outcome_coverage = outcomes.map(o => ({
+      id:    o.id,
+      fr:    o.fr,
+      en:    o.en,
+      count: refCounts[o.id] || 0,
+    }));
+  }
+
   return {
     uuid:               data.meta?.student_uuid || data.profile?.student_id,
     name:               data.profile?.full_name || "—",
@@ -465,6 +488,7 @@ function buildRow(data) {
     last_wrap:          lastWrap         ? { date: lastWrap.date, wrap: lastWrap.weekly_wrap }           : null,
     total_target:       totalTarget,
     competency_coverage,
+    outcome_coverage,
     raw:                data,
   };
 }
@@ -1362,6 +1386,28 @@ function buildDetailHTML(s) {
       ${compRows}
     </div>` : "";
 
+  // Outcome mini-section
+  const outcomeRows = (s.outcome_coverage || []).filter(o => o.count > 0).map(o => {
+    const label = o[lang === "fr-CA" ? "fr" : "en"] || o.fr;
+    return `
+      <div style="display:flex;align-items:baseline;gap:var(--sp-3);
+                  margin-bottom:var(--sp-2);font-size:1.2rem">
+        <span style="color:var(--color-chlorophyll-500);font-weight:700;
+                     flex-shrink:0">${escHtml(o.id)}</span>
+        <span style="color:var(--text-muted);flex:1">${escHtml(label.slice(0, 60))}${label.length > 60 ? "…" : ""}</span>
+        <span style="color:var(--text-subtle);flex-shrink:0">${o.count}×</span>
+      </div>`;
+  }).join("");
+
+  const outcomeSection = outcomeRows ? `
+    <div style="margin-top:var(--sp-4);padding-top:var(--sp-3);border-top:1px solid var(--border)">
+      <div style="font-size:1.1rem;font-weight:700;text-transform:uppercase;
+                  letter-spacing:0.08em;color:var(--text-subtle);margin-bottom:var(--sp-3)">
+        📌 ${lang === "fr-CA" ? "Résultats d'apprentissage associés" : "Associated learning outcomes"}
+      </div>
+      ${outcomeRows}
+    </div>` : "";
+
   return `
     <div style="margin-bottom:var(--sp-3);display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center">
       <span style="font-size:1.2rem;color:var(--text-subtle)">Fichiers chargés :</span>
@@ -1375,6 +1421,7 @@ function buildDetailHTML(s) {
         </div>
         ${acts || "<span style='color:var(--text-subtle)'>—</span>"}
         ${compSection}
+        ${outcomeSection}
       </div>
       <div>
         <div style="font-size:1.1rem;font-weight:700;text-transform:uppercase;

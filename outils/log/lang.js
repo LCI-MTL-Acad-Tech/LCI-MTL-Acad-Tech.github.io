@@ -290,6 +290,13 @@ const LANG = {
     "drawer.people_org":      "Organisation",
     "drawer.people_drag":     "Glisse une personne sur une tâche pour l'y associer",
 
+    "drawer.tags_title":      "Compétences & apprentissages",
+    "drawer.tags_hint":       "Clique ou glisse sur une tâche. Les compétences déjà couvertes apparaissent en priorité.",
+    "drawer.tags_search":     "Chercher…",
+    "drawer.tags_competency": "Compétences du cours",
+    "drawer.tags_outcome":    "Résultats d'apprentissage du programme",
+    "drawer.tags_empty":      "Aucun résultat pour cette recherche.",
+
     "drawer.projects_title":  "Projets",
     "drawer.projects_add":    "Ajouter un projet",
     "drawer.projects_status_active":    "En cours",
@@ -407,6 +414,7 @@ const LANG = {
     "dashboard.section_tools":      "Outils utilisés",
     "dashboard.section_lessons":    "Apprentissages",
     "dashboard.section_reflection": "Réflexion",
+    "dashboard.section_outcomes":       "Résultats d'apprentissage",
     "dashboard.section_competencies": "Suivi des compétences",
     "dashboard.total_days":         "Jours travaillés",
     "dashboard.total_hours":        "Heures documentées",
@@ -728,6 +736,13 @@ const LANG = {
     "drawer.people_role_placeholder": "e.g. supervisor, client, colleague, coach…",
     "drawer.people_org":      "Organization",
     "drawer.people_drag":     "Drag a person onto a task to associate them",
+
+    "drawer.tags_title":      "Competencies & learning",
+    "drawer.tags_hint":       "Click or drag onto a task. Course competencies appear first.",
+    "drawer.tags_search":     "Search…",
+    "drawer.tags_competency": "Course competencies",
+    "drawer.tags_outcome":    "Program learning outcomes",
+    "drawer.tags_empty":      "No results for this search.",
     "drawer.projects_title":  "Projects",
     "drawer.projects_add":    "Add a project",
     "drawer.projects_status_active":    "Active",
@@ -915,7 +930,8 @@ const LANG = {
     "dashboard.weekly_change":        "Change",
     "dashboard.settings_note":        "This report was generated with non-default settings.",
     "dashboard.print_report":         "Print / Save PDF",
-    "dashboard.section_competencies": "Competency tracking",
+    "dashboard.section_outcomes":       "Learning outcomes",
+        "dashboard.section_competencies": "Competency tracking",
 
     // Hub view modes
     "hub.view_students":       "By student",

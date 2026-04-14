@@ -154,6 +154,20 @@ function migrateData(data) {
       data.context.calendar_week_start = 1; // Monday
     }
   }
+
+  // v1.4 → v1.5: add learning_refs to tasks that don't have it
+  if (data.logs) {
+    data.logs.forEach(log => {
+      (log.tasks || []).forEach(task => {
+        if (task.learning_refs === undefined) {
+          task.learning_refs = [];
+        }
+      });
+    });
+  }
+  if (data.meta && !data.meta.schema_version?.startsWith("1.5")) {
+    data.meta.schema_version = "1.5";
+  }
 }
 
 function loadReportData() {
@@ -287,7 +301,8 @@ function createNewTask() {
     person_ids: [],
     topic: "",
     learning: "",
-    lesson_tags: [],
+    lesson_tags:   [],    // free-text tags (kept for backward compat)
+    learning_refs: [],    // structured refs: [{ type: "competency"|"outcome", id }]
     training_subtype: null,
   };
 }

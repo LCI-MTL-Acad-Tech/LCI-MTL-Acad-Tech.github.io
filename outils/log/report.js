@@ -581,6 +581,7 @@ function buildDashboard() {
   buildMoodTimeline(logs);
   buildWeeklyWraps(logs);
   buildCompetencyProgress(logs, data);
+  buildOutcomeCoverage(logs, data);
   buildToolsChart(logs, data);
   buildLessonsCloud(logs);
   buildReflectionSection(data);
@@ -638,6 +639,15 @@ function buildNav() {
     { id: "section-lessons",       key: "dashboard.section_lessons" },
     { id: "section-reflection",    key: "dashboard.section_reflection" },
   ];
+
+  // Only show outcomes section when the student's program has non-redundant outcomes
+  const programCode = mergedData?.profile?.program || "";
+  if (typeof getStudentOutcomes === "function" && getStudentOutcomes(programCode).length > 0) {
+    // Insert after competencies
+    const compIdx = sections.findIndex(s => s.id === "section-competencies");
+    sections.splice(compIdx + 1, 0, { id: "section-outcomes", key: "dashboard.section_outcomes" });
+  }
+
   const nav = document.getElementById("report-nav");
   nav.innerHTML = sections.map((s, i) =>
     `<button class="report-nav-btn ${i === 0 ? "active" : ""}"
@@ -1469,4 +1479,81 @@ function onSidebarLoad() {
   uploadedFiles = [d];
   renderFileList([{ name: d.profile?.full_name || "journal.json", ok: true }]);
   validateAndMerge([d]);
+}
+
+// ── Learning outcome coverage ─────────────────────────────────
+function buildOutcomeCoverage(logs, data) {
+  const container = document.getElementById("outcomes-content");
+  if (!container) return;
+  const lang = getCurrentLang();
+  const isFr = lang === "fr-CA";
+
+  const programCode = data.profile?.program || "";
+  if (typeof getStudentOutcomes !== "function") {
+    container.innerHTML = "";
+    return;
+  }
+  const outcomes = getStudentOutcomes(programCode);
+  if (!outcomes.length) {
+    container.innerHTML = "";
+    return;
+  }
+
+  // Count task references per outcome across all logs
+  const refCounts = {};
+  logs.forEach(log => {
+    (log.tasks || []).forEach(task => {
+      (task.learning_refs || []).forEach(ref => {
+        if (ref.type === "outcome") {
+          refCounts[ref.id] = (refCounts[ref.id] || 0) + 1;
+        }
+      });
+    });
+  });
+
+  const maxCount = Math.max(1, ...Object.values(refCounts));
+  const touched  = outcomes.filter(o => refCounts[o.id]);
+  const untouched = outcomes.filter(o => !refCounts[o.id]);
+  const coveragePct = Math.round((touched.length / outcomes.length) * 100);
+
+  const rows = [...touched, ...untouched].map(o => {
+    const count  = refCounts[o.id] || 0;
+    const pct    = Math.round((count / maxCount) * 100);
+    const label  = isFr ? o.fr : (o.en || o.fr);
+    const color  = count > 0 ? "var(--color-chlorophyll-500)" : "var(--border)";
+    const textColor = count > 0 ? "var(--color-chlorophyll-500)" : "var(--text-subtle)";
+    return `
+      <div style="margin-bottom:var(--sp-4)">
+        <div style="display:flex;justify-content:space-between;
+                    align-items:baseline;margin-bottom:4px;gap:var(--sp-3)">
+          <div style="min-width:0">
+            <span style="font-size:1.1rem;font-weight:700;color:${textColor};
+                         margin-right:var(--sp-2)">${escHtml(o.id)}</span>
+            <span style="font-size:1.25rem;color:var(--text-muted)">${escHtml(label)}</span>
+          </div>
+          <span style="font-size:1.2rem;font-weight:700;color:${textColor};
+                       flex-shrink:0">${count > 0 ? count + "×" : "—"}</span>
+        </div>
+        <div style="height:6px;background:var(--bg-subtle);border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${color};
+                      border-radius:3px;transition:width .3s"></div>
+        </div>
+      </div>`;
+  }).join("");
+
+  container.innerHTML = `
+    <div class="chart-wrap">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;
+                  flex-wrap:wrap;gap:var(--sp-3);margin-bottom:var(--sp-5)">
+        <h4 data-i18n="dashboard.section_outcomes" style="margin:0">
+          ${isFr ? "Résultats d'apprentissage" : "Learning outcomes"}
+        </h4>
+        <span style="font-size:1.3rem;color:var(--text-muted)">
+          ${touched.length} / ${outcomes.length}
+          ${isFr ? "résultats associés" : "outcomes tagged"}
+          · <strong style="color:var(--color-chlorophyll-500)">${coveragePct}%</strong>
+        </span>
+      </div>
+      ${rows}
+    </div>`;
 }

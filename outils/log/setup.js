@@ -100,7 +100,9 @@ function buildProgramDropdown() {
 
   sel.innerHTML = `<option value="">${lang === "fr-CA" ? "— Choisir un programme —" : "— Select a program —"}</option>`;
 
-  PROGRAMS.forEach(p => {
+  // getSelectablePrograms() filters out hidden placeholder programs (e.g. 420.B0)
+  const programs = typeof getSelectablePrograms === "function" ? getSelectablePrograms() : PROGRAMS;
+  programs.forEach(p => {
     const opt = document.createElement("option");
     opt.value = p.code;
     opt.textContent = getProgramLabel(p.code, lang);

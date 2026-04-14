@@ -307,6 +307,7 @@ const PROGRAMS = [
   { code: "420.BX", name: { "fr-CA": "Techniques de l'informatique — Jeux vidéo",               "en-CA": "Computer Science Technology — Video Game Technology" } },
   // ── Programmer-analyst (AEC) ──────────────────────────────────────────
   { code: "LEA.3Q", name: { "fr-CA": "Programmeur-analyste en technologies de l'information",   "en-CA": "Information Technology Programmer-Analyst" } },
+  { code: "LEA.99", name: { "fr-CA": "Gestion de réseaux et sécurité (AEC)",                     "en-CA": "Network Management and Security (AEC)" } },
   // ── AI & ML (AEC) ─────────────────────────────────────────────────────
   { code: "LEA.DQ", name: { "fr-CA": "Intelligence artificielle et apprentissage machine",       "en-CA": "Artificial Intelligence and Machine Learning" } },
   // ── Accounting ────────────────────────────────────────────────────────
@@ -315,9 +316,11 @@ const PROGRAMS = [
   // ── Business management ───────────────────────────────────────────────
   { code: "410.D0", name: { "fr-CA": "Gestion de commerces",                                     "en-CA": "Business Management" } },
   { code: "LCA.70", name: { "fr-CA": "Gestion de commerces (AEC)",                               "en-CA": "Business Management (AEC)" } },
+  { code: "410.X0", name: { "fr-CA": "Gestion de commerces — Industries créatives",              "en-CA": "Business Management — Creative Industries" } },
   // ── Hospitality ───────────────────────────────────────────────────────
   { code: "430.A0", name: { "fr-CA": "Gestion d'un établissement de restauration",               "en-CA": "Food Service Management" } },
   { code: "430.B0", name: { "fr-CA": "Gestion hôtelière",                                        "en-CA": "Hotel Management" } },
+  { code: "LJA.17", name: { "fr-CA": "Gestion hôtelière (AEC)",                                  "en-CA": "Hotel Management (AEC)" } },
   // ── Interior design ───────────────────────────────────────────────────
   { code: "570.E0", name: { "fr-CA": "Design d'intérieur",                                       "en-CA": "Interior Design" } },
   { code: "NTA.21", name: { "fr-CA": "Design d'intérieur (AEC)",                                 "en-CA": "Interior Design (AEC)" } },
@@ -328,6 +331,7 @@ const PROGRAMS = [
   { code: "NTC.0Q", name: { "fr-CA": "Design de la mode (AEC)",                                  "en-CA": "Fashion Design (AEC)" } },
   { code: "NTC.1W", name: { "fr-CA": "Commercialisation de la mode (AEC)",                       "en-CA": "Fashion Marketing (AEC)" } },
   // ── Logistics ─────────────────────────────────────────────────────────
+  { code: "410.G0", name: { "fr-CA": "Techniques de la logistique du transport (DEC)",           "en-CA": "Transportation Logistics Technology (DEC)" } },
   { code: "LCA.5G", name: { "fr-CA": "Techniques de la logistique du transport (AEC)",           "en-CA": "Transportation Logistics Technology (AEC)" } },
   // ── Social media strategy (AEC) ───────────────────────────────────────
   { code: "NWY.1X", name: { "fr-CA": "Stratégie sur les réseaux sociaux (AEC)",             "en-CA": "Social Media Strategy (AEC)" } },
@@ -352,7 +356,7 @@ const COURSES = {
       "fr-CA": "Intégration en entreprise : Gestion de réseaux et sécurité",
       "en-CA": "Workplace Integration: Network Management and Security"
     },
-    programs: ["420.BR"],
+    programs: ["420.BR", "LEA.99"],
     hours: 240,
     competencies: [
       { ...SHARED_COMPETENCIES["00SE"] },
@@ -650,7 +654,7 @@ const COURSES = {
       "fr-CA": "Stage en gestion commerciale",
       "en-CA": "Internship in Commercial Management"
     },
-    programs: ["410.D0", "LCA.70"],
+    programs: ["410.D0", "LCA.70", "410.X0"],
     hours: 120,
     competencies: [
       {
@@ -702,7 +706,7 @@ const COURSES = {
       "fr-CA": "Stage",
       "en-CA": "Internship"
     },
-    programs: ["430.A0", "430.B0"],
+    programs: ["430.A0", "430.B0", "LJA.17"],
     hours: 240,
     competencies: [
       {
@@ -871,7 +875,7 @@ const COURSES = {
       "fr-CA": "Stage en logistique du transport",
       "en-CA": "Internship in Transportation Logistics"
     },
-    programs: ["LCA.5G"],
+    programs: ["LCA.5G", "410.G0"],
     hours: 120,
     competencies: [
       {
@@ -1303,6 +1307,13 @@ function getCoursesForProgram(programCode) {
 }
 
 /**
+ * Returns only selectable (non-hidden) programs for student-facing UI.
+ */
+function getSelectablePrograms() {
+  return PROGRAMS.filter(p => !p.hidden);
+}
+
+/**
  * Returns a display label for a course in the given language.
  * Format: "420-SG6-AS — Workplace Integration: Network Management and Security"
  * @param {string} courseCode
@@ -1319,6 +1330,222 @@ function getCourseLabel(courseCode, lang) {
   return `${courseCode} — ${title}`;
 }
 
+// ── Program learning outcomes ──────────────────────────────────────────────────
+// Source: LCI Education website (collegelasalle.lcieducation.com), fetched Apr 2026.
+// IDs are stable and program-scoped (LO-{PROGRAM}-{NNN}).
+// redundant_with: outcome substantially covered by a ministry competency —
+//   hidden in the student UI in favour of the competency.
+const PROGRAM_OUTCOMES = {
+  "420.BP": [
+    { id: "LO-420BP-001", fr: "Maîtrise des langages de programmation pour des solutions logicielles évolutives", en: "Mastery of programming languages for scalable software solutions" },
+    { id: "LO-420BP-002", fr: "Résolution de problèmes complexes et conception de solutions algorithmiques", en: "Complex problem solving and algorithmic solution design" },
+    { id: "LO-420BP-003", fr: "Application de méthodologies rigoureuses pour le développement de logiciels fiables", en: "Application of rigorous methodologies for reliable software development" },
+    { id: "LO-420BP-004", fr: "Tests, débogage et assurance de la performance des systèmes", en: "Testing, debugging and system performance assurance" },
+    { id: "LO-420BP-005", fr: "Gestion de projets informatiques", en: "IT project management" },
+    { id: "LO-420BP-006", fr: "Analyse orientée objet pour la conception et l'intégration d'applications industrielles", en: "Object-oriented analysis for the design and integration of industrial applications" },
+  ],
+  "420.BR": [
+    { id: "LO-420BR-001", fr: "Conception, mise en œuvre et dépannage d'infrastructures réseau physiques et infonuagiques", en: "Design, implementation and troubleshooting of physical and cloud network infrastructures" },
+    { id: "LO-420BR-002", fr: "Cybersécurité : protection des systèmes réseau contre les menaces", en: "Cybersecurity: protecting network systems against threats" },
+    { id: "LO-420BR-003", fr: "Surveillance réseau, optimisation des performances et planification de capacité", en: "Network monitoring, performance optimization and capacity planning" },
+    { id: "LO-420BR-004", fr: "Évaluation des risques, planification de reprise après sinistre et réponse aux incidents", en: "Risk assessment, disaster recovery planning and incident response" },
+    { id: "LO-420BR-005", fr: "Certifications CISCO et LPIC", en: "CISCO and LPIC certifications" },
+    { id: "LO-420BR-006", fr: "Administration de systèmes Linux et gestion d'applications réseau", en: "Linux system administration and network application management" },
+  ],
+  "420.BX": [
+    { id: "LO-420BX-001", fr: "Programmation de moteurs de jeux en Java, C++ et autres langages", en: "Game engine programming in Java, C++ and other languages" },
+    { id: "LO-420BX-002", fr: "Conception et implémentation de mécaniques et de mondes de jeux vidéo", en: "Design and implementation of video game mechanics and worlds" },
+    { id: "LO-420BX-003", fr: "Résolution de problèmes techniques pour assurer la fluidité du gameplay", en: "Technical problem solving to ensure smooth gameplay" },
+    { id: "LO-420BX-004", fr: "Tests de jeux et assurance qualité : identification et correction d'erreurs", en: "Game testing and quality assurance: identifying and fixing errors" },
+    { id: "LO-420BX-005", fr: "Développement pour jeux AAA, équipes indépendantes et applications", en: "Development for AAA games, independent teams and applications" },
+    { id: "LO-420BX-006", fr: "Collaboration avec des studios de jeux de premier plan", en: "Collaboration with leading game studios", redundant_with: "00SE" },
+  ],
+  "LEA.3Q": [
+    { id: "LO-LEA3Q-001", fr: "Identification, collecte et analyse des besoins de traitement de l'information", en: "Identification, collection and analysis of information processing needs" },
+    { id: "LO-LEA3Q-002", fr: "Modélisation des données et des processus avec logiciels de quatrième génération", en: "Data and process modelling with fourth-generation software" },
+    { id: "LO-LEA3Q-003", fr: "Gestion et configuration d'applications réseau", en: "Network application management and configuration" },
+    { id: "LO-LEA3Q-004", fr: "Maîtrise linguistique pour solutions logicielles évolutives", en: "Language mastery for scalable software solutions" },
+    { id: "LO-LEA3Q-005", fr: "Résolution de problèmes complexes et solutions algorithmiques", en: "Complex problem solving and algorithmic solutions" },
+    { id: "LO-LEA3Q-006", fr: "Tests, débogage et assurance de la performance du système", en: "Testing, debugging and system performance assurance" },
+  ],
+  "LEA.99": [
+    { id: "LO-LEA99-001", fr: "Installation et administration de réseaux informatiques", en: "Installation and administration of computer networks" },
+    { id: "LO-LEA99-002", fr: "Sécurisation des systèmes et gestion des accès", en: "System security and access management" },
+    { id: "LO-LEA99-003", fr: "Surveillance et maintenance de l'infrastructure réseau", en: "Network infrastructure monitoring and maintenance" },
+    { id: "LO-LEA99-004", fr: "Support technique et dépannage réseau", en: "Technical support and network troubleshooting" },
+  ],
+  "LEA.DQ": [
+    { id: "LO-LEADQ-001", fr: "Application des concepts mathématiques pour créer des modèles et solutions en informatique", en: "Application of mathematical concepts to create IT models and solutions" },
+    { id: "LO-LEADQ-002", fr: "Préparation et exploration de données, choix des algorithmes appropriés", en: "Data preparation and exploration, selection of appropriate algorithms" },
+    { id: "LO-LEADQ-003", fr: "Intégration interdisciplinaire pour générer des résultats décisionnels à valeur ajoutée", en: "Interdisciplinary integration to generate value-added decision-making results" },
+    { id: "LO-LEADQ-004", fr: "Apprentissage automatique : fonctionnement et application pratique", en: "Machine learning: functioning and practical application" },
+    { id: "LO-LEADQ-005", fr: "Applications en FinTech, jeux vidéo et cybersécurité", en: "Applications in FinTech, video games and cybersecurity" },
+    { id: "LO-LEADQ-006", fr: "Analyse de données et intelligence d'affaires", en: "Data analysis and business intelligence" },
+  ],
+  "570.E0": [
+    { id: "LO-570E0-001", fr: "Création d'espaces intérieurs fonctionnels et esthétiquement plaisants", en: "Creation of functional and aesthetically pleasing interior spaces" },
+    { id: "LO-570E0-002", fr: "Amélioration de l'ambiance et de l'atmosphère des environnements intérieurs", en: "Enhancement of the ambiance and atmosphere of interior environments" },
+    { id: "LO-570E0-003", fr: "Connaissance des codes du bâtiment, réglementations et pratiques durables", en: "Knowledge of building codes, regulations and sustainable practices" },
+    { id: "LO-570E0-004", fr: "Conception d'espaces sécuritaires et conformes aux normes", en: "Design of safe, standards-compliant spaces" },
+    { id: "LO-570E0-005", fr: "Présentation de concepts de design aux clients", en: "Presentation of design concepts to clients", redundant_with: "022G" },
+    { id: "LO-570E0-006", fr: "Collaboration avec clients, entrepreneurs et collègues", en: "Collaboration with clients, contractors and colleagues" },
+  ],
+  "NTA.21": [
+    { id: "LO-NTA21-001", fr: "Création d'espaces intérieurs fonctionnels et esthétiquement plaisants pour contextes résidentiels, commerciaux et institutionnels", en: "Creation of functional and aesthetically pleasing interior spaces for residential, commercial and institutional contexts" },
+    { id: "LO-NTA21-002", fr: "Maîtrise des logiciels professionnels de design d'intérieur", en: "Mastery of professional interior design software" },
+    { id: "LO-NTA21-003", fr: "Application des codes du bâtiment et des réglementations", en: "Application of building codes and regulations" },
+    { id: "LO-NTA21-004", fr: "Conception durable et respectueuse de l'environnement", en: "Sustainable and environmentally responsible design" },
+    { id: "LO-NTA21-005", fr: "Présentation de concepts aux clients", en: "Presentation of concepts to clients", redundant_with: "022G" },
+    { id: "LO-NTA21-006", fr: "Coordination avec entrepreneurs et fournisseurs", en: "Coordination with contractors and suppliers" },
+  ],
+  "571.A0": [
+    { id: "LO-571A0-001", fr: "Conception de collections de vêtements originaux, du concept à la fabrication", en: "Design of original clothing collections, from concept to production" },
+    { id: "LO-571A0-002", fr: "Maîtrise des techniques de patronage, coupe et assemblage", en: "Mastery of pattern-making, cutting and assembly techniques" },
+    { id: "LO-571A0-003", fr: "Recherche et analyse des tendances de l'industrie de la mode", en: "Research and analysis of fashion industry trends", redundant_with: "00TW" },
+    { id: "LO-571A0-004", fr: "Développement de stratégies créatives et de présentation de collections", en: "Development of creative strategies and collection presentations", redundant_with: "00TW" },
+    { id: "LO-571A0-005", fr: "Connaissance des matériaux textiles et des procédés de fabrication", en: "Knowledge of textile materials and manufacturing processes" },
+    { id: "LO-571A0-006", fr: "Compétences en dessin de mode et illustration", en: "Fashion drawing and illustration skills" },
+  ],
+  "NTC.0Q": [
+    { id: "LO-NTC0Q-001", fr: "Conception de collections de vêtements et accessoires originaux", en: "Design of original clothing and accessories collections" },
+    { id: "LO-NTC0Q-002", fr: "Maîtrise des techniques de production : patronage, prototypage, coupe", en: "Mastery of production techniques: pattern-making, prototyping, cutting" },
+    { id: "LO-NTC0Q-003", fr: "Développement de stratégies marketing pour les créations", en: "Development of marketing strategies for creative work" },
+    { id: "LO-NTC0Q-004", fr: "Analyse de marché et positionnement de la marque", en: "Market analysis and brand positioning" },
+    { id: "LO-NTC0Q-005", fr: "Maîtrise du design numérique pour la mode", en: "Mastery of digital design for fashion" },
+  ],
+  "571.C0": [
+    { id: "LO-571C0-001", fr: "Développement et mise en œuvre de stratégies marketing pour la mode", en: "Development and implementation of fashion marketing strategies", redundant_with: "00X1" },
+    { id: "LO-571C0-002", fr: "Gestion commerciale et développement des ventes dans l'industrie de la mode", en: "Commercial management and sales development in the fashion industry" },
+    { id: "LO-571C0-003", fr: "Analyse des tendances et positionnement de produits", en: "Trend analysis and product positioning" },
+    { id: "LO-571C0-004", fr: "Organisation d'événements mode et expériences clientèle", en: "Organisation of fashion events and customer experiences" },
+    { id: "LO-571C0-005", fr: "Gestion de la chaîne d'approvisionnement dans la mode", en: "Fashion supply chain management" },
+    { id: "LO-571C0-006", fr: "Commerce électronique et marketing numérique appliqués à la mode", en: "E-commerce and digital marketing applied to fashion", redundant_with: "00X1" },
+  ],
+  "NTC.1W": [
+    { id: "LO-NTC1W-001", fr: "Développement de stratégies marketing et commerciales pour la mode", en: "Development of marketing and commercial strategies for fashion" },
+    { id: "LO-NTC1W-002", fr: "Entrepreneuriat et développement de marque dans l'industrie de la mode", en: "Entrepreneurship and brand development in the fashion industry" },
+    { id: "LO-NTC1W-003", fr: "Gestion de produits et commerce électronique", en: "Product management and e-commerce" },
+    { id: "LO-NTC1W-004", fr: "Marketing numérique appliqué à la mode", en: "Digital marketing applied to fashion" },
+    { id: "LO-NTC1W-005", fr: "Gestion des relations clients et développement des ventes", en: "Customer relationship management and sales development" },
+  ],
+  "410.G0": [
+    { id: "LO-410G0-001", fr: "Planification et coordination des opérations de transport et de logistique", en: "Planning and coordination of transport and logistics operations" },
+    { id: "LO-410G0-002", fr: "Gestion des stocks, des entrepôts et de la chaîne d'approvisionnement", en: "Inventory, warehouse and supply chain management" },
+    { id: "LO-410G0-003", fr: "Optimisation des flux de marchandises et réduction des coûts", en: "Optimization of goods flow and cost reduction" },
+    { id: "LO-410G0-004", fr: "Utilisation des systèmes d'information logistique", en: "Use of logistics information systems" },
+    { id: "LO-410G0-005", fr: "Connaissance des réglementations du transport national et international", en: "Knowledge of national and international transport regulations" },
+    { id: "LO-410G0-006", fr: "Gestion des relations avec les fournisseurs et les transporteurs", en: "Management of relationships with suppliers and carriers" },
+  ],
+  "LCA.5G": [
+    { id: "LO-LCA5G-001", fr: "Coordination des opérations de transport et de distribution", en: "Coordination of transport and distribution operations" },
+    { id: "LO-LCA5G-002", fr: "Gestion des stocks et de la chaîne d'approvisionnement", en: "Inventory and supply chain management" },
+    { id: "LO-LCA5G-003", fr: "Optimisation logistique et réduction des délais", en: "Logistics optimization and lead time reduction" },
+    { id: "LO-LCA5G-004", fr: "Utilisation des outils de gestion logistique", en: "Use of logistics management tools" },
+    { id: "LO-LCA5G-005", fr: "Application des réglementations du transport", en: "Application of transport regulations" },
+  ],
+  "410.B0": [
+    { id: "LO-410B0-001", fr: "Tenue de livres et comptabilité générale", en: "Bookkeeping and general accounting" },
+    { id: "LO-410B0-002", fr: "Préparation des états financiers", en: "Preparation of financial statements" },
+    { id: "LO-410B0-003", fr: "Gestion de la paie et des comptes clients et fournisseurs", en: "Payroll and accounts receivable/payable management" },
+    { id: "LO-410B0-004", fr: "Application des normes comptables et fiscales québécoises", en: "Application of Quebec accounting and tax standards" },
+    { id: "LO-410B0-005", fr: "Utilisation des logiciels comptables professionnels", en: "Use of professional accounting software" },
+    { id: "LO-410B0-006", fr: "Analyse financière et production de rapports", en: "Financial analysis and reporting" },
+  ],
+  "LCA.71": [
+    { id: "LO-LCA71-001", fr: "Tenue de livres et comptabilité générale", en: "Bookkeeping and general accounting" },
+    { id: "LO-LCA71-002", fr: "Préparation des états financiers", en: "Preparation of financial statements" },
+    { id: "LO-LCA71-003", fr: "Gestion de la paie, comptes clients et fournisseurs", en: "Payroll, accounts receivable and payable management" },
+    { id: "LO-LCA71-004", fr: "Application des normes comptables et fiscales", en: "Application of accounting and tax standards" },
+    { id: "LO-LCA71-005", fr: "Utilisation des logiciels comptables", en: "Use of accounting software" },
+    { id: "LO-LCA71-006", fr: "Production de rapports financiers", en: "Production of financial reports" },
+  ],
+  "410.D0": [
+    { id: "LO-410D0-001", fr: "Gestion des opérations commerciales et des ventes", en: "Commercial operations and sales management" },
+    { id: "LO-410D0-002", fr: "Marketing et développement de la clientèle", en: "Marketing and customer development" },
+    { id: "LO-410D0-003", fr: "Gestion des ressources humaines dans un contexte commercial", en: "Human resources management in a commercial context" },
+    { id: "LO-410D0-004", fr: "Analyse financière et gestion budgétaire", en: "Financial analysis and budget management" },
+    { id: "LO-410D0-005", fr: "Gestion des stocks et approvisionnement", en: "Inventory and procurement management" },
+    { id: "LO-410D0-006", fr: "Service à la clientèle et développement des affaires", en: "Customer service and business development" },
+  ],
+  "LCA.70": [
+    { id: "LO-LCA70-001", fr: "Gestion des opérations commerciales", en: "Commercial operations management" },
+    { id: "LO-LCA70-002", fr: "Développement des ventes et marketing", en: "Sales development and marketing" },
+    { id: "LO-LCA70-003", fr: "Gestion des responsabilités d'affaires et opérations commerciales", en: "Business responsibilities and commercial operations management" },
+    { id: "LO-LCA70-004", fr: "Commerce électronique et stratégie numérique", en: "E-commerce and digital strategy" },
+    { id: "LO-LCA70-005", fr: "Gestion budgétaire et analyse financière de base", en: "Budget management and basic financial analysis" },
+  ],
+  "410.X0": [
+    { id: "LO-410X0-001", fr: "Gestion de projets créatifs et alignement des objectifs commerciaux avec les objectifs artistiques", en: "Creative project management and alignment of commercial with artistic objectives" },
+    { id: "LO-410X0-002", fr: "Stratégies marketing propres aux industries créatives : promotion et développement de marque", en: "Marketing strategies specific to creative industries: promotion and brand development" },
+    { id: "LO-410X0-003", fr: "Analyse des budgets, optimisation des ressources dans des contextes créatifs", en: "Budget analysis and resource optimization in creative contexts" },
+    { id: "LO-410X0-004", fr: "Direction d'équipes créatives pluridisciplinaires", en: "Leadership of multidisciplinary creative teams" },
+    { id: "LO-410X0-005", fr: "Connaissance des secteurs créatifs : design, jeux vidéo, multimédia, mode, médias, publicité", en: "Knowledge of creative sectors: design, video games, multimedia, fashion, media, advertising" },
+    { id: "LO-410X0-006", fr: "Production et valorisation de contenus créatifs", en: "Production and development of creative content" },
+  ],
+  "430.A0": [
+    { id: "LO-430A0-001", fr: "Gestion des opérations hôtelières et des normes de service", en: "Management of hotel operations and service standards" },
+    { id: "LO-430A0-002", fr: "Leadership et gestion d'équipes dans l'industrie de l'hospitalité", en: "Leadership and team management in the hospitality industry" },
+    { id: "LO-430A0-003", fr: "Gestion des revenus hôteliers, analyse financière et budgétisation", en: "Hotel revenue management, financial analysis and budgeting" },
+    { id: "LO-430A0-004", fr: "Connaissance des tendances locales et mondiales de l'hospitalité", en: "Knowledge of local and global hospitality trends" },
+    { id: "LO-430A0-005", fr: "Expérience pratique par des stages rémunérés", en: "Practical experience through paid internships" },
+    { id: "LO-430A0-006", fr: "Gestion de la relation client et standards d'hospitalité de premier ordre", en: "Client relationship management and first-class hospitality standards" },
+  ],
+  "LJA.17": [
+    { id: "LO-LJA17-001", fr: "Gestion des opérations hôtelières et standards de service", en: "Management of hotel operations and service standards" },
+    { id: "LO-LJA17-002", fr: "Leadership et motivation des équipes hôtelières", en: "Leadership and motivation of hotel teams" },
+    { id: "LO-LJA17-003", fr: "Gestion des revenus, analyse financière et budgétisation", en: "Revenue management, financial analysis and budgeting" },
+    { id: "LO-LJA17-004", fr: "Connaissance des contextes local et mondial de l'hospitalité", en: "Knowledge of local and global hospitality contexts" },
+    { id: "LO-LJA17-005", fr: "Compétences pratiques acquises par stages rémunérés", en: "Practical skills acquired through paid internships" },
+    { id: "LO-LJA17-006", fr: "Gestion de la relation client et développement de l'expérience client", en: "Client relationship management and customer experience development" },
+  ],
+  "NWY.1X": [
+    { id: "LO-NWY1X-001", fr: "Développement et mise en œuvre de stratégies sur les réseaux sociaux", en: "Development and implementation of social media strategies" },
+    { id: "LO-NWY1X-002", fr: "Création et gestion de contenu pour les plateformes numériques", en: "Content creation and management for digital platforms", redundant_with: "KR41" },
+    { id: "LO-NWY1X-003", fr: "Analyse des métriques et mesure de la performance des campagnes", en: "Metrics analysis and campaign performance measurement", redundant_with: "KR49" },
+    { id: "LO-NWY1X-004", fr: "Gestion de communautés en ligne", en: "Online community management", redundant_with: "KR48" },
+    { id: "LO-NWY1X-005", fr: "Marketing d'influence et partenariats numériques", en: "Influencer marketing and digital partnerships" },
+    { id: "LO-NWY1X-006", fr: "Veille et gestion de la réputation en ligne", en: "Online monitoring and reputation management" },
+  ],
+};
+
+/**
+ * Returns the non-redundant learning outcomes for a program.
+ * These are shown alongside competencies in the tag drawer.
+ * @param {string} programCode
+ * @returns {Array<{id, fr, en}>}
+ */
+function getStudentOutcomes(programCode) {
+  const outcomes = PROGRAM_OUTCOMES[programCode] || [];
+  return outcomes.filter(o => !o.redundant_with);
+}
+
+/**
+ * Returns a unified tag pool for a student: ministry competencies + non-redundant
+ * program outcomes. Used to populate the Compétences & apprentissages drawer.
+ * Each item: { type: 'competency'|'outcome', id, label: {fr, en} }
+ * @param {string} courseCode
+ * @param {string} programCode
+ * @param {string} lang
+ * @returns {Array}
+ */
+function getStudentTagPool(courseCode, programCode, lang) {
+  const tags = [];
+  // Competencies first
+  const comps = getStudentCompetencies(courseCode, programCode);
+  comps.forEach(c => tags.push({
+    type: 'competency',
+    id:   c.code,
+    label: c.title,
+  }));
+  // Non-redundant outcomes
+  const outcomes = getStudentOutcomes(programCode);
+  outcomes.forEach(o => tags.push({
+    type: 'outcome',
+    id:   o.id,
+    label: { 'fr-CA': o.fr, 'en-CA': o.en },
+  }));
+  return tags;
+}
 /**
  * Returns a display label for a program in the given language.
  * @param {string} programCode
