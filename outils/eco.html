@@ -651,6 +651,66 @@ main { flex: 1; max-width: 1280px; margin: 0 auto; padding: 24px 20px; width: 10
   .upload-card { padding: 32px 20px; }
 }
 
+/* ── PRINT OPTIONS ── */
+.print-options-bar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.print-options-label {
+  font-family: var(--font-display);
+  font-size: 10px; font-weight: 500;
+  color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  white-space: nowrap; margin-right: 4px;
+}
+.print-toggle-group {
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 10px;
+  border-left: 1px solid var(--border);
+}
+.print-toggle-group:first-of-type { border-left: none; padding-left: 0; }
+.print-toggle-label {
+  font-size: 12px; color: var(--text2); white-space: nowrap;
+}
+.toggle-switch {
+  position: relative; width: 32px; height: 18px; flex-shrink: 0;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; inset: 0; cursor: pointer;
+  background: var(--bg3); border-radius: 18px;
+  transition: background var(--transition);
+}
+.toggle-slider::before {
+  content: ''; position: absolute;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: white; left: 3px; top: 3px;
+  transition: transform var(--transition);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle-switch input:checked + .toggle-slider { background: var(--accent); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(14px); }
+
+.print-position-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+.print-position-toggle button {
+  padding: 4px 10px; background: transparent; border: none;
+  font-size: 11px; font-family: var(--font-display);
+  color: var(--text3); cursor: pointer;
+  transition: all var(--transition);
+}
+.print-position-toggle button.active {
+  background: var(--accent); color: var(--accent-fg);
+}
+
 /* ── PRINT ── */
 .btn-print {
   display: inline-flex; align-items: center; gap: 8px;
@@ -885,6 +945,60 @@ main { flex: 1; max-width: 1280px; margin: 0 auto; padding: 24px 20px; width: 10
 }
 .print-back-btn:hover { background: rgba(255,255,255,0.2); }
 
+.print-instruction-top {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+  padding: 12px 20px; max-width: 1280px; margin: 0 auto;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.print-instruction-headline { display: flex; flex-direction: column; gap: 2px; }
+.print-instruction-title {
+  font-size: 14px; font-weight: 600; color: white;
+  font-family: 'DM Sans', sans-serif;
+}
+.print-instruction-hint {
+  font-size: 11px; color: rgba(255,255,255,0.6);
+  font-family: 'DM Mono', monospace;
+}
+.print-instruction-body {
+  max-width: 1280px; margin: 0 auto;
+  padding: 10px 20px 14px;
+  display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;
+}
+.browser-tabs {
+  display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; padding-top: 2px;
+}
+.browser-tab {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px; padding: 5px 12px;
+  font-size: 12px; color: rgba(255,255,255,0.75);
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.browser-tab.active, .browser-tab:hover {
+  background: white; color: #00587C; border-color: white; font-weight: 500;
+}
+.browser-panels { flex: 1; min-width: 200px; }
+.browser-panel { display: none; }
+.browser-panel.active { display: block; }
+.browser-steps {
+  margin: 0; padding: 0 0 0 18px; list-style: decimal;
+}
+.browser-steps li {
+  font-size: 12px; color: rgba(255,255,255,0.88);
+  line-height: 1.5; margin-bottom: 3px;
+}
+.browser-steps li strong { color: white; }
+.browser-steps li:last-child { margin-bottom: 0; }
+
+@media (max-width: 680px) {
+  .print-instruction-top { padding: 10px 14px; }
+  .print-instruction-body { padding: 8px 14px 12px; flex-direction: column; gap: 10px; }
+  .browser-tabs { gap: 4px; }
+  .browser-tab { padding: 4px 9px; font-size: 11px; }
+}
+
 @media (max-width: 680px) {
   .print-instruction-steps { gap: 6px; }
   .print-instruction-sep { display: none; }
@@ -932,7 +1046,7 @@ main { flex: 1; max-width: 1280px; margin: 0 auto; padding: 24px 20px; width: 10
           </div>
           <div class="help-step">
             <div class="help-step-num">2</div>
-            <div class="help-step-text" data-i18n="helpStep2">Une personne disposant d'un accès collaborateur au formulaire doit ouvrir Microsoft Forms, aller dans l'onglet <strong>Réponses</strong>, puis cliquer sur <strong>Ouvrir dans Excel</strong> pour télécharger le fichier .xlsx.</div>
+            <div class="help-step-text" data-i18n="helpStep2">Une personne disposant d'un accès collaborateur au formulaire doit ouvrir Microsoft Forms, aller dans l'onglet <strong>Réponses</strong>, cliquer sur le bouton <strong>Ouvrir dans Excel</strong>, puis dans le panneau qui s'ouvre, choisir <strong>Télécharger une copie</strong>. Ne pas utiliser le fichier directement depuis Excel en ligne.</div>
           </div>
           <div class="help-step">
             <div class="help-step-num">3</div>
@@ -1025,7 +1139,7 @@ const T = {
     helpTitle: "How to use this calculator",
     helpStep1: "This calculator is linked to the eco-conception form. Students and jury members submit their responses online.",
     helpFormLink: "Open the form →",
-    helpStep2: "Someone with collaborator access to the form must open Microsoft Forms, go to the Responses tab, then click Open in Excel to download the .xlsx file.",
+    helpStep2: "Someone with collaborator access to the form must open Microsoft Forms, go to the Responses tab, click <strong>Open in Excel</strong>, then in the panel that appears choose <strong>Download a copy</strong>. Do not use the file directly from Excel online.",
     helpStep3: "Import that Excel file here. The calculator scores submissions automatically — no data is sent to any server.",
     uploadTitle: "Import responses",
     uploadSub: "Drag and drop the Excel file exported from Microsoft Forms, or click to browse.",
@@ -1408,7 +1522,12 @@ function parseRow(headers, row) {
 // ═══════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════
-let currentView = 'dashboard'; // 'dashboard' | 'scoresheet'
+let currentView = 'dashboard';
+let printOpts = {
+  showStudentList: true,
+  studentListPosition: 'end',   // 'start' | 'end'
+  showBreakdown: true,
+}; // 'dashboard' | 'scoresheet'
 let currentSubmissionIdx = -1;
 let filterProfile = 'all';
 let filterStatus = 'all';
@@ -1532,8 +1651,33 @@ function renderDashboard() {
       ${profiles.map(p=>`<option value="${p}" ${filterProfile===p?'selected':''}>${p}</option>`).join('')}
     </select>` : ''}
   </div>
-  <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
-    <button class="btn-print" onclick="openPrintView()">🖨 ${lang==='fr'?'Générer le rapport PDF':'Generate PDF report'}</button>
+  <div class="print-options-bar">
+    <span class="print-options-label">🖨 ${lang==='fr'?'Rapport PDF':'PDF report'}</span>
+
+    <div class="print-toggle-group">
+      <label class="toggle-switch">
+        <input type="checkbox" ${printOpts.showStudentList?'checked':''} onchange="printOpts.showStudentList=this.checked">
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="print-toggle-label">${lang==='fr'?'Liste des étudiant·e·s':'Student list'}</span>
+      <div class="print-position-toggle" style="${printOpts.showStudentList?'':'opacity:0.4;pointer-events:none'}">
+        <button class="${printOpts.studentListPosition==='start'?'active':''}" onclick="printOpts.studentListPosition='start';renderDashboard()">${lang==='fr'?'Début':'Start'}</button>
+        <button class="${printOpts.studentListPosition==='end'?'active':''}" onclick="printOpts.studentListPosition='end';renderDashboard()">${lang==='fr'?'Fin':'End'}</button>
+      </div>
+    </div>
+
+    <div class="print-toggle-group">
+      <label class="toggle-switch">
+        <input type="checkbox" ${printOpts.showBreakdown?'checked':''} onchange="printOpts.showBreakdown=this.checked">
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="print-toggle-label">${lang==='fr'?'Détail des scores':'Score breakdown'}</span>
+    </div>
+
+    <div style="flex:1"></div>
+    <button class="btn-print" onclick="openPrintView()">
+      ${lang==='fr'?'Aperçu et export PDF →':'Preview and export PDF →'}
+    </button>
   </div>
 
   <div class="table-wrap">
@@ -1957,21 +2101,42 @@ function openPrintView() {
   const pv = document.getElementById('printView');
 
   const fr = lang === 'fr';
+  const browsers = fr ? [
+    { name: 'Chrome / Edge', icon: '🟢', steps: ['Cliquez sur le bouton <strong>🖨 Imprimer</strong> ci-dessous, ou appuyez sur <span class="print-kbd">Ctrl+P</span> <span class="print-kbd-mac">⌘P</span>', 'Dans le panneau qui s\'ouvre, trouvez <strong>Destination</strong> ou <strong>Imprimante</strong>', 'Cliquez sur la liste déroulante et choisissez <strong>Enregistrer au format PDF</strong>', 'Cliquez sur <strong>Enregistrer</strong> et choisissez l\'emplacement'] },
+    { name: 'Firefox', icon: '🟠', steps: ['Cliquez sur le bouton <strong>🖨 Imprimer</strong> ci-dessous, ou appuyez sur <span class="print-kbd">Ctrl+P</span> <span class="print-kbd-mac">⌘P</span>', 'Dans la fenêtre d\'impression, cliquez sur <strong>Enregistrer au format PDF</strong> dans la liste des imprimantes à droite', 'Cliquez sur <strong>Enregistrer</strong>'] },
+    { name: 'Safari (Mac)', icon: '🔵', steps: ['Appuyez sur <span class="print-kbd-mac">⌘P</span>', 'En bas à gauche de la fenêtre, cliquez sur le menu déroulant <strong>PDF</strong>', 'Choisissez <strong>Enregistrer au format PDF…</strong>', 'Donnez un nom au fichier et cliquez sur <strong>Enregistrer</strong>'] },
+  ] : [
+    { name: 'Chrome / Edge', icon: '🟢', steps: ['Click the <strong>🖨 Print</strong> button below, or press <span class="print-kbd">Ctrl+P</span> <span class="print-kbd-mac">⌘P</span>', 'In the panel that opens, find <strong>Destination</strong> or <strong>Printer</strong>', 'Click the dropdown and choose <strong>Save as PDF</strong>', 'Click <strong>Save</strong> and choose where to save the file'] },
+    { name: 'Firefox', icon: '🟠', steps: ['Click the <strong>🖨 Print</strong> button below, or press <span class="print-kbd">Ctrl+P</span> <span class="print-kbd-mac">⌘P</span>', 'In the print window, click <strong>Save to PDF</strong> in the printer list on the right', 'Click <strong>Save</strong>'] },
+    { name: 'Safari (Mac)', icon: '🔵', steps: ['Press <span class="print-kbd-mac">⌘P</span>', 'At the bottom left of the print window, click the <strong>PDF</strong> dropdown', 'Choose <strong>Save as PDF…</strong>', 'Name the file and click <strong>Save</strong>'] },
+  ];
+
+  const browserTabs = browsers.map((b,i) => `
+    <button class="browser-tab ${i===0?'active':''}" onclick="switchBrowserTab(${i})">${b.icon} ${b.name}</button>
+  `).join('');
+
+  const browserPanels = browsers.map((b,i) => `
+    <div class="browser-panel ${i===0?'active':''}" id="bpanel-${i}">
+      <ol class="browser-steps">
+        ${b.steps.map(s => `<li>${s}</li>`).join('')}
+      </ol>
+    </div>
+  `).join('');
+
   const instructionBar = `<div class="print-instruction-bar" id="printInstructionBar">
-    <div class="print-instruction-content">
-      <div class="print-instruction-steps">
-        <span class="print-instruction-title">${fr ? 'Enregistrer en PDF' : 'Save as PDF'}</span>
-        <span class="print-instruction-sep">·</span>
-        <span class="print-instruction-step"><span class="print-step-num">1</span>${fr ? 'Cliquez sur' : 'Click'} <strong>${fr ? 'Imprimer' : 'Print'}</strong> <span class="print-kbd">${fr ? 'Ctrl+P' : 'Ctrl+P'}</span> <span class="print-kbd-mac">⌘P</span></span>
-        <span class="print-instruction-sep">·</span>
-        <span class="print-instruction-step"><span class="print-step-num">2</span>${fr ? 'Dans «&nbsp;Destination&nbsp;», choisissez' : 'Under «&nbsp;Destination&nbsp;», choose'} <strong>${fr ? 'Enregistrer au format PDF' : 'Save as PDF'}</strong></span>
-        <span class="print-instruction-sep">·</span>
-        <span class="print-instruction-step"><span class="print-step-num">3</span>${fr ? 'Cliquez sur «&nbsp;Enregistrer&nbsp;»' : 'Click «&nbsp;Save&nbsp;»'}</span>
+    <div class="print-instruction-top">
+      <div class="print-instruction-headline">
+        <span class="print-instruction-title">${fr ? '💾 Comment enregistrer en PDF' : '💾 How to save as PDF'}</span>
+        <span class="print-instruction-hint">${fr ? 'Choisissez votre navigateur ci-dessous' : 'Select your browser below'}</span>
       </div>
       <div class="print-instruction-actions">
-        <button class="print-now-btn" onclick="window.print()">🖨 ${fr ? 'Ouvrir l\'impression' : 'Open print dialog'}</button>
+        <button class="print-now-btn" onclick="window.print()">🖨 ${fr ? "Ouvrir l'impression" : 'Open print dialog'}</button>
         <button class="print-back-btn" onclick="closePrintView()">← ${fr ? 'Retour' : 'Back'}</button>
       </div>
+    </div>
+    <div class="print-instruction-body">
+      <div class="browser-tabs">${browserTabs}</div>
+      <div class="browser-panels">${browserPanels}</div>
     </div>
   </div>`;
 
@@ -1987,6 +2152,11 @@ function closePrintView() {
   document.getElementById('dashboard').style.display = 'block';
   document.getElementById('uploadBtn').style.display = 'flex';
   window.scrollTo(0, 0);
+}
+
+function switchBrowserTab(idx) {
+  document.querySelectorAll('.browser-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  document.querySelectorAll('.browser-panel').forEach((p,i) => p.classList.toggle('active', i===idx));
 }
 
 function buildPrintView(students) {
@@ -2025,7 +2195,7 @@ function buildPrintView(students) {
         <img id="${photoId}"
              src="${esc(s.garmentPhoto)}"
              alt="${esc(s.studentName)}"
-             style="max-width:100%;max-height:320px;object-fit:contain;border-radius:6px;display:block;margin:8px 0"
+             style="max-width:800px;max-height:600px;object-fit:contain;border-radius:6px;display:block;margin:8px 0"
              onerror="this.style.display='none';document.getElementById('pfallback-${i}').style.display='block'"
              onload="document.getElementById('pfallback-${i}').style.display='none'">
         <div id="pfallback-${i}" style="display:none">
@@ -2116,7 +2286,8 @@ function buildPrintView(students) {
     </table>
   </div>`;
 
-  return toc + cards + `
+  const tocHtml = printOpts.showStudentList ? toc : '';
+  const breakdownHtml = printOpts.showBreakdown ? `
     <hr class="print-divider">
     <div class="print-card">
       <div class="print-breakdown-title">${fr ? 'Détail des scores' : 'Score breakdown'}</div>
@@ -2124,7 +2295,13 @@ function buildPrintView(students) {
         ? 'Détail critère par critère pour chaque soumission, dans le même ordre que ci-dessus.'
         : 'Criterion-by-criterion detail for each submission, in the same order as above.'}</div>
       ${breakdowns}
-    </div>`;
+    </div>` : '';
+
+  if (printOpts.studentListPosition === 'start') {
+    return tocHtml + cards + breakdownHtml;
+  } else {
+    return cards + breakdownHtml + tocHtml;
+  }
 }
 
 function printCritRow(val, label, ptsVal) {
