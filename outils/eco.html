@@ -2093,14 +2093,441 @@ function hasOption(v, kw) { return String(v||'').toLowerCase().includes(kw.toLow
 // ═══════════════════════════════════════════════════════
 // PRINT VIEW
 // ═══════════════════════════════════════════════════════
+const PRINT_STYLES = `<style>
+:root {
+  --blue:       #00587C;
+  --blue-dim:   #004561;
+  --blue-glow:  rgba(0,88,124,0.18);
+  --green:      #1B8B5A;
+  --green-dim:  #166f47;
+  --amber:      #C47A00;
+  --red:        #C0392B;
+  --pass:       #1B8B5A;
+  --fail:       #C0392B;
+  --pending:    #C47A00;
+
+  /* Light mode */
+  --bg:         #F5F3EE;
+  --bg2:        #EDEAE3;
+  --bg3:        #E3DFD6;
+  --surface:    #FFFFFF;
+  --surface2:   #F9F8F5;
+  --border:     rgba(0,0,0,0.10);
+  --border2:    rgba(0,0,0,0.06);
+  --text:       #0F1A20;
+  --text2:      #3D4F58;
+  --text3:      #6B7E88;
+  --accent:     var(--blue);
+  --accent-fg:  #FFFFFF;
+
+  --radius:     10px;
+  --radius-lg:  16px;
+  --shadow:     0 2px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
+
+  --font-display: 'DM Mono', monospace;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+
+  --transition: 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+
+[data-theme="dark"] {
+  --bg:         #0A1419;
+  --bg2:        #0F1E25;
+  --bg3:        #162530;
+  --surface:    #162530;
+  --surface2:   #1C2F3C;
+  --border:     rgba(255,255,255,0.09);
+  --border2:    rgba(255,255,255,0.05);
+  --text:       #EAF0F3;
+  --text2:      #A8BFC8;
+  --text3:      #6A8A98;
+  --accent:     #3AABCF;
+  --accent-fg:  #0A1419;
+  --blue:       #3AABCF;
+  --blue-glow:  rgba(58,171,207,0.15);
+  --green:      #2ECC8A;
+  --amber:      #F0A830;
+  --red:        #E05C4A;
+  --pass:       #2ECC8A;
+  --fail:       #E05C4A;
+  --pending:    #F0A830;
+}
+
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── PRINT OPTIONS ── */
+.print-options-bar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.print-options-label {
+  font-family: var(--font-display);
+  font-size: 10px; font-weight: 500;
+  color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  white-space: nowrap; margin-right: 4px;
+}
+.print-toggle-group {
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 10px;
+  border-left: 1px solid var(--border);
+}
+.print-toggle-group:first-of-type { border-left: none; padding-left: 0; }
+.print-toggle-label {
+  font-size: 12px; color: var(--text2); white-space: nowrap;
+}
+.toggle-switch {
+  position: relative; width: 32px; height: 18px; flex-shrink: 0;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; inset: 0; cursor: pointer;
+  background: var(--bg3); border-radius: 18px;
+  transition: background var(--transition);
+}
+.toggle-slider::before {
+  content: ''; position: absolute;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: white; left: 3px; top: 3px;
+  transition: transform var(--transition);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle-switch input:checked + .toggle-slider { background: var(--accent); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(14px); }
+
+.print-position-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+.print-position-toggle button {
+  padding: 4px 10px; background: transparent; border: none;
+  font-size: 11px; font-family: var(--font-display);
+  color: var(--text3); cursor: pointer;
+  transition: all var(--transition);
+}
+.print-position-toggle button.active {
+  background: var(--accent); color: var(--accent-fg);
+}
+
+/* ── PRINT ── */
+.btn-print {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 7px 14px;
+  font-size: 13px; color: var(--text2); font-family: var(--font-body);
+  cursor: pointer; transition: all var(--transition);
+}
+.btn-print:hover { background: var(--bg2); color: var(--text); }
+
+@media print {
+  @page { margin: 16mm 14mm; size: A4; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+  header, .filters, .summary-bar, .section-bars,
+  .table-wrap, .back-btn, .btn-print, .btn-icon,
+  .lang-toggle, .header-controls, .upload-zone,
+  .jury-input-block, .help-block,
+  .print-instruction-bar { display: none !important; }
+
+  body { background: white !important; color: #0F1A20 !important; }
+  main { padding: 0 !important; max-width: 100% !important; }
+
+  .print-view { display: block !important; }
+  .print-card { page-break-after: always; }
+  .print-card:last-child { page-break-after: avoid; }
+
+  .print-score-section { page-break-inside: avoid; }
+  .score-section-body { display: block !important; }
+
+  a { color: #00587C !important; }
+}
+
+.print-view { display: none; }
+
+.print-card {
+  background: white;
+  padding: 32px 28px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+.print-card-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  border-bottom: 3px solid #00587C;
+  padding-bottom: 16px; margin-bottom: 20px;
+}
+.print-student-name {
+  font-size: 22px; font-weight: 700; color: #0F1A20;
+  letter-spacing: -0.5px;
+}
+.print-student-meta {
+  font-size: 12px; color: #5A6470; margin-top: 4px; line-height: 1.7;
+}
+.print-total-block { text-align: right; }
+.print-total-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 48px; font-weight: 500; line-height: 1;
+  letter-spacing: -2px;
+}
+.print-total-num.pass { color: #1B8B5A; }
+.print-total-num.fail { color: #C0392B; }
+.print-total-num.pending { color: #C47A00; }
+.print-total-label { font-size: 11px; color: #5A6470; font-family: 'DM Mono', monospace; }
+.print-status-badge {
+  display: inline-block; font-family: 'DM Mono', monospace;
+  font-size: 10px; font-weight: 500; letter-spacing: 0.5px;
+  padding: 3px 10px; border-radius: 20px; margin-top: 6px;
+}
+.print-status-badge.pass { background: rgba(27,139,90,0.1); color: #1B8B5A; }
+.print-status-badge.fail { background: rgba(192,57,43,0.1); color: #C0392B; }
+.print-status-badge.pending { background: rgba(196,122,0,0.1); color: #C47A00; }
+
+.print-sections {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; margin-bottom: 20px;
+}
+.print-section-block {
+  background: #F5F3EE; border-radius: 8px; padding: 12px 14px;
+}
+.print-section-code {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  font-weight: 500; color: white; background: #00587C;
+  padding: 2px 7px; border-radius: 4px; display: inline-block;
+  margin-bottom: 6px; letter-spacing: 0.5px;
+}
+.print-section-title { font-size: 12px; color: #3D4F58; margin-bottom: 8px; }
+.print-section-score {
+  font-family: 'DM Mono', monospace;
+  font-size: 22px; font-weight: 500; color: #0F1A20;
+  letter-spacing: -0.5px;
+}
+.print-section-max { font-size: 11px; color: #6B7E88; }
+.print-section-bar-track {
+  height: 5px; background: #E3DFD6; border-radius: 3px;
+  margin-top: 8px; overflow: hidden;
+}
+.print-section-bar-fill { height: 100%; border-radius: 3px; background: #00587C; }
+
+.print-photo-block {
+  border: 1px solid #E3DFD6; border-radius: 8px;
+  padding: 12px 16px; margin-bottom: 20px;
+  background: #F5F3EE;
+}
+.print-photo-label {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  color: #6B7E88; text-transform: uppercase; letter-spacing: 0.8px;
+  margin-bottom: 6px;
+}
+.print-photo-link { font-size: 12px; color: #00587C; word-break: break-all; }
+.print-login-note {
+  font-size: 11px; color: #C47A00; margin-top: 6px;
+  font-style: italic;
+}
+
+.print-divider {
+  border: none; border-top: 2px solid #00587C;
+  margin: 40px 0 32px;
+}
+.print-breakdown-title {
+  font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500;
+  color: #00587C; text-transform: uppercase; letter-spacing: 0.8px;
+  margin-bottom: 4px;
+}
+.print-breakdown-sub {
+  font-size: 12px; color: #6B7E88; margin-bottom: 24px;
+}
+.print-score-section {
+  margin-bottom: 20px; page-break-inside: avoid;
+}
+.print-score-section-header {
+  display: flex; align-items: center; gap: 10px;
+  background: #F2F4F5; border-radius: 6px;
+  padding: 8px 12px; margin-bottom: 8px;
+}
+.print-criterion-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 5px 0; border-bottom: 1px solid #F2F4F5;
+  font-size: 11px;
+}
+.print-criterion-row:last-child { border-bottom: none; }
+.print-criterion-check {
+  width: 16px; height: 16px; border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; flex-shrink: 0; margin-top: 1px;
+}
+.print-criterion-check.yes { background: rgba(27,139,90,0.12); color: #1B8B5A; }
+.print-criterion-check.no  { background: #F2F4F5; color: #6B7E88; }
+.print-criterion-text { flex: 1; color: #3D4F58; line-height: 1.4; }
+.print-criterion-pts { font-family: 'DM Mono', monospace; font-size: 11px; flex-shrink: 0; }
+.print-criterion-pts.pos { color: #1B8B5A; font-weight: 500; }
+.print-criterion-pts.neg { color: #C0392B; font-weight: 500; }
+.print-criterion-pts.zero { color: #6B7E88; }
+.print-qual-block {
+  background: #F5F3EE; border-radius: 6px;
+  padding: 8px 10px; margin: 6px 0 6px 26px;
+  font-size: 11px; color: #5A6470; font-style: italic; line-height: 1.5;
+}
+
+.print-student-separator {
+  border: none; border-top: 1px dashed #D8DDE2;
+  margin: 32px 0;
+}
+
+/* instruction bar */
+.print-instruction-bar {
+  position: sticky; top: 0; z-index: 200;
+  background: #00587C;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+.print-instruction-content {
+  max-width: 1280px; margin: 0 auto;
+  padding: 12px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+}
+.print-instruction-steps {
+  display: flex; align-items: center; gap: 10px;
+  flex-wrap: wrap; flex: 1;
+}
+.print-instruction-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; font-weight: 500;
+  color: rgba(255,255,255,0.7);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  white-space: nowrap;
+}
+.print-instruction-sep { color: rgba(255,255,255,0.3); font-size: 14px; }
+.print-instruction-step {
+  font-size: 12px; color: rgba(255,255,255,0.9);
+  display: flex; align-items: center; gap: 6px;
+}
+.print-step-num {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
+  color: white; flex-shrink: 0;
+}
+.print-kbd {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 4px; padding: 1px 6px;
+  font-family: 'DM Mono', monospace; font-size: 11px; color: white;
+}
+.print-kbd-mac {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 4px; padding: 1px 6px;
+  font-family: 'DM Mono', monospace; font-size: 11px; color: white;
+}
+.print-instruction-actions {
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.print-now-btn {
+  background: white; color: #00587C;
+  border: none; border-radius: 8px;
+  padding: 7px 14px; font-size: 13px; font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: opacity 0.15s;
+  white-space: nowrap;
+}
+.print-now-btn:hover { opacity: 0.88; }
+.print-back-btn {
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.9);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 8px; padding: 7px 14px;
+  font-size: 13px; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: background 0.15s;
+  white-space: nowrap;
+}
+.print-back-btn:hover { background: rgba(255,255,255,0.2); }
+
+.print-instruction-top {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+  padding: 12px 20px; max-width: 1280px; margin: 0 auto;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.print-instruction-headline { display: flex; flex-direction: column; gap: 2px; }
+.print-instruction-title {
+  font-size: 14px; font-weight: 600; color: white;
+  font-family: 'DM Sans', sans-serif;
+}
+.print-instruction-hint {
+  font-size: 11px; color: rgba(255,255,255,0.6);
+  font-family: 'DM Mono', monospace;
+}
+.print-instruction-body {
+  max-width: 1280px; margin: 0 auto;
+  padding: 10px 20px 14px;
+  display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;
+}
+.browser-tabs {
+  display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; padding-top: 2px;
+}
+.browser-tab {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px; padding: 5px 12px;
+  font-size: 12px; color: rgba(255,255,255,0.75);
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.browser-tab.active, .browser-tab:hover {
+  background: white; color: #00587C; border-color: white; font-weight: 500;
+}
+.browser-panels { flex: 1; min-width: 200px; }
+.browser-panel { display: none; }
+.browser-panel.active { display: block; }
+.browser-steps {
+  margin: 0; padding: 0 0 0 18px; list-style: decimal;
+}
+.browser-steps li {
+  font-size: 12px; color: rgba(255,255,255,0.88);
+  line-height: 1.5; margin-bottom: 3px;
+}
+.browser-steps li strong { color: white; }
+.browser-steps li:last-child { margin-bottom: 0; }
+
+@media (max-width: 680px) {
+  .print-instruction-top { padding: 10px 14px; }
+  .print-instruction-body { padding: 8px 14px 12px; flex-direction: column; gap: 10px; }
+  .browser-tabs { gap: 4px; }
+  .browser-tab { padding: 4px 9px; font-size: 11px; }
+}
+
+@media (max-width: 680px) {
+  .print-instruction-steps { gap: 6px; }
+  .print-instruction-sep { display: none; }
+  .print-kbd-mac { display: none; }
+}
+</style>`;
+
 function openPrintView() {
   const students = allSubmissions.filter(s => !s.isJury);
   if (!students.length) return;
 
   const sorted = [...students].sort((a,b) => b.total - a.total);
-  const pv = document.getElementById('printView');
-
   const fr = lang === 'fr';
+
   const browsers = fr ? [
     { name: 'Chrome / Edge', icon: '🟢', steps: ['Cliquez sur le bouton <strong>🖨 Imprimer</strong> ci-dessous, ou appuyez sur <span class="print-kbd">Ctrl+P</span> <span class="print-kbd-mac">⌘P</span>', 'Dans le panneau qui s\'ouvre, trouvez <strong>Destination</strong> ou <strong>Imprimante</strong>', 'Cliquez sur la liste déroulante et choisissez <strong>Enregistrer au format PDF</strong>', 'Cliquez sur <strong>Enregistrer</strong> et choisissez l\'emplacement'] },
     { name: 'Firefox', icon: '🟠', steps: ['Cliquez sur le bouton <strong>🖨 Imprimer</strong> ci-dessous, ou appuyez sur <span class="print-kbd">Ctrl+P</span> <span class="print-kbd-mac">⌘P</span>', 'Dans la fenêtre d\'impression, cliquez sur <strong>Enregistrer au format PDF</strong> dans la liste des imprimantes à droite', 'Cliquez sur <strong>Enregistrer</strong>'] },
@@ -2111,19 +2538,15 @@ function openPrintView() {
     { name: 'Safari (Mac)', icon: '🔵', steps: ['Press <span class="print-kbd-mac">⌘P</span>', 'At the bottom left of the print window, click the <strong>PDF</strong> dropdown', 'Choose <strong>Save as PDF…</strong>', 'Name the file and click <strong>Save</strong>'] },
   ];
 
-  const browserTabs = browsers.map((b,i) => `
-    <button class="browser-tab ${i===0?'active':''}" onclick="switchBrowserTab(${i})">${b.icon} ${b.name}</button>
-  `).join('');
+  const browserTabsHtml = browsers.map((b,i) =>
+    `<button class="browser-tab ${i===0?'active':''}" onclick="document.querySelectorAll('.browser-tab').forEach((t,j)=>t.classList.toggle('active',j===${i}));document.querySelectorAll('.browser-panel').forEach((p,j)=>p.classList.toggle('active',j===${i}))">${b.icon} ${b.name}</button>`
+  ).join('');
 
-  const browserPanels = browsers.map((b,i) => `
-    <div class="browser-panel ${i===0?'active':''}" id="bpanel-${i}">
-      <ol class="browser-steps">
-        ${b.steps.map(s => `<li>${s}</li>`).join('')}
-      </ol>
-    </div>
-  `).join('');
+  const browserPanelsHtml = browsers.map((b,i) =>
+    `<div class="browser-panel ${i===0?'active':''}">${'<ol class="browser-steps">' + b.steps.map(s=>`<li>${s}</li>`).join('') + '</ol>'}</div>`
+  ).join('');
 
-  const instructionBar = `<div class="print-instruction-bar" id="printInstructionBar">
+  const instructionBarHtml = `<div class="print-instruction-bar" id="printInstructionBar">
     <div class="print-instruction-top">
       <div class="print-instruction-headline">
         <span class="print-instruction-title">${fr ? '💾 Comment enregistrer en PDF' : '💾 How to save as PDF'}</span>
@@ -2131,20 +2554,41 @@ function openPrintView() {
       </div>
       <div class="print-instruction-actions">
         <button class="print-now-btn" onclick="window.print()">🖨 ${fr ? "Ouvrir l'impression" : 'Open print dialog'}</button>
-        <button class="print-back-btn" onclick="closePrintView()">← ${fr ? 'Retour' : 'Back'}</button>
+        <button class="print-back-btn" onclick="window.close()">← ${fr ? 'Fermer' : 'Close'}</button>
       </div>
     </div>
     <div class="print-instruction-body">
-      <div class="browser-tabs">${browserTabs}</div>
-      <div class="browser-panels">${browserPanels}</div>
+      <div class="browser-tabs">${browserTabsHtml}</div>
+      <div class="browser-panels">${browserPanelsHtml}</div>
     </div>
   </div>`;
 
-  pv.innerHTML = instructionBar + buildPrintView(sorted);
-  pv.style.display = 'block';
-  document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('uploadBtn').style.display = 'none';
-  window.scrollTo(0, 0);
+  const bodyHtml = instructionBarHtml + buildPrintView(sorted);
+
+  // Open a new window with self-contained HTML — avoids Edge zero-byte PDF bug
+  const printWin = window.open('', '_blank', 'width=1100,height=800');
+  if (!printWin) {
+    alert(fr
+      ? 'Le navigateur a bloqué l\'ouverture de la fenêtre. Autorisez les popups pour ce site.'
+      : 'The browser blocked the popup. Please allow popups for this page.');
+    return;
+  }
+
+  printWin.document.write(`<!DOCTYPE html>
+<html lang="${lang}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${fr ? 'Rapport Éco-conception' : 'Eco-conception Report'}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap">
+${PRINT_STYLES}
+</head>
+<body>
+${bodyHtml}
+</body>
+</html>`);
+  printWin.document.close();
 }
 
 function closePrintView() {
