@@ -651,6 +651,148 @@ main { flex: 1; max-width: 1280px; margin: 0 auto; padding: 24px 20px; width: 10
   .upload-card { padding: 32px 20px; }
 }
 
+/* ── IMAGE DRAWER ── */
+.img-drawer {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.img-drawer-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 0;
+}
+.img-drawer-title {
+  font-family: var(--font-display);
+  font-size: 11px; font-weight: 500;
+  color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.8px;
+}
+.img-drawer-toggle {
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; color: var(--text3);
+  font-family: var(--font-display);
+  transition: color var(--transition);
+}
+.img-drawer-toggle:hover { color: var(--text); }
+.img-drawer-body { margin-top: 14px; }
+.img-drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  transition: all var(--transition);
+  cursor: pointer;
+}
+.img-drop-zone.drag-over {
+  border-color: var(--accent);
+  background: var(--bg2);
+  box-shadow: 0 0 0 3px var(--blue-glow);
+}
+.img-drop-zone-label {
+  font-size: 13px; color: var(--text3); line-height: 1.6;
+}
+.img-drop-zone-label strong { color: var(--text2); }
+.img-stats {
+  margin-top: 10px;
+  font-family: var(--font-display);
+  font-size: 11px; color: var(--text3);
+  display: flex; gap: 16px; flex-wrap: wrap;
+}
+.img-stat-match { color: var(--pass); }
+.img-stat-missing { color: var(--pending); }
+
+/* ── REPORT VIEW ── */
+#reportView {
+  background: var(--bg);
+}
+.report-topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--blue);
+  padding: 10px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+.report-topbar-title {
+  font-family: var(--font-display);
+  font-size: 13px; font-weight: 500; color: white;
+}
+.report-topbar-actions {
+  display: flex; align-items: center; gap: 8px;
+}
+.report-hide-bar-btn {
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.9);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 8px; padding: 6px 12px;
+  font-size: 12px; font-family: var(--font-body);
+  cursor: pointer; transition: background 0.15s;
+}
+.report-hide-bar-btn:hover { background: rgba(255,255,255,0.22); }
+.report-back-btn {
+  background: white; color: var(--blue);
+  border: none; border-radius: 8px;
+  padding: 6px 14px; font-size: 13px; font-weight: 600;
+  font-family: var(--font-body); cursor: pointer;
+}
+.report-back-btn:hover { opacity: 0.88; }
+.report-body {
+  max-width: 1100px; margin: 0 auto; padding: 32px 20px;
+}
+@media print {
+  .report-topbar { display: none !important; }
+  #reportView { display: block !important; }
+  .report-body { padding: 0; max-width: 100%; }
+  header, #dashboard, #printView, .upload-zone, #reportView > .report-topbar { display: none !important; }
+}
+
+/* ── PROGRESS OVERLAY ── */
+/* ── PROGRESS OVERLAY ── */
+.progress-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.15s ease;
+}
+.progress-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  min-width: 320px; max-width: 420px; width: 90%;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+.progress-title {
+  font-size: 15px; font-weight: 600; color: var(--text);
+  margin-bottom: 6px;
+}
+.progress-sub {
+  font-size: 12px; color: var(--text3);
+  margin-bottom: 20px; line-height: 1.5;
+}
+.progress-track {
+  height: 8px; background: var(--bg2);
+  border-radius: 4px; overflow: hidden;
+  margin-bottom: 10px;
+}
+.progress-fill {
+  height: 100%; border-radius: 4px;
+  background: var(--accent);
+  transition: width 0.2s ease;
+  width: 0%;
+}
+.progress-pct {
+  font-family: var(--font-display);
+  font-size: 13px; color: var(--text3);
+}
+
+/* ── PRINT OPTIONS ── */
+/* ── PRINT OPTIONS ── */
 /* ── PRINT OPTIONS ── */
 .print-options-bar {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
@@ -1075,8 +1217,17 @@ main { flex: 1; max-width: 1280px; margin: 0 auto; padding: 24px 20px; width: 10
 
   <!-- DASHBOARD (hidden until file loaded) -->
   <div class="dashboard" id="dashboard" style="display:none"></div>
+
+  <!-- hidden file input for images — triggered by button in print options bar -->
+  <input type="file" id="imgFileInputQ1" multiple accept="image/*,.pdf,application/pdf" style="display:none" onchange="handleImgFilesQ(event.target.files,'q1'); this.value=''">
+  <input type="file" id="imgFileInputQ2" multiple accept="image/*,.pdf,application/pdf" style="display:none" onchange="handleImgFilesQ(event.target.files,'q2'); this.value=''">
+  <input type="file" id="imgFileInputQ3" multiple accept="image/*,.pdf,application/pdf" style="display:none" onchange="handleImgFilesQ(event.target.files,'q3'); this.value=''">
+
   <!-- PRINT VIEW -->
   <div class="print-view" id="printView"></div>
+
+  <!-- IN-PAGE REPORT VIEW -->
+  <div id="reportView" style="display:none"></div>
 </main>
 
 </div>
@@ -1194,6 +1345,7 @@ function setLang(l) {
   document.getElementById('btnFR').classList.toggle('active', l==='fr');
   document.getElementById('btnEN').classList.toggle('active', l==='en');
   document.documentElement.lang = l;
+  updateImgDrawerLabels();
   renderAll();
 }
 
@@ -1516,6 +1668,7 @@ function parseRow(headers, row) {
     selfAssessment: isYes(get('selfAssessment')),
     additionalComments: cell(r,'additionalComments'),
     garmentPhoto: get('garmentPhoto'),
+    fabricPhotoPlan: get('fabricPhotoPlan'),
   };
 }
 
@@ -1523,6 +1676,22 @@ function parseRow(headers, row) {
 // STATE
 // ═══════════════════════════════════════════════════════
 let currentView = 'dashboard';
+// Per-question image stores: filename (normalized) -> data URL
+const imageStores = { q1: {}, q2: {}, q3: {} };
+// Unified resolver — checks all stores
+const imageStore = new Proxy({}, {
+  get(_, key) {
+    return imageStores.q1[key] || imageStores.q2[key] || imageStores.q3[key];
+  },
+  set(_, key, val) {
+    // not used directly — use imageStores.qN
+    return true;
+  }
+});
+function imageStoreHas(key) {
+  return !!(imageStores.q1[key] || imageStores.q2[key] || imageStores.q3[key]);
+}
+
 let printOpts = {
   showStudentList: true,
   studentListPosition: 'end',   // 'start' | 'end'
@@ -1675,8 +1844,45 @@ function renderDashboard() {
     </div>
 
     <div style="flex:1"></div>
-    <button class="btn-print" onclick="openPrintView()">
-      ${lang==='fr'?'Aperçu et export PDF →':'Preview and export PDF →'}
+    ${(() => {
+      const fr = lang === 'fr';
+      const tip = fr
+        ? 'Dans OneDrive, accédez au dossier du formulaire → téléchargez et décompressez le dossier de la question correspondante.'
+        : 'In OneDrive, go to the form folder → download and unzip the folder for the corresponding question.';
+      function qBtn(qKey, label) {
+        const store = imageStores[qKey];
+        // count unique files (stored under up to 2 keys each)
+        const keys = Object.keys(store);
+        const uniqueCount = Math.ceil(keys.length / 2);
+        const color = uniqueCount > 0 ? 'var(--pass)' : 'var(--text2)';
+        const badge = uniqueCount > 0 ? ` <span style="color:var(--pass);font-family:var(--font-display);font-size:11px">✓ ${uniqueCount}</span>` : '';
+        return `<span style="display:inline-flex;align-items:center;gap:4px;margin-right:6px">
+          <button class="btn-print" onclick="document.getElementById('imgFileInput${qKey.toUpperCase()}').click()" style="color:${color}" title="${tip}">📷 ${label}</button>${badge}<span style="cursor:help;font-size:11px;color:var(--text3);padding:1px 5px;border:1px solid var(--border);border-radius:4px;line-height:1.6" title="${tip}">?</span>
+        </span>`;
+      }
+      const pendingUrls = (() => {
+        if (!allSubmissions.length) return 0;
+        const students = allSubmissions.filter(s => !s.isJury);
+        let pending = 0;
+        students.forEach(s => {
+          [s.garmentPhoto, s.fabricPhotoPlan].forEach(field => {
+            if (!field) return;
+            String(field).split(';').map(u => u.trim()).filter(Boolean).forEach(u => {
+              if (!resolveImage(u) && !u.toLowerCase().endsWith('.pdf')) pending++;
+            });
+          });
+        });
+        return pending;
+      })();
+      const pendingBadge = pendingUrls > 0
+        ? `<span style="font-size:11px;color:var(--pending);font-family:var(--font-display);margin-left:4px" title="${fr?'Images encore en attente de chargement depuis une URL':'Images still loading from a URL'}">⚠ ${pendingUrls} URL${pendingUrls>1?(fr?'s en attente':' pending'):(fr?' en attente':' pending')}</span>`
+        : (allSubmissions.length && (Object.keys(imageStores.q1).length + Object.keys(imageStores.q2).length + Object.keys(imageStores.q3).length) > 0
+            ? `<span style="font-size:11px;color:var(--pass);font-family:var(--font-display);margin-left:4px">✓ ${fr?'toutes les images chargées':'all images loaded'}</span>`
+            : '');
+      return qBtn('q1','Q1') + qBtn('q2','Q2') + qBtn('q3','Q3') + pendingBadge;
+    })()}
+    <button class="btn-print" onclick="downloadHTMLReport()">
+      ${lang==='fr'?'📄 Générer le rapport':'📄 Generate report'}
     </button>
   </div>
 
@@ -2093,6 +2299,187 @@ function hasOption(v, kw) { return String(v||'').toLowerCase().includes(kw.toLow
 // ═══════════════════════════════════════════════════════
 // PRINT VIEW
 // ═══════════════════════════════════════════════════════
+function toggleImgDrawer() {
+  const body = document.getElementById('imgDrawerBody');
+  body.style.display = body.style.display === 'none' ? 'block' : 'none';
+}
+
+function updateImgDrawerLabels() {
+  const fr = lang === 'fr';
+  const title = document.getElementById('imgDrawerTitle');
+  const toggle = document.getElementById('imgDrawerToggle');
+  const label = document.getElementById('imgDropLabel');
+  if (title) title.textContent = '📷 ' + (fr ? 'Photos des vêtements' : 'Garment photos');
+  if (toggle) toggle.textContent = fr ? 'Afficher / Masquer' : 'Show / Hide';
+  if (label) label.innerHTML = fr
+    ? '<strong>Glissez les photos ici</strong> ou cliquez pour parcourir.<br>Téléchargez tous les fichiers image soumis via le formulaire et déposez-les ici — le calculateur les associe automatiquement par nom de fichier.'
+    : '<strong>Drop photos here</strong> or click to browse.<br>Download all image files submitted via the form and drop them here — the calculator matches them automatically by filename.';
+  updateImgStats();
+}
+
+function updateImgStats() {
+  const students = allSubmissions.filter(s => !s.isJury);
+
+  // Build missing list and also log which store just got updated
+  const missing = [];
+  students.forEach(s => {
+    [s.garmentPhoto, s.fabricPhotoPlan].forEach(field => {
+      if (!field) return;
+      String(field).split(';').map(u => u.trim()).filter(Boolean).forEach(u => {
+        if (!resolveImage(u)) {
+          const fname = normalizeKey(u.split('/').pop().split('?')[0]);
+          missing.push(fname);
+        }
+      });
+    });
+  });
+
+  // Per-folder summary
+  ['q1','q2','q3'].forEach(qKey => {
+    const s = countStoreStats(qKey);
+    if (s.matched === 0) return;
+    const folder = qKey.toUpperCase();
+    if (s.matched >= s.total) {
+      console.log('EcoScale ' + folder + ' — all matched ✓ (' + s.matched + '/' + s.total + ')');
+    } else {
+      console.log('EcoScale ' + folder + ' — ' + s.matched + '/' + s.total + ' matched');
+    }
+  });
+
+  if (missing.length) {
+    console.group('EcoScale — missing images (' + missing.length + ')');
+    missing.forEach(f => console.log(f));
+    console.groupEnd();
+  } else {
+    const totalLoaded = Object.keys(imageStores.q1).length + Object.keys(imageStores.q2).length + Object.keys(imageStores.q3).length;
+    if (totalLoaded > 0) console.log('EcoScale — all images matched ✓');
+  }
+
+  if (currentView === 'dashboard') renderDashboard();
+}
+
+function imgDragOver(e) {
+  e.preventDefault();
+  document.getElementById('imgDropZone').classList.add('drag-over');
+}
+function imgDragLeave(e) {
+  document.getElementById('imgDropZone').classList.remove('drag-over');
+}
+function imgDrop(e) {
+  e.preventDefault();
+  document.getElementById('imgDropZone').classList.remove('drag-over');
+  const files = [...e.dataTransfer.items]
+    .filter(i => i.kind === 'file')
+    .map(i => i.getAsFile())
+    .filter(f => f && f.type.startsWith('image/'));
+  handleImgFiles(files);
+}
+
+function normalizeKey(str) {
+  // Decode once — handles normal %20 etc.
+  // Decode twice if result still contains % sequences (handles double-encoded URLs like %2520 -> %20 -> space)
+  let decoded = str;
+  try { decoded = decodeURIComponent(str); } catch(e) {}
+  if (decoded.includes('%')) {
+    try { decoded = decodeURIComponent(decoded); } catch(e) {}
+  }
+  return decoded
+    .normalize('NFC')
+    .replace(/‘|’|‚|‛/g, "'")  // curly single quotes -> straight
+    .replace(/“|”|„|‟/g, '"')   // curly double quotes -> straight
+    .toLowerCase();
+}
+
+function handleImgFiles(files) { handleImgFilesQ(files, 'q1'); }
+
+function handleImgFilesQ(files, qKey) {
+  const store = imageStores[qKey];
+  const arr = [...files].filter(f => f.type.startsWith('image/') || f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
+  if (!arr.length) return;
+  let loaded = 0;
+  arr.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const key = normalizeKey(file.name);
+      store[key] = e.target.result;
+      const rawKey = file.name.normalize('NFC').toLowerCase();
+      if (rawKey !== key) store[rawKey] = e.target.result;
+      loaded++;
+      if (loaded === arr.length) { updateImgStats(); renderAll(); }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function filenameFromUrl(url) {
+  // Handles semicolon-separated multiple URLs — returns array of normalized keys
+  return String(url || '').split(';').map(u => {
+    try {
+      return normalizeKey(u.trim().split('/').pop().split('?')[0]);
+    } catch(e) { return ''; }
+  }).filter(Boolean);
+}
+
+function resolveImage(url) {
+  const names = filenameFromUrl(url);
+  for (const name of names) {
+    const dataUrl = imageStores.q1[name] || imageStores.q2[name] || imageStores.q3[name];
+    if (dataUrl) return { dataUrl, name };
+  }
+  return null;
+}
+
+function countImageStats() {
+  const students = allSubmissions.filter(s => !s.isJury);
+  let totalUrls = 0, matched = 0;
+  students.forEach(s => {
+    [s.garmentPhoto, s.fabricPhotoPlan].forEach(field => {
+      if (!field) return;
+      String(field).split(';').map(u => u.trim()).filter(Boolean).forEach(u => {
+        totalUrls++;
+        if (resolveImage(u)) matched++;
+      });
+    });
+  });
+  return { totalUrls, matched, missing: totalUrls - matched };
+}
+
+function countStoreStats(qKey) {
+  const store = imageStores[qKey];
+  // Count unique files loaded (each stored under up to 2 keys)
+  const uniqueFiles = new Set();
+  Object.keys(store).forEach(k => uniqueFiles.add(k));
+  const loaded = Math.ceil(uniqueFiles.size / 2);
+  // Count how many submission URLs this store resolves
+  const students = allSubmissions.filter(s => !s.isJury);
+  let matched = 0;
+  const seen = new Set();
+  students.forEach(s => {
+    [s.garmentPhoto, s.fabricPhotoPlan].forEach(field => {
+      if (!field) return;
+      String(field).split(';').map(u => u.trim()).filter(Boolean).forEach(u => {
+        if (seen.has(u)) return;
+        const names = filenameFromUrl(u);
+        if (names.some(n => store[n])) { matched++; seen.add(u); }
+      });
+    });
+  });
+  // total = all unique submission image URLs
+  const allUrls = new Set();
+  students.forEach(s => {
+    [s.garmentPhoto, s.fabricPhotoPlan].forEach(field => {
+      if (!field) return;
+      String(field).split(';').map(u => u.trim()).filter(Boolean).forEach(u => allUrls.add(u));
+    });
+  });
+  return { loaded, matched, total: allUrls.size };
+}
+
+function countMissingImages() {
+  return countImageStats().missing;
+}
+
+
 const PRINT_STYLES = `<style>
 :root {
   --blue:       #00587C;
@@ -2166,6 +2553,49 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ── PROGRESS OVERLAY ── */
+.progress-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.15s ease;
+}
+.progress-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  min-width: 320px; max-width: 420px; width: 90%;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+.progress-title {
+  font-size: 15px; font-weight: 600; color: var(--text);
+  margin-bottom: 6px;
+}
+.progress-sub {
+  font-size: 12px; color: var(--text3);
+  margin-bottom: 20px; line-height: 1.5;
+}
+.progress-track {
+  height: 8px; background: var(--bg2);
+  border-radius: 4px; overflow: hidden;
+  margin-bottom: 10px;
+}
+.progress-fill {
+  height: 100%; border-radius: 4px;
+  background: var(--accent);
+  transition: width 0.2s ease;
+  width: 0%;
+}
+.progress-pct {
+  font-family: var(--font-display);
+  font-size: 13px; color: var(--text3);
+}
+
+/* ── PRINT OPTIONS ── */
+/* ── PRINT OPTIONS ── */
 /* ── PRINT OPTIONS ── */
 .print-options-bar {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
@@ -2521,6 +2951,260 @@ body {
 }
 </style>`;
 
+async function downloadHTMLReport() {
+  openReportView();
+}
+
+async function openReportView() {
+  const students = allSubmissions.filter(s => !s.isJury);
+  if (!students.length) return;
+
+  const sorted = [...students].sort((a,b) => b.total - a.total);
+  const fr = lang === 'fr';
+
+  // Show report container, hide dashboard
+  const reportDiv = document.getElementById('reportView');
+  const dashDiv   = document.getElementById('dashboard');
+  dashDiv.style.display = 'none';
+  document.getElementById('imgDrawer') && (document.getElementById('imgDrawer').style.display = 'none');
+  reportDiv.style.display = 'block';
+  document.getElementById('uploadBtn').style.display = 'none';
+  window.scrollTo(0, 0);
+
+  // Topbar
+  reportDiv.innerHTML = `<div class="report-topbar" id="reportTopbar">
+    <span class="report-topbar-title">📄 ${fr ? 'Rapport Éco-conception' : 'Eco-conception Report'}</span>
+    <div class="report-topbar-actions">
+      <button class="report-hide-bar-btn" onclick="toggleReportTopbar()">${fr ? 'Masquer pour impression' : 'Hide for printing'}</button>
+      <button class="report-hide-bar-btn" onclick="window.print()">🖨 ${fr ? "Imprimer / PDF" : "Print / PDF"}</button>
+      <button class="report-back-btn" onclick="closeReportView()">← ${fr ? 'Retour' : 'Back'}</button>
+    </div>
+  </div>
+  <div class="report-body" id="reportBody"><div style="text-align:center;padding:40px;color:var(--text3);font-size:14px">${fr ? 'Génération en cours…' : 'Building report…'}</div></div>`;
+
+  // Show progress overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'progress-overlay';
+  overlay.innerHTML = `<div class="progress-card">
+    <div class="progress-title">${fr ? 'Génération du rapport…' : 'Building report…'}</div>
+    <div class="progress-sub" id="progSub">${fr ? 'Préparation…' : 'Preparing…'}</div>
+    <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
+    <div class="progress-pct" id="progPct">0%</div>
+  </div>`;
+  document.body.appendChild(overlay);
+
+  function setProgress(pct, label) {
+    const fill = document.getElementById('progFill');
+    const pctEl = document.getElementById('progPct');
+    const sub = document.getElementById('progSub');
+    if (fill) fill.style.width = pct + '%';
+    if (pctEl) pctEl.textContent = Math.round(pct) + '%';
+    if (sub && label) sub.textContent = label;
+  }
+
+  await new Promise(r => setTimeout(r, 30));
+
+  const reportBody = document.getElementById('reportBody');
+  reportBody.innerHTML = '';
+
+  const total = sorted.length;
+
+  // ── TOC ──
+  if (printOpts.showStudentList && printOpts.studentListPosition === 'start') {
+    setProgress(2, fr ? 'Table des matières…' : 'Table of contents…');
+    await new Promise(r => setTimeout(r, 0));
+    const tocEl = document.createElement('div');
+    tocEl.innerHTML = buildTocHtml(sorted, fr);
+    reportBody.appendChild(tocEl);
+  }
+
+  // ── Cards ──
+  for (let i = 0; i < total; i++) {
+    const s = sorted[i];
+    setProgress(5 + (i / total) * 65, (fr ? 'Vêtement ' : 'Garment ') + (i+1) + ' / ' + total + ' — ' + esc(s.studentName));
+    await new Promise(r => setTimeout(r, 0));
+    const cardEl = document.createElement('div');
+    cardEl.innerHTML = buildStudentCard(s, i, fr);
+    reportBody.appendChild(cardEl);
+  }
+
+  // ── Breakdown ──
+  if (printOpts.showBreakdown) {
+    setProgress(72, fr ? 'Détail des scores…' : 'Score breakdown…');
+    await new Promise(r => setTimeout(r, 0));
+    const bkHeader = document.createElement('div');
+    bkHeader.innerHTML = `<hr class="print-divider"><div class="print-card"><div class="print-breakdown-title">${fr?'Détail des scores':'Score breakdown'}</div><div class="print-breakdown-sub">${fr?'Détail critère par critère pour chaque soumission.':'Criterion-by-criterion detail for each submission.'}</div>`;
+    reportBody.appendChild(bkHeader);
+    for (let i = 0; i < sorted.length; i++) {
+      const s = sorted[i];
+      setProgress(72 + (i / sorted.length) * 23, (fr ? 'Détail ' : 'Breakdown ') + (i+1) + '/' + sorted.length);
+      await new Promise(r => setTimeout(r, 0));
+      const bkEl = document.createElement('div');
+      bkEl.innerHTML = `<div class="print-score-section">
+        <div class="print-score-section-header">
+          <span class="print-section-code" style="background:#00587C">S1–S4</span>
+          <span style="font-size:14px;font-weight:600;color:#0F1A20;flex:1">${esc(s.studentName)}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:16px;font-weight:500">${s.total}/100</span>
+        </div>
+        ${buildBreakdownS1(s,fr)}${buildBreakdownS2(s,fr)}${buildBreakdownS3(s,fr)}${buildBreakdownS4(s,fr)}
+        ${i < sorted.length-1 ? '<hr class="print-student-separator">' : '</div>'}
+      </div>`;
+      reportBody.appendChild(bkEl);
+    }
+    const bkClose = document.createElement('div');
+    bkClose.innerHTML = '</div>';
+    reportBody.appendChild(bkClose);
+  }
+
+  // ── TOC at end ──
+  if (printOpts.showStudentList && printOpts.studentListPosition === 'end') {
+    setProgress(97, fr ? 'Table des matières…' : 'Table of contents…');
+    await new Promise(r => setTimeout(r, 0));
+    const tocEl = document.createElement('div');
+    tocEl.innerHTML = buildTocHtml(sorted, fr);
+    reportBody.appendChild(tocEl);
+  }
+
+  setProgress(100, fr ? 'Terminé' : 'Done');
+  await new Promise(r => setTimeout(r, 80));
+  overlay.remove();
+}
+
+function buildTocHtml(sorted, fr) {
+  return `<div class="print-card print-toc-card">
+    <div style="border-bottom:3px solid #00587C;padding-bottom:14px;margin-bottom:20px">
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:#6B7E88;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">Éco-conception</div>
+      <div style="font-size:20px;font-weight:700;color:#0F1A20;letter-spacing:-0.5px">${fr?'Rapport des scores':'Score report'}</div>
+      <div style="font-size:12px;color:#6B7E88;margin-top:4px">${new Date().toLocaleDateString(fr?'fr-CA':'en-CA',{year:'numeric',month:'long',day:'numeric'})}</div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead><tr style="border-bottom:2px solid #E3DFD6">
+        <th style="text-align:left;padding:6px 10px 8px 0;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase;letter-spacing:0.8px">${fr?'Étudiant·e':'Student'}</th>
+        <th style="text-align:left;padding:6px 10px 8px;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase">${fr?'Profil':'Profile'}</th>
+        <th style="text-align:center;padding:6px 10px 8px;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500">S1</th>
+        <th style="text-align:center;padding:6px 10px 8px;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500">S2</th>
+        <th style="text-align:center;padding:6px 10px 8px;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500">S3</th>
+        <th style="text-align:center;padding:6px 10px 8px;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500">S4</th>
+        <th style="text-align:right;padding:6px 0 8px 10px;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase">${fr?'Total':'Total'}</th>
+        <th style="text-align:right;padding:6px 0 8px 10px;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase">${fr?'Statut':'Status'}</th>
+      </tr></thead>
+      <tbody>
+        ${sorted.map((s,i) => {
+          const sc = s.juryPending?'#C47A00':s.passed?'#1B8B5A':'#C0392B';
+          const sl = s.juryPending?t('pendingLabel'):s.passed?t('certified'):t('notCertified');
+          return `<tr style="border-bottom:1px solid #F2F4F5;background:${i%2===0?'#FAFAF8':'white'}">
+            <td style="padding:8px 10px 8px 0;font-weight:600;color:#0F1A20">${esc(s.studentName)}</td>
+            <td style="padding:8px 10px;color:#5A6470;font-size:12px">${esc(s.profile)}</td>
+            <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:12px">${s.s1}</td>
+            <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:12px">${s.s2}</td>
+            <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:12px">${s.s3}</td>
+            <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:12px">${s.s4}</td>
+            <td style="padding:8px 0 8px 10px;text-align:right;font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:${sc}">${s.total}</td>
+            <td style="padding:8px 0 8px 10px;text-align:right;font-size:11px;color:${sc};font-family:'DM Mono',monospace">${sl}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function buildStudentCard(s, i, fr) {
+  const statusClass = s.juryPending ? 'pending' : s.passed ? 'pass' : 'fail';
+  const statusLabel = s.juryPending ? t('pendingLabel') : s.passed ? t('certified') : t('notCertified');
+  const sections = [
+    {code:'S1',title:t('sectionConceptualization'),score:s.s1,max:20},
+    {code:'S2',title:t('sectionFabrics'),score:s.s2,max:40},
+    {code:'S3',title:t('sectionProduction'),score:s.s3,max:30},
+    {code:'S4',title:t('sectionCare'),score:s.s4,max:10},
+  ];
+  const sectionBlocks = sections.map(sec => {
+    const pct = Math.max(0,Math.min(100,(sec.score/sec.max)*100));
+    return `<div class="print-section-block">
+      <div class="print-section-code">${sec.code}</div>
+      <div class="print-section-title">${sec.title}</div>
+      <div><span class="print-section-score">${sec.score}</span><span class="print-section-max"> / ${sec.max} pts</span></div>
+      <div class="print-section-bar-track"><div class="print-section-bar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+
+  function imgBlock(url, label) {
+    if (!url) return '';
+    return String(url).split(';').map(u => {
+      u = u.trim(); if (!u) return '';
+      const resolved = resolveImage(u);
+      const isPdf = u.toLowerCase().endsWith('.pdf') || (resolved && resolved.dataUrl.startsWith('data:application/pdf'));
+      if (resolved && !isPdf) {
+        return `<div class="print-photo-block"><div class="print-photo-label">${label}</div>
+          <img src="${resolved.dataUrl}" style="max-width:800px;max-height:600px;object-fit:contain;border-radius:6px;display:block;margin:8px 0"></div>`;
+      } else if (isPdf) {
+        return `<div class="print-photo-block"><div class="print-photo-label">${label}</div>
+          <div style="padding:10px 14px;background:#FFF3DC;border:1px solid rgba(196,122,0,0.3);border-radius:6px;font-size:12px;color:#7A4800">📄 ${fr?'Ce fichier est un PDF et ne peut pas être affiché dans le rapport.':'This file is a PDF and cannot be displayed in the report.'}</div></div>`;
+      } else {
+        return `<div class="print-photo-block"><div class="print-photo-label">${label}</div>
+          <div class="print-photo-link"><a href="${esc(u)}" target="_blank">${esc(u)}</a></div>
+          <div class="print-login-note">⚠ ${fr?'Image non chargée. Glissez les photos dans le tiroir ci-dessus, ou connectez-vous à votre compte LCI.':'Image not loaded. Drop photos into the drawer above, or log in to your LCI account.'}</div></div>`;
+      }
+    }).join('');
+  }
+
+  return `<div class="print-card">
+    <div class="print-card-header">
+      <div>
+        <div class="print-student-name">${esc(s.studentName)}</div>
+        <div class="print-student-meta">
+          ${fr?'N° étudiant·e':'Student no.'}: ${esc(s.studentNo||'—')} &nbsp;·&nbsp;
+          ${fr?'Profil':'Profile'}: ${esc(s.profile)} &nbsp;·&nbsp;
+          ${fr?'Catégorie':'Category'}: ${esc(s.garmentCat)}<br>
+          ${fr?'Usage':'Intended use'}: ${esc(s.intendedUse)} &nbsp;·&nbsp;
+          ${fr?'Soumis le':'Submitted'}: ${esc(s.submittedAt)}
+        </div>
+      </div>
+      <div class="print-total-block">
+        <div class="print-total-num ${statusClass}">${s.total}</div>
+        <div class="print-total-label">/ 100 pts</div>
+        <div class="print-status-badge ${statusClass}">${statusLabel}</div>
+      </div>
+    </div>
+    <div class="print-sections">${sectionBlocks}</div>
+    ${imgBlock(s.garmentPhoto, fr?'Photo du vêtement':'Garment photo')}
+    ${imgBlock(s.fabricPhotoPlan, fr?'Plan de placement du tissu':'Fabric placement plan')}
+  </div>`;
+}
+
+function toggleReportTopbar() {
+  const bar = document.getElementById('reportTopbar');
+  if (!bar) return;
+  const fr = lang === 'fr';
+  let pill = document.getElementById('reportRestorePill');
+  if (bar.style.display === 'none') {
+    bar.style.display = '';
+    if (pill) pill.remove();
+  } else {
+    bar.style.display = 'none';
+    if (!pill) {
+      pill = document.createElement('div');
+      pill.id = 'reportRestorePill';
+      pill.title = fr ? 'Afficher la barre' : 'Show toolbar';
+      pill.onclick = toggleReportTopbar;
+      pill.textContent = fr ? '▲ afficher' : '▲ show';
+      pill.style.cssText = 'position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:200;background:var(--blue,#00587C);color:white;font-size:10px;font-family:monospace;padding:2px 12px;border-radius:0 0 8px 8px;cursor:pointer;opacity:0.7;transition:opacity 0.15s;letter-spacing:0.5px;';
+      pill.onmouseenter = () => pill.style.opacity = '1';
+      pill.onmouseleave = () => pill.style.opacity = '0.7';
+      document.body.appendChild(pill);
+    }
+  }
+}
+
+function closeReportView() {
+  const pill = document.getElementById('reportRestorePill');
+  if (pill) pill.remove();
+  document.getElementById('reportView').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('uploadBtn').style.display = 'flex';
+  window.scrollTo(0, 0);
+}
+
+
 function openPrintView() {
   const students = allSubmissions.filter(s => !s.isJury);
   if (!students.length) return;
@@ -2632,23 +3316,48 @@ function buildPrintView(students) {
       </div>`;
     }).join('');
 
-    const photoId = 'photo-' + i;
-    const photoBlock = s.garmentPhoto ? `
-      <div class="print-photo-block" id="pblock-${i}">
-        <div class="print-photo-label">${fr ? 'Photo du vêtement' : 'Garment photo'}</div>
-        <img id="${photoId}"
-             src="${esc(s.garmentPhoto)}"
-             alt="${esc(s.studentName)}"
-             style="max-width:800px;max-height:600px;object-fit:contain;border-radius:6px;display:block;margin:8px 0"
-             onerror="this.style.display='none';document.getElementById('pfallback-${i}').style.display='block'"
-             onload="document.getElementById('pfallback-${i}').style.display='none'">
-        <div id="pfallback-${i}" style="display:none">
-          <div class="print-photo-link"><a href="${esc(s.garmentPhoto)}" target="_blank">${esc(s.garmentPhoto)}</a></div>
-          <div class="print-login-note">⚠ ${fr
-            ? 'Image non chargée. Connectez-vous à votre compte LCI dans ce navigateur pour afficher la photo.'
-            : 'Image could not be loaded. Log in to your LCI account in this browser to display the photo.'}</div>
-        </div>
-      </div>` : '';
+    function makeImgBlock(url, label, idx, suffix) {
+      if (!url) return '';
+      // Handle multiple URLs (semicolon-separated)
+      const urls = String(url).split(';').map(u => u.trim()).filter(Boolean);
+      return urls.map((u, ui) => {
+        const resolved = resolveImage(u);
+        const src = resolved ? resolved.dataUrl : u;
+        const isLocal = !!resolved;
+        const imgId = 'photo-' + idx + suffix + ui;
+        const fbId  = 'pfallback-' + idx + suffix + ui;
+        if (isLocal) {
+          const isPdf = src.startsWith('data:application/pdf') || u.toLowerCase().endsWith('.pdf');
+          return `<div class="print-photo-block">
+            <div class="print-photo-label">${label}${urls.length > 1 ? ' (' + (ui+1) + '/' + urls.length + ')' : ''}</div>
+            ${isPdf
+              ? `<div style="margin:8px 0;padding:10px 14px;background:rgba(196,122,0,0.08);border:1px solid rgba(196,122,0,0.25);border-radius:6px;font-size:13px;color:var(--amber)">📄 ${fr ? 'Ce fichier est un PDF et ne peut pas être affiché dans le rapport. Ouvrez le lien pour le consulter.' : 'This file is a PDF and cannot be displayed in the report. Open the link to view it.'} <a href="${esc(u)}" target="_blank" style="color:var(--accent);margin-left:6px">${fr?'Ouvrir →':'Open →'}</a></div>`
+              : `<img src="${src}" alt="" style="max-width:800px;max-height:600px;object-fit:contain;border-radius:6px;display:block;margin:8px 0">`}
+          </div>`;
+        } else {
+          // Remote URL — try to load, fallback if blocked
+          return `<div class="print-photo-block">
+            <div class="print-photo-label">${label}${urls.length > 1 ? ' (' + (ui+1) + '/' + urls.length + ')' : ''}</div>
+            <img id="${imgId}" src="${esc(u)}" alt=""
+                 style="max-width:800px;max-height:600px;object-fit:contain;border-radius:6px;display:block;margin:8px 0"
+                 onerror="this.style.display='none';document.getElementById('${fbId}').style.display='block'"
+                 onload="document.getElementById('${fbId}').style.display='none'">
+            <div id="${fbId}" style="display:none">
+              ${u.toLowerCase().endsWith('.pdf')
+              ? `<div style="padding:10px 14px;background:rgba(196,122,0,0.08);border:1px solid rgba(196,122,0,0.25);border-radius:6px;font-size:13px;color:var(--amber)">📄 ${fr ? 'Ce fichier est un PDF et ne peut pas être affiché dans le rapport.' : 'This file is a PDF and cannot be displayed in the report.'}</div>`
+              : `<div class="print-photo-link"><a href="${esc(u)}" target="_blank">${esc(u)}</a></div>
+                 <div class="print-login-note">⚠ ${fr
+                   ? 'Image non chargée. Glissez les photos dans le tiroir ci-dessus, ou connectez-vous à votre compte LCI.'
+                   : 'Image not loaded. Drop photos into the drawer above, or log in to your LCI account.'}</div>`}
+            </div>
+          </div>`;
+        }
+      }).join('');
+    }
+    const photoBlock = (s.garmentPhoto || s.fabricPhotoPlan) ? (
+      makeImgBlock(s.garmentPhoto,    fr ? 'Photo du vêtement'            : 'Garment photo',       i, 'g') +
+      makeImgBlock(s.fabricPhotoPlan, fr ? 'Plan de placement du tissu'   : 'Fabric placement plan', i, 'f')
+    ) : '';
 
     return `<div class="print-card">
       <div class="print-card-header">
