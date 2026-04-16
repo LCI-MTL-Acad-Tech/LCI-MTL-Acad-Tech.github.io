@@ -650,6 +650,247 @@ main { flex: 1; max-width: 1280px; margin: 0 auto; padding: 24px 20px; width: 10
   .score-section-header { flex-wrap: wrap; }
   .upload-card { padding: 32px 20px; }
 }
+
+/* ── PRINT ── */
+.btn-print {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 7px 14px;
+  font-size: 13px; color: var(--text2); font-family: var(--font-body);
+  cursor: pointer; transition: all var(--transition);
+}
+.btn-print:hover { background: var(--bg2); color: var(--text); }
+
+@media print {
+  @page { margin: 16mm 14mm; size: A4; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+  header, .filters, .summary-bar, .section-bars,
+  .table-wrap, .back-btn, .btn-print, .btn-icon,
+  .lang-toggle, .header-controls, .upload-zone,
+  .jury-input-block, .help-block,
+  .print-instruction-bar { display: none !important; }
+
+  body { background: white !important; color: #0F1A20 !important; }
+  main { padding: 0 !important; max-width: 100% !important; }
+
+  .print-view { display: block !important; }
+  .print-card { page-break-after: always; }
+  .print-card:last-child { page-break-after: avoid; }
+
+  .print-score-section { page-break-inside: avoid; }
+  .score-section-body { display: block !important; }
+
+  a { color: #00587C !important; }
+}
+
+.print-view { display: none; }
+
+.print-card {
+  background: white;
+  padding: 32px 28px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+.print-card-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  border-bottom: 3px solid #00587C;
+  padding-bottom: 16px; margin-bottom: 20px;
+}
+.print-student-name {
+  font-size: 22px; font-weight: 700; color: #0F1A20;
+  letter-spacing: -0.5px;
+}
+.print-student-meta {
+  font-size: 12px; color: #5A6470; margin-top: 4px; line-height: 1.7;
+}
+.print-total-block { text-align: right; }
+.print-total-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 48px; font-weight: 500; line-height: 1;
+  letter-spacing: -2px;
+}
+.print-total-num.pass { color: #1B8B5A; }
+.print-total-num.fail { color: #C0392B; }
+.print-total-num.pending { color: #C47A00; }
+.print-total-label { font-size: 11px; color: #5A6470; font-family: 'DM Mono', monospace; }
+.print-status-badge {
+  display: inline-block; font-family: 'DM Mono', monospace;
+  font-size: 10px; font-weight: 500; letter-spacing: 0.5px;
+  padding: 3px 10px; border-radius: 20px; margin-top: 6px;
+}
+.print-status-badge.pass { background: rgba(27,139,90,0.1); color: #1B8B5A; }
+.print-status-badge.fail { background: rgba(192,57,43,0.1); color: #C0392B; }
+.print-status-badge.pending { background: rgba(196,122,0,0.1); color: #C47A00; }
+
+.print-sections {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; margin-bottom: 20px;
+}
+.print-section-block {
+  background: #F5F3EE; border-radius: 8px; padding: 12px 14px;
+}
+.print-section-code {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  font-weight: 500; color: white; background: #00587C;
+  padding: 2px 7px; border-radius: 4px; display: inline-block;
+  margin-bottom: 6px; letter-spacing: 0.5px;
+}
+.print-section-title { font-size: 12px; color: #3D4F58; margin-bottom: 8px; }
+.print-section-score {
+  font-family: 'DM Mono', monospace;
+  font-size: 22px; font-weight: 500; color: #0F1A20;
+  letter-spacing: -0.5px;
+}
+.print-section-max { font-size: 11px; color: #6B7E88; }
+.print-section-bar-track {
+  height: 5px; background: #E3DFD6; border-radius: 3px;
+  margin-top: 8px; overflow: hidden;
+}
+.print-section-bar-fill { height: 100%; border-radius: 3px; background: #00587C; }
+
+.print-photo-block {
+  border: 1px solid #E3DFD6; border-radius: 8px;
+  padding: 12px 16px; margin-bottom: 20px;
+  background: #F5F3EE;
+}
+.print-photo-label {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  color: #6B7E88; text-transform: uppercase; letter-spacing: 0.8px;
+  margin-bottom: 6px;
+}
+.print-photo-link { font-size: 12px; color: #00587C; word-break: break-all; }
+.print-login-note {
+  font-size: 11px; color: #C47A00; margin-top: 6px;
+  font-style: italic;
+}
+
+.print-divider {
+  border: none; border-top: 2px solid #00587C;
+  margin: 40px 0 32px;
+}
+.print-breakdown-title {
+  font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500;
+  color: #00587C; text-transform: uppercase; letter-spacing: 0.8px;
+  margin-bottom: 4px;
+}
+.print-breakdown-sub {
+  font-size: 12px; color: #6B7E88; margin-bottom: 24px;
+}
+.print-score-section {
+  margin-bottom: 20px; page-break-inside: avoid;
+}
+.print-score-section-header {
+  display: flex; align-items: center; gap: 10px;
+  background: #F2F4F5; border-radius: 6px;
+  padding: 8px 12px; margin-bottom: 8px;
+}
+.print-criterion-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 5px 0; border-bottom: 1px solid #F2F4F5;
+  font-size: 11px;
+}
+.print-criterion-row:last-child { border-bottom: none; }
+.print-criterion-check {
+  width: 16px; height: 16px; border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; flex-shrink: 0; margin-top: 1px;
+}
+.print-criterion-check.yes { background: rgba(27,139,90,0.12); color: #1B8B5A; }
+.print-criterion-check.no  { background: #F2F4F5; color: #6B7E88; }
+.print-criterion-text { flex: 1; color: #3D4F58; line-height: 1.4; }
+.print-criterion-pts { font-family: 'DM Mono', monospace; font-size: 11px; flex-shrink: 0; }
+.print-criterion-pts.pos { color: #1B8B5A; font-weight: 500; }
+.print-criterion-pts.neg { color: #C0392B; font-weight: 500; }
+.print-criterion-pts.zero { color: #6B7E88; }
+.print-qual-block {
+  background: #F5F3EE; border-radius: 6px;
+  padding: 8px 10px; margin: 6px 0 6px 26px;
+  font-size: 11px; color: #5A6470; font-style: italic; line-height: 1.5;
+}
+
+.print-student-separator {
+  border: none; border-top: 1px dashed #D8DDE2;
+  margin: 32px 0;
+}
+
+/* instruction bar */
+.print-instruction-bar {
+  position: sticky; top: 0; z-index: 200;
+  background: #00587C;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+.print-instruction-content {
+  max-width: 1280px; margin: 0 auto;
+  padding: 12px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+}
+.print-instruction-steps {
+  display: flex; align-items: center; gap: 10px;
+  flex-wrap: wrap; flex: 1;
+}
+.print-instruction-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; font-weight: 500;
+  color: rgba(255,255,255,0.7);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  white-space: nowrap;
+}
+.print-instruction-sep { color: rgba(255,255,255,0.3); font-size: 14px; }
+.print-instruction-step {
+  font-size: 12px; color: rgba(255,255,255,0.9);
+  display: flex; align-items: center; gap: 6px;
+}
+.print-step-num {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
+  color: white; flex-shrink: 0;
+}
+.print-kbd {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 4px; padding: 1px 6px;
+  font-family: 'DM Mono', monospace; font-size: 11px; color: white;
+}
+.print-kbd-mac {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 4px; padding: 1px 6px;
+  font-family: 'DM Mono', monospace; font-size: 11px; color: white;
+}
+.print-instruction-actions {
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.print-now-btn {
+  background: white; color: #00587C;
+  border: none; border-radius: 8px;
+  padding: 7px 14px; font-size: 13px; font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: opacity 0.15s;
+  white-space: nowrap;
+}
+.print-now-btn:hover { opacity: 0.88; }
+.print-back-btn {
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.9);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 8px; padding: 7px 14px;
+  font-size: 13px; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: background 0.15s;
+  white-space: nowrap;
+}
+.print-back-btn:hover { background: rgba(255,255,255,0.2); }
+
+@media (max-width: 680px) {
+  .print-instruction-steps { gap: 6px; }
+  .print-instruction-sep { display: none; }
+  .print-kbd-mac { display: none; }
+}
+
 </style>
 </head>
 <body>
@@ -720,6 +961,8 @@ main { flex: 1; max-width: 1280px; margin: 0 auto; padding: 24px 20px; width: 10
 
   <!-- DASHBOARD (hidden until file loaded) -->
   <div class="dashboard" id="dashboard" style="display:none"></div>
+  <!-- PRINT VIEW -->
+  <div class="print-view" id="printView"></div>
 </main>
 
 </div>
@@ -1289,6 +1532,9 @@ function renderDashboard() {
       ${profiles.map(p=>`<option value="${p}" ${filterProfile===p?'selected':''}>${p}</option>`).join('')}
     </select>` : ''}
   </div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+    <button class="btn-print" onclick="openPrintView()">🖨 ${lang==='fr'?'Générer le rapport PDF':'Generate PDF report'}</button>
+  </div>
 
   <div class="table-wrap">
     <table class="submissions-table">
@@ -1700,6 +1946,321 @@ window.renderAll = function() {
 
 // hasOption needed in render context
 function hasOption(v, kw) { return String(v||'').toLowerCase().includes(kw.toLowerCase()); }
+// ═══════════════════════════════════════════════════════
+// PRINT VIEW
+// ═══════════════════════════════════════════════════════
+function openPrintView() {
+  const students = allSubmissions.filter(s => !s.isJury);
+  if (!students.length) return;
+
+  const sorted = [...students].sort((a,b) => b.total - a.total);
+  const pv = document.getElementById('printView');
+
+  const fr = lang === 'fr';
+  const instructionBar = `<div class="print-instruction-bar" id="printInstructionBar">
+    <div class="print-instruction-content">
+      <div class="print-instruction-steps">
+        <span class="print-instruction-title">${fr ? 'Enregistrer en PDF' : 'Save as PDF'}</span>
+        <span class="print-instruction-sep">·</span>
+        <span class="print-instruction-step"><span class="print-step-num">1</span>${fr ? 'Cliquez sur' : 'Click'} <strong>${fr ? 'Imprimer' : 'Print'}</strong> <span class="print-kbd">${fr ? 'Ctrl+P' : 'Ctrl+P'}</span> <span class="print-kbd-mac">⌘P</span></span>
+        <span class="print-instruction-sep">·</span>
+        <span class="print-instruction-step"><span class="print-step-num">2</span>${fr ? 'Dans «&nbsp;Destination&nbsp;», choisissez' : 'Under «&nbsp;Destination&nbsp;», choose'} <strong>${fr ? 'Enregistrer au format PDF' : 'Save as PDF'}</strong></span>
+        <span class="print-instruction-sep">·</span>
+        <span class="print-instruction-step"><span class="print-step-num">3</span>${fr ? 'Cliquez sur «&nbsp;Enregistrer&nbsp;»' : 'Click «&nbsp;Save&nbsp;»'}</span>
+      </div>
+      <div class="print-instruction-actions">
+        <button class="print-now-btn" onclick="window.print()">🖨 ${fr ? 'Ouvrir l\'impression' : 'Open print dialog'}</button>
+        <button class="print-back-btn" onclick="closePrintView()">← ${fr ? 'Retour' : 'Back'}</button>
+      </div>
+    </div>
+  </div>`;
+
+  pv.innerHTML = instructionBar + buildPrintView(sorted);
+  pv.style.display = 'block';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('uploadBtn').style.display = 'none';
+  window.scrollTo(0, 0);
+}
+
+function closePrintView() {
+  document.getElementById('printView').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('uploadBtn').style.display = 'flex';
+  window.scrollTo(0, 0);
+}
+
+function buildPrintView(students) {
+  const fr = lang === 'fr';
+
+  // ── Summary cards (one per student) ──
+  const cards = students.map((s, i) => {
+    const statusClass = s.juryPending ? 'pending' : s.passed ? 'pass' : 'fail';
+    const statusLabel = s.juryPending ? t('pendingLabel') : s.passed ? t('certified') : t('notCertified');
+    const sections = [
+      { code:'S1', title: t('sectionConceptualization'), score: s.s1, max: 20 },
+      { code:'S2', title: t('sectionFabrics'),           score: s.s2, max: 40 },
+      { code:'S3', title: t('sectionProduction'),        score: s.s3, max: 30 },
+      { code:'S4', title: t('sectionCare'),              score: s.s4, max: 10 },
+    ];
+
+    const sectionBlocks = sections.map(sec => {
+      const pct = Math.max(0, Math.min(100, (sec.score / sec.max) * 100));
+      return `<div class="print-section-block">
+        <div class="print-section-code">${sec.code}</div>
+        <div class="print-section-title">${sec.title}</div>
+        <div>
+          <span class="print-section-score">${sec.score}</span>
+          <span class="print-section-max"> / ${sec.max} pts</span>
+        </div>
+        <div class="print-section-bar-track">
+          <div class="print-section-bar-fill" style="width:${pct}%"></div>
+        </div>
+      </div>`;
+    }).join('');
+
+    const photoId = 'photo-' + i;
+    const photoBlock = s.garmentPhoto ? `
+      <div class="print-photo-block" id="pblock-${i}">
+        <div class="print-photo-label">${fr ? 'Photo du vêtement' : 'Garment photo'}</div>
+        <img id="${photoId}"
+             src="${esc(s.garmentPhoto)}"
+             alt="${esc(s.studentName)}"
+             style="max-width:100%;max-height:320px;object-fit:contain;border-radius:6px;display:block;margin:8px 0"
+             onerror="this.style.display='none';document.getElementById('pfallback-${i}').style.display='block'"
+             onload="document.getElementById('pfallback-${i}').style.display='none'">
+        <div id="pfallback-${i}" style="display:none">
+          <div class="print-photo-link"><a href="${esc(s.garmentPhoto)}" target="_blank">${esc(s.garmentPhoto)}</a></div>
+          <div class="print-login-note">⚠ ${fr
+            ? 'Image non chargée. Connectez-vous à votre compte LCI dans ce navigateur pour afficher la photo.'
+            : 'Image could not be loaded. Log in to your LCI account in this browser to display the photo.'}</div>
+        </div>
+      </div>` : '';
+
+    return `<div class="print-card">
+      <div class="print-card-header">
+        <div>
+          <div class="print-student-name">${esc(s.studentName)}</div>
+          <div class="print-student-meta">
+            ${fr ? 'N° étudiant·e' : 'Student no.'}: ${esc(s.studentNo || '—')} &nbsp;·&nbsp;
+            ${fr ? 'Profil' : 'Profile'}: ${esc(s.profile)} &nbsp;·&nbsp;
+            ${fr ? 'Catégorie' : 'Category'}: ${esc(s.garmentCat)}<br>
+            ${fr ? 'Usage' : 'Intended use'}: ${esc(s.intendedUse)} &nbsp;·&nbsp;
+            ${fr ? 'Soumis le' : 'Submitted'}: ${esc(s.submittedAt)}
+          </div>
+        </div>
+        <div class="print-total-block">
+          <div class="print-total-num ${statusClass}">${s.total}</div>
+          <div class="print-total-label">/ 100 pts</div>
+          <div class="print-status-badge ${statusClass}">${statusLabel}</div>
+        </div>
+      </div>
+      <div class="print-sections">${sectionBlocks}</div>
+      ${photoBlock}
+    </div>`;
+  }).join('');
+
+  // ── Breakdown section (all students, appended after cards) ──
+  const breakdowns = students.map((s, i) => {
+    return `<div class="print-score-section">
+      <div class="print-score-section-header">
+        <span class="print-section-code" style="background:#00587C">S1–S4</span>
+        <span style="font-size:14px;font-weight:600;color:#0F1A20;flex:1">${esc(s.studentName)}</span>
+        <span style="font-family:'DM Mono',monospace;font-size:16px;font-weight:500">${s.total}/100</span>
+      </div>
+      ${buildBreakdownS1(s, fr)}
+      ${buildBreakdownS2(s, fr)}
+      ${buildBreakdownS3(s, fr)}
+      ${buildBreakdownS4(s, fr)}
+      ${i < students.length - 1 ? '<hr class="print-student-separator">' : ''}
+    </div>`;
+  }).join('');
+
+  // ── Table of contents ──
+  const toc = `<div class="print-card print-toc-card">
+    <div style="border-bottom:3px solid #00587C;padding-bottom:14px;margin-bottom:20px">
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:#6B7E88;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">Éco-conception</div>
+      <div style="font-size:20px;font-weight:700;color:#0F1A20;letter-spacing:-0.5px">${fr?'Rapport des scores':'Score report'}</div>
+      <div style="font-size:12px;color:#6B7E88;margin-top:4px">${new Date().toLocaleDateString(fr?'fr-CA':'en-CA',{year:'numeric',month:'long',day:'numeric'})}</div>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:14px">${fr?'Soumissions — du meilleur au moins bon score':'Submissions — highest to lowest score'}</div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead>
+        <tr style="border-bottom:2px solid #E3DFD6">
+          <th style="text-align:left;padding:6px 10px 8px 0;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase;letter-spacing:0.8px">${fr?'Étudiant·e':'Student'}</th>
+          <th style="text-align:left;padding:6px 10px 8px;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase;letter-spacing:0.8px">${fr?'Profil':'Profile'}</th>
+          <th style="text-align:center;padding:6px 10px 8px;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase;letter-spacing:0.8px">S1</th>
+          <th style="text-align:center;padding:6px 10px 8px;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase;letter-spacing:0.8px">S2</th>
+          <th style="text-align:center;padding:6px 10px 8px;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase;letter-spacing:0.8px">S3</th>
+          <th style="text-align:center;padding:6px 10px 8px;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase;letter-spacing:0.8px">S4</th>
+          <th style="text-align:right;padding:6px 0 8px 10px;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase;letter-spacing:0.8px">${fr?'Total':'Total'}</th>
+          <th style="text-align:right;padding:6px 0 8px 10px;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase;letter-spacing:0.8px">${fr?'Statut':'Status'}</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${students.map((s,i) => {
+          const statusColor = s.juryPending ? '#C47A00' : s.passed ? '#1B8B5A' : '#C0392B';
+          const statusLabel = s.juryPending ? t('pendingLabel') : s.passed ? t('certified') : t('notCertified');
+          const rowBg = i % 2 === 0 ? '#FAFAF8' : 'white';
+          return `<tr style="border-bottom:1px solid #F2F4F5;background:${rowBg}">
+            <td style="padding:8px 10px 8px 0;font-weight:600;color:#0F1A20">${esc(s.studentName)}</td>
+            <td style="padding:8px 10px;color:#5A6470;font-size:12px">${esc(s.profile)}</td>
+            <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:12px">${s.s1}</td>
+            <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:12px">${s.s2}</td>
+            <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:12px">${s.s3}</td>
+            <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:12px">${s.s4}</td>
+            <td style="padding:8px 0 8px 10px;text-align:right;font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:${statusColor}">${s.total}</td>
+            <td style="padding:8px 0 8px 10px;text-align:right;font-size:11px;color:${statusColor};font-family:'DM Mono',monospace">${statusLabel}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  return toc + cards + `
+    <hr class="print-divider">
+    <div class="print-card">
+      <div class="print-breakdown-title">${fr ? 'Détail des scores' : 'Score breakdown'}</div>
+      <div class="print-breakdown-sub">${fr
+        ? 'Détail critère par critère pour chaque soumission, dans le même ordre que ci-dessus.'
+        : 'Criterion-by-criterion detail for each submission, in the same order as above.'}</div>
+      ${breakdowns}
+    </div>`;
+}
+
+function printCritRow(val, label, ptsVal) {
+  const isPos = String(ptsVal).startsWith('+') && ptsVal !== '+0';
+  const isNeg = String(ptsVal).startsWith('-');
+  const cls = val ? 'yes' : 'no';
+  const icon = val ? '✓' : '○';
+  const ptsClass = val ? (isPos ? 'pos' : isNeg ? 'neg' : 'zero') : (isNeg ? 'zero' : 'zero');
+  const opacity = val ? '' : 'opacity:0.4;';
+  return `<div class="print-criterion-row" style="${opacity}">
+    <div class="print-criterion-check ${cls}">${icon}</div>
+    <div class="print-criterion-text">${label}</div>
+    <div class="print-criterion-pts ${ptsClass}">${ptsVal}</div>
+  </div>`;
+}
+
+function printSectionHeader(code, title, score, max) {
+  const pct = Math.max(0, Math.min(100, (score / max) * 100));
+  return `<div class="print-score-section-header" style="margin-top:12px">
+    <span class="print-section-code">${code}</span>
+    <span style="font-size:12px;font-weight:600;color:#0F1A20;flex:1">${title}</span>
+    <span style="font-family:'DM Mono',monospace;font-size:14px">${score}/${max}</span>
+  </div>`;
+}
+
+function printQual(label, value) {
+  if (!value) return '';
+  return `<div class="print-qual-block"><strong>${label}:</strong> ${esc(value)}</div>`;
+}
+
+function buildBreakdownS1(s, fr) {
+  const rows = [
+    printCritRow(s.upcycled, fr?'Vêtement entièrement conçu à partir de récupération':'Designed entirely from upcycled garments', s.upcycled?'+20':'0'),
+  ];
+  if (!s.s1Override) {
+    rows.push(
+      printCritRow(s.intentionalDesign, fr?'Conception intentionnelle':'Intentional design approach', s.intentionalDesign?'+5':'0'),
+      printCritRow(s.localSourcing, fr?'Approvisionnement local':'Local sourcing', s.localSourcing?'+5':'0'),
+      printCritRow(s.digitalProto, fr?'Prototypage numérique / patrons existants':'Digital prototyping or existing patterns', s.digitalProto?'+5':'0'),
+      printCritRow(s.lowWasteCutting, fr?'Coupe zéro déchet':'Low-waste cutting', s.lowWasteCutting?'+5':'0'),
+      printCritRow(s.lowImpactProcess, fr?'Procédés à faible impact':'Low-impact transformation processes', s.lowImpactProcess?'+5':'0'),
+      printCritRow(s.materialSelection, fr?'Sélection appropriée des matériaux et garnitures':'Appropriate material and trim selection', s.materialSelection?'+3':'0'),
+    );
+  }
+  return printSectionHeader('S1', t('sectionConceptualization'), s.s1, 20) + rows.join('') +
+    (s.parts.length ? printQual(fr?'Matériaux par partie':'Materials by part', s.parts.map((p,i)=>`${fr?'Partie':'Part'} ${i+1}: ${p}`).join(' · ')) : '');
+}
+
+function buildBreakdownS2(s, fr) {
+  const trimOpts = options(s.trimRaw);
+  const transfoOpts = options(s.transfoRaw);
+
+  const originRow = `<div class="print-criterion-row">
+    <div class="print-criterion-check yes">→</div>
+    <div class="print-criterion-text">${fr?'Origine':'Origin'}: ${esc(s.mainFabricOrigin)}${s.mainFabricSupplier?' — '+esc(s.mainFabricSupplier):''}</div>
+    <div class="print-criterion-pts ${s.s2Origin>0?'pos':s.s2Origin<0?'neg':'zero'}">${pts(s.s2Origin)}</div>
+  </div>`;
+
+  const compRow = `<div class="print-criterion-row">
+    <div class="print-criterion-check yes">→</div>
+    <div class="print-criterion-text">${fr?'Composition':'Composition'}: ${esc(s.mainFabricComp)}${s.stretchContent?' + '+(fr?'élastique':'stretch')+' (−3)':''}</div>
+    <div class="print-criterion-pts ${s.s2Comp>0?'pos':s.s2Comp<0?'neg':'zero'}">${pts(s.s2Comp)}</div>
+  </div>`;
+
+  const trimRows = TRIM_OPTIONS.map(o => {
+    const sel = optionSelected(s.trimRaw, o.kw);
+    const isPos = o.pts.startsWith('+'); const isNeg = o.pts.startsWith('−') || o.pts.startsWith('-');
+    return `<div class="print-criterion-row" style="${sel?'':'opacity:0.4;'}">
+      <div class="print-criterion-check ${sel?'yes':'no'}">${sel?'✓':'○'}</div>
+      <div class="print-criterion-text">${fr?o.fr:o.en}</div>
+      <div class="print-criterion-pts ${sel?(isPos?'pos':isNeg?'neg':'zero'):'zero'}">${o.pts}</div>
+    </div>`;
+  }).join('');
+
+  const transfoRows = TRANSFO_OPTIONS.map(o => {
+    const sel = optionSelected(s.transfoRaw, o.kw);
+    const isPos = o.pts.startsWith('+'); const isNeg = o.pts.startsWith('−') || o.pts.startsWith('-');
+    return `<div class="print-criterion-row" style="${sel?'':'opacity:0.4;'}">
+      <div class="print-criterion-check ${sel?'yes':'no'}">${sel?'✓':'○'}</div>
+      <div class="print-criterion-text">${fr?o.fr:o.en}</div>
+      <div class="print-criterion-pts ${sel?(isPos?'pos':isNeg?'neg':'zero'):'zero'}">${o.pts}</div>
+    </div>`;
+  }).join('');
+
+  const ifaceRow = `<div class="print-criterion-row">
+    <div class="print-criterion-check yes">→</div>
+    <div class="print-criterion-text">${fr?'Entoilage':'Interfacing'}: ${esc(s.interfacingMethod)}</div>
+    <div class="print-criterion-pts ${s.s2Interface>0?'pos':s.s2Interface<0?'neg':'zero'}">${pts(s.s2Interface)}</div>
+  </div>`;
+
+  return printSectionHeader('S2', t('sectionFabrics'), s.s2, 40)
+    + originRow + compRow
+    + `<div style="font-size:10px;color:#6B7E88;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;padding:6px 0 3px 26px">${fr?'Garnitures':'Trim'} (${pts(s.s2Trim)})</div>`
+    + trimRows
+    + `<div style="font-size:10px;color:#6B7E88;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;padding:6px 0 3px 26px">${fr?'Transformations':'Transformation'} (${pts(s.s2Transfo)})</div>`
+    + transfoRows
+    + ifaceRow
+    + (s.fusingJustification ? printQual(fr?'Justification entoilage':'Fusing justification', s.fusingJustification) : '');
+}
+
+function buildBreakdownS3(s, fr) {
+  const ws = wasteScore(s);
+  return printSectionHeader('S3', t('sectionProduction'), s.s3, 30)
+    + printCritRow(s.durableConstruction, fr?'Construction solide et durable':'Durable construction', s.durableConstruction?'+5':'0')
+    + `<div class="print-criterion-row">
+        <div class="print-criterion-check yes">→</div>
+        <div class="print-criterion-text">${fr?'Stratégie déchets':'Waste strategy'}: ${esc(s.wasteStrategy)}</div>
+        <div class="print-criterion-pts ${ws>0?'pos':'zero'}">${ws>0?'+'+ws:'0'}</div>
+       </div>`
+    + (s.wasteDescription ? printQual(fr?'Description':'Description', s.wasteDescription) : '')
+    + printCritRow(s.strategicPattern, fr?'Placement stratégique du patron':'Strategic pattern placement', s.strategicPattern?'+5':'0')
+    + (s.fabricQuantity ? printQual(fr?'Tissu utilisé':'Fabric used', s.fabricQuantity) : '')
+    + `<div class="print-criterion-row">
+        <div class="print-criterion-check ${s.jurySeam>0?'yes':'no'}">${s.jurySeam>0?'✓':'○'}</div>
+        <div class="print-criterion-text">${fr?'Score coutures (jury)':'Jury seam score'}</div>
+        <div class="print-criterion-pts ${s.jurySeam>0?'pos':'zero'}">${s.jurySeam>0?'+'+s.jurySeam:'0'}</div>
+       </div>`
+    + (s.seamTypes ? printQual(fr?'Types de coutures':'Seam types', s.seamTypes) : '')
+    + (s.seamJustification ? printQual(fr?'Justification coutures':'Seam justification', s.seamJustification) : '')
+    + (s.reflection ? printQual(fr?'Réflexion':'Reflection', s.reflection) : '');
+}
+
+function buildBreakdownS4(s, fr) {
+  return printSectionHeader('S4', t('sectionCare'), s.s4, 10)
+    + (s.s4raw > s.s4 ? `<div style="font-size:10px;color:#C47A00;padding:3px 0 3px 26px">${fr?`Score brut : ${s.s4raw} — plafonné à 10`:`Raw score: ${s.s4raw} — capped at 10`}</div>` : '')
+    + printCritRow(s.easilyMended, fr?'Facilement réparable':'Easily mended', s.easilyMended?'+3':'0')
+    + printCritRow(s.structurallySolid, fr?'Solidité structurelle':'Structurally solid', s.structurallySolid?'+3':'0')
+    + printCritRow(s.materialsLastLong, fr?'Matériaux durables dans le temps':'Materials built to last', s.materialsLastLong?'+5':'0')
+    + printCritRow(s.accessibleCare, fr?'Entretien accessible':'Accessible care (no dry-cleaning)', s.accessibleCare?'+3':'0')
+    + printCritRow(s.easilyAltered, fr?'Facilement modifiable':'Easily altered to extend lifespan', s.easilyAltered?'+5':'0')
+    + printCritRow(s.compostable, fr?'Compostable ou biodégradable':'Compostable or biodegradable', s.compostable?'+10':'0')
+    + printCritRow(s.easyDisassemble, fr?'Facile à démonter':'Easy to disassemble for recycling', s.easyDisassemble?'+7':'0')
+    + (s.additionalComments ? printQual(fr?'Commentaires':'Comments', s.additionalComments) : '');
+}
+
+
 </script>
 </body>
 </html>
