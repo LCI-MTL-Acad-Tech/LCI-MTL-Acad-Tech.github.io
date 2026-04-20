@@ -702,7 +702,21 @@ function initM0Page(){
 
   // Render the single panel
   const panel=document.getElementById('panel-m0');
-  if(panel) panel.innerHTML=renderM0Panel(S);
+  if(panel){
+    panel.innerHTML=renderM0Panel(S);
+    // Delegated listener — catches acheck clicks even if inline onclick fails
+    panel.addEventListener('click', e=>{
+      const btn = e.target.closest('.acheck');
+      if(!btn) return;
+      console.log('[acheck] delegated click on', btn.outerHTML);
+      const onclick = btn.getAttribute('onclick');
+      console.log('[acheck] onclick attr:', onclick);
+      if(onclick) {
+        try { eval(onclick); }
+        catch(err) { console.error('[acheck] eval error:', err); }
+      }
+    });
+  }
 
   // Nav — no prev, next goes to s01
   const prevBtn=document.getElementById('prev-sess-btn');
