@@ -1643,7 +1643,7 @@ function parseRow(headers, row) {
     submittedAt: r[1] ? String(r[1]).substring(0,16) : '',
     s1, s1Override,
     s2, s2Origin, s2Comp, s2Trim, s2TrimOverride, s2Transfo, s2TransfoOverride, s2Interface,
-    s3, s3WasteOverride, juryPending, jurySeam,
+    s3, s3WasteOverride, juryPending: true, jurySeam: undefined,
     s4, s4raw,
     total,
     passed: total >= 80,
