@@ -1252,8 +1252,8 @@ const T = {
     failCount: "Non certifié·e·s",
     pendingJury: "En attente du jury",
     filterAll: "Tous les profils",
-    filterPass: "Certifié·e·s (≥ 80)",
-    filterFail: "Non certifié·e·s (< 80)",
+    filterPass: "Certifié·e·s (≥ 85)",
+    filterFail: "Non certifié·e·s (< 85)",
     filterPending: "En attente du jury",
     colName: "Étudiant·e",
     colProfile: "Profil",
@@ -1302,8 +1302,8 @@ const T = {
     failCount: "Not certified",
     pendingJury: "Awaiting jury",
     filterAll: "All profiles",
-    filterPass: "Certified (≥ 80)",
-    filterFail: "Not certified (< 80)",
+    filterPass: "Certified (≥ 85)",
+    filterFail: "Not certified (< 85)",
     filterPending: "Awaiting jury",
     colName: "Student",
     colProfile: "Profile",
@@ -1474,7 +1474,6 @@ const COL = {
   selfAssessment: 60,
   additionalComments: 61,
   // madeFromExisting: removed from form
-  // jury seam score — entered manually in dashboard, not in student form
 };
 
 function cell(row, key) {
@@ -1610,12 +1609,7 @@ function parseRow(headers, row) {
 
   if (isYes(get('strategicPattern'))) s3 += 5;
 
-  // Jury seam score: check col index — not present in student form; default 0
-  let jurySeam = undefined;
-  // Will be handled via manual input or separate jury export
-  // jurySeam is undefined until explicitly set via input or JSON load
-
-  // jurySeam added when set via setJuryScore, not at parse time
+  
 
   // ── SECTION 4: Care (raw sum, display capped at 10) ──
   let s4raw = 0;
@@ -1643,10 +1637,10 @@ function parseRow(headers, row) {
     submittedAt: r[1] ? String(r[1]).substring(0,16) : '',
     s1, s1Override,
     s2, s2Origin, s2Comp, s2Trim, s2TrimOverride, s2Transfo, s2TransfoOverride, s2Interface,
-    s3, s3WasteOverride, juryPending: true, jurySeam: undefined,
+    s3, s3_base: s3, s3WasteOverride, crochetVert: 'pending',
     s4, s4raw,
     total,
-    passed: total >= 80,
+    passed: total >= passThreshold,
     upcycled,
     // raw answers for display
     intentionalDesign: isYes(get('intentionalDesign')),
@@ -1726,6 +1720,7 @@ let sortKey = 'total';
 let sortDir = -1;
 let juryScores = {};       // studentNo (or name) -> score
 let juryLocked = false;    // true when loaded from JSON
+let passThreshold = 72;    // configurable pass/fail threshold
 let juryDirty = false;     // unsaved changes
 const JURY_LS_KEY = 'ecoscale_jury_autosave';
 
@@ -1758,7 +1753,7 @@ function renderDashboard() {
       s.s3 = s.s3 - (s.jurySeam||0) + v;
       s.jurySeam = v;
       s.total = s.s1 + s.s2 + s.s3 + s.s4;
-      s.passed = s.total >= 80;
+      s.passed = s.total >= passThreshold;
       s.juryPending = false; // explicitly scored, even if 0
     }
   });
@@ -1767,8 +1762,8 @@ function renderDashboard() {
   let filtered = students.filter(s => {
     if (filterProfile !== 'all' && !s.profile.includes(filterProfile)) return false;
     if (filterStatus === 'pass' && !s.passed) return false;
-    if (filterStatus === 'fail' && (s.passed || s.juryPending)) return false;
-    if (filterStatus === 'pending' && !s.juryPending) return false;
+    if (filterStatus === 'fail' && (s.passed || s.crochetVert==='pending')) return false;
+    if (filterStatus === 'pending' && s.crochetVert !== 'pending') return false;
     return true;
   });
 
@@ -1787,7 +1782,7 @@ function renderDashboard() {
 
   const passCount = students.filter(s=>s.passed && !s.juryPending).length;
   const failCount = students.filter(s=>!s.passed && !s.juryPending).length;
-  const pendingCount = students.filter(s=>s.juryPending).length;
+  const pendingCount = students.filter(s=>s.crochetVert==='pending').length;
   const avgTotal = students.length ? Math.round(students.reduce((a,s)=>a+s.total,0)/students.length) : 0;
 
   const profiles = [...new Set(students.map(s=>s.profile).filter(Boolean))];
@@ -1800,17 +1795,17 @@ function renderDashboard() {
     </div>
     <div class="stat-card">
       <div class="stat-label">${t('avgTotal')}</div>
-      <div class="stat-value">${avgTotal}<span style="font-size:16px;color:var(--text3)">/100</span></div>
+      <div class="stat-value">${avgTotal}<span style="font-size:16px;color:var(--text3)">/85</span></div>
     </div>
     <div class="stat-card">
       <div class="stat-label">${t('passCount')}</div>
       <div class="stat-value pass">${passCount}</div>
-      <div class="stat-sub">≥ 80 pts</div>
+      <div class="stat-sub">≥ ${passThreshold} pts</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">${t('failCount')}</div>
       <div class="stat-value fail">${failCount}</div>
-      <div class="stat-sub">< 80 pts</div>
+      <div class="stat-sub">< ${passThreshold} pts</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">${t('pendingJury')}</div>
@@ -1822,7 +1817,7 @@ function renderDashboard() {
     <div class="section-bars-title">${t('avgsTitle')}</div>
     ${sectionBarRow(t('sectionConceptualization'), avgs.s1, 20)}
     ${sectionBarRow(t('sectionFabrics'), avgs.s2, 40)}
-    ${sectionBarRow(t('sectionProduction'), avgs.s3, 30)}
+    ${sectionBarRow(t('sectionProduction'), avgs.s3, 25)}
     ${sectionBarRow(t('sectionCare'), avgs.s4, 10)}
   </div>
 
@@ -1839,8 +1834,8 @@ function renderDashboard() {
     </select>
     <select class="filter-select" onchange="setFilterStatus(this.value)">
       <option value="all">${t('filterAll').replace('profils','statuts').replace('profiles','statuses')}</option>
-      <option value="pass">${t('filterPass')}</option>
-      <option value="fail">${t('filterFail')}</option>
+      <option value="pass">${lang==='fr'?'Certifié·e·s (≥ '+passThreshold+')':'Certified (≥ '+passThreshold+')'}</option>
+      <option value="fail">${lang==='fr'?'Non certifié·e·s (< '+passThreshold+')':'Not certified (< '+passThreshold+')'}</option>
       <option value="pending">${t('filterPending')}</option>
     </select>
     ${profiles.length > 1 ? `<select class="filter-select" onchange="setFilterProfile(this.value)">
@@ -1850,6 +1845,14 @@ function renderDashboard() {
   </div>
   <div class="print-options-bar">
     <span class="print-options-label">🖨 ${lang==='fr'?'Rapport PDF':'PDF report'}</span>
+    <div class="print-toggle-group" style="border-left:none;padding-left:0">
+      <span class="print-toggle-label">${lang==='fr'?'Seuil de réussite :':'Pass threshold:'}</span>
+      <input type="number" min="0" max="200" step="1" value="${passThreshold}"
+        style="width:52px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:3px 7px;font-family:var(--font-display);font-size:13px;color:var(--text);text-align:center;"
+        onchange="setPassThreshold(parseInt(this.value)||72)"
+        title="${lang==='fr'?'Score minimum pour obtenir le crochet vert':'Minimum score to be granted the crochet vert'}">
+      <span style="font-size:11px;color:var(--text3);font-family:var(--font-display)">/85</span>
+    </div>
 
     <div class="print-toggle-group">
       <label class="toggle-switch">
@@ -1909,6 +1912,24 @@ function renderDashboard() {
             : '');
       return qBtn('q1','Q1') + qBtn('q2','Q2') + qBtn('q3','Q3') + pendingBadge;
     })()}
+    <div class="print-toggle-group" style="border-left:1px solid var(--border);padding-left:10px">
+      <span class="print-toggle-label" style="white-space:nowrap">${lang==='fr'?'Trier le rapport :':'Report order:'}</span>
+      <select class="filter-select" id="reportSortKey" style="font-size:11px;padding:4px 8px">
+        <option value="total_desc">${lang==='fr'?'Score ↓':'Score ↓'}</option>
+        <option value="total_asc">${lang==='fr'?'Score ↑':'Score ↑'}</option>
+        <option value="studentNo_asc">${lang==='fr'?'N° étudiant·e ↑':'Student ID ↑'}</option>
+        <option value="studentNo_desc">${lang==='fr'?'N° étudiant·e ↓':'Student ID ↓'}</option>
+        <option value="name_asc">${lang==='fr'?'Nom A→Z':'Name A→Z'}</option>
+        <option value="name_desc">${lang==='fr'?'Nom Z→A':'Name Z→A'}</option>
+      </select>
+    </div>
+    <div class="print-toggle-group">
+      <label class="toggle-switch">
+        <input type="checkbox" id="reportNoImages" onchange="renderDashboard()">
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="print-toggle-label">${lang==='fr'?'Sans images':'No images'}</span>
+    </div>
     <button class="btn-print" onclick="downloadHTMLReport()">
       ${lang==='fr'?'📄 Générer le rapport':'📄 Generate report'}
     </button>
@@ -1931,15 +1952,15 @@ function renderDashboard() {
         ${filtered.length === 0 ? `<tr><td colspan="7" class="empty-state">${t('noSubmissions')}</td></tr>` :
           filtered.map(s => {
             const idx = students.indexOf(s);
-            const statusClass = s.juryPending ? 'pending' : s.passed ? 'pass' : 'fail';
+            const statusClass = s.crochetVert==='granted' ? 'pass' : s.crochetVert==='refused' ? 'fail' : s.passed ? 'pass' : 'fail';
             return `<tr onclick="openScoresheet(${idx})">
-              <td><strong>${esc(s.studentName)}</strong>${s.juryPending?`<span class="badge-jury">${t('juryPending').split(' ')[0]}</span>`:''}</td>
+              <td><strong>${esc(s.studentName)}</strong>${s.crochetVert==='pending'?`<span class="badge-jury">${t('juryPending').split(' ')[0]}</span>`:''}</td>
               <td style="color:var(--text3);font-size:12px">${esc(s.profile)}</td>
               <td style="font-family:var(--font-display)">${s.s1}<span style="color:var(--text3)">/20</span></td>
               <td style="font-family:var(--font-display)">${s.s2}<span style="color:var(--text3)">/40</span></td>
               <td style="font-family:var(--font-display)">${s.s3}<span style="color:var(--text3)">/30</span></td>
               <td style="font-family:var(--font-display)">${s.s4}<span style="color:var(--text3)">/10</span></td>
-              <td><span class="score-pill ${statusClass}">${s.total}/100</span></td>
+              <td><span class="score-pill ${statusClass}">${s.total}/85</span></td>
             </tr>`;
           }).join('')}
       </tbody>
@@ -1992,7 +2013,7 @@ function renderScoresheet(idx) {
   const s = students[idx];
   if (!s) return;
 
-  const statusClass = s.juryPending ? 'pending' : s.passed ? 'pass' : 'fail';
+  const statusClass = s.crochetVert==='granted' ? 'pass' : s.crochetVert==='refused' ? 'fail' : s.passed ? 'pass' : 'fail';
   const statusLabel = s.juryPending ? t('pendingLabel') : s.passed ? t('certified') : t('notCertified');
 
   const html = `
@@ -2013,8 +2034,18 @@ function renderScoresheet(idx) {
       </div>
       <div class="sheet-total">
         <div class="sheet-total-num" style="color:var(--${statusClass})">${s.total}</div>
-        <div class="sheet-total-label">/ 100 pts</div>
+        <div class="sheet-total-label">/ 85 pts</div>
         <div class="sheet-total-status ${statusClass}">${statusLabel}</div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-direction:column;align-items:center">
+        <div style="font-size:11px;color:var(--text3);font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.5px">${lang==='fr'?'Crochet vert':'Crochet vert'}</div>
+        <div style="display:flex;gap:6px">
+          ${juryLocked
+            ? `<span style="font-size:13px;font-weight:600;color:${s.crochetVert==='granted'?'var(--pass)':s.crochetVert==='refused'?'var(--fail)':'var(--pending)'}">${s.crochetVert==='granted'?'✓ '+(lang==='fr'?'Accordé':'Granted'):s.crochetVert==='refused'?'✗ '+(lang==='fr'?'Refusé':'Refused'):'◔ '+(lang==='fr'?'En attente':'Pending')}</span>`
+            : `<button onclick="setJuryScore(${idx},'granted')" style="padding:3px 10px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:${s.crochetVert==='granted'?'var(--pass)':'transparent'};color:${s.crochetVert==='granted'?'white':'var(--pass)'};border:1.5px solid var(--pass)" onclick="event.stopPropagation()">✓ ${lang==='fr'?'Accorder':'Grant'}</button>
+               <button onclick="setJuryScore(${idx},'refused')" style="padding:3px 10px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:${s.crochetVert==='refused'?'var(--fail)':'transparent'};color:${s.crochetVert==='refused'?'white':'var(--fail)'};border:1.5px solid var(--fail)" onclick="event.stopPropagation()">✗ ${lang==='fr'?'Refuser':'Refuse'}</button>`
+          }
+        </div>
+      </div>
       </div>
     </div>
 
@@ -2154,10 +2185,10 @@ function renderS2(s) {
 
 function renderS3(s, idx) {
   const pct = (s.s3/30)*100;
-  return sectionBlock('S3', t('sectionProduction'), s.s3, 30, pct, `s3-body`, `
+  return sectionBlock('S3', t('sectionProduction'), s.s3, 25, pct, `s3-body`, `
     <div class="section-score-bar">
       <div class="section-score-bar-track"><div class="section-score-bar-fill" style="width:${Math.min(100,pct)}%"></div></div>
-      <div class="section-score-bar-label">${s.s3} / 30 ${t('maxPts')}</div>
+      <div class="section-score-bar-label">${s.s3} / 25 ${t('maxPts')}</div>
     </div>
     ${crit(s.durableConstruction, lang==='fr'?'Construction solide et durable':'Durable construction', s.durableConstruction?'+5':'0')}
     <div class="criterion-row">
@@ -2169,14 +2200,7 @@ function renderS3(s, idx) {
     ${s.s3WasteOverride?`<div class="override-notice" style="font-size:12px">✦ ${t('override15')}</div>`:''}
     ${crit(s.strategicPattern, lang==='fr'?'Placement stratégique du patron':'Strategic pattern placement', s.strategicPattern?'+5':'0')}
     ${s.fabricQuantity?`<div style="font-size:12px;color:var(--text3);margin:4px 0 0 30px">${lang==='fr'?'Tissu utilisé':'Fabric used'}: ${esc(s.fabricQuantity)}</div>`:''}
-    <div class="jury-input-block" style="${juryLocked?'opacity:0.7':''}">
-      <div class="jury-input-label">🎯 ${t('juryLabel')}${juryLocked?' 🔒':''}</div>
-      <input type="number" min="0" max="15" step="1" class="jury-score-input"
-        value="${s.jurySeam !== undefined ? s.jurySeam : ''}" placeholder="—"
-        ${juryLocked?'disabled title="'+(lang==='fr'?'Scores verrouillés — cliquez sur Ajuster pour modifier':'Scores locked — click Adjust to edit')+'"':''}
-        onchange="setJuryScore(${idx}, this.value)"
-        onclick="event.stopPropagation()">
-    </div>
+
     ${s.seamTypes?`<div class="qualitative-block" style="margin-top:8px"><div class="qualitative-label">${lang==='fr'?'Types de coutures':'Seam types'}</div><div class="qualitative-value">${esc(s.seamTypes)}</div></div>`:''}
     ${s.threadWeight?`<div style="font-size:12px;color:var(--text3);margin-top:6px">TEX: ${esc(s.threadWeight)} · ${lang==='fr'?'Fil':'Thread'}: ${esc(s.threadComp)}</div>`:''}
     ${s.seamJustification?`<div class="qualitative-block" style="margin-top:6px"><div class="qualitative-label">${lang==='fr'?'Justification coutures':'Seam justification'}</div><div class="qualitative-value">${esc(s.seamJustification)}</div></div>`:''}
@@ -2276,7 +2300,7 @@ function setJuryScoreByKey(key, val) {
   s.s3 = s.s3 - (s.jurySeam||0) + v;
   s.jurySeam = v;
   s.total = s.s1 + s.s2 + s.s3 + s.s4;
-  s.passed = s.total >= 80;
+  s.passed = s.total >= passThreshold;
   s.juryPending = false; // explicitly scored, even if 0
   markJuryDirty();
 }
@@ -2296,7 +2320,7 @@ function setJuryScore(idx, val) {
   s.s3 = s.s3 - (s.jurySeam||0) + v;
   s.jurySeam = v;
   s.total = s.s1 + s.s2 + s.s3 + s.s4;
-  s.passed = s.total >= 80;
+  s.passed = s.total >= passThreshold;
   s.juryPending = false; // explicitly scored, even if 0
   markJuryDirty();
   // update total display live in score sheet
@@ -2337,8 +2361,8 @@ function buildJuryPayload() {
   const scores = {};
   students.forEach(s => {
     const key = juryKey(s);
-    if (s.jurySeam !== undefined && s.jurySeam !== null) {
-      scores[key] = { seam: s.jurySeam, name: s.studentName };
+    if (s.crochetVert && s.crochetVert !== 'pending') {
+      scores[key] = { crochetVert: s.crochetVert, name: s.studentName };
     }
   });
   return { savedAt: new Date().toISOString(), scores };
@@ -2370,13 +2394,17 @@ function applyJuryJSON(fileOrObj, lock=true) {
       s.s3 = s.s3 - (s.jurySeam||0) + v;
       s.jurySeam = v;
       s.total = s.s1 + s.s2 + s.s3 + s.s4;
-      s.passed = s.total >= 80;
+      s.passed = s.total >= passThreshold;
       s.juryPending = false; // explicitly scored, even if 0
     });
     juryLocked = lock;
     juryDirty = false;
     updateJuryBar();
     renderAll();
+    // If report view is open, rebuild it so inputs are populated
+    if (document.getElementById('reportView').style.display !== 'none') {
+      openReportView();
+    }
   }
   if (fileOrObj instanceof File) {
     const reader = new FileReader();
@@ -2404,8 +2432,35 @@ function tryRestoreJuryAutosave() {
   } catch(e) {}
 }
 
+function setPassThreshold(val) {
+  passThreshold = Math.max(0, Math.min(200, val || 72));
+  // Recompute passed for all students
+  allSubmissions.filter(s => !s.isJury).forEach(s => {
+    s.passed = s.total >= passThreshold;
+  });
+  renderAll();
+  updateJuryBar();
+}
+
 function unlockJury() {
   juryLocked = false;
+  updateJuryBar();
+  renderAll();
+}
+
+function resetJuryScores() {
+  const fr = lang === 'fr';
+  const msg = fr
+    ? 'Êtes-vous sûr·e de vouloir réinitialiser tous les scores du jury ? Cette action est irréversible.'
+    : 'Are you sure you want to reset all jury scores? This cannot be undone.';
+  if (!confirm(msg)) return;
+  juryScores = {};
+  juryDirty = false;
+  try { localStorage.removeItem(JURY_LS_KEY); } catch(e) {}
+  allSubmissions.filter(s => !s.isJury).forEach(s => {
+    s.crochetVert = 'pending';
+    delete juryScores[juryKey(s)];
+  });
   updateJuryBar();
   renderAll();
 }
@@ -2420,7 +2475,7 @@ function updateJuryBar() {
   newBar.style.cssText = 'position:sticky;top:60px;z-index:90;background:' +
     (juryLocked ? 'rgba(27,139,90,0.92)' : 'rgba(196,122,0,0.92)') +
     ';backdrop-filter:blur(8px);padding:7px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;';
-  const pendingCount = allSubmissions.filter(s=>!s.isJury&&s.juryPending).length;
+  const pendingCount = allSubmissions.filter(s=>!s.isJury&&s.crochetVert==='pending').length;
   if (juryLocked) {
     newBar.innerHTML = `<span style="font-size:12px;color:white;flex:1">🔒 ${fr?'Scores du jury chargés et verrouillés':'Jury scores loaded and locked'}</span>
       <button onclick="unlockJury()" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:white;border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer">${fr?'Ajuster les scores du jury':'Adjust jury scores'}</button>`;
@@ -3132,7 +3187,19 @@ async function openReportView() {
   const students = allSubmissions.filter(s => !s.isJury);
   if (!students.length) return;
 
-  const sorted = [...students].sort((a,b) => b.total - a.total);
+  const sortKey = document.getElementById('reportSortKey')?.value || 'total_desc';
+  const noImages = document.getElementById('reportNoImages')?.checked || false;
+  const sorted = [...students].sort((a,b) => {
+    const [key, dir] = sortKey.split('_');
+    const mul = dir === 'asc' ? 1 : -1;
+    if (key === 'total') return mul * (a.total - b.total);
+    if (key === 'studentNo') {
+      const na = String(a.studentNo||''), nb = String(b.studentNo||'');
+      return mul * na.localeCompare(nb, undefined, {numeric:true});
+    }
+    if (key === 'name') return mul * a.studentName.localeCompare(b.studentName);
+    return 0;
+  });
   const fr = lang === 'fr';
 
   // Show report container, hide dashboard
@@ -3197,8 +3264,13 @@ async function openReportView() {
     setProgress(5 + (i / total) * 65, (fr ? 'Vêtement ' : 'Garment ') + (i+1) + ' / ' + total + ' — ' + esc(s.studentName));
     await new Promise(r => setTimeout(r, 0));
     const cardEl = document.createElement('div');
-    cardEl.innerHTML = buildStudentCard(s, i, fr);
+    cardEl.innerHTML = buildStudentCard(s, i, fr, noImages);
     reportBody.appendChild(cardEl);
+    if (i < total - 1) {
+      const sep = document.createElement('hr');
+      sep.style.cssText = 'border:none;border-top:2px solid var(--border);margin:8px 0;';
+      reportBody.appendChild(sep);
+    }
   }
 
   // ── Breakdown ──
@@ -3217,7 +3289,7 @@ async function openReportView() {
         <div class="print-score-section-header">
           <span class="print-section-code" style="background:#00587C">S1–S4</span>
           <span style="font-size:14px;font-weight:600;color:#0F1A20;flex:1">${esc(s.studentName)}</span>
-          <span style="font-family:'DM Mono',monospace;font-size:16px;font-weight:500">${s.total}/100</span>
+          <span style="font-family:'DM Mono',monospace;font-size:16px;font-weight:500">${s.total}/85</span>
         </div>
         ${buildBreakdownS1(s,fr)}${buildBreakdownS2(s,fr)}${buildBreakdownS3(s,fr)}${buildBreakdownS4(s,fr)}
         ${i < sorted.length-1 ? '<hr class="print-student-separator">' : '</div>'}
@@ -3281,13 +3353,13 @@ function buildTocHtml(sorted, fr) {
   </div>`;
 }
 
-function buildStudentCard(s, i, fr) {
-  const statusClass = s.juryPending ? 'pending' : s.passed ? 'pass' : 'fail';
+function buildStudentCard(s, i, fr, noImages) {
+  const statusClass = s.crochetVert==='granted' ? 'pass' : s.crochetVert==='refused' ? 'fail' : s.passed ? 'pass' : 'fail';
   const statusLabel = s.juryPending ? t('pendingLabel') : s.passed ? t('certified') : t('notCertified');
   const sections = [
     {code:'S1',title:t('sectionConceptualization'),score:s.s1,max:20},
     {code:'S2',title:t('sectionFabrics'),score:s.s2,max:40},
-    {code:'S3',title:t('sectionProduction'),score:s.s3,max:30},
+    {code:'S3',title:t('sectionProduction'),score:s.s3,max:25},
     {code:'S4',title:t('sectionCare'),score:s.s4,max:10},
   ];
   const sectionBlocks = sections.map(sec => {
@@ -3320,19 +3392,7 @@ function buildStudentCard(s, i, fr) {
     }).join('');
   }
 
-  const juryVal = s.jurySeam;
-  const juryInputHtml = juryLocked
-    ? `<div style="margin-top:8px;padding:8px 12px;background:#F5F3EE;border-radius:6px;font-size:12px;color:#5A6470">
-        🔒 ${fr?'Score coutures du jury':'Jury seam score'}: <strong style="font-family:'DM Mono',monospace">${juryVal !== undefined ? juryVal + '/15' : '—'}</strong>
-       </div>`
-    : `<div style="margin-top:8px;padding:8px 12px;background:rgba(196,122,0,0.07);border:1px solid rgba(196,122,0,0.2);border-radius:6px;display:flex;align-items:center;gap:10px">
-        <span style="font-size:12px;color:#C47A00;flex:1">🎯 ${fr?'Score coutures du jury (0–15)':'Jury seam score (0–15)'}:</span>
-        <input type="number" min="0" max="15" step="1"
-          value="${juryVal !== undefined ? juryVal : ''}" placeholder="—"
-          style="width:60px;background:white;border:1px solid #D8DDE2;border-radius:5px;padding:4px 8px;font-family:'DM Mono',monospace;font-size:14px;text-align:center;"
-          onchange="setJuryScoreByKey('${esc(juryKey(s))}', this.value); this.closest('.print-card').querySelector('.print-total-num').textContent = allSubmissions.filter(x=>!x.isJury).find(x=>juryKey(x)==='${esc(juryKey(s))}')?.total || 0"
-          onclick="event.stopPropagation()">
-       </div>`;
+  const juryInputHtml = ''; // jury seam score removed
 
   return `<div class="print-card">
     <div class="print-card-header">
@@ -3348,14 +3408,43 @@ function buildStudentCard(s, i, fr) {
       </div>
       <div class="print-total-block">
         <div class="print-total-num ${statusClass}">${s.total}</div>
-        <div class="print-total-label">/ 100 pts</div>
+        <div class="print-total-label">/ 85 pts</div>
         <div class="print-status-badge ${statusClass}">${statusLabel}</div>
       </div>
     </div>
     <div class="print-sections">${sectionBlocks}</div>
-    ${juryInputHtml}
-    ${imgBlock(s.garmentPhoto, fr?'Photo du vêtement':'Garment photo')}
-    ${imgBlock(s.fabricPhotoPlan, fr?'Plan de placement du tissu':'Fabric placement plan')}
+    <div style="margin:10px 0;padding:10px 14px;border-radius:8px;border:2px solid ${
+      s.crochetVert==='granted' ? 'rgba(27,139,90,0.4)' :
+      s.crochetVert==='refused' ? 'rgba(192,57,43,0.4)' : 'rgba(196,122,0,0.3)'
+    };background:${
+      s.crochetVert==='granted' ? 'rgba(27,139,90,0.07)' :
+      s.crochetVert==='refused' ? 'rgba(192,57,43,0.07)' : 'rgba(196,122,0,0.05)'
+    };display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <span style="font-size:13px;font-weight:600;color:${
+        s.crochetVert==='granted' ? '#1B8B5A' :
+        s.crochetVert==='refused' ? '#C0392B' : '#C47A00'
+      }">
+        ${s.crochetVert==='granted' ? '✓ '+(fr?'Crochet vert accordé':'Crochet vert granted') :
+          s.crochetVert==='refused' ? '✗ '+(fr?'Crochet vert refusé':'Crochet vert refused') :
+          '◔ '+(fr?'En attente du jury':'Pending jury decision')}
+      </span>
+      ${juryLocked ? '' : `
+        <button onclick="setCrochetVert('${esc(juryKey(s))}','granted')" style="
+          padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;
+          background:${s.crochetVert==='granted'?'#1B8B5A':'transparent'};
+          color:${s.crochetVert==='granted'?'white':'#1B8B5A'};
+          border:1.5px solid #1B8B5A;
+        " onclick="event.stopPropagation()">✓ ${fr?'Accorder':'Grant'}</button>
+        <button onclick="setCrochetVert('${esc(juryKey(s))}','refused')" style="
+          padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;
+          background:${s.crochetVert==='refused'?'#C0392B':'transparent'};
+          color:${s.crochetVert==='refused'?'white':'#C0392B'};
+          border:1.5px solid #C0392B;
+        " onclick="event.stopPropagation()">✗ ${fr?'Refuser':'Refuse'}</button>
+      `}
+    </div>
+    ${noImages ? '' : imgBlock(s.garmentPhoto, fr?'Photo du vêtement':'Garment photo')}
+    ${noImages ? '' : imgBlock(s.fabricPhotoPlan, fr?'Plan de placement du tissu':'Fabric placement plan')}
   </div>`;
 }
 
@@ -3481,12 +3570,12 @@ function buildPrintView(students) {
 
   // ── Summary cards (one per student) ──
   const cards = students.map((s, i) => {
-    const statusClass = s.juryPending ? 'pending' : s.passed ? 'pass' : 'fail';
+    const statusClass = s.crochetVert==='granted' ? 'pass' : s.crochetVert==='refused' ? 'fail' : s.passed ? 'pass' : 'fail';
     const statusLabel = s.juryPending ? t('pendingLabel') : s.passed ? t('certified') : t('notCertified');
     const sections = [
       { code:'S1', title: t('sectionConceptualization'), score: s.s1, max: 20 },
       { code:'S2', title: t('sectionFabrics'),           score: s.s2, max: 40 },
-      { code:'S3', title: t('sectionProduction'),        score: s.s3, max: 30 },
+      { code:'S3', title: t('sectionProduction'),        score: s.s3, max: 25 },
       { code:'S4', title: t('sectionCare'),              score: s.s4, max: 10 },
     ];
 
@@ -3562,7 +3651,7 @@ function buildPrintView(students) {
         </div>
         <div class="print-total-block">
           <div class="print-total-num ${statusClass}">${s.total}</div>
-          <div class="print-total-label">/ 100 pts</div>
+          <div class="print-total-label">/ 85 pts</div>
           <div class="print-status-badge ${statusClass}">${statusLabel}</div>
         </div>
       </div>
@@ -3577,7 +3666,7 @@ function buildPrintView(students) {
       <div class="print-score-section-header">
         <span class="print-section-code" style="background:#00587C">S1–S4</span>
         <span style="font-size:14px;font-weight:600;color:#0F1A20;flex:1">${esc(s.studentName)}</span>
-        <span style="font-family:'DM Mono',monospace;font-size:16px;font-weight:500">${s.total}/100</span>
+        <span style="font-family:'DM Mono',monospace;font-size:16px;font-weight:500">${s.total}/85</span>
       </div>
       ${buildBreakdownS1(s, fr)}
       ${buildBreakdownS2(s, fr)}
@@ -3756,10 +3845,11 @@ function buildBreakdownS3(s, fr) {
     + (s.wasteDescription ? printQual(fr?'Description':'Description', s.wasteDescription) : '')
     + printCritRow(s.strategicPattern, fr?'Placement stratégique du patron':'Strategic pattern placement', s.strategicPattern?'+5':'0')
     + (s.fabricQuantity ? printQual(fr?'Tissu utilisé':'Fabric used', s.fabricQuantity) : '')
+
     + `<div class="print-criterion-row">
-        <div class="print-criterion-check ${s.jurySeam>0?'yes':'no'}">${s.jurySeam>0?'✓':'○'}</div>
-        <div class="print-criterion-text">${fr?'Score coutures (jury)':'Jury seam score'}</div>
-        <div class="print-criterion-pts ${s.jurySeam>0?'pos':'zero'}">${s.jurySeam>0?'+'+s.jurySeam:'0'}</div>
+        <div class="print-criterion-check ${s.crochetVert==='granted'?'yes':s.crochetVert==='refused'?'no':'na'}">${s.crochetVert==='granted'?'✓':s.crochetVert==='refused'?'✗':'◔'}</div>
+        <div class="print-criterion-text">${fr?'Crochet vert':'Crochet vert'}: ${s.crochetVert==='granted'?(fr?'Accordé':'Granted'):s.crochetVert==='refused'?(fr?'Refusé':'Refused'):(fr?'En attente':'Pending')}</div>
+        <div class="print-criterion-pts zero"></div>
        </div>`
     + (s.seamTypes ? printQual(fr?'Types de coutures':'Seam types', s.seamTypes) : '')
     + (s.seamJustification ? printQual(fr?'Justification coutures':'Seam justification', s.seamJustification) : '')
