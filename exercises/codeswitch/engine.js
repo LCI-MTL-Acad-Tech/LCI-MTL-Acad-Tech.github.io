@@ -543,10 +543,13 @@ function revealAns(rid,sessId,actId,ns){
 }
 
 function toggleActCheck(sessId,actId,ns){
+  console.log('[acheck] toggleActCheck called — sessId:', sessId, 'actId:', actId, 'ns:', ns);
   const rec=_lsGet(sessId);
+  console.log('[acheck] rec before:', JSON.stringify(rec));
   if(!rec[ns]) rec[ns]={};
   rec[ns][actId]=!rec[ns][actId];
   _lsSet(sessId,rec);
+  console.log('[acheck] rec after:', JSON.stringify(rec));
   updateActCheck(actId,!!rec[ns][actId]);
   updateCompBtn(sessId,ns);
 }
