@@ -1253,7 +1253,7 @@ const T = {
     pendingJury: "En attente du jury",
     filterAll: "Tous les profils",
     filterPass: "Certifié·e·s (≥ 85)",
-    filterFail: "Non certifié·e·s (< 85)",
+    filterFail: "Non certifié·e·s (< 72)",
     filterPending: "En attente du jury",
     colName: "Étudiant·e",
     colProfile: "Profil",
@@ -1303,7 +1303,7 @@ const T = {
     pendingJury: "Awaiting jury",
     filterAll: "All profiles",
     filterPass: "Certified (≥ 85)",
-    filterFail: "Not certified (< 85)",
+    filterFail: "Not certified (< 72)",
     filterPending: "Awaiting jury",
     colName: "Student",
     colProfile: "Profile",
@@ -1743,6 +1743,11 @@ function showDashboard() {
 
 function renderDashboard() {
   const students = allSubmissions.filter(s => !s.isJury);
+  // Apply crochetVert decisions from juryScores store
+  students.forEach(s => {
+    const key = juryKey(s);
+    if (juryScores[key]) s.crochetVert = juryScores[key];
+  });
   const avgs = sectionAverages(students);
 
   // Apply jury scores (key-based)
@@ -1750,11 +1755,8 @@ function renderDashboard() {
     const key = juryKey(s);
     if (juryScores[key] !== undefined) {
       const v = juryScores[key];
-      s.s3 = s.s3 - (s.jurySeam||0) + v;
-      s.jurySeam = v;
-      s.total = s.s1 + s.s2 + s.s3 + s.s4;
+          s.total = s.s1 + s.s2 + s.s3 + s.s4;
       s.passed = s.total >= passThreshold;
-      s.juryPending = false; // explicitly scored, even if 0
     }
   });
 
@@ -1780,8 +1782,8 @@ function renderDashboard() {
     return sortDir*(va-vb);
   });
 
-  const passCount = students.filter(s=>s.passed && !s.juryPending).length;
-  const failCount = students.filter(s=>!s.passed && !s.juryPending).length;
+  const passCount = students.filter(s=>s.crochetVert==='granted').length;
+  const failCount = students.filter(s=>s.crochetVert==='refused').length;
   const pendingCount = students.filter(s=>s.crochetVert==='pending').length;
   const avgTotal = students.length ? Math.round(students.reduce((a,s)=>a+s.total,0)/students.length) : 0;
 
@@ -1798,17 +1800,17 @@ function renderDashboard() {
       <div class="stat-value">${avgTotal}<span style="font-size:16px;color:var(--text3)">/85</span></div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">${t('passCount')}</div>
+      <div class="stat-label">${lang==='fr'?'Crochet vert accordé':'Crochet vert granted'}</div>
       <div class="stat-value pass">${passCount}</div>
-      <div class="stat-sub">≥ ${passThreshold} pts</div>
+      
     </div>
     <div class="stat-card">
-      <div class="stat-label">${t('failCount')}</div>
+      <div class="stat-label">${lang==='fr'?'Crochet vert refusé':'Crochet vert refused'}</div>
       <div class="stat-value fail">${failCount}</div>
-      <div class="stat-sub">< ${passThreshold} pts</div>
+      
     </div>
     <div class="stat-card">
-      <div class="stat-label">${t('pendingJury')}</div>
+      <div class="stat-label">${lang==='fr'?'Crochet vert en attente':'Crochet vert pending'}</div>
       <div class="stat-value pending">${pendingCount}</div>
     </div>
   </div>
@@ -2291,18 +2293,35 @@ function wasteScore(s) {
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function setJuryScoreByKey(key, val) {
+  setCrochetVert(key, val); // routes to crochetVert system
+}
+
+function setCrochetVert(key, decision) {
   if (juryLocked) return;
-  const v = Math.max(0, Math.min(15, parseInt(val)||0));
+  const fr = lang === 'fr';
   const students = allSubmissions.filter(s => !s.isJury);
   const s = students.find(s => juryKey(s) === key);
   if (!s) return;
-  juryScores[key] = v;
-  s.s3 = s.s3 - (s.jurySeam||0) + v;
-  s.jurySeam = v;
-  s.total = s.s1 + s.s2 + s.s3 + s.s4;
-  s.passed = s.total >= passThreshold;
-  s.juryPending = false; // explicitly scored, even if 0
+  if (decision === 'granted' && s.total < passThreshold) {
+    const msg = fr
+      ? `Ce·tte étudiant·e a un score de ${s.total}/85, en dessous du seuil de ${passThreshold}. Confirmer l'attribution du crochet vert quand même ?`
+      : `This student has a score of ${s.total}/85, below the threshold of ${passThreshold}. Confirm granting the crochet vert anyway?`;
+    if (!confirm(msg)) return;
+  }
+  if (decision === 'refused' && s.total >= passThreshold) {
+    const msg = fr
+      ? `Ce·tte étudiant·e a un score de ${s.total}/85, au-dessus du seuil de ${passThreshold}. Confirmer le refus du crochet vert quand même ?`
+      : `This student has a score of ${s.total}/85, above the threshold of ${passThreshold}. Confirm refusing the crochet vert anyway?`;
+    if (!confirm(msg)) return;
+  }
+  juryScores[key] = decision;
+  s.crochetVert = decision;
   markJuryDirty();
+  if (document.getElementById('reportView').style.display !== 'none') {
+    openReportView();
+  } else {
+    renderAll();
+  }
 }
 
 function juryKey(s) {
@@ -2310,29 +2329,9 @@ function juryKey(s) {
 }
 
 function setJuryScore(idx, val) {
-  if (juryLocked) return;
-  const v = Math.max(0, Math.min(15, parseInt(val)||0));
   const students = allSubmissions.filter(s=>!s.isJury);
   const s = students[idx];
-  if (!s) return;
-  const key = juryKey(s);
-  juryScores[key] = v;
-  s.s3 = s.s3 - (s.jurySeam||0) + v;
-  s.jurySeam = v;
-  s.total = s.s1 + s.s2 + s.s3 + s.s4;
-  s.passed = s.total >= passThreshold;
-  s.juryPending = false; // explicitly scored, even if 0
-  markJuryDirty();
-  // update total display live in score sheet
-  const totalEl = document.querySelector('.sheet-total-num');
-  if (totalEl) {
-    totalEl.textContent = s.total;
-    const statusEl = document.querySelector('.sheet-total-status');
-    if (statusEl) {
-      statusEl.className = 'sheet-total-status ' + (s.passed?'pass':'fail');
-      statusEl.textContent = s.passed ? t('certified') : t('notCertified');
-    }
-  }
+  if (s) setCrochetVert(juryKey(s), val);
 }
 
 function markJuryDirty() {
@@ -2389,13 +2388,11 @@ function applyJuryJSON(fileOrObj, lock=true) {
       const key = juryKey(s);
       const entry = scores[key] || scores[s.studentName] || scores[s.studentNo];
       if (!entry) return;
-      const v = Math.max(0, Math.min(15, parseInt(entry.seam ?? entry) || 0));
-      juryScores[key] = v;
-      s.s3 = s.s3 - (s.jurySeam||0) + v;
-      s.jurySeam = v;
-      s.total = s.s1 + s.s2 + s.s3 + s.s4;
+      const cv = entry.crochetVert || 'pending';
+      juryScores[key] = cv;
+      s.crochetVert = cv;
+          s.total = s.s1 + s.s2 + s.s3 + s.s4;
       s.passed = s.total >= passThreshold;
-      s.juryPending = false; // explicitly scored, even if 0
     });
     juryLocked = lock;
     juryDirty = false;
@@ -2630,8 +2627,12 @@ function handleImgFilesQ(files, qKey) {
     reader.onload = e => {
       const key = normalizeKey(file.name);
       store[key] = e.target.result;
+      // Also store under raw key (for %20-in-filename edge case)
       const rawKey = file.name.normalize('NFC').toLowerCase();
       if (rawKey !== key) store[rawKey] = e.target.result;
+      // Also store under stem-only key (for PDF→PNG conversion: same stem, different ext)
+      const stemKey = key.replace(/\.[^.]+$/, '');
+      if (stemKey !== key) store[stemKey] = e.target.result;
       loaded++;
       if (loaded === arr.length) { updateImgStats(); renderAll(); }
     };
@@ -2640,12 +2641,19 @@ function handleImgFilesQ(files, qKey) {
 }
 
 function filenameFromUrl(url) {
-  // Handles semicolon-separated multiple URLs — returns array of normalized keys
-  return String(url || '').split(';').map(u => {
+  // Returns array of keys to try: full filename + stem-only (for PDF→PNG matching)
+  const keys = [];
+  String(url || '').split(';').forEach(u => {
     try {
-      return normalizeKey(u.trim().split('/').pop().split('?')[0]);
-    } catch(e) { return ''; }
-  }).filter(Boolean);
+      const key = normalizeKey(u.trim().split('/').pop().split('?')[0]);
+      if (!key) return;
+      keys.push(key);
+      // stem-only: matches e.g. 'img_1620_riley paulin.pdf' URL → 'img_1620_riley paulin.png' file
+      const stem = key.replace(/\.[^.]+$/, '');
+      if (stem && stem !== key) keys.push(stem);
+    } catch(e) {}
+  });
+  return [...new Set(keys)]; // deduplicate
 }
 
 function resolveImage(url) {
@@ -3386,8 +3394,13 @@ function buildStudentCard(s, i, fr, noImages) {
           <div style="padding:10px 14px;background:#FFF3DC;border:1px solid rgba(196,122,0,0.3);border-radius:6px;font-size:12px;color:#7A4800">📄 ${fr?'Ce fichier est un PDF et ne peut pas être affiché dans le rapport.':'This file is a PDF and cannot be displayed in the report.'}</div></div>`;
       } else {
         return `<div class="print-photo-block"><div class="print-photo-label">${label}</div>
-          <div class="print-photo-link"><a href="${esc(u)}" target="_blank">${esc(u)}</a></div>
-          <div class="print-login-note">⚠ ${fr?'Image non chargée. Glissez les photos dans le tiroir ci-dessus, ou connectez-vous à votre compte LCI.':'Image not loaded. Drop photos into the drawer above, or log in to your LCI account.'}</div></div>`;
+          <div style="padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text3);line-height:1.7">
+            ⚠ ${fr?'Image non chargée localement.':'Image not loaded locally.'}
+            <a href="${esc(u)}" target="_blank" rel="noopener"
+               style="color:var(--accent);margin-left:6px;font-weight:500;white-space:nowrap">
+              ${fr?'Ouvrir dans OneDrive →':'Open in OneDrive →'}
+            </a>
+          </div></div>`;
       }
     }).join('');
   }
@@ -3623,10 +3636,10 @@ function buildPrintView(students) {
             <div id="${fbId}" style="display:none">
               ${u.toLowerCase().endsWith('.pdf')
               ? `<div style="padding:10px 14px;background:rgba(196,122,0,0.08);border:1px solid rgba(196,122,0,0.25);border-radius:6px;font-size:13px;color:var(--amber)">📄 ${fr ? 'Ce fichier est un PDF et ne peut pas être affiché dans le rapport.' : 'This file is a PDF and cannot be displayed in the report.'}</div>`
-              : `<div class="print-photo-link"><a href="${esc(u)}" target="_blank">${esc(u)}</a></div>
-                 <div class="print-login-note">⚠ ${fr
-                   ? 'Image non chargée. Glissez les photos dans le tiroir ci-dessus, ou connectez-vous à votre compte LCI.'
-                   : 'Image not loaded. Drop photos into the drawer above, or log in to your LCI account.'}</div>`}
+              : `<div style="padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text3)">
+                   ⚠ ${fr?'Image non chargée localement.':'Image not loaded locally.'}
+                   <a href="${esc(u)}" target="_blank" rel="noopener" style="color:var(--accent);margin-left:6px;font-weight:500">${fr?'Ouvrir dans OneDrive →':'Open in OneDrive →'}</a>
+                 </div>`}
             </div>
           </div>`;
         }
