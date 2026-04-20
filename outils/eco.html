@@ -1611,13 +1611,11 @@ function parseRow(headers, row) {
   if (isYes(get('strategicPattern'))) s3 += 5;
 
   // Jury seam score: check col index — not present in student form; default 0
-  let jurySeam = 0;
+  let jurySeam = undefined;
   // Will be handled via manual input or separate jury export
-  const jurySeamRaw = r[COL.jurySeamScore] !== undefined ? Number(r[COL.jurySeamScore]) : NaN;
-  const juryPending = isNaN(jurySeamRaw) || jurySeamRaw === 0;
-  // jurySeam stays 0 unless set
+  // jurySeam is undefined until explicitly set via input or JSON load
 
-  s3 += jurySeam;
+  // jurySeam added when set via setJuryScore, not at parse time
 
   // ── SECTION 4: Care (raw sum, display capped at 10) ──
   let s4raw = 0;
@@ -1761,7 +1759,7 @@ function renderDashboard() {
       s.jurySeam = v;
       s.total = s.s1 + s.s2 + s.s3 + s.s4;
       s.passed = s.total >= 80;
-      s.juryPending = v === 0;
+      s.juryPending = false; // explicitly scored, even if 0
     }
   });
 
@@ -2174,7 +2172,7 @@ function renderS3(s, idx) {
     <div class="jury-input-block" style="${juryLocked?'opacity:0.7':''}">
       <div class="jury-input-label">🎯 ${t('juryLabel')}${juryLocked?' 🔒':''}</div>
       <input type="number" min="0" max="15" step="1" class="jury-score-input"
-        value="${s.jurySeam||0}"
+        value="${s.jurySeam !== undefined ? s.jurySeam : ''}" placeholder="—"
         ${juryLocked?'disabled title="'+(lang==='fr'?'Scores verrouillés — cliquez sur Ajuster pour modifier':'Scores locked — click Adjust to edit')+'"':''}
         onchange="setJuryScore(${idx}, this.value)"
         onclick="event.stopPropagation()">
@@ -2279,7 +2277,7 @@ function setJuryScoreByKey(key, val) {
   s.jurySeam = v;
   s.total = s.s1 + s.s2 + s.s3 + s.s4;
   s.passed = s.total >= 80;
-  s.juryPending = v === 0;
+  s.juryPending = false; // explicitly scored, even if 0
   markJuryDirty();
 }
 
@@ -2299,7 +2297,7 @@ function setJuryScore(idx, val) {
   s.jurySeam = v;
   s.total = s.s1 + s.s2 + s.s3 + s.s4;
   s.passed = s.total >= 80;
-  s.juryPending = v === 0;
+  s.juryPending = false; // explicitly scored, even if 0
   markJuryDirty();
   // update total display live in score sheet
   const totalEl = document.querySelector('.sheet-total-num');
@@ -2339,7 +2337,9 @@ function buildJuryPayload() {
   const scores = {};
   students.forEach(s => {
     const key = juryKey(s);
-    scores[key] = { seam: s.jurySeam || 0, name: s.studentName };
+    if (s.jurySeam !== undefined && s.jurySeam !== null) {
+      scores[key] = { seam: s.jurySeam, name: s.studentName };
+    }
   });
   return { savedAt: new Date().toISOString(), scores };
 }
@@ -2371,7 +2371,7 @@ function applyJuryJSON(fileOrObj, lock=true) {
       s.jurySeam = v;
       s.total = s.s1 + s.s2 + s.s3 + s.s4;
       s.passed = s.total >= 80;
-      s.juryPending = v === 0;
+      s.juryPending = false; // explicitly scored, even if 0
     });
     juryLocked = lock;
     juryDirty = false;
@@ -3320,15 +3320,15 @@ function buildStudentCard(s, i, fr) {
     }).join('');
   }
 
-  const juryVal = s.jurySeam || 0;
+  const juryVal = s.jurySeam;
   const juryInputHtml = juryLocked
     ? `<div style="margin-top:8px;padding:8px 12px;background:#F5F3EE;border-radius:6px;font-size:12px;color:#5A6470">
-        🔒 ${fr?'Score coutures du jury':'Jury seam score'}: <strong style="font-family:'DM Mono',monospace">${juryVal}/15</strong>
+        🔒 ${fr?'Score coutures du jury':'Jury seam score'}: <strong style="font-family:'DM Mono',monospace">${juryVal !== undefined ? juryVal + '/15' : '—'}</strong>
        </div>`
     : `<div style="margin-top:8px;padding:8px 12px;background:rgba(196,122,0,0.07);border:1px solid rgba(196,122,0,0.2);border-radius:6px;display:flex;align-items:center;gap:10px">
         <span style="font-size:12px;color:#C47A00;flex:1">🎯 ${fr?'Score coutures du jury (0–15)':'Jury seam score (0–15)'}:</span>
         <input type="number" min="0" max="15" step="1"
-          value="${juryVal}"
+          value="${juryVal !== undefined ? juryVal : ''}" placeholder="—"
           style="width:60px;background:white;border:1px solid #D8DDE2;border-radius:5px;padding:4px 8px;font-family:'DM Mono',monospace;font-size:14px;text-align:center;"
           onchange="setJuryScoreByKey('${esc(juryKey(s))}', this.value); this.closest('.print-card').querySelector('.print-total-num').textContent = allSubmissions.filter(x=>!x.isJury).find(x=>juryKey(x)==='${esc(juryKey(s))}')?.total || 0"
           onclick="event.stopPropagation()">
