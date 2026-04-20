@@ -513,9 +513,13 @@ function checkQ(sessId,actId,idx,total,ns){
 function checkF(sessId,actId,ns){
   const input=document.getElementById('bi-'+actId);
   if(!input||input.disabled) return;
-  const allActs=[...(SESSION.ide?.activities||[]),...(SESSION.engine?.activities||[])];
+  const allActs=[
+    ...(SESSION.activities||[]),
+    ...(SESSION.ide?.activities||[]),
+    ...(SESSION.engine?.activities||[])
+  ];
   const act=allActs.find(a=>a.id===actId);
-  if(!act) return;
+  if(!act){ console.warn('[checkF] act not found for', actId); return; }
   const correct=input.value.trim().toLowerCase()===act.answer.toLowerCase();
   input.classList.remove('ok','nok'); input.classList.add(correct?'ok':'nok');
   input.disabled=true;
