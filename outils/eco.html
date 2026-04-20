@@ -1354,6 +1354,34 @@ function setLang(l) {
 // ═══════════════════════════════════════════════════════
 let dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
+// ── Cookie helpers ──────────────────────────────────────────────
+function setCookie(name, value, days) {
+  const d = new Date(); d.setTime(d.getTime() + days*24*60*60*1000);
+  document.cookie = name + '=' + encodeURIComponent(value) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
+}
+function getCookie(name) {
+  const v = document.cookie.split('; ').find(r => r.startsWith(name + '='));
+  return v ? decodeURIComponent(v.split('=')[1]) : null;
+}
+
+// ── Report mode state ────────────────────────────────────────────
+let reportMode = getCookie('ecoscale_reportMode') || 'report'; // 'list' | 'report'
+
+function setReportMode(mode) {
+  reportMode = mode;
+  setCookie('ecoscale_reportMode', mode, 365);
+  renderDashboard();
+}
+
+// ── Sort order cookie ─────────────────────────────────────────────
+function saveReportSortCookie() {
+  const sel = document.getElementById('reportSortKey');
+  if (sel) setCookie('ecoscale_sortKey', sel.value, 365);
+}
+function getReportSortCookie() {
+  return getCookie('ecoscale_sortKey') || 'total_desc';
+}
+
 window.addEventListener('beforeunload', e => {
   if (juryDirty) {
     e.preventDefault();
@@ -1799,19 +1827,20 @@ function renderDashboard() {
       <div class="stat-label">${t('avgTotal')}</div>
       <div class="stat-value">${avgTotal}<span style="font-size:16px;color:var(--text3)">/85</span></div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">${lang==='fr'?'Crochet vert accordé':'Crochet vert granted'}</div>
+    <div class="stat-card" style="border-left:3px solid var(--pass)">
+      <div class="stat-label">✓ ${lang==='fr'?'Crochet vert accordé':'Crochet vert granted'}</div>
       <div class="stat-value pass">${passCount}</div>
-      
+      <div class="stat-sub">${students.length>0?Math.round(passCount/students.length*100):0}%</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">${lang==='fr'?'Crochet vert refusé':'Crochet vert refused'}</div>
+    <div class="stat-card" style="border-left:3px solid var(--fail)">
+      <div class="stat-label">✗ ${lang==='fr'?'Crochet vert refusé':'Crochet vert refused'}</div>
       <div class="stat-value fail">${failCount}</div>
-      
+      <div class="stat-sub">${students.length>0?Math.round(failCount/students.length*100):0}%</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">${lang==='fr'?'Crochet vert en attente':'Crochet vert pending'}</div>
+    <div class="stat-card" style="border-left:3px solid var(--pending)">
+      <div class="stat-label">◔ ${lang==='fr'?'En attente':'Pending'}</div>
       <div class="stat-value pending">${pendingCount}</div>
+      <div class="stat-sub">${students.length>0?Math.round(pendingCount/students.length*100):0}%</div>
     </div>
   </div>
 
@@ -1916,13 +1945,20 @@ function renderDashboard() {
     })()}
     <div class="print-toggle-group" style="border-left:1px solid var(--border);padding-left:10px">
       <span class="print-toggle-label" style="white-space:nowrap">${lang==='fr'?'Trier le rapport :':'Report order:'}</span>
-      <select class="filter-select" id="reportSortKey" style="font-size:11px;padding:4px 8px">
-        <option value="total_desc">${lang==='fr'?'Score ↓':'Score ↓'}</option>
-        <option value="total_asc">${lang==='fr'?'Score ↑':'Score ↑'}</option>
-        <option value="studentNo_asc">${lang==='fr'?'N° étudiant·e ↑':'Student ID ↑'}</option>
-        <option value="studentNo_desc">${lang==='fr'?'N° étudiant·e ↓':'Student ID ↓'}</option>
-        <option value="name_asc">${lang==='fr'?'Nom A→Z':'Name A→Z'}</option>
-        <option value="name_desc">${lang==='fr'?'Nom Z→A':'Name Z→A'}</option>
+      <select class="filter-select" id="reportSortKey" style="font-size:11px;padding:4px 8px"
+        onchange="saveReportSortCookie()">
+        ${['total_desc','total_asc','studentNo_asc','studentNo_desc','name_asc','name_desc'].map(v => {
+          const labels = {
+            total_desc: lang==='fr'?'Score ↓':'Score ↓',
+            total_asc:  lang==='fr'?'Score ↑':'Score ↑',
+            studentNo_asc:  lang==='fr'?'N° étudiant·e ↑':'Student ID ↑',
+            studentNo_desc: lang==='fr'?'N° étudiant·e ↓':'Student ID ↓',
+            name_asc:  lang==='fr'?'Nom A→Z':'Name A→Z',
+            name_desc: lang==='fr'?'Nom Z→A':'Name Z→A',
+          };
+          const saved = getReportSortCookie();
+          return '<option value="'+v+'"'+(saved===v?' selected':'')+'>'+labels[v]+'</option>';
+        }).join('')}
       </select>
     </div>
     <div class="print-toggle-group">
@@ -1932,8 +1968,12 @@ function renderDashboard() {
       </label>
       <span class="print-toggle-label">${lang==='fr'?'Sans images':'No images'}</span>
     </div>
+    <div class="lang-toggle" style="margin-right:4px">
+      <button class="${reportMode==='list'?'active':''}" onclick="setReportMode('list')">${lang==='fr'?'📋 Liste':'📋 List'}</button>
+      <button class="${reportMode==='report'?'active':''}" onclick="setReportMode('report')">${lang==='fr'?'📄 Rapport':'📄 Report'}</button>
+    </div>
     <button class="btn-print" onclick="downloadHTMLReport()">
-      ${lang==='fr'?'📄 Générer le rapport':'📄 Generate report'}
+      ${lang==='fr'?(reportMode==='list'?'Générer la liste':'Générer le rapport'):(reportMode==='list'?'Generate list':'Generate report')}
     </button>
   </div>
 
@@ -2630,9 +2670,12 @@ function handleImgFilesQ(files, qKey) {
       // Also store under raw key (for %20-in-filename edge case)
       const rawKey = file.name.normalize('NFC').toLowerCase();
       if (rawKey !== key) store[rawKey] = e.target.result;
-      // Also store under stem-only key (for PDF→PNG conversion: same stem, different ext)
+      // Stem-only key: for PDF→PNG same-stem conversion
       const stemKey = key.replace(/\.[^.]+$/, '');
       if (stemKey !== key) store[stemKey] = e.target.result;
+      // ImageMagick appends -0, -1, -2 for multi-page PDFs → strip that suffix too
+      const magickStem = stemKey.replace(/-\d+$/, '');
+      if (magickStem && magickStem !== stemKey) store[magickStem] = e.target.result;
       loaded++;
       if (loaded === arr.length) { updateImgStats(); renderAll(); }
     };
@@ -2648,9 +2691,12 @@ function filenameFromUrl(url) {
       const key = normalizeKey(u.trim().split('/').pop().split('?')[0]);
       if (!key) return;
       keys.push(key);
-      // stem-only: matches e.g. 'img_1620_riley paulin.pdf' URL → 'img_1620_riley paulin.png' file
+      // stem-only: matches PDF URL → same-stem PNG
       const stem = key.replace(/\.[^.]+$/, '');
       if (stem && stem !== key) keys.push(stem);
+      // ImageMagick multi-page: strip trailing -0/-1 from stem
+      const magickStem = stem.replace(/-\d+$/, '');
+      if (magickStem && magickStem !== stem) keys.push(magickStem);
     } catch(e) {}
   });
   return [...new Set(keys)]; // deduplicate
@@ -2663,6 +2709,45 @@ function resolveImage(url) {
     if (dataUrl) return { dataUrl, name };
   }
   return null;
+}
+
+// Returns ALL matched images for a URL — handles multi-page PDFs converted to PNG
+// ImageMagick produces stem-0.png, stem-1.png, stem-2.png ...
+function resolveAllImages(url) {
+  const primary = resolveImage(url);
+  if (!primary) return [];
+
+  // Check if primary was matched via a stem (no extension or with -N suffix stripped)
+  // If so, look for stem-0, stem-1, stem-2... until we hit a gap
+  const stem = primary.name.replace(/\.[^.]+$/, '').replace(/-\d+$/, '');
+  const results = [primary];
+
+  // Collect all stem-N.* keys from all stores
+  const allKeys = [
+    ...Object.keys(imageStores.q1),
+    ...Object.keys(imageStores.q2),
+    ...Object.keys(imageStores.q3),
+  ];
+  // Find keys that match stem-N pattern (ImageMagick pages)
+  const pageKeys = allKeys
+    .filter(k => {
+      const kStem = k.replace(/\.[^.]+$/, '').replace(/-\d+$/, '');
+      return kStem === stem && k !== primary.name;
+    })
+    .sort((a, b) => {
+      // Sort by page number
+      const na = parseInt((a.match(/-(\d+)\.[^.]+$/) || [])[1] ?? 0);
+      const nb = parseInt((b.match(/-(\d+)\.[^.]+$/) || [])[1] ?? 0);
+      return na - nb;
+    });
+
+  for (const k of pageKeys) {
+    const dataUrl = imageStores.q1[k] || imageStores.q2[k] || imageStores.q3[k];
+    if (dataUrl && !results.find(r => r.name === k)) {
+      results.push({ dataUrl, name: k });
+    }
+  }
+  return results;
 }
 
 function countImageStats() {
@@ -3195,8 +3280,9 @@ async function openReportView() {
   const students = allSubmissions.filter(s => !s.isJury);
   if (!students.length) return;
 
-  const sortKey = document.getElementById('reportSortKey')?.value || 'total_desc';
-  const noImages = document.getElementById('reportNoImages')?.checked || false;
+  const sortKey = document.getElementById('reportSortKey')?.value || getReportSortCookie();
+  const noImages = (document.getElementById('reportNoImages')?.checked || false) || reportMode === 'list';
+  const isList = reportMode === 'list';
   const sorted = [...students].sort((a,b) => {
     const [key, dir] = sortKey.split('_');
     const mul = dir === 'asc' ? 1 : -1;
@@ -3219,6 +3305,70 @@ async function openReportView() {
   document.getElementById('uploadBtn').style.display = 'none';
   window.scrollTo(0, 0);
 
+  // ── List mode: render compact ordering doc ──────────────────────
+  if (isList) {
+    const sortLabels = {
+      total_desc: fr?'Score décroissant':'Descending score',
+      total_asc:  fr?'Score croissant':'Ascending score',
+      studentNo_asc:  fr?'N° étudiant·e croissant':'Student ID ascending',
+      studentNo_desc: fr?'N° étudiant·e décroissant':'Student ID descending',
+      name_asc:  fr?'Nom A→Z':'Name A→Z',
+      name_desc: fr?'Nom Z→A':'Name Z→A',
+    };
+    const sortLabel = sortLabels[sortKey] || sortKey;
+
+    reportDiv.innerHTML = `<div class="report-topbar" id="reportTopbar">
+      <span class="report-topbar-title">📋 ${fr?'Liste de présentation':'Presentation list'}</span>
+      <div class="report-topbar-actions">
+        <button class="report-hide-bar-btn" onclick="toggleReportTopbar()">${fr?'Masquer pour impression':'Hide for printing'}</button>
+        <button class="report-hide-bar-btn" onclick="window.print()">🖨 ${fr?'Imprimer':'Print'}</button>
+        <button class="report-back-btn" onclick="closeReportView()">← ${fr?'Retour':'Back'}</button>
+      </div>
+    </div>
+    <div class="report-body" id="reportBody"></div>`;
+
+    const body = document.getElementById('reportBody');
+    const header = document.createElement('div');
+    header.innerHTML = `<div style="font-family:'DM Mono',monospace;font-size:11px;color:#6B7E88;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">Éco-conception 2026</div>
+      <div style="font-size:22px;font-weight:700;color:#0F1A20;letter-spacing:-0.5px;margin-bottom:4px">${fr?'Ordre de présentation':'Presentation order'}</div>
+      <div style="font-size:13px;color:#6B7E88;margin-bottom:4px">${fr?'Critère de tri':'Sort criteria'}: <strong style="color:#3D4F58">${sortLabel}</strong></div>
+      <div style="font-size:12px;color:#9AABB5;margin-bottom:24px">${new Date().toLocaleDateString(fr?'fr-CA':'en-CA',{year:'numeric',month:'long',day:'numeric'})}</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead><tr style="border-bottom:2px solid #00587C">
+          <th style="padding:7px 10px 8px 0;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase;letter-spacing:0.8px;width:36px">#</th>
+          <th style="padding:7px 10px 8px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase;letter-spacing:0.8px">${fr?'Étudiant·e':'Student'}</th>
+          <th style="padding:7px 10px 8px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase;letter-spacing:0.8px">${fr?'N°':'ID'}</th>
+          <th style="padding:7px 10px 8px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase;letter-spacing:0.8px">${fr?'Profil':'Profile'}</th>
+          <th style="padding:7px 10px 8px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase;letter-spacing:0.8px">${fr?'Catégorie':'Category'}</th>
+          <th style="padding:7px 10px 8px;text-align:right;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase;letter-spacing:0.8px">${fr?'Score':'Score'}</th>
+          <th style="padding:7px 0 8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:#6B7E88;font-weight:500;text-transform:uppercase;letter-spacing:0.8px">${fr?'Verdict':'Verdict'}</th>
+        </tr></thead>
+        <tbody id="listBody"></tbody>
+      </table>`;
+    body.appendChild(header);
+
+    overlay.remove();
+
+    const tbody = document.getElementById('listBody');
+    sorted.forEach((s, i) => {
+      const tr = document.createElement('tr');
+      const cvColor = s.crochetVert==='granted'?'#1B8B5A':s.crochetVert==='refused'?'#C0392B':'#C47A00';
+      const cvLabel = s.crochetVert==='granted'?'✓':s.crochetVert==='refused'?'✗':'◔';
+      tr.style.cssText = 'border-bottom:1px solid #F2F4F5;background:'+(i%2===0?'#FAFAF8':'white');
+      tr.innerHTML = `
+        <td style="padding:9px 10px 9px 0;font-family:'DM Mono',monospace;font-size:12px;color:#9AABB5;font-weight:500">${i+1}</td>
+        <td style="padding:9px 10px;font-weight:600;color:#0F1A20">${esc(s.studentName)}</td>
+        <td style="padding:9px 10px;font-family:'DM Mono',monospace;font-size:11px;color:#6B7E88">${esc(s.studentNo||'—')}</td>
+        <td style="padding:9px 10px;font-size:12px;color:#5A6470">${esc(s.profile)}</td>
+        <td style="padding:9px 10px;font-size:12px;color:#5A6470">${esc(s.garmentCat)}</td>
+        <td style="padding:9px 0 9px 10px;text-align:right;font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:#0F1A20">${s.total}</td>
+        <td style="padding:9px 0 9px 10px;text-align:center;font-size:15px;color:${cvColor}" title="${s.crochetVert}">${cvLabel}</td>`;
+      tbody.appendChild(tr);
+    });
+    return; // done — skip full report build
+  }
+
+  // ── Full report mode ──────────────────────────────────────────────
   // Topbar
   reportDiv.innerHTML = `<div class="report-topbar" id="reportTopbar">
     <span class="report-topbar-title">📄 ${fr ? 'Rapport Éco-conception' : 'Eco-conception Report'}</span>
@@ -3384,11 +3534,20 @@ function buildStudentCard(s, i, fr, noImages) {
     if (!url) return '';
     return String(url).split(';').map(u => {
       u = u.trim(); if (!u) return '';
-      const resolved = resolveImage(u);
-      const isPdf = u.toLowerCase().endsWith('.pdf') || (resolved && resolved.dataUrl.startsWith('data:application/pdf'));
-      if (resolved && !isPdf) {
-        return `<div class="print-photo-block"><div class="print-photo-label">${label}</div>
-          <img src="${resolved.dataUrl}" style="max-width:800px;max-height:600px;object-fit:contain;border-radius:6px;display:block;margin:8px 0"></div>`;
+      const isPdf = u.toLowerCase().endsWith('.pdf');
+      const allResolved = resolveAllImages(u);
+      if (allResolved.length > 0) {
+        // Show all pages; first one uses the label, extra pages labelled (2), (3)...
+        return allResolved.map((resolved, pi) => {
+          const pageLabel = allResolved.length > 1 ? label + ' (' + (pi+1) + '/' + allResolved.length + ')' : label;
+          const isPagePdf = resolved.dataUrl.startsWith('data:application/pdf');
+          if (isPagePdf) {
+            return `<div class="print-photo-block"><div class="print-photo-label">${pageLabel}</div>
+              <div style="padding:10px 14px;background:#FFF3DC;border:1px solid rgba(196,122,0,0.3);border-radius:6px;font-size:12px;color:#7A4800">📄 ${fr?'Ce fichier est un PDF et ne peut pas être affiché dans le rapport.':'This file is a PDF and cannot be displayed in the report.'}</div></div>`;
+          }
+          return `<div class="print-photo-block"><div class="print-photo-label">${pageLabel}</div>
+            <img src="${resolved.dataUrl}" style="max-width:800px;max-height:600px;object-fit:contain;border-radius:6px;display:block;margin:8px 0"></div>`;
+        }).join('');
       } else if (isPdf) {
         return `<div class="print-photo-block"><div class="print-photo-label">${label}</div>
           <div style="padding:10px 14px;background:#FFF3DC;border:1px solid rgba(196,122,0,0.3);border-radius:6px;font-size:12px;color:#7A4800">📄 ${fr?'Ce fichier est un PDF et ne peut pas être affiché dans le rapport.':'This file is a PDF and cannot be displayed in the report.'}</div></div>`;
