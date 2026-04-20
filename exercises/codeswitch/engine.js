@@ -969,6 +969,8 @@ function initCopyButtons(){
   document.querySelectorAll(sel).forEach(el=>{
     // Skip if already wrapped
     if(el.parentElement.classList.contains('copyable')) return;
+    // Skip code blocks containing interactive inputs (fill activities)
+    if(el.querySelector('input')) return;
 
     const wrapper = document.createElement('div');
     wrapper.className = 'copyable';
