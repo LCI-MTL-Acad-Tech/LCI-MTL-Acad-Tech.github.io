@@ -1210,9 +1210,9 @@ main { flex: 1; max-width: 1280px; margin: 0 auto; padding: 24px 20px; width: 10
         <span>📂</span>
         <span data-i18n="uploadBtn">Choisir un fichier .xlsx</span>
       </button>
-      <div class="upload-note" data-i18n="uploadNote">eco-conception_*.xlsx</div>
+      <div class="upload-note" data-i18n="uploadNote">eco-conception_*.xlsx &nbsp;+&nbsp; ecoscale-jury-*.json (optionnel)</div>
     </div>
-    <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="handleFile(event)">
+    <input type="file" id="fileInput" accept=".xlsx,.xls,.json" multiple onchange="handleFileInputChange(event)">
   </div>
 
   <!-- DASHBOARD (hidden until file loaded) -->
@@ -1353,6 +1353,13 @@ function setLang(l) {
 // THEME
 // ═══════════════════════════════════════════════════════
 let dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+window.addEventListener('beforeunload', e => {
+  if (juryDirty) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
 function applyTheme() {
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
   document.getElementById('themeBtn').textContent = dark ? '☀️' : '🌙';
@@ -1370,14 +1377,24 @@ function handleDragLeave(e) { document.getElementById('dropZone').classList.remo
 function handleDrop(e) {
   e.preventDefault();
   document.getElementById('dropZone').classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file) processFile(file);
+  handleFiles([...e.dataTransfer.files]);
 }
-function handleFile(e) { const file = e.target.files[0]; if (file) processFile(file); }
+function handleFile(e) { handleFiles([...e.target.files]); }
+function handleFileInputChange(e) { handleFiles([...e.target.files]); }
+
+function handleFiles(files) {
+  const xlsx = files.find(f => f.name.match(/\.xlsx?$/i));
+  const json = files.find(f => f.name.match(/\.json$/i));
+  if (xlsx) processFile(xlsx, json);
+  else if (json && allSubmissions.length) applyJuryJSON(json);
+  else if (json) { pendingJuryFile = json; }
+}
+let pendingJuryFile = null;
 
 let allSubmissions = [];
 
-function processFile(file) {
+function processFile(file, juryFile) {
+  if (juryFile) pendingJuryFile = juryFile;
   const reader = new FileReader();
   reader.onload = function(e) {
     const wb = XLSX.read(e.target.result, {type:'array'});
@@ -1386,7 +1403,14 @@ function processFile(file) {
     if (rows.length < 2) return;
     const headers = rows[0];
     const dataRows = rows.slice(1).filter(r => r.some(c => c !== undefined && c !== ''));
-    allSubmissions = dataRows.map(row => parseRow(headers, row));
+    const TEST_IDS = new Set(['123456789987654321', '987654321123456789']);
+    allSubmissions = dataRows
+      .map(row => parseRow(headers, row))
+      .filter(s => !TEST_IDS.has(String(s.studentNo).trim()));
+    // Apply jury JSON if one was dropped alongside excel
+    if (pendingJuryFile) { applyJuryJSON(pendingJuryFile); pendingJuryFile = null; }
+    // Offer to restore autosaved jury data
+    else { tryRestoreJuryAutosave(); }
     showDashboard();
   };
   reader.readAsArrayBuffer(file);
@@ -1702,7 +1726,10 @@ let filterProfile = 'all';
 let filterStatus = 'all';
 let sortKey = 'total';
 let sortDir = -1;
-let juryScores = {}; // idx -> score
+let juryScores = {};       // studentNo (or name) -> score
+let juryLocked = false;    // true when loaded from JSON
+let juryDirty = false;     // unsaved changes
+const JURY_LS_KEY = 'ecoscale_jury_autosave';
 
 function renderAll() {
   if (currentView === 'dashboard') renderDashboard();
@@ -1718,20 +1745,23 @@ function showDashboard() {
   document.getElementById('uploadBtn').style.display = 'flex';
   currentView = 'dashboard';
   renderDashboard();
+  updateJuryBar();
 }
 
 function renderDashboard() {
   const students = allSubmissions.filter(s => !s.isJury);
   const avgs = sectionAverages(students);
 
-  // Apply jury scores
+  // Apply jury scores (key-based)
   students.forEach((s,i) => {
-    if (juryScores[i] !== undefined) {
-      s.jurySeam = juryScores[i];
-      s.s3 = s.s3 - (s.jurySeam||0) + juryScores[i];
+    const key = juryKey(s);
+    if (juryScores[key] !== undefined) {
+      const v = juryScores[key];
+      s.s3 = s.s3 - (s.jurySeam||0) + v;
+      s.jurySeam = v;
       s.total = s.s1 + s.s2 + s.s3 + s.s4;
       s.passed = s.total >= 80;
-      s.juryPending = false;
+      s.juryPending = v === 0;
     }
   });
 
@@ -2141,10 +2171,11 @@ function renderS3(s, idx) {
     ${s.s3WasteOverride?`<div class="override-notice" style="font-size:12px">✦ ${t('override15')}</div>`:''}
     ${crit(s.strategicPattern, lang==='fr'?'Placement stratégique du patron':'Strategic pattern placement', s.strategicPattern?'+5':'0')}
     ${s.fabricQuantity?`<div style="font-size:12px;color:var(--text3);margin:4px 0 0 30px">${lang==='fr'?'Tissu utilisé':'Fabric used'}: ${esc(s.fabricQuantity)}</div>`:''}
-    <div class="jury-input-block">
-      <div class="jury-input-label">🎯 ${t('juryLabel')}</div>
+    <div class="jury-input-block" style="${juryLocked?'opacity:0.7':''}">
+      <div class="jury-input-label">🎯 ${t('juryLabel')}${juryLocked?' 🔒':''}</div>
       <input type="number" min="0" max="15" step="1" class="jury-score-input"
-        value="${juryScores[idx]||0}"
+        value="${s.jurySeam||0}"
+        ${juryLocked?'disabled title="'+(lang==='fr'?'Scores verrouillés — cliquez sur Ajuster pour modifier':'Scores locked — click Adjust to edit')+'"':''}
         onchange="setJuryScore(${idx}, this.value)"
         onclick="event.stopPropagation()">
     </div>
@@ -2237,28 +2268,170 @@ function wasteScore(s) {
 }
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-function setJuryScore(idx, val) {
+function setJuryScoreByKey(key, val) {
+  if (juryLocked) return;
   const v = Math.max(0, Math.min(15, parseInt(val)||0));
-  juryScores[idx] = v;
+  const students = allSubmissions.filter(s => !s.isJury);
+  const s = students.find(s => juryKey(s) === key);
+  if (!s) return;
+  juryScores[key] = v;
+  s.s3 = s.s3 - (s.jurySeam||0) + v;
+  s.jurySeam = v;
+  s.total = s.s1 + s.s2 + s.s3 + s.s4;
+  s.passed = s.total >= 80;
+  s.juryPending = v === 0;
+  markJuryDirty();
+}
+
+function juryKey(s) {
+  return (s.studentNo && s.studentNo !== 'nan' && s.studentNo !== '') ? s.studentNo : s.studentName;
+}
+
+function setJuryScore(idx, val) {
+  if (juryLocked) return;
+  const v = Math.max(0, Math.min(15, parseInt(val)||0));
   const students = allSubmissions.filter(s=>!s.isJury);
   const s = students[idx];
-  if (s) {
-    s.s3 = s.s3 - (s.jurySeam||0) + v;
-    s.jurySeam = v;
-    s.total = s.s1 + s.s2 + s.s3 + s.s4;
-    s.passed = s.total >= 80;
-    s.juryPending = false;
-    // update total display live
-    const totalEl = document.querySelector('.sheet-total-num');
-    if (totalEl) {
-      totalEl.textContent = s.total;
-      const statusEl = document.querySelector('.sheet-total-status');
-      if (statusEl) {
-        statusEl.className = 'sheet-total-status ' + (s.passed?'pass':'fail');
-        statusEl.textContent = s.passed ? t('certified') : t('notCertified');
-      }
+  if (!s) return;
+  const key = juryKey(s);
+  juryScores[key] = v;
+  s.s3 = s.s3 - (s.jurySeam||0) + v;
+  s.jurySeam = v;
+  s.total = s.s1 + s.s2 + s.s3 + s.s4;
+  s.passed = s.total >= 80;
+  s.juryPending = v === 0;
+  markJuryDirty();
+  // update total display live in score sheet
+  const totalEl = document.querySelector('.sheet-total-num');
+  if (totalEl) {
+    totalEl.textContent = s.total;
+    const statusEl = document.querySelector('.sheet-total-status');
+    if (statusEl) {
+      statusEl.className = 'sheet-total-status ' + (s.passed?'pass':'fail');
+      statusEl.textContent = s.passed ? t('certified') : t('notCertified');
     }
   }
+}
+
+function markJuryDirty() {
+  juryDirty = true;
+  autoSaveJury();
+  updateJuryBar();
+}
+
+function juryFormFingerprint() {
+  // Use first student name+no as a stable fingerprint for this Excel
+  const first = allSubmissions.find(s => !s.isJury);
+  if (!first) return 'unknown';
+  return (first.studentNo || '') + '_' + (first.studentName || '');
+}
+
+function autoSaveJury() {
+  try {
+    const payload = buildJuryPayload();
+    payload.formFingerprint = juryFormFingerprint();
+    localStorage.setItem(JURY_LS_KEY, JSON.stringify(payload));
+  } catch(e) {}
+}
+
+function buildJuryPayload() {
+  const students = allSubmissions.filter(s => !s.isJury);
+  const scores = {};
+  students.forEach(s => {
+    const key = juryKey(s);
+    scores[key] = { seam: s.jurySeam || 0, name: s.studentName };
+  });
+  return { savedAt: new Date().toISOString(), scores };
+}
+
+function saveJuryJSON() {
+  const payload = buildJuryPayload();
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ecoscale-jury-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  juryDirty = false;
+  updateJuryBar();
+}
+
+function applyJuryJSON(fileOrObj, lock=true) {
+  function apply(data) {
+    const students = allSubmissions.filter(s => !s.isJury);
+    const scores = data.scores || data;
+    students.forEach((s, idx) => {
+      const key = juryKey(s);
+      const entry = scores[key] || scores[s.studentName] || scores[s.studentNo];
+      if (!entry) return;
+      const v = Math.max(0, Math.min(15, parseInt(entry.seam ?? entry) || 0));
+      juryScores[key] = v;
+      s.s3 = s.s3 - (s.jurySeam||0) + v;
+      s.jurySeam = v;
+      s.total = s.s1 + s.s2 + s.s3 + s.s4;
+      s.passed = s.total >= 80;
+      s.juryPending = v === 0;
+    });
+    juryLocked = lock;
+    juryDirty = false;
+    updateJuryBar();
+    renderAll();
+  }
+  if (fileOrObj instanceof File) {
+    const reader = new FileReader();
+    reader.onload = e => { try { apply(JSON.parse(e.target.result)); } catch(err) { alert('Invalid jury JSON file.'); } };
+    reader.readAsText(fileOrObj);
+  } else {
+    apply(fileOrObj);
+  }
+}
+
+function tryRestoreJuryAutosave() {
+  try {
+    const saved = localStorage.getItem(JURY_LS_KEY);
+    if (!saved) return;
+    const data = JSON.parse(saved);
+    if (!data || !data.scores) return;
+    // Check fingerprint matches current form
+    if (data.formFingerprint && data.formFingerprint !== juryFormFingerprint()) return;
+    const savedAt = data.savedAt ? new Date(data.savedAt).toLocaleString() : '?';
+    const fr = lang === 'fr';
+    const msg = fr
+      ? `Des scores du jury ont été sauvegardés automatiquement le ${savedAt}. Voulez-vous les restaurer ?`
+      : `Jury scores were auto-saved on ${savedAt}. Would you like to restore them?`;
+    if (confirm(msg)) applyJuryJSON(data, false);
+  } catch(e) {}
+}
+
+function unlockJury() {
+  juryLocked = false;
+  updateJuryBar();
+  renderAll();
+}
+
+function updateJuryBar() {
+  const bar = document.getElementById('juryBar');
+  if (bar) bar.remove();
+  if (!allSubmissions.length) return;
+  const fr = lang === 'fr';
+  const newBar = document.createElement('div');
+  newBar.id = 'juryBar';
+  newBar.style.cssText = 'position:sticky;top:60px;z-index:90;background:' +
+    (juryLocked ? 'rgba(27,139,90,0.92)' : 'rgba(196,122,0,0.92)') +
+    ';backdrop-filter:blur(8px);padding:7px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;';
+  const pendingCount = allSubmissions.filter(s=>!s.isJury&&s.juryPending).length;
+  if (juryLocked) {
+    newBar.innerHTML = `<span style="font-size:12px;color:white;flex:1">🔒 ${fr?'Scores du jury chargés et verrouillés':'Jury scores loaded and locked'}</span>
+      <button onclick="unlockJury()" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:white;border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer">${fr?'Ajuster les scores du jury':'Adjust jury scores'}</button>`;
+  } else {
+    newBar.innerHTML = `<span style="font-size:12px;color:white;flex:1">🎯 ${fr?'Mode saisie jury':'Jury entry mode'}${pendingCount>0?' — '+pendingCount+' '+(fr?'manquant(s)':'pending'):' ✓'}</span>
+      ${juryDirty ? `<span style="font-size:11px;color:rgba(255,255,255,0.8)">${fr?'● Modifications non sauvegardées':'● Unsaved changes'}</span>` : '<span style="font-size:11px;color:rgba(255,255,255,0.8)">✓ '+(fr?'Sauvegardé':'Saved')+'</span>'}
+      <button onclick="saveJuryJSON()" style="background:white;color:#7A4800;border:none;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer">${fr?'💾 Sauvegarder JSON':'💾 Save JSON'}</button>`;
+  }
+  // Insert after header
+  const header = document.querySelector('header');
+  if (header) header.insertAdjacentElement('afterend', newBar);
 }
 
 function backToDashboard() {
@@ -3147,6 +3320,20 @@ function buildStudentCard(s, i, fr) {
     }).join('');
   }
 
+  const juryVal = s.jurySeam || 0;
+  const juryInputHtml = juryLocked
+    ? `<div style="margin-top:8px;padding:8px 12px;background:#F5F3EE;border-radius:6px;font-size:12px;color:#5A6470">
+        🔒 ${fr?'Score coutures du jury':'Jury seam score'}: <strong style="font-family:'DM Mono',monospace">${juryVal}/15</strong>
+       </div>`
+    : `<div style="margin-top:8px;padding:8px 12px;background:rgba(196,122,0,0.07);border:1px solid rgba(196,122,0,0.2);border-radius:6px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:12px;color:#C47A00;flex:1">🎯 ${fr?'Score coutures du jury (0–15)':'Jury seam score (0–15)'}:</span>
+        <input type="number" min="0" max="15" step="1"
+          value="${juryVal}"
+          style="width:60px;background:white;border:1px solid #D8DDE2;border-radius:5px;padding:4px 8px;font-family:'DM Mono',monospace;font-size:14px;text-align:center;"
+          onchange="setJuryScoreByKey('${esc(juryKey(s))}', this.value); this.closest('.print-card').querySelector('.print-total-num').textContent = allSubmissions.filter(x=>!x.isJury).find(x=>juryKey(x)==='${esc(juryKey(s))}')?.total || 0"
+          onclick="event.stopPropagation()">
+       </div>`;
+
   return `<div class="print-card">
     <div class="print-card-header">
       <div>
@@ -3166,6 +3353,7 @@ function buildStudentCard(s, i, fr) {
       </div>
     </div>
     <div class="print-sections">${sectionBlocks}</div>
+    ${juryInputHtml}
     ${imgBlock(s.garmentPhoto, fr?'Photo du vêtement':'Garment photo')}
     ${imgBlock(s.fabricPhotoPlan, fr?'Plan de placement du tissu':'Fabric placement plan')}
   </div>`;
@@ -3280,6 +3468,7 @@ function closePrintView() {
   document.getElementById('dashboard').style.display = 'block';
   document.getElementById('uploadBtn').style.display = 'flex';
   window.scrollTo(0, 0);
+  updateJuryBar();
 }
 
 function switchBrowserTab(idx) {
