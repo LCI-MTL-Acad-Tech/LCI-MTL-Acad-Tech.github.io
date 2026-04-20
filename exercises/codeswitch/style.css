@@ -342,6 +342,7 @@ pre { overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
   background: transparent; flex-shrink: 0; cursor: pointer;
   transition: all .2s var(--ease); display: flex; align-items: center; justify-content: center;
   font-size: 1.2rem; color: transparent;
+  pointer-events: auto !important; position: relative; z-index: 10;
 }
 .acheck.done { background: var(--blue); border-color: var(--blue); color: var(--white); }
 .activity h4 { font-size: 1.7rem; margin-bottom: .6rem; line-height: 1.2; }
