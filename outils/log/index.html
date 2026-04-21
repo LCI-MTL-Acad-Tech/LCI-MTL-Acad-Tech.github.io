@@ -51,7 +51,10 @@
               <h4 data-i18n="welcome.cta_new">Commencer la configuration</h4>
               <p class="text-muted" style="font-size:1.4rem; margin-top:var(--sp-1)">Première fois? Configure ton profil et commence à documenter.</p>
             </div>
-            <button class="btn btn--primary" onclick="goToScreen('screen-onboard')" data-i18n="welcome.cta_new">Commencer la configuration</button>
+            <div style="display:flex;align-items:center;gap:var(--sp-2)">
+              <button class="btn btn--primary" onclick="goToScreen('screen-onboard')" data-i18n="welcome.cta_new">Commencer la configuration</button>
+              <span class="help-tip" tabindex="0" data-tip="" data-i18n-tip="welcome.cta_new_tip">?</span>
+            </div>
           </div>
         </div>
 
@@ -75,13 +78,15 @@
             style="background:none;border:none;cursor:pointer;font-family:inherit;
                    font-size:1.3rem;color:var(--text-subtle);text-decoration:underline;padding:0"
             data-i18n="welcome.export_config">💾 Exporter la configuration</button>
+          <span class="help-tip" tabindex="0" data-tip="" data-i18n-tip="welcome.export_config_tip">?</span>
           <span style="color:var(--text-subtle);margin:0 var(--sp-2)">·</span>
           <label style="background:none;border:none;cursor:pointer;font-family:inherit;
                         font-size:1.3rem;color:var(--text-subtle);text-decoration:underline;padding:0">
             <input type="file" accept=".json" style="display:none"
               onchange="importConfig(this.files[0])">
-            <span data-i18n="welcome.import_config">📥 Changer d'ordinateur</span>
+            <span data-i18n="welcome.import_config">📥 Importer sur cet appareil</span>
           </label>
+          <span class="help-tip" tabindex="0" data-tip="" data-i18n-tip="welcome.import_config_tip">?</span>
         </div>
         <div id="reset-link-row" class="hidden" style="text-align:right;margin-top:calc(-1 * var(--sp-2));margin-bottom:var(--sp-4)">
           <button onclick="openResetModal()"
@@ -114,7 +119,8 @@
             <label style="cursor:pointer;font-size:1.3rem;color:var(--text-subtle)">
               <input type="file" accept=".json" style="display:none"
                 onchange="importConfig(this.files[0])">
-              📥 <span data-i18n="welcome.import_config_hint">Tu as déjà un fichier de config d'un autre ordinateur ? Importe-le ici.</span>
+              📥 <span data-i18n="welcome.import_config">Importer sur cet appareil</span>
+              <span class="help-tip" tabindex="0" data-tip="" data-i18n-tip="welcome.import_config_tip">?</span>
             </label>
           </div>
         </div>

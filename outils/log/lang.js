@@ -66,8 +66,11 @@ const LANG = {
     "welcome.cta_new":        "Commencer la configuration",
     "welcome.cta_continue":   "Continuer mon journal",
     "welcome.export_config":      "Exporter la configuration",
-    "welcome.import_config":      "Changer d'ordinateur",
-    "welcome.import_config_hint": "Tu as déjà un fichier de config d'un autre ordinateur ? Importe-le ici.",
+    "welcome.import_config":      "Importer sur cet appareil",
+    "welcome.import_config_hint": "Importe un fichier de configuration exporté depuis un autre appareil pour reprendre là où tu t'es arrêté·e.",
+    "welcome.export_config_tip":  "Exporte ta configuration (profil, horaire, outils, collègues) pour la réimporter sur un autre appareil. Tes journaux ne sont PAS inclus — télécharge-les séparément chaque jour.",
+    "welcome.import_config_tip":  "Importe un fichier de configuration (.json) exporté depuis un autre appareil. Tes paramètres seront restaurés. Si tu as aussi des journaux sauvegardés, charge-les ensuite via le panneau de fichiers.",
+    "welcome.cta_new_tip":        "Première fois sur cette application. Tu vas configurer ton profil, ton horaire et ton parcours de stage.",
     "welcome.cta_weekly":     "Bilan de la semaine",
     "welcome.cta_report":     "Voir mon suivi de progression",
 
@@ -586,8 +589,11 @@ const LANG = {
     "welcome.cta_new":        "Start setup",
     "welcome.cta_continue":   "Continue my journal",
     "welcome.export_config":      "Export configuration",
-    "welcome.import_config":      "Switch computer",
-    "welcome.import_config_hint": "Already have a config file from another computer? Import it here.",
+    "welcome.import_config":      "Import on this device",
+    "welcome.import_config_hint": "Import a configuration file exported from another device to pick up where you left off.",
+    "welcome.export_config_tip":  "Export your configuration (profile, schedule, tools, colleagues) to import it on another device. Your daily logs are NOT included — download them separately each day.",
+    "welcome.import_config_tip":  "Import a configuration file (.json) exported from another device. Your settings will be restored. If you also have saved logs, load them afterwards via the file panel.",
+    "welcome.cta_new_tip":        "First time using this app. You'll set up your profile, schedule, and internship pathway.",
     "welcome.cta_weekly":     "Weekly report",
     "welcome.cta_report":     "Open my progress tracker",
 
@@ -1074,6 +1080,10 @@ function applyLanguage(lang, persist = true) {
   });
   document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
     el.placeholder = t(el.getAttribute("data-i18n-placeholder"));
+  });
+  // Tooltip data-tip attributes
+  document.querySelectorAll("[data-i18n-tip]").forEach(el => {
+    el.setAttribute("data-tip", t(el.getAttribute("data-i18n-tip")));
   });
   // Update lang toggle buttons — support both single-cycle and dual FR/EN pattern
   document.querySelectorAll(".lang-toggle-btn").forEach(btn => {
