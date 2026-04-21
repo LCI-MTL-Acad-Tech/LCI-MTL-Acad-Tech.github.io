@@ -2646,12 +2646,11 @@ function normalizeKey(str) {
   if (decoded.includes('%')) {
     try { decoded = decodeURIComponent(decoded); } catch(e) {}
   }
-  return decoded
-    .normalize('NFC')
-    .replace(/[‘’‚‛]/g, "'")
-    .replace(/[“”„‟]/g, '"')
-    .replace(/ |\t|\n|\r|\f|\v|\u00A0|\u1680|\u2000|\u2001|\u2002|\u2003|\u2004|\u2005|\u2006|\u2007|\u2008|\u2009|\u200A|\u202F|\u205F|\u3000|\uFEFF/g, '')
-    .toLowerCase();
+  // NFC normalize (handles NFD combining accents)
+  decoded = decoded.normalize('NFC');
+  // Strip everything except alphanumeric and dot (keep dot for extension matching)
+  // This handles all space variants, dashes, underscores, punctuation, special chars
+  return decoded.replace(/[^a-z0-9.]/gi, '').toLowerCase();
 }
 
 function handleImgFiles(files) { handleImgFilesQ(files, 'q1'); }
@@ -2665,15 +2664,18 @@ function handleImgFilesQ(files, qKey) {
     const reader = new FileReader();
     reader.onload = e => {
       const key = normalizeKey(file.name);
+      // Warn on collision (two different files with same alphanumeric key)
+      if (store[key] && store[key] !== e.target.result) {
+        console.warn('EcoScale — filename collision:', file.name, '→', key);
+      }
       store[key] = e.target.result;
-      // Also store under raw key (for %20-in-filename edge case)
-      const rawKey = file.name.normalize('NFC').toLowerCase();
-      if (rawKey !== key) store[rawKey] = e.target.result;
       // Stem-only key: for PDF→PNG same-stem conversion
-      const stemKey = key.replace(/\.[^.]+$/, '');
-      if (stemKey !== key) store[stemKey] = e.target.result;
-      // ImageMagick appends -0, -1, -2 for multi-page PDFs → strip that suffix too
-      const magickStem = stemKey.replace(/-\d+$/, '');
+      const stemKey = key.replace(/[^a-z0-9]/g, '') === key
+        ? key.replace(/[.][^.]+$/, '')   // already clean, just strip extension
+        : key.replace(/[.][^.]+$/, '');  // strip extension
+      if (stemKey && stemKey !== key) store[stemKey] = e.target.result;
+      // ImageMagick multi-page: strip trailing digit suffix
+      const magickStem = stemKey.replace(/0$|1$|2$|3$|4$|5$|6$|7$|8$|9$/, '').replace(/0$|1$|2$|3$|4$|5$|6$|7$|8$|9$/, '');
       if (magickStem && magickStem !== stemKey) store[magickStem] = e.target.result;
       loaded++;
       if (loaded === arr.length) { updateImgStats(); renderAll(); }
@@ -2683,22 +2685,21 @@ function handleImgFilesQ(files, qKey) {
 }
 
 function filenameFromUrl(url) {
-  // Returns array of keys to try: full filename + stem-only (for PDF→PNG matching)
   const keys = [];
   String(url || '').split(';').forEach(u => {
     try {
       const key = normalizeKey(u.trim().split('/').pop().split('?')[0]);
       if (!key) return;
       keys.push(key);
-      // stem-only: matches PDF URL → same-stem PNG
-      const stem = key.replace(/\.[^.]+$/, '');
+      // stem without extension (for PDF→PNG matching)
+      const stem = key.replace(/[.][^.]+$/, '');
       if (stem && stem !== key) keys.push(stem);
-      // ImageMagick multi-page: strip trailing -0/-1 from stem
-      const magickStem = stem.replace(/-\d+$/, '');
-      if (magickStem && magickStem !== stem) keys.push(magickStem);
+      // strip trailing digits (ImageMagick page suffix: -0, -1 become just digits after our strip)
+      const noDigitEnd = stem.replace(/\d+$/, '');
+      if (noDigitEnd && noDigitEnd !== stem) keys.push(noDigitEnd);
     } catch(e) {}
   });
-  return [...new Set(keys)]; // deduplicate
+  return [...new Set(keys)];
 }
 
 function resolveImage(url) {
