@@ -2650,7 +2650,7 @@ function normalizeKey(str) {
     .normalize('NFC')
     .replace(/[‘’‚‛]/g, "'")
     .replace(/[“”„‟]/g, '"')
-    .replace(/[\s             ᠎﻿]+/g, '')
+    .replace(/ |\t|\n|\r|\f|\v|\u00A0|\u1680|\u2000|\u2001|\u2002|\u2003|\u2004|\u2005|\u2006|\u2007|\u2008|\u2009|\u200A|\u202F|\u205F|\u3000|\uFEFF/g, '')
     .toLowerCase();
 }
 
@@ -3316,6 +3316,18 @@ async function openReportView() {
   document.getElementById('uploadBtn').style.display = 'none';
   window.scrollTo(0, 0);
 
+  // Show progress overlay — created here so both list and report modes can use it
+  const overlay = document.createElement('div');
+  overlay.className = 'progress-overlay';
+  overlay.innerHTML = `<div class="progress-card">
+    <div class="progress-title">${fr ? 'Génération du rapport…' : 'Building report…'}</div>
+    <div class="progress-sub" id="progSub">${fr ? 'Préparation…' : 'Preparing…'}</div>
+    <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
+    <div class="progress-pct" id="progPct">0%</div>
+  </div>`;
+  document.body.appendChild(overlay);
+  await new Promise(r => setTimeout(r, 30));
+
   // ── List mode: render compact ordering doc ──────────────────────
   if (isList) {
     const sortLabels = {
@@ -3391,16 +3403,7 @@ async function openReportView() {
   </div>
   <div class="report-body" id="reportBody"><div style="text-align:center;padding:40px;color:var(--text3);font-size:14px">${fr ? 'Génération en cours…' : 'Building report…'}</div></div>`;
 
-  // Show progress overlay
-  const overlay = document.createElement('div');
-  overlay.className = 'progress-overlay';
-  overlay.innerHTML = `<div class="progress-card">
-    <div class="progress-title">${fr ? 'Génération du rapport…' : 'Building report…'}</div>
-    <div class="progress-sub" id="progSub">${fr ? 'Préparation…' : 'Preparing…'}</div>
-    <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
-    <div class="progress-pct" id="progPct">0%</div>
-  </div>`;
-  document.body.appendChild(overlay);
+
 
   function setProgress(pct, label) {
     const fill = document.getElementById('progFill');
