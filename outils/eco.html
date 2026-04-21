@@ -1930,7 +1930,7 @@ function renderDashboard() {
           [s.garmentPhoto, s.fabricPhotoPlan].forEach(field => {
             if (!field) return;
             String(field).split(';').map(u => u.trim()).filter(Boolean).forEach(u => {
-              if (!resolveImage(u) && !u.toLowerCase().endsWith('.pdf')) pending++;
+              if (!resolveImage(u)) pending++; // PDFs without PNG conversion also count as pending
             });
           });
         });
@@ -2620,7 +2620,7 @@ function updateImgStats() {
     if (totalLoaded > 0) console.log('EcoScale — all images matched ✓');
   }
 
-  if (currentView === 'dashboard') renderDashboard();
+  renderAll();
 }
 
 function imgDragOver(e) {
@@ -2767,10 +2767,14 @@ function countImageStats() {
 
 function countStoreStats(qKey) {
   const store = imageStores[qKey];
-  // Count unique files loaded (each stored under up to 2 keys)
-  const uniqueFiles = new Set();
-  Object.keys(store).forEach(k => uniqueFiles.add(k));
-  const loaded = Math.ceil(uniqueFiles.size / 2);
+  // Count unique files loaded — track by stem to handle multiple keys per file
+  const seenStems = new Set();
+  Object.keys(store).forEach(k => {
+    // Normalise to stem to deduplicate (decoded key, raw key, stem key all map to same file)
+    const stem = k.replace(/\.[^.]+$/, '').replace(/-\d+$/, '');
+    seenStems.add(stem || k);
+  });
+  const loaded = seenStems.size;
   // Count how many submission URLs this store resolves
   const students = allSubmissions.filter(s => !s.isJury);
   let matched = 0;
@@ -3422,7 +3426,7 @@ async function openReportView() {
     setProgress(5 + (i / total) * 65, (fr ? 'Vêtement ' : 'Garment ') + (i+1) + ' / ' + total + ' — ' + esc(s.studentName));
     await new Promise(r => setTimeout(r, 0));
     const cardEl = document.createElement('div');
-    cardEl.innerHTML = buildStudentCard(s, i, fr, noImages);
+    cardEl.innerHTML = buildStudentCard(s, i, fr, noImages, isList);
     reportBody.appendChild(cardEl);
     if (i < total - 1) {
       const sep = document.createElement('hr');
@@ -3511,7 +3515,7 @@ function buildTocHtml(sorted, fr) {
   </div>`;
 }
 
-function buildStudentCard(s, i, fr, noImages) {
+function buildStudentCard(s, i, fr, noImages, isList) {
   const statusClass = s.crochetVert==='granted' ? 'pass' : s.crochetVert==='refused' ? 'fail' : s.passed ? 'pass' : 'fail';
   const statusLabel = s.juryPending ? t('pendingLabel') : s.passed ? t('certified') : t('notCertified');
   const sections = [
@@ -3585,7 +3589,7 @@ function buildStudentCard(s, i, fr, noImages) {
       </div>
     </div>
     <div class="print-sections">${sectionBlocks}</div>
-    <div style="margin:10px 0;padding:10px 14px;border-radius:8px;border:2px solid ${
+    ${isList ? '' : `<div style="margin:10px 0;padding:10px 14px;border-radius:8px;border:2px solid ${
       s.crochetVert==='granted' ? 'rgba(27,139,90,0.4)' :
       s.crochetVert==='refused' ? 'rgba(192,57,43,0.4)' : 'rgba(196,122,0,0.3)'
     };background:${
@@ -3614,9 +3618,9 @@ function buildStudentCard(s, i, fr, noImages) {
           border:1.5px solid #C0392B;
         " onclick="event.stopPropagation()">✗ ${fr?'Refuser':'Refuse'}</button>
       `}
-    </div>
-    ${noImages ? '' : imgBlock(s.garmentPhoto, fr?'Photo du vêtement':'Garment photo')}
-    ${noImages ? '' : imgBlock(s.fabricPhotoPlan, fr?'Plan de placement du tissu':'Fabric placement plan')}
+    </div>`}
+    ${isList ? '' : imgBlock(s.garmentPhoto, fr?'Photo du vêtement':'Garment photo')}
+    ${isList ? '' : imgBlock(s.fabricPhotoPlan, fr?'Plan de placement du tissu':'Fabric placement plan')}
   </div>`;
 }
 
