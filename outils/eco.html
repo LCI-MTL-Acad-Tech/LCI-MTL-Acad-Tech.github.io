@@ -2648,9 +2648,9 @@ function normalizeKey(str) {
   }
   return decoded
     .normalize('NFC')
-    .replace(/‘|’|‚|‛/g, "'")  // curly single quotes -> straight
-    .replace(/“|”|„|‟/g, '"')   // curly double quotes -> straight
-    .replace(/ | /g, ' ')                 // narrow no-break space / NBSP -> space (macOS screenshot filenames)
+    .replace(/[‘’‚‛]/g, "'")
+    .replace(/[“”„‟]/g, '"')
+    .replace(/[\s             ᠎﻿]+/g, '')
     .toLowerCase();
 }
 
