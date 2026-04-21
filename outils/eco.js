@@ -1419,21 +1419,11 @@ function normalizeKey(str) {
   if (decoded.includes('%')) {
     try { decoded = decodeURIComponent(decoded); } catch(e) {}
   }
-  // Normalize to NFD so every accented char becomes base + combining mark
-  decoded = decoded.normalize('NFD');
-  // Walk the string: skip any char that is followed by a combining diacritic mark
-  // (Unicode combining marks: U+0300–U+036F)
-  // Also skip the combining marks themselves
-  // This way é (e + U+0301) → both chars skipped, same as URL's é → stripped
+  // Keep only a-z, 0-9, dot — strip everything else
+  // Both URL and file.name go through same stripping, encoding-agnostic
   let result = '';
   for (let i = 0; i < decoded.length; i++) {
     const c = decoded.charCodeAt(i);
-    // Skip combining diacritical marks
-    if (c >= 0x0300 && c <= 0x036F) continue;
-    // Skip base char if followed by a combining mark
-    const next = decoded.charCodeAt(i + 1);
-    if (next >= 0x0300 && next <= 0x036F) continue;
-    // Keep only ASCII alphanumeric and dot
     if ((c >= 48 && c <= 57) || (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || c === 46) {
       result += decoded[i];
     }
@@ -1455,10 +1445,6 @@ function handleImgFilesQ(files, qKey) {
       // Warn on collision (two different files with same alphanumeric key)
       if (store[key] && store[key] !== e.target.result) {
         console.warn('EcoScale — filename collision:', file.name, '→', key);
-      }
-      // Debug: log Capture d'écran files so we can compare keys
-      if (file.name.toLowerCase().includes('capture') || file.name.toLowerCase().includes('captur')) {
-        console.log('EcoScale DEBUG store key:', key, '← file.name:', JSON.stringify(file.name));
       }
       store[key] = e.target.result;
       // Stem-only key: for PDF→PNG same-stem conversion
