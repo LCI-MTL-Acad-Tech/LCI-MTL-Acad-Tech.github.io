@@ -72,6 +72,9 @@ function prefillFromCache() {
       setVal("ctx-work-hours-h", ctx.work_hours.h);
       setVal("ctx-work-hours-m", ctx.work_hours.m);
     }
+    // Start time and lunch break
+    if (ctx.work_start_time) setVal("ctx-start-time", ctx.work_start_time);
+    if (ctx.lunch_minutes != null) setVal("ctx-lunch-minutes", ctx.lunch_minutes);
     // Work days — check the right checkboxes
     if (ctx.work_days) {
       document.querySelectorAll(".ctx-work-day").forEach(cb => {
@@ -105,7 +108,11 @@ function buildProgramDropdown() {
 
   // getSelectablePrograms() filters out hidden placeholder programs (e.g. 420.B0)
   const programs = typeof getSelectablePrograms === "function" ? getSelectablePrograms() : PROGRAMS;
-  programs.forEach(p => {
+  // Sort alphabetically by display label in current language
+  const sorted = [...programs].sort((a, b) =>
+    getProgramLabel(a.code, lang).localeCompare(getProgramLabel(b.code, lang), lang)
+  );
+  sorted.forEach(p => {
     const opt = document.createElement("option");
     opt.value = p.code;
     opt.textContent = getProgramLabel(p.code, lang);
@@ -301,6 +308,10 @@ function saveContextAndNext() {
   const workH = parseInt(document.getElementById("ctx-work-hours-h").value) || 7;
   const workM = parseInt(document.getElementById("ctx-work-hours-m").value) || 30;
 
+  // Start time and lunch break
+  const startTime   = document.getElementById("ctx-start-time").value || "08:30";
+  const lunchMins   = parseInt(document.getElementById("ctx-lunch-minutes").value) || 60;
+
   // Work days: collect checked checkboxes
   const workDays = [];
   document.querySelectorAll(".ctx-work-day:checked").forEach(cb => {
@@ -314,6 +325,8 @@ function saveContextAndNext() {
     calendar_week_start:  parseInt(document.getElementById("ctx-cal-week-start").value ?? "1"),
     work_days:            workDays.length ? workDays : [1,2,3,4,5],
     work_hours:           { h: workH, m: workM },
+    work_start_time:      startTime,
+    lunch_minutes:        lunchMins,
     total_hours_target:   parseFloat(document.getElementById("ctx-total-hours").value) || null,
     planned_absences:     [],
     skills_to_develop:    [],

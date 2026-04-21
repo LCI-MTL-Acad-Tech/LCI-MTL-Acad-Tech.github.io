@@ -169,6 +169,8 @@
 /* ── Reset & base ─────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 62.5%; scroll-behavior: smooth; }
+/* Buttons don't inherit colour/font by default in all browsers — force it */
+button { color: inherit; font-family: inherit; font-size: inherit; }
 body {
   font-family: 'Modern Gothic', system-ui, -apple-system, sans-serif;
   font-size: 1.6rem;
@@ -843,6 +845,7 @@ input[type="checkbox"] { width: auto; accent-color: var(--accent); cursor: point
   cursor: pointer;
   transition: all var(--dur-mod) var(--ease-exp);
   background: var(--bg-card);
+  color: var(--text);          /* explicit — browsers default button text to black */
   text-align: left;
 }
 .pathway-card:hover { border-color: var(--accent); box-shadow: var(--shadow-lg); transform: translateY(-2px); }
