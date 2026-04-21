@@ -1419,15 +1419,26 @@ function normalizeKey(str) {
   if (decoded.includes('%')) {
     try { decoded = decodeURIComponent(decoded); } catch(e) {}
   }
-  decoded = decoded.normalize('NFC');
-  // Strip non-ASCII using charCode comparison (avoids regex escape issues)
-  let ascii = '';
+  // Normalize to NFD so every accented char becomes base + combining mark
+  decoded = decoded.normalize('NFD');
+  // Walk the string: skip any char that is followed by a combining diacritic mark
+  // (Unicode combining marks: U+0300–U+036F)
+  // Also skip the combining marks themselves
+  // This way é (e + U+0301) → both chars skipped, same as URL's é → stripped
+  let result = '';
   for (let i = 0; i < decoded.length; i++) {
     const c = decoded.charCodeAt(i);
-    if (c < 128) ascii += decoded[i];
+    // Skip combining diacritical marks
+    if (c >= 0x0300 && c <= 0x036F) continue;
+    // Skip base char if followed by a combining mark
+    const next = decoded.charCodeAt(i + 1);
+    if (next >= 0x0300 && next <= 0x036F) continue;
+    // Keep only ASCII alphanumeric and dot
+    if ((c >= 48 && c <= 57) || (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || c === 46) {
+      result += decoded[i];
+    }
   }
-  // Strip non-alphanumeric (keep dot for extension matching)
-  return ascii.replace(/[^a-z0-9.]/gi, '').toLowerCase();
+  return result.toLowerCase();
 }
 
 function handleImgFiles(files) { handleImgFilesQ(files, 'q1'); }
