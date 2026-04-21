@@ -2641,8 +2641,6 @@ function imgDrop(e) {
 }
 
 function normalizeKey(str) {
-  // Decode once — handles normal %20 etc.
-  // Decode twice if result still contains % sequences (handles double-encoded URLs like %2520 -> %20 -> space)
   let decoded = str;
   try { decoded = decodeURIComponent(str); } catch(e) {}
   if (decoded.includes('%')) {
@@ -2652,6 +2650,7 @@ function normalizeKey(str) {
     .normalize('NFC')
     .replace(/‘|’|‚|‛/g, "'")  // curly single quotes -> straight
     .replace(/“|”|„|‟/g, '"')   // curly double quotes -> straight
+    .replace(/ | /g, ' ')                 // narrow no-break space / NBSP -> space (macOS screenshot filenames)
     .toLowerCase();
 }
 
@@ -2704,11 +2703,19 @@ function filenameFromUrl(url) {
 
 function resolveImage(url) {
   const names = filenameFromUrl(url);
+  let pdfResult = null;
   for (const name of names) {
     const dataUrl = imageStores.q1[name] || imageStores.q2[name] || imageStores.q3[name];
-    if (dataUrl) return { dataUrl, name };
+    if (dataUrl) {
+      // Prefer image over PDF — if this is a PDF data URL, keep looking for a better match
+      if (dataUrl.startsWith('data:application/pdf') || dataUrl.startsWith('data:application/octet')) {
+        if (!pdfResult) pdfResult = { dataUrl, name };
+      } else {
+        return { dataUrl, name }; // image found — return immediately
+      }
+    }
   }
-  return null;
+  return pdfResult; // fall back to PDF only if no image found
 }
 
 // Returns ALL matched images for a URL — handles multi-page PDFs converted to PNG
