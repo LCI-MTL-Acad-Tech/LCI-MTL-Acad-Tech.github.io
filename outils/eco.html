@@ -2646,11 +2646,11 @@ function normalizeKey(str) {
   if (decoded.includes('%')) {
     try { decoded = decodeURIComponent(decoded); } catch(e) {}
   }
-  // NFC normalize (handles NFD combining accents)
-  decoded = decoded.normalize('NFC');
-  // Strip everything except alphanumeric and dot (keep dot for extension matching)
-  // This handles all space variants, dashes, underscores, punctuation, special chars
-  return decoded.replace(/[^a-z0-9.]/gi, '').toLowerCase();
+  return decoded
+    .normalize('NFC')
+    .replace(/[^\u0000-\u007F]/g, '')  // strip all non-ASCII
+    .replace(/[^a-z0-9.]/gi, '')       // strip all non-alphanumeric (except dot)
+    .toLowerCase();
 }
 
 function handleImgFiles(files) { handleImgFilesQ(files, 'q1'); }
