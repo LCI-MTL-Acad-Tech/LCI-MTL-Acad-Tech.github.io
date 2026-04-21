@@ -2084,3 +2084,195 @@ body { overflow-x: hidden; }
 @media (max-width: 600px) {
   .file-sidebar { width: min(28rem, 90vw); }
 }
+
+/* ════════════════════════════════════════════════════════════
+   MOBILE UX IMPROVEMENTS
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Hide fixed sidebar tab on mobile — use a dedicated button instead ── */
+@media (max-width: 768px) {
+  .file-sidebar {
+    /* On mobile: full-width sheet sliding up from bottom, like drawers */
+    width: 100%;
+    top: auto;
+    bottom: 0;
+    height: 85vh;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    transform: translateY(100%);
+    transition: transform var(--dur-mod) var(--ease-exp);
+    border-left: none;
+    border-top: 1px solid var(--border);
+    box-shadow: var(--shadow-xl);
+  }
+  .file-sidebar.is-open {
+    transform: translateY(0);
+  }
+  /* Hide the persistent side tab — access via mobile top-bar button */
+  .file-sidebar__tab {
+    display: none;
+  }
+  /* Drag handle like the drawer panels */
+  .file-sidebar__inner::before {
+    content: '';
+    display: block;
+    width: 4rem;
+    height: 0.4rem;
+    background: var(--border);
+    border-radius: var(--r-pill);
+    margin: 0 auto var(--sp-4);
+    flex-shrink: 0;
+  }
+  /* No offset needed on mobile */
+  .has-file-sidebar .main-content,
+  .has-drawer-toggles .main-content {
+    padding-right: 0;
+    padding-left: 0;
+  }
+}
+
+/* ── Mobile overlay for sidebar (same as drawer-overlay) ── */
+@media (max-width: 768px) {
+  .file-sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    z-index: 199;
+  }
+  .file-sidebar-overlay.visible { display: block; }
+}
+
+/* ── Log page: task block improvements on mobile ── */
+@media (max-width: 768px) {
+
+  /* Task description input — bigger and more prominent */
+  .task-block input[type="text"]:first-of-type {
+    font-size: 1.7rem;
+    font-weight: 600;
+    padding: var(--sp-3);
+  }
+
+  /* Duration inputs — larger tap targets */
+  .duration-inputs {
+    gap: var(--sp-3);
+    flex-wrap: wrap;
+  }
+  .duration-inputs input {
+    width: 7rem;
+    height: 4.4rem;
+    font-size: 1.8rem;
+    text-align: center;
+    padding: var(--sp-2);
+  }
+  .input-unit {
+    font-size: 1.4rem;
+    color: var(--text-muted);
+  }
+
+  /* Activity type select — full width on mobile */
+  .task-block select {
+    width: 100%;
+    font-size: 1.6rem;
+    padding: var(--sp-2) var(--sp-3);
+    height: 4.4rem;
+  }
+
+  /* Task assign buttons — bigger, easier to tap */
+  .task-assign-btns {
+    gap: var(--sp-3);
+    margin-top: var(--sp-4);
+  }
+  .task-assign-btn {
+    min-height: 4.4rem;
+    font-size: 1.4rem;
+    padding: var(--sp-2) var(--sp-4);
+    border-radius: var(--r-pill);
+    border-style: solid;
+  }
+
+  /* Task block: make the delete button clearly separate */
+  .task-remove {
+    position: absolute;
+    top: var(--sp-2);
+    right: var(--sp-2);
+    min-width: 3.6rem;
+    min-height: 3.6rem;
+    opacity: 0.5;
+  }
+  .task-block:focus-within .task-remove,
+  .task-block:active .task-remove {
+    opacity: 1;
+  }
+
+  /* Add task button — full width on mobile */
+  #tasks-list + * .btn--secondary,
+  .section-title + .btn--secondary {
+    min-height: 5rem;
+    font-size: 1.5rem;
+  }
+
+  /* Date header — smaller on mobile */
+  #log-date-display {
+    font-size: 2.2rem;
+  }
+
+  /* Date control buttons — full width row on mobile */
+  #change-date-btn,
+  #go-to-today-btn {
+    min-height: 4rem;
+    font-size: 1.4rem;
+  }
+
+  /* Morning energy ratings — 3 per row on small screens */
+  .rating-btn {
+    min-width: calc(33% - var(--sp-2));
+    flex-basis: calc(33% - var(--sp-2));
+  }
+
+  /* Day summary stats — 2-column grid instead of row */
+  .day-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-3);
+  }
+  .day-summary-stat { text-align: center; }
+  .day-summary-val  { font-size: 2rem; }
+
+  /* Section titles in the right column — visible separator */
+  .log-layout > div:last-child > .card:first-child {
+    border-top: 3px solid var(--accent);
+  }
+}
+
+/* ── Mobile: "Load files" button in the top bar (replaces hidden sidebar tab) ── */
+.mobile-sidebar-btn {
+  display: none;
+}
+@media (max-width: 768px) {
+  .mobile-sidebar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-1);
+    padding: var(--sp-1) var(--sp-3);
+    border-radius: var(--r-pill);
+    font-size: 1.3rem;
+    font-family: inherit;
+    cursor: pointer;
+    border: 1.5px solid rgba(255,255,255,.3);
+    background: rgba(255,255,255,.1);
+    color: white;
+    font-weight: 500;
+  }
+  .mobile-sidebar-btn:active {
+    background: rgba(255,255,255,.2);
+  }
+}
+
+/* ── Add task button — more prominent on mobile ── */
+@media (max-width: 768px) {
+  #add-task-btn {
+    min-height: 4.8rem;
+    font-size: 1.5rem;
+    padding: var(--sp-2) var(--sp-4);
+  }
+}

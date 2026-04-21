@@ -671,7 +671,7 @@ const LANG = {
     "log.go_to_today":        "Today",
     "log.go_to_today_title":  "Create or open today's log",
     "log.date_pick_label":    "Log date",
-    "log.late_filing":    "log.late_filing":        "Late entry — I am writing this log after the day it covers",
+    "log.late_filing":        "Late entry — I am writing this log after the day it covers",
     "log.section_tasks":      "Tasks for the day",
     "log.add_task":           "Add a task",
     "log.task_description":   "Task description",

@@ -1130,6 +1130,14 @@ function initFileSidebar() {
     }
   });
 
+  // On mobile, closing the sidebar also hides the tap-outside overlay
+  tab.addEventListener("click", () => {
+    const overlay = document.getElementById("file-sidebar-overlay");
+    if (overlay && !sidebar.classList.contains("is-open")) {
+      overlay.classList.remove("visible");
+    }
+  });
+
   // Populate student info on load
   _sidebarRefreshWho();
 }
@@ -1361,4 +1369,28 @@ function getEffectiveToday(data) {
   const lastLog = [...logs].sort((a, b) => b.date.localeCompare(a.date))[0]?.date;
   if (!lastLog) return realToday;
   return lastLog > realToday ? lastLog : realToday;
+}
+
+// ── Mobile file sidebar helpers ───────────────────────────────
+// On mobile the sidebar is a bottom sheet (like drawers) rather than
+// a persistent right-edge tab. This function opens it and wires a
+// tap-outside overlay to close it again.
+function openFileSidebarMobile() {
+  const sidebar = document.getElementById("file-sidebar");
+  if (!sidebar) return;
+  sidebar.classList.add("is-open");
+
+  // Show overlay
+  let overlay = document.getElementById("file-sidebar-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.id = "file-sidebar-overlay";
+    overlay.className = "file-sidebar-overlay";
+    overlay.addEventListener("click", () => {
+      sidebar.classList.remove("is-open");
+      overlay.classList.remove("visible");
+    });
+    document.body.appendChild(overlay);
+  }
+  overlay.classList.add("visible");
 }

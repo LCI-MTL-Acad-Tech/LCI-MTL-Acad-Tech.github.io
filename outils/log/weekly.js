@@ -398,8 +398,6 @@ function renderDayBarsInto(logs, container) {
       </div>`;
   }).join("");
 }
-  }).join("");
-}
 
 // ── Activity pie ──────────────────────────────────────────────
 function buildActivityPie(logs, container) {

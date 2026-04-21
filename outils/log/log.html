@@ -36,6 +36,9 @@
           <a href="report.html" class="nav-link" data-i18n="nav.report">Suivi</a>
         </nav>
         <div class="header-actions">
+          <!-- Mobile-only load button — triggers file sidebar as bottom sheet -->
+          <button class="mobile-sidebar-btn" onclick="openFileSidebarMobile()"
+            data-i18n="sidebar.tab_label" aria-label="Load files">📂</button>
           <button class="btn btn--ghost btn--sm lang-toggle-btn" data-lang-target="fr-CA">FR</button>
           <button class="btn btn--ghost btn--sm lang-toggle-btn" data-lang-target="en-CA">EN</button>
           <button class="btn btn--ghost btn--sm theme-toggle-btn" aria-label="Toggle theme" style="padding:var(--sp-2);line-height:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg></button>
@@ -209,7 +212,7 @@
           <div class="card mb-4">
             <div class="flex items-center justify-between mb-4">
               <div class="section-title" style="border:none;margin:0;padding:0" data-i18n="log.section_tasks">Tâches</div>
-              <button class="btn btn--secondary btn--sm" onclick="addTask()">
+              <button id="add-task-btn" class="btn btn--secondary btn--sm" onclick="addTask()">
                 + <span data-i18n="log.add_task">Ajouter une tâche</span>
               </button>
             </div>
@@ -653,10 +656,10 @@
     </svg>
   </button>
 
-<script src="lang.js"></script>
-<script src="app.js"></script>
-<script src="courses.js"></script>
-<script src="log.js"></script>
+<script src="lang.js?v=20260421"></script>
+<script src="app.js?v=20260421"></script>
+<script src="courses.js?v=20260421"></script>
+<script src="log.js?v=20260421"></script>
 
   <!-- Competencies & learning outcomes drawer -->
   <div class="drawer-panel" id="drawer-tags">

@@ -14,6 +14,9 @@ function goToScreen(id) {
     target.classList.remove("hidden");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
+  // Re-apply language on every screen transition so data-i18n elements
+  // are populated even if the initial applyLanguage ran while they were hidden.
+  if (typeof applyLanguage === "function") applyLanguage(getCurrentLang(), false);
 }
 
 // ── Onboarding ───────────────────────────────────────────────

@@ -1573,53 +1573,6 @@ function buildDetailHTML(s) {
           </div>` : ""}
       </div>
     </div>`;
-      <div>
-        <div style="font-size:1.1rem;font-weight:700;text-transform:uppercase;
-                    letter-spacing:0.08em;color:var(--text-subtle);margin-bottom:var(--sp-3)">
-          Activités
-        </div>
-        ${acts || "<span style='color:var(--text-subtle)'>—</span>"}
-        ${compSection}
-        ${outcomeSection}
-      </div>
-      <div>
-        <div style="font-size:1.1rem;font-weight:700;text-transform:uppercase;
-                    letter-spacing:0.08em;color:var(--text-subtle);margin-bottom:var(--sp-3)">
-          Contexte
-        </div>
-        ${info || "—"}
-      </div>
-      <div>
-        <div style="font-size:1.1rem;font-weight:700;text-transform:uppercase;
-                    letter-spacing:0.08em;color:var(--text-subtle);margin-bottom:var(--sp-3)">
-          Humeur (${s.mood_points.length} jours)
-        </div>
-        ${moodSparklineLarge(s.mood_points)}
-        ${s.last_obstacle ? `
-          <div style="margin-top:var(--sp-4);padding:var(--sp-3);background:rgba(255,107,112,.08);
-                      border-radius:var(--r-md);border-left:3px solid var(--danger)">
-            <div style="font-size:1.1rem;font-weight:700;color:var(--danger);margin-bottom:var(--sp-1)">
-              Dernier obstacle signalé (${s.last_obstacle.date})
-            </div>
-            <div style="font-size:1.3rem">${escHtml(s.last_obstacle.text)}</div>
-            ${s.last_obstacle.response ? `<div style="font-size:1.2rem;color:var(--text-subtle);margin-top:var(--sp-1)">→ ${escHtml(s.last_obstacle.response)}</div>` : ""}
-          </div>` : ""}
-        ${s.last_plan ? `
-          <div style="margin-top:var(--sp-3);font-size:1.3rem;color:var(--text-muted)">
-            <strong>Planifié :</strong> ${escHtml(s.last_plan.text)}
-            <span style="font-size:1.1rem;color:var(--text-subtle)"> (${s.last_plan.date})</span>
-          </div>` : ""}
-        ${s.last_wrap ? `
-          <div style="margin-top:var(--sp-3);padding:var(--sp-3);background:var(--bg-subtle);
-                      border-radius:var(--r-md)">
-            <div style="font-size:1.1rem;font-weight:700;color:var(--text-subtle);margin-bottom:var(--sp-1)">
-              Dernier bilan hebdo (${s.last_wrap.date})
-            </div>
-            ${s.last_wrap.wrap.highlight ? `<div style="font-size:1.3rem">🌟 ${escHtml(s.last_wrap.wrap.highlight)}</div>` : ""}
-            ${s.last_wrap.wrap.change    ? `<div style="font-size:1.2rem;color:var(--text-muted)">→ ${escHtml(s.last_wrap.wrap.change)}</div>` : ""}
-          </div>` : ""}
-      </div>
-    </div>`;
 }
 
 // ── Integrity helpers ─────────────────────────────────────────
