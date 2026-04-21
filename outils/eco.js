@@ -1445,6 +1445,10 @@ function handleImgFilesQ(files, qKey) {
       if (store[key] && store[key] !== e.target.result) {
         console.warn('EcoScale — filename collision:', file.name, '→', key);
       }
+      // Debug: log Capture d'écran files so we can compare keys
+      if (file.name.toLowerCase().includes('capture') || file.name.toLowerCase().includes('captur')) {
+        console.log('EcoScale DEBUG store key:', key, '← file.name:', JSON.stringify(file.name));
+      }
       store[key] = e.target.result;
       // Stem-only key: for PDF→PNG same-stem conversion
       const stemKey = key.replace(/[^a-z0-9]/g, '') === key
