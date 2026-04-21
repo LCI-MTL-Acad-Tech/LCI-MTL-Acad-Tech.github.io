@@ -1527,9 +1527,16 @@ function resolveAllImages(url) {
       return na - nb;
     });
 
+  // Deduplicate by stem (same filename = same image regardless of store or compression)
+  const seenStems = new Set([stem]);
+  const seenDataUrls = new Set([primary.dataUrl]);
   for (const k of pageKeys) {
+    const kStem = k.replace(/\.[^.]+$/, '').replace(/-\d+$/, '');
+    if (seenStems.has(kStem)) continue;
     const dataUrl = imageStores.q1[k] || imageStores.q2[k] || imageStores.q3[k];
-    if (dataUrl && !results.find(r => r.name === k)) {
+    if (dataUrl && !seenDataUrls.has(dataUrl)) {
+      seenStems.add(kStem);
+      seenDataUrls.add(dataUrl);
       results.push({ dataUrl, name: k });
     }
   }
