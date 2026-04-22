@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="upload-form-url" content="https://forms.cloud.microsoft/r/LE4Dc2gZaE">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><span data-i18n="nav.title">Journal de stage</span></title>
+  <title></title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="alternate icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPCEtLSBCYWNrZ3JvdW5kIGNpcmNsZSAtLT4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0iIzAwNTg3YyIvPgogIDwhLS0gQnJpZWZjYXNlIGJvZHkgLS0+CiAgPHJlY3QgeD0iNSIgeT0iMTMiIHdpZHRoPSIyMiIgaGVpZ2h0PSIxNCIgcng9IjIuNSIgZmlsbD0id2hpdGUiLz4KICA8IS0tIEJyaWVmY2FzZSBoYW5kbGUgLS0+CiAgPHBhdGggZD0iTTExIDEzdi0yLjVhMSAxIDAgMCAxIDEtMWg4YTEgMSAwIDAgMSAxIDFWMTMiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPCEtLSBDZW50ZXIgY2xhc3AgLS0+CiAgPHJlY3QgeD0iMTMuNSIgeT0iMTcuNSIgd2lkdGg9IjUiIGhlaWdodD0iMyIgcng9IjEiIGZpbGw9IiMwMDU4N2MiLz4KICA8IS0tIEhvcml6b250YWwgYmFuZCAtLT4KICA8cmVjdCB4PSI1IiB5PSIxOC41IiB3aWR0aD0iMjIiIGhlaWdodD0iMi41IiBmaWxsPSJyZ2JhKDAsODgsMTI0LDAuMTUpIi8+Cjwvc3ZnPg==">
   <link rel="stylesheet" href="style.css">
@@ -73,20 +73,34 @@
         </div>
 
         <!-- Start over — only shown when continue card is visible -->
-        <div id="export-config-row" class="hidden" style="text-align:center;margin-top:var(--sp-4);margin-bottom:var(--sp-2)">
-          <button onclick="exportConfig()"
-            style="background:none;border:none;cursor:pointer;font-family:inherit;
-                   font-size:1.3rem;color:var(--text-subtle);text-decoration:underline;padding:0"
-            data-i18n="welcome.export_config">💾 Exporter la configuration</button>
-          <span class="help-tip" tabindex="0" data-tip="" data-i18n-tip="welcome.export_config_tip">?</span>
-          <span style="color:var(--text-subtle);margin:0 var(--sp-2)">·</span>
-          <label style="background:none;border:none;cursor:pointer;font-family:inherit;
-                        font-size:1.3rem;color:var(--text-subtle);text-decoration:underline;padding:0">
-            <input type="file" accept=".json" style="display:none"
-              onchange="importConfig(this.files[0])">
-            <span data-i18n="welcome.import_config">📥 Importer sur cet appareil</span>
-          </label>
-          <span class="help-tip" tabindex="0" data-tip="" data-i18n-tip="welcome.import_config_tip">?</span>
+        <div id="export-config-row" class="hidden"
+          style="display:flex;align-items:center;justify-content:center;
+                 flex-wrap:wrap;gap:var(--sp-3) var(--sp-5);
+                 margin-top:var(--sp-4);margin-bottom:var(--sp-2)">
+
+          <!-- Export -->
+          <div style="display:flex;align-items:center;gap:var(--sp-2)">
+            <button onclick="exportConfig()"
+              style="background:none;border:none;cursor:pointer;font-family:inherit;
+                     font-size:1.3rem;color:var(--text-subtle);text-decoration:underline;padding:0"
+              data-i18n="welcome.export_config">💾 Exporter la configuration</button>
+            <span class="help-tip" tabindex="0" data-tip="" data-i18n-tip="welcome.export_config_tip">?</span>
+          </div>
+
+          <span style="color:var(--text-subtle)">·</span>
+
+          <!-- Import -->
+          <div style="display:flex;align-items:center;gap:var(--sp-2)">
+            <label style="background:none;border:none;cursor:pointer;font-family:inherit;
+                          font-size:1.3rem;color:var(--text-subtle);text-decoration:underline;
+                          padding:0;display:flex;align-items:center">
+              <input type="file" accept=".json" style="display:none"
+                onchange="importConfig(this.files[0])">
+              <span data-i18n="welcome.import_config">📥 Importer sur cet appareil</span>
+            </label>
+            <span class="help-tip" tabindex="0" data-tip="" data-i18n-tip="welcome.import_config_tip">?</span>
+          </div>
+
         </div>
         <div id="reset-link-row" class="hidden" style="text-align:right;margin-top:calc(-1 * var(--sp-2));margin-bottom:var(--sp-4)">
           <button onclick="openResetModal()"
@@ -116,13 +130,13 @@
           <button class="btn btn--primary btn--full btn--lg mt-6" id="onboard-cta" disabled
                   onclick="goToScreen('screen-pathway')" data-i18n="onboard.cta">C'est compris</button>
 
-          <div style="text-align:center;margin-top:var(--sp-5)">
-            <label style="cursor:pointer;font-size:1.3rem;color:var(--text-subtle)">
+          <div style="display:flex;align-items:center;justify-content:center;gap:var(--sp-2);margin-top:var(--sp-5)">
+            <label style="cursor:pointer;font-size:1.3rem;color:var(--text-subtle);display:flex;align-items:center;gap:var(--sp-1)">
               <input type="file" accept=".json" style="display:none"
                 onchange="importConfig(this.files[0])">
               📥 <span data-i18n="welcome.import_config">Importer sur cet appareil</span>
-              <span class="help-tip" tabindex="0" data-tip="" data-i18n-tip="welcome.import_config_tip">?</span>
             </label>
+            <span class="help-tip" tabindex="0" data-tip="" data-i18n-tip="welcome.import_config_tip">?</span>
           </div>
         </div>
       </div>
