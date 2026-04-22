@@ -8,6 +8,13 @@ const LANG = {
   "fr-CA": {
 
     // ── Global / Navigation ──────────────────────────────────
+    "nav.title":          "Journal de stage",
+    "nav.title.log":      "Journal du jour",
+    "nav.title.weekly":   "Bilan hebdomadaire",
+    "nav.title.calendar": "Calendrier de stage",
+    "nav.title.report":   "Rapport de stage",
+    "nav.title.hub":      "Hub — Tableau de bord",
+    "cal.legend_title":   "Légende",
     "nav.setup":              "Configuration",
     "nav.log":                "Journal",
     "nav.calendar":           "Calendrier",
@@ -82,6 +89,7 @@ const LANG = {
     "onboard.p4":             "Nomme tes fichiers de façon cohérente. L'application génère automatiquement un nom de fichier pour toi.",
     "onboard.p5":             "Si tu oublies de faire ton journal un jour, tu peux le rédiger le lendemain en cochant « Journal en retard ».",
     "onboard.checklist":      "J'ai compris : je dois télécharger mon journal chaque jour et conserver tous mes fichiers JSON dans un même dossier.",
+    "onboard.checklist_hint": "Coche la case ci-dessus pour continuer.",
     "onboard.cta":            "C'est compris — commencer",
 
     // ── Setup — Profile ──────────────────────────────────────
@@ -462,6 +470,9 @@ const LANG = {
     "error.merge_uuid":       "Impossible de fusionner : les fichiers proviennent de comptes différents.",
     "error.config_not_log":    "Ce fichier est une configuration, pas un journal. Utilise 'Changer d'ordinateur' sur la page de configuration.",
     "error.not_config":       "Ce fichier n'est pas un fichier de configuration valide.",
+    "error.field_required":     "Ce champ est obligatoire.",
+    "error.student_id_numeric": "Le numéro étudiant doit contenir uniquement des chiffres.",
+    "error.program_required":   "Choisis ton programme avant de continuer.",
     "error.no_files":         "Aucun fichier sélectionné.",
 
     // ── Reset dialogue
@@ -531,6 +542,13 @@ const LANG = {
   "en-CA": {
 
     // ── Global / Navigation ──────────────────────────────────
+    "nav.title":          "Internship Journal",
+    "nav.title.log":      "Daily Log",
+    "nav.title.weekly":   "Weekly Wrap-up",
+    "nav.title.calendar": "Internship Calendar",
+    "nav.title.report":   "Progress Report",
+    "nav.title.hub":      "Hub — Dashboard",
+    "cal.legend_title":   "Legend",
     "nav.setup":              "Setup",
     "nav.log":                "Daily Log",
     "nav.calendar":           "Calendar",
@@ -605,6 +623,7 @@ const LANG = {
     "onboard.p4":             "The app automatically generates a consistent filename for you each day.",
     "onboard.p5":             "If you forget to log a day, you can write it up the next day by checking \"Late filing\".",
     "onboard.checklist":      "I understand: I must download my log every day and keep all my JSON files in one folder.",
+    "onboard.checklist_hint": "Check the box above to continue.",
     "onboard.cta":            "Got it — let's begin",
 
     // ── Setup — Profile ──────────────────────────────────────
@@ -1034,6 +1053,9 @@ const LANG = {
     "error.merge_uuid":       "These files belong to different students. Upload files for one student at a time.",
     "error.config_not_log":   "This file is a configuration, not a log. Use \'Switch computer\' on the setup page.",
     "error.not_config":       "This file is not a valid configuration file.",
+    "error.field_required":     "This field is required.",
+    "error.student_id_numeric": "Student ID must contain digits only.",
+    "error.program_required":   "Please select your program before continuing.",
 
     // ── Reset modal ──────────────────────────────────────────────
     "reset.title":         "Start over",
@@ -1098,6 +1120,13 @@ function applyLanguage(lang, persist = true) {
     }
   });
   document.documentElement.lang = lang === "fr-CA" ? "fr" : "en";
+  // Update browser tab title from data-page-title-key attribute
+  const pageTitleKey = document.documentElement.getAttribute("data-page-title-key");
+  if (pageTitleKey) {
+    const base = t("nav.title");
+    const page = t(pageTitleKey);
+    document.title = page + " — " + base;
+  }
 }
 
 function formatDate(isoString) {

@@ -21,11 +21,13 @@ function goToScreen(id) {
 
 // ── Onboarding ───────────────────────────────────────────────
 function toggleOnboardCheck(checkbox) {
-  const cta = document.getElementById("onboard-cta");
-  const row = document.getElementById("onboard-check-row");
+  const cta  = document.getElementById("onboard-cta");
+  const row  = document.getElementById("onboard-check-row");
+  const hint = document.getElementById("onboard-check-hint");
   if (checkbox.checked) {
     cta.disabled = false;
     row.classList.add("checked");
+    if (hint) hint.style.display = "none";
   } else {
     cta.disabled = true;
     row.classList.remove("checked");
@@ -193,8 +195,14 @@ function saveProfileAndNext() {
   const programSel = document.getElementById("profile-program-select");
   const programCode = programSel ? programSel.value : "";
 
-  if (!name)      { showFieldError("profile-name");       return; }
-  if (!studentId) { showFieldError("profile-student-id"); return; }
+  if (!name)        { showFieldError("profile-name", "error.field_required"); return; }
+  if (!studentId)   { showFieldError("profile-student-id", "error.field_required"); return; }
+  // Student ID: warn if it contains letters (most IDs are numeric)
+  if (!/^\d+$/.test(studentId)) {
+    showFieldError("profile-student-id", "error.student_id_numeric");
+    return;
+  }
+  if (!programCode) { showFieldError("profile-program-select", "error.program_required"); return; }
 
   setupData.profile = {
     full_name:             name,
@@ -584,12 +592,25 @@ function importProjectJSON() {
     : `✓ ${projects.length} project${projects.length > 1 ? "s" : ""} imported.`;
   setTimeout(() => { status.textContent = ""; }, 4000);
 }
-function showFieldError(id) {
+function showFieldError(id, msgKey) {
   const el = document.getElementById(id);
   if (!el) return;
   el.style.borderColor = "var(--danger)";
   el.focus();
-  setTimeout(() => el.style.borderColor = "", 2000);
+  // Show an inline error message below the field
+  const errId = id + "-error";
+  let errEl = document.getElementById(errId);
+  if (!errEl) {
+    errEl = document.createElement("div");
+    errEl.id = errId;
+    errEl.style.cssText = "color:var(--danger);font-size:1.2rem;margin-top:var(--sp-1)";
+    el.parentNode.insertBefore(errEl, el.nextSibling);
+  }
+  errEl.textContent = t(msgKey || "error.field_required");
+  setTimeout(() => {
+    el.style.borderColor = "";
+    if (errEl) errEl.textContent = "";
+  }, 3500);
 }
 
 // ── Init ──────────────────────────────────────────────────────

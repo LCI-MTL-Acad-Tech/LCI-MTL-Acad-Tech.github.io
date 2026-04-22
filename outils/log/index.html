@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="upload-form-url" content="https://forms.cloud.microsoft/r/LE4Dc2gZaE">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Journal de stage</title>
+  <title><span data-i18n="nav.title">Journal de stage</span></title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="alternate icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPCEtLSBCYWNrZ3JvdW5kIGNpcmNsZSAtLT4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0iIzAwNTg3YyIvPgogIDwhLS0gQnJpZWZjYXNlIGJvZHkgLS0+CiAgPHJlY3QgeD0iNSIgeT0iMTMiIHdpZHRoPSIyMiIgaGVpZ2h0PSIxNCIgcng9IjIuNSIgZmlsbD0id2hpdGUiLz4KICA8IS0tIEJyaWVmY2FzZSBoYW5kbGUgLS0+CiAgPHBhdGggZD0iTTExIDEzdi0yLjVhMSAxIDAgMCAxIDEtMWg4YTEgMSAwIDAgMSAxIDFWMTMiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPCEtLSBDZW50ZXIgY2xhc3AgLS0+CiAgPHJlY3QgeD0iMTMuNSIgeT0iMTcuNSIgd2lkdGg9IjUiIGhlaWdodD0iMyIgcng9IjEiIGZpbGw9IiMwMDU4N2MiLz4KICA8IS0tIEhvcml6b250YWwgYmFuZCAtLT4KICA8cmVjdCB4PSI1IiB5PSIxOC41IiB3aWR0aD0iMjIiIGhlaWdodD0iMi41IiBmaWxsPSJyZ2JhKDAsODgsMTI0LDAuMTUpIi8+Cjwvc3ZnPg==">
   <link rel="stylesheet" href="style.css">
@@ -111,6 +111,7 @@
             <input type="checkbox" id="onboard-check" onchange="toggleOnboardCheck(this)">
             <span data-i18n="onboard.checklist"></span>
           </label>
+          <p id="onboard-check-hint" class="text-muted" style="font-size:1.3rem;margin-top:var(--sp-2)" data-i18n="onboard.checklist_hint"></p>
 
           <button class="btn btn--primary btn--full btn--lg mt-6" id="onboard-cta" disabled
                   onclick="goToScreen('screen-pathway')" data-i18n="onboard.cta">C'est compris</button>
@@ -489,7 +490,7 @@
     <div class="making-of">
       <div class="making-of-inner">
         <button class="making-of-toggle" onclick="toggleMakingOf(this)" aria-expanded="false">
-          <span class="making-of-label" data-i18n="making.label">Comment cet outil a été créé</span>
+          <span class="making-of-label" data-i18n="making.label"></span>
           <span class="making-of-chevron" aria-hidden="true">›</span>
         </button>
         <div class="making-of-body" hidden>
