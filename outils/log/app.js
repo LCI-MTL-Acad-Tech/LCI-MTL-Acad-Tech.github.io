@@ -987,7 +987,7 @@ function alwaysRemindUpload(type) {
 // The form URL is read from a <meta name="upload-form-url"> tag so
 // it can be configured per deployment without touching JS.
 
-const UPLOAD_FORM_URL = "https://forms.cloud.microsoft/r/LE4Dc2gZaE";
+const UPLOAD_FORM_URL = "https://lcieducation-my.sharepoint.com/:f:/g/personal/elisa_schaeffer_collegelasalle_com/IgDuTArLyqXOSYc0rdHnAhTOAf2HQnWL01dYrthgl8k5RNk?e=lD2Jm2";
 
 function getUploadFormUrl() {
   const meta = document.querySelector('meta[name="upload-form-url"]');

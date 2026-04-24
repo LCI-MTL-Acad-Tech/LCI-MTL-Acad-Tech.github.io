@@ -652,17 +652,20 @@ function setHubView(view) {
 }
 
 function renderCurrentView() {
-  const tableWrap = document.getElementById("hub-table-section");
-  const compWrap  = document.getElementById("hub-comp-section");
+  const tableWrap  = document.getElementById("hub-table-section");
+  const compWrap   = document.getElementById("hub-comp-section");
   const courseWrap = document.getElementById("hub-course-section");
+  const calWrap    = document.getElementById("hub-cal-section");
 
   if (tableWrap)  tableWrap.style.display  = hubView === "students"   ? "" : "none";
   if (compWrap)   compWrap.style.display   = hubView === "competency" ? "" : "none";
   if (courseWrap) courseWrap.style.display = hubView === "course"     ? "" : "none";
+  if (calWrap)    calWrap.style.display    = hubView === "calendar"   ? "" : "none";
 
   if (hubView === "students")   renderTable();
   if (hubView === "competency") renderCompetencyView();
   if (hubView === "course")     renderCourseView();
+  if (hubView === "calendar")   renderCalendarView();
 }
 
 // ── Stat tiles ────────────────────────────────────────────────
@@ -1736,4 +1739,292 @@ function exportCSV() {
   a.download = `hub_stage_${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+// ── Hub calendar view ─────────────────────────────────────────
+// Shows a date grid: rows = students, columns = working days.
+// Cells show submission status and modality for each day.
+// Column headers show cohort-level stats: planned / submitted / onsite.
+
+function renderCalendarView() {
+  const container = document.getElementById("hub-cal-section");
+  if (!container) return;
+  const isFr = getCurrentLang() === "fr-CA";
+
+  const cohort = filtered;
+  if (!cohort.length) {
+    container.innerHTML = `<p class="text-muted" style="padding:var(--sp-6)">
+      ${isFr ? "Aucun étudiant·e visible." : "No students visible."}</p>`;
+    return;
+  }
+
+  // ── Determine date range ──────────────────────────────────
+  // Use the intersection of all students' internship periods if they overlap,
+  // otherwise fall back to the union clamped to a reasonable window.
+  const allStarts = cohort.map(s => s.raw.context?.start_date).filter(Boolean).sort();
+  const allEnds   = cohort.map(s => s.raw.context?.scheduled_end_date).filter(Boolean).sort();
+
+  // Default to today ± 30 days if no dates defined
+  const today = new Date().toISOString().slice(0, 10);
+  const rangeStart = allStarts[0]             || today;
+  const rangeEnd   = allEnds[allEnds.length - 1] || today;
+
+  // Build list of all calendar days in range
+  const allDays = [];
+  let cur = new Date(rangeStart + "T12:00:00");
+  const end = new Date(rangeEnd  + "T12:00:00");
+  while (cur <= end) {
+    allDays.push(cur.toISOString().slice(0, 10));
+    cur.setDate(cur.getDate() + 1);
+  }
+
+  // Limit to 90 days to keep the table readable; add a notice if truncated
+  const MAX_DAYS = 90;
+  const truncated = allDays.length > MAX_DAYS;
+  const days = allDays.slice(0, MAX_DAYS);
+
+  // ── Build per-student log maps ────────────────────────────
+  // logMap[uuid][date] = { submitted, onsite, remote, late, future }
+  const logMap = {};
+  cohort.forEach(s => {
+    const uid = s.uuid;
+    logMap[uid] = {};
+    (s.raw.logs || []).forEach(l => {
+      logMap[uid][l.date] = {
+        submitted:    true,
+        onsite:       !!l.modality_onsite,
+        remote:       !!l.modality_remote,
+        late_filing:  !!l.late_filing,
+        future_filing:!!l.future_filing,
+      };
+    });
+  });
+
+  // ── Per-day cohort stats ──────────────────────────────────
+  // For each day: how many students planned to work, submitted, were onsite
+  function isWorkDay(s, dateStr) {
+    const dow = new Date(dateStr + "T12:00:00").getDay(); // 0=Sun
+    const workDays = s.raw.context?.work_days || [1,2,3,4,5];
+    if (!workDays.includes(dow)) return false;
+    const start = s.raw.context?.start_date;
+    const end   = s.raw.context?.scheduled_end_date;
+    if (start && dateStr < start) return false;
+    if (end   && dateStr > end)   return false;
+    const absences = s.raw.context?.planned_absences || [];
+    if (absences.includes(dateStr)) return false;
+    return true;
+  }
+
+  const dayStats = days.map(d => {
+    const planned   = cohort.filter(s => isWorkDay(s, d)).length;
+    const submitted = cohort.filter(s => logMap[s.uuid]?.[d]?.submitted).length;
+    const onsite    = cohort.filter(s => logMap[s.uuid]?.[d]?.onsite).length;
+    return { date: d, planned, submitted, onsite };
+  });
+
+  // ── Colour helpers ────────────────────────────────────────
+  // Cell background based on submission + modality
+  function cellStyle(s, d) {
+    const entry = logMap[s.uuid]?.[d];
+    if (!isWorkDay(s, d)) {
+      // Weekend or outside internship: very faint
+      return "background:var(--bg-subtle);";
+    }
+    if (!entry) {
+      // Planned work day, no log
+      return "background:var(--bg-card);border:1.5px solid var(--border);";
+    }
+    if (entry.future_filing) {
+      // Log dated in the future
+      return "background:rgba(255,107,112,.18);border:1.5px solid var(--danger);";
+    }
+    if (entry.onsite) {
+      return "background:var(--accent);opacity:.85;";
+    }
+    if (entry.remote) {
+      return "background:var(--color-blue-400,#5ba8c4);opacity:.85;";
+    }
+    // Submitted but modality unknown
+    return "background:var(--text-subtle);opacity:.5;";
+  }
+
+  function cellTitle(s, d) {
+    const entry = logMap[s.uuid]?.[d];
+    const dow = new Date(d + "T12:00:00").toLocaleDateString(
+      isFr ? "fr-CA" : "en-CA", { weekday:"short" });
+    if (!isWorkDay(s, d)) return isFr ? "Hors horaire" : "Not a work day";
+    if (!entry) return isFr ? "Pas de journal" : "No log submitted";
+    const flags = [
+      entry.onsite  ? (isFr ? "en présentiel" : "onsite") : "",
+      entry.remote  ? (isFr ? "à distance"    : "remote") : "",
+      entry.late_filing   ? (isFr ? "saisie tardive" : "late")   : "",
+      entry.future_filing ? (isFr ? "saisie future"  : "future") : "",
+    ].filter(Boolean).join(", ");
+    return `${d} — ${flags || (isFr ? "soumis" : "submitted")}`;
+  }
+
+  // ── Stat bar gradient (submitted / planned) ───────────────
+  function statBar(submitted, planned, onsite) {
+    if (!planned) return "";
+    const pctSub    = Math.round((submitted / planned) * 100);
+    const pctOnsite = planned ? Math.round((onsite / planned) * 100) : 0;
+    const colour = pctSub >= 90 ? "var(--success,#2a6e00)"
+                 : pctSub >= 60 ? "var(--warning,#c47a3a)"
+                 : "var(--danger)";
+    return `
+      <div style="height:4px;background:var(--border);border-radius:2px;margin-top:2px">
+        <div style="height:100%;width:${pctSub}%;background:${colour};border-radius:2px;
+                    position:relative">
+          <div style="position:absolute;top:0;left:0;height:100%;width:${pctOnsite}%;
+                      background:var(--accent);opacity:.7;border-radius:2px"></div>
+        </div>
+      </div>`;
+  }
+
+  // ── Month header spans ────────────────────────────────────
+  // Group consecutive days by month for the top header row
+  const monthGroups = [];
+  let lastMonth = null, span = 0;
+  days.forEach((d, i) => {
+    const m = d.slice(0, 7);
+    if (m !== lastMonth) {
+      if (lastMonth) monthGroups.push({ label: lastMonth, span });
+      lastMonth = m; span = 1;
+    } else { span++; }
+    if (i === days.length - 1) monthGroups.push({ label: lastMonth, span });
+  });
+
+  function monthLabel(ym) {
+    const [y, m] = ym.split("-");
+    return new Date(+y, +m - 1, 1).toLocaleDateString(
+      isFr ? "fr-CA" : "en-CA", { month: "long", year: "numeric" });
+  }
+
+  // ── Cell size — shrink when many days ────────────────────
+  const cellW = days.length > 60 ? 14 : days.length > 30 ? 18 : 24;
+
+  // ── Build HTML ────────────────────────────────────────────
+  const CELL = (bg, title) =>
+    `<td title="${escHtml(title)}" style="width:${cellW}px;min-width:${cellW}px;
+      height:${cellW}px;padding:0;${bg}border-radius:3px"></td>`;
+
+  const thead_month = `<tr>
+    <th style="min-width:14rem;text-align:left;position:sticky;left:0;
+               background:var(--bg-card);z-index:2;font-weight:600">
+      ${isFr ? "Étudiant·e" : "Student"}
+    </th>
+    ${monthGroups.map(g =>
+      `<th colspan="${g.span}" style="text-align:left;font-size:1rem;
+        padding-bottom:0;white-space:nowrap;font-weight:600;color:var(--accent)">
+        ${monthLabel(g.label)}
+      </th>`
+    ).join("")}
+  </tr>`;
+
+  const thead_days = `<tr>
+    <th style="position:sticky;left:0;background:var(--bg-card);z-index:2"></th>
+    ${days.map((d, i) => {
+      const dt = new Date(d + "T12:00:00");
+      const dow = dt.getDay();
+      const isWE = dow === 0 || dow === 6;
+      const dayNum = dt.getDate();
+      const dayLetter = dt.toLocaleDateString(isFr ? "fr-CA" : "en-CA",
+        { weekday:"narrow" });
+      const stat = dayStats[i];
+      return `<th title="${d}" style="width:${cellW}px;min-width:${cellW}px;padding:1px 0;
+               vertical-align:bottom;font-weight:${isWE ? 400 : 600};
+               color:${isWE ? "var(--text-subtle)" : "var(--text)"}">
+        <div style="writing-mode:vertical-rl;transform:rotate(180deg);
+                    font-size:0.95rem;line-height:1;margin-bottom:2px">
+          ${dayLetter}${dayNum}
+        </div>
+        ${stat.planned > 0 ? `
+          <div style="font-size:0.9rem;color:var(--text-subtle);text-align:center">
+            ${stat.submitted}/${stat.planned}
+          </div>
+          ${statBar(stat.submitted, stat.planned, stat.onsite)}` : ""}
+      </th>`;
+    }).join("")}
+  </tr>`;
+
+  const tbody = cohort.map(s => {
+    const cells = days.map(d => CELL(cellStyle(s, d), cellTitle(s, d))).join("");
+    // Submitted count for this student
+    const submCount = days.filter(d => logMap[s.uuid]?.[d]?.submitted).length;
+    const workCount = days.filter(d => isWorkDay(s, d)).length;
+    return `<tr>
+      <td style="position:sticky;left:0;background:var(--bg-card);z-index:1;
+                 white-space:nowrap;padding:2px var(--sp-3) 2px 0;font-size:1.2rem"
+          onclick="openStudentPanel('${escHtml(s.uuid)}')" style="cursor:pointer">
+        <strong>${escHtml(s.name)}</strong>
+        <span style="color:var(--text-subtle);font-size:1rem;margin-left:var(--sp-2)">
+          ${submCount}/${workCount}
+        </span>
+      </td>
+      ${cells}
+    </tr>`;
+  }).join("");
+
+  // ── Legend ────────────────────────────────────────────────
+  const legendItems = [
+    { bg: "background:var(--accent)",                   label: isFr ? "Présentiel" : "Onsite" },
+    { bg: "background:var(--color-blue-400,#5ba8c4)",   label: isFr ? "À distance" : "Remote" },
+    { bg: "background:var(--text-subtle);opacity:.5",   label: isFr ? "Soumis (modalité inconnue)" : "Submitted (no modality)" },
+    { bg: "background:rgba(255,107,112,.25);border:1.5px solid var(--danger)", label: isFr ? "Date future" : "Future-filed" },
+    { bg: "background:var(--bg-card);border:1.5px solid var(--border)", label: isFr ? "Attendu — pas de journal" : "Expected — no log" },
+    { bg: "background:var(--bg-subtle)",                label: isFr ? "Hors horaire" : "Not scheduled" },
+  ];
+  const legend = `
+    <div style="display:flex;flex-wrap:wrap;gap:var(--sp-3) var(--sp-5);
+                margin-bottom:var(--sp-4);align-items:center">
+      ${legendItems.map(item =>
+        `<div style="display:flex;align-items:center;gap:var(--sp-2);font-size:1.2rem">
+          <div style="width:1.4rem;height:1.4rem;border-radius:3px;flex-shrink:0;${item.bg}"></div>
+          ${escHtml(item.label)}
+        </div>`
+      ).join("")}
+    </div>`;
+
+  // ── Onsite summary bar ────────────────────────────────────
+  // Total onsite today (or last available day)
+  const availableToday = dayStats.find(d => d.date === today) || dayStats[dayStats.length - 1];
+  const onsiteSummary = availableToday ? `
+    <div style="display:flex;gap:var(--sp-6);flex-wrap:wrap;margin-bottom:var(--sp-5)">
+      <div>
+        <div style="font-size:2.4rem;font-weight:500;color:var(--accent)">
+          ${availableToday.onsite}
+        </div>
+        <div style="font-size:1.2rem;color:var(--text-subtle)">
+          ${isFr ? "En présentiel aujourd'hui" : "Onsite today"}
+        </div>
+      </div>
+      <div>
+        <div style="font-size:2.4rem;font-weight:500">
+          ${availableToday.submitted}/${availableToday.planned}
+        </div>
+        <div style="font-size:1.2rem;color:var(--text-subtle)">
+          ${isFr ? "Journaux soumis / attendus" : "Logs submitted / expected"}
+        </div>
+      </div>
+    </div>` : "";
+
+  const truncNotice = truncated ? `
+    <p style="font-size:1.2rem;color:var(--text-subtle);margin-bottom:var(--sp-3)">
+      ⚠ ${isFr
+        ? `Affichage limité aux ${MAX_DAYS} premiers jours.`
+        : `Display limited to the first ${MAX_DAYS} days.`}
+    </p>` : "";
+
+  container.innerHTML = `
+    <div style="padding:var(--sp-2) 0">
+      ${onsiteSummary}
+      ${legend}
+      ${truncNotice}
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+        <table style="border-collapse:separate;border-spacing:2px;table-layout:fixed">
+          <thead>${thead_month}${thead_days}</thead>
+          <tbody>${tbody}</tbody>
+        </table>
+      </div>
+    </div>`;
 }
