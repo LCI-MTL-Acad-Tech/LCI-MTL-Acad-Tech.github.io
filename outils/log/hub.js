@@ -1815,52 +1815,73 @@ function renderCalendarView() {
     return true;
   }
 
+  // Build planned-modality lookup per student
+  const planMap = {};
+  cohort.forEach(s => {
+    planMap[s.uuid] = {};
+    (s.raw.context?.planned_modalities || []).forEach(m => {
+      planMap[s.uuid][m.date] = m.modality; // "onsite"|"remote"|"hybrid"
+    });
+  });
+
   const dayStats = days.map(d => {
-    const planned   = cohort.filter(s => isWorkDay(s, d)).length;
-    const submitted = cohort.filter(s => logMap[s.uuid]?.[d]?.submitted).length;
-    const onsite    = cohort.filter(s => logMap[s.uuid]?.[d]?.onsite).length;
-    return { date: d, planned, submitted, onsite };
+    const planned        = cohort.filter(s => isWorkDay(s, d)).length;
+    const submitted      = cohort.filter(s => logMap[s.uuid]?.[d]?.submitted).length;
+    const onsite         = cohort.filter(s => logMap[s.uuid]?.[d]?.onsite).length;
+    const planOnsite     = cohort.filter(s => isWorkDay(s,d) && planMap[s.uuid]?.[d] === "onsite").length;
+    const planRemote     = cohort.filter(s => isWorkDay(s,d) && planMap[s.uuid]?.[d] === "remote").length;
+    const planHybrid     = cohort.filter(s => isWorkDay(s,d) && planMap[s.uuid]?.[d] === "hybrid").length;
+    return { date: d, planned, submitted, onsite, planOnsite, planRemote, planHybrid };
   });
 
   // ── Colour helpers ────────────────────────────────────────
-  // Cell background based on submission + modality
+  // Cells encode BOTH planned modality (dot) AND reality (fill).
+  // Top half of cell = plan indicator; fill colour = actual submission.
   function cellStyle(s, d) {
     const entry = logMap[s.uuid]?.[d];
-    if (!isWorkDay(s, d)) {
-      // Weekend or outside internship: very faint
-      return "background:var(--bg-subtle);";
-    }
+    const plan  = planMap[s.uuid]?.[d];
+
+    if (!isWorkDay(s, d)) return "background:var(--bg-subtle);";
+
+    // Base fill from reality
+    let fill;
     if (!entry) {
-      // Planned work day, no log
-      return "background:var(--bg-card);border:1.5px solid var(--border);";
+      fill = "background:var(--bg-card);border:1.5px solid var(--border);";
+    } else if (entry.future_filing) {
+      fill = "background:rgba(255,107,112,.18);border:1.5px solid var(--danger);";
+    } else if (entry.onsite) {
+      fill = "background:var(--accent);opacity:.85;";
+    } else if (entry.remote) {
+      fill = "background:var(--color-blue-400,#5ba8c4);opacity:.85;";
+    } else {
+      fill = "background:var(--text-subtle);opacity:.5;";
     }
-    if (entry.future_filing) {
-      // Log dated in the future
-      return "background:rgba(255,107,112,.18);border:1.5px solid var(--danger);";
+
+    // Plan dot overlay via border-top colour
+    if (plan && !entry) {
+      const planColour = plan === "onsite"  ? "var(--accent)"
+                       : plan === "remote"  ? "var(--color-blue-400,#5ba8c4)"
+                       : "var(--color-charcoal-300,#9ca3a5)";
+      fill += `border-top:3px solid ${planColour};`;
     }
-    if (entry.onsite) {
-      return "background:var(--accent);opacity:.85;";
-    }
-    if (entry.remote) {
-      return "background:var(--color-blue-400,#5ba8c4);opacity:.85;";
-    }
-    // Submitted but modality unknown
-    return "background:var(--text-subtle);opacity:.5;";
+    return fill;
   }
 
   function cellTitle(s, d) {
     const entry = logMap[s.uuid]?.[d];
-    const dow = new Date(d + "T12:00:00").toLocaleDateString(
-      isFr ? "fr-CA" : "en-CA", { weekday:"short" });
+    const plan  = planMap[s.uuid]?.[d];
     if (!isWorkDay(s, d)) return isFr ? "Hors horaire" : "Not a work day";
-    if (!entry) return isFr ? "Pas de journal" : "No log submitted";
+    const planStr = plan
+      ? (isFr ? `Prévu : ${plan}` : `Planned: ${plan}`)
+      : (isFr ? "Modalité non précisée" : "Modality not set");
+    if (!entry) return `${d} — ${planStr} · ${isFr ? "pas de journal" : "no log"}`;
     const flags = [
-      entry.onsite  ? (isFr ? "en présentiel" : "onsite") : "",
-      entry.remote  ? (isFr ? "à distance"    : "remote") : "",
-      entry.late_filing   ? (isFr ? "saisie tardive" : "late")   : "",
-      entry.future_filing ? (isFr ? "saisie future"  : "future") : "",
+      entry.onsite        ? (isFr ? "présentiel"     : "onsite")  : "",
+      entry.remote        ? (isFr ? "télétravail"     : "remote")  : "",
+      entry.late_filing   ? (isFr ? "saisie tardive"  : "late")    : "",
+      entry.future_filing ? (isFr ? "saisie future"   : "future")  : "",
     ].filter(Boolean).join(", ");
-    return `${d} — ${flags || (isFr ? "soumis" : "submitted")}`;
+    return `${d} — ${isFr ? "Réel" : "Actual"}: ${flags || (isFr ? "soumis" : "submitted")} · ${planStr}`;
   }
 
   // ── Stat bar gradient (submitted / planned) ───────────────
@@ -1942,7 +1963,11 @@ function renderCalendarView() {
           <div style="font-size:0.9rem;color:var(--text-subtle);text-align:center">
             ${stat.submitted}/${stat.planned}
           </div>
-          ${statBar(stat.submitted, stat.planned, stat.onsite)}` : ""}
+          ${statBar(stat.submitted, stat.planned, stat.onsite)}
+          <div style="font-size:0.8rem;color:var(--text-subtle);text-align:center;margin-top:1px"
+               title="${isFr ? 'Prévu : présentiel / télétravail' : 'Planned: onsite / remote'}">
+            ${stat.planOnsite ? '●'.repeat(Math.min(stat.planOnsite,3)) : ''}${stat.planRemote ? '<span style="color:var(--color-blue-400,#5ba8c4)">' + '●'.repeat(Math.min(stat.planRemote,3)) + '</span>' : ''}
+          </div>` : ""}
       </th>`;
     }).join("")}
   </tr>`;
@@ -1967,11 +1992,12 @@ function renderCalendarView() {
 
   // ── Legend ────────────────────────────────────────────────
   const legendItems = [
-    { bg: "background:var(--accent)",                   label: isFr ? "Présentiel" : "Onsite" },
-    { bg: "background:var(--color-blue-400,#5ba8c4)",   label: isFr ? "À distance" : "Remote" },
+    { bg: "background:var(--accent)",                   label: isFr ? "Réel : présentiel" : "Actual: onsite" },
+    { bg: "background:var(--color-blue-400,#5ba8c4)",   label: isFr ? "Réel : télétravail" : "Actual: remote" },
     { bg: "background:var(--text-subtle);opacity:.5",   label: isFr ? "Soumis (modalité inconnue)" : "Submitted (no modality)" },
     { bg: "background:rgba(255,107,112,.25);border:1.5px solid var(--danger)", label: isFr ? "Date future" : "Future-filed" },
-    { bg: "background:var(--bg-card);border:1.5px solid var(--border)", label: isFr ? "Attendu — pas de journal" : "Expected — no log" },
+    { bg: "background:var(--bg-card);border:1.5px solid var(--border);border-top:3px solid var(--accent)", label: isFr ? "Prévu : présentiel (non soumis)" : "Planned: onsite (no log yet)" },
+    { bg: "background:var(--bg-card);border:1.5px solid var(--border);border-top:3px solid var(--color-blue-400,#5ba8c4)", label: isFr ? "Prévu : télétravail (non soumis)" : "Planned: remote (no log yet)" },
     { bg: "background:var(--bg-subtle)",                label: isFr ? "Hors horaire" : "Not scheduled" },
   ];
   const legend = `

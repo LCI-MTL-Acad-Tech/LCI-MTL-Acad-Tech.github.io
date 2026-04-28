@@ -204,14 +204,19 @@ function renderGrid() {
         ? `<div class="cal-absence-chip" title="${escHtml(absObj.reason)}">✗ ${escHtml(absObj.reason)}</div>`
         : isAbs ? `<div class="cal-absence-chip">✗</div>` : "";
 
+      const plannedMod = !isAbs ? modalityMap[ds] : null;
+      const modDot = plannedMod
+        ? `<div class="cal-mod-dot cal-mod-dot--${plannedMod}" title="${t('cal.legend_plan_' + plannedMod)}"></div>`
+        : "";
       const onclick = (isIntern && (isWork || isAbs))
-        ? `onclick="openAbsenceModal('${ds}', ${isAbs})"` : "";
+        ? `onclick="openDayModal('${ds}', ${isAbs}, '${ds}')"` : "";
 
       rowHTML += `
         <div class="${cellClass}" ${onclick}>
           <div class="cal-day-num">${cur.getDate()}</div>
           ${badges.length ? `<div class="cal-badges">${badges.join("")}</div>` : ""}
           ${absNote}
+          ${modDot}
           <span class="cal-month-label">${shortMonth(cur, lang)}</span>
         </div>`;
 
@@ -368,23 +373,68 @@ function renderLegend() {
   }).join("");
 }
 
-// ── Absence modal ─────────────────────────────────────────────
-function openAbsenceModal(date, isCurrentlyAbsent) {
+// ── Day plan modal ────────────────────────────────────────────
+// Unified modal for planning a work day: modality (onsite/remote/hybrid)
+// and absence marking with optional reason.
+function openDayModal(date, isCurrentlyAbsent) {
   pendingAbsenceDate = date;
   const lang = getCurrentLang();
   const d    = parseDate(date);
+  const ctx  = calData.context;
 
   document.getElementById("absence-modal-title").textContent =
     formatShortDate(d, lang);
-  document.getElementById("absence-reason-input").value =
-    isCurrentlyAbsent
-      ? ((calData.context.planned_absences || []).find(a => a.date === date)?.reason || "")
-      : "";
 
-  const removeBtn = document.getElementById("absence-remove-btn");
-  removeBtn.style.display = isCurrentlyAbsent ? "" : "none";
+  // Restore existing state
+  const absObj = (ctx.planned_absences  || []).find(a => a.date === date);
+  const modObj = (ctx.planned_modalities|| []).find(m => m.date === date);
+
+  document.getElementById("absence-reason-input").value =
+    absObj?.reason || "";
+
+  // Show/hide the two panels
+  const modPanel = document.getElementById("day-modal-modality");
+  const absPanel = document.getElementById("day-modal-absence");
+  if (isCurrentlyAbsent) {
+    modPanel.style.display = "none";
+    absPanel.style.display = "";
+  } else {
+    modPanel.style.display = "";
+    absPanel.style.display = "none";
+  }
+
+  // Set active modality button
+  ["onsite","remote","hybrid"].forEach(m => {
+    const btn = document.getElementById("mod-btn-" + m);
+    if (btn) btn.classList.toggle("selected", modObj?.modality === m);
+  });
+
+  document.getElementById("absence-remove-btn").style.display =
+    isCurrentlyAbsent ? "" : "none";
+  document.getElementById("day-modal-mark-absent-btn").style.display =
+    isCurrentlyAbsent ? "none" : "";
 
   document.getElementById("absence-modal").classList.remove("hidden");
+}
+
+// Legacy alias (called from some paths)
+function openAbsenceModal(date, isCurrentlyAbsent) {
+  openDayModal(date, isCurrentlyAbsent);
+}
+
+function selectModality(mod) {
+  ["onsite","remote","hybrid"].forEach(m => {
+    const btn = document.getElementById("mod-btn-" + m);
+    if (btn) btn.classList.toggle("selected", m === mod);
+  });
+}
+
+function markAbsentFromModal() {
+  // Switch modal to absence mode
+  document.getElementById("day-modal-modality").style.display = "none";
+  document.getElementById("day-modal-absence").style.display  = "";
+  document.getElementById("day-modal-mark-absent-btn").style.display = "none";
+  document.getElementById("absence-remove-btn").style.display = "";
   setTimeout(() => document.getElementById("absence-reason-input").focus(), 80);
 }
 
@@ -396,14 +446,33 @@ function closeAbsenceModal(e) {
 
 function confirmAbsence() {
   if (!pendingAbsenceDate) return;
-  const reason = document.getElementById("absence-reason-input").value.trim();
-  const ctx    = calData.context;
+  const ctx  = calData.context;
+  const date = pendingAbsenceDate;
 
-  // Remove existing entry for this date if any
-  ctx.planned_absences = (ctx.planned_absences || []).filter(a => a.date !== pendingAbsenceDate);
-  // Add new entry
-  ctx.planned_absences.push({ date: pendingAbsenceDate, reason });
-  ctx.planned_absences.sort((a,b) => a.date.localeCompare(b.date));
+  // Determine which panel is active
+  const absPanel = document.getElementById("day-modal-absence");
+  const isAbsMode = absPanel.style.display !== "none";
+
+  // Clear both planned entries for this date
+  ctx.planned_absences   = (ctx.planned_absences   || []).filter(a => a.date !== date);
+  ctx.planned_modalities = (ctx.planned_modalities || []).filter(m => m.date !== date);
+
+  if (isAbsMode) {
+    // Save absence
+    const reason = document.getElementById("absence-reason-input").value.trim();
+    ctx.planned_absences.push({ date, reason });
+    ctx.planned_absences.sort((a,b) => a.date.localeCompare(b.date));
+  } else {
+    // Save modality
+    const selected = ["onsite","remote","hybrid"].find(m => {
+      const btn = document.getElementById("mod-btn-" + m);
+      return btn?.classList.contains("selected");
+    });
+    if (selected) {
+      ctx.planned_modalities.push({ date, modality: selected });
+      ctx.planned_modalities.sort((a,b) => a.date.localeCompare(b.date));
+    }
+  }
 
   persistAndRefresh();
   document.getElementById("absence-modal").classList.add("hidden");
@@ -418,6 +487,8 @@ function removeAbsence() {
 }
 
 function removeAbsenceByDate(date) {
+  calData.context.planned_modalities =
+    (calData.context.planned_modalities || []).filter(m => m.date !== date);
   const ctx = calData.context;
   ctx.planned_absences = (ctx.planned_absences || []).filter(a => a.date !== date);
   persistAndRefresh();

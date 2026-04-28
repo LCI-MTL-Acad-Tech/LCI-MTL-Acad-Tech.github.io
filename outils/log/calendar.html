@@ -165,6 +165,24 @@
       transition: border-color var(--dur-fast), background var(--dur-fast);
     }
     .cal-upload-zone:hover { border-color: var(--accent); background: var(--tag-bg); }
+
+    /* ── Planned modality dot on calendar cell ── */
+    .cal-mod-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      margin: 2px auto 0; flex-shrink: 0;
+    }
+    .cal-mod-dot--onsite  { background: var(--accent); }
+    .cal-mod-dot--remote  { background: var(--color-blue-400, #5ba8c4); }
+    .cal-mod-dot--hybrid  { background: linear-gradient(135deg, var(--accent) 50%, var(--color-blue-400, #5ba8c4) 50%); }
+
+    /* ── Modality selector buttons in day modal ── */
+    .mod-btn { border: 1.5px solid var(--border); min-width: 9rem; }
+    .mod-btn.selected {
+      border-color: var(--accent);
+      background: var(--tag-bg);
+      color: var(--accent);
+      font-weight: 600;
+    }
   </style>
 </head>
 <body class="has-file-sidebar">
@@ -276,19 +294,48 @@
 
 </div><!-- /page-wrap -->
 
-<!-- Absence modal -->
+<!-- Day plan modal -->
 <div id="absence-modal" class="reset-modal-overlay hidden" onclick="closeAbsenceModal(event)">
   <div class="reset-modal-box" role="dialog" aria-modal="true" style="max-width:44rem">
     <div class="reset-modal-header">
-      <h3 id="absence-modal-title">Absence</h3>
+      <h3 id="absence-modal-title"></h3>
     </div>
     <div class="reset-modal-body">
-      <div class="form-group">
-        <label data-i18n="cal.absence_reason">Raison (optionnel)</label>
-        <input type="text" id="absence-reason-input" style="width:100%"
-          data-i18n-placeholder="cal.absence_note_placeholder"
-          onkeydown="if(event.key==='Enter')confirmAbsence()">
+
+      <!-- Modality panel (default) -->
+      <div id="day-modal-modality">
+        <div class="form-group">
+          <label data-i18n="cal.modality_label">Modalité prévue</label>
+          <div style="display:flex;gap:var(--sp-3);flex-wrap:wrap;margin-top:var(--sp-2)">
+            <button id="mod-btn-onsite" type="button"
+              class="btn btn--ghost btn--sm mod-btn" onclick="selectModality('onsite')"
+              data-i18n="cal.modality_onsite">Présentiel</button>
+            <button id="mod-btn-remote" type="button"
+              class="btn btn--ghost btn--sm mod-btn" onclick="selectModality('remote')"
+              data-i18n="cal.modality_remote">Télétravail</button>
+            <button id="mod-btn-hybrid" type="button"
+              class="btn btn--ghost btn--sm mod-btn" onclick="selectModality('hybrid')"
+              data-i18n="cal.modality_hybrid">Mixte</button>
+          </div>
+        </div>
+        <div style="margin-top:var(--sp-3)">
+          <button id="day-modal-mark-absent-btn" type="button"
+            class="btn btn--ghost btn--sm" style="color:var(--danger)"
+            onclick="markAbsentFromModal()"
+            data-i18n="cal.mark_absent">Marquer comme absent·e</button>
+        </div>
       </div>
+
+      <!-- Absence panel (shown when marking absent) -->
+      <div id="day-modal-absence" style="display:none">
+        <div class="form-group">
+          <label data-i18n="cal.absence_reason">Raison (optionnel)</label>
+          <input type="text" id="absence-reason-input" style="width:100%"
+            data-i18n-placeholder="cal.absence_note_placeholder"
+            onkeydown="if(event.key==='Enter')confirmAbsence()">
+        </div>
+      </div>
+
     </div>
     <div class="reset-modal-footer">
       <button class="btn btn--ghost" onclick="closeAbsenceModal()"
