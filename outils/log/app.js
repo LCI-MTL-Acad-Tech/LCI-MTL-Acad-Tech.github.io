@@ -167,6 +167,11 @@ function migrateData(data) {
         const savedDate = (log.saved_at || log.created_at || "").slice(0, 10);
         log.future_filing = savedDate ? log.date > savedDate : false;
       }
+      // Backfill late_filing flag
+      if (log.late_filing === undefined) {
+        const savedDate = (log.saved_at || log.created_at || "").slice(0, 10);
+        log.late_filing = savedDate ? log.date < savedDate : false;
+      }
       // Backfill learning_refs on tasks
       (log.tasks || []).forEach(task => {
         if (task.learning_refs === undefined) task.learning_refs = [];

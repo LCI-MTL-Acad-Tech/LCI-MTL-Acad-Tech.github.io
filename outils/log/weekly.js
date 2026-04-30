@@ -49,7 +49,8 @@ function resetWeekly() {
   document.getElementById("weekly-accordion").innerHTML = "";
   document.getElementById("phase-upload").classList.remove("hidden");
   document.getElementById("phase-report").classList.add("hidden");
-  document.getElementById("upload-status").innerHTML = "";
+  const statusEl = document.getElementById("upload-status");
+  if (statusEl) statusEl.innerHTML = "";
 }
 
 // Downloads the current merged weekly data as a JSON file.
