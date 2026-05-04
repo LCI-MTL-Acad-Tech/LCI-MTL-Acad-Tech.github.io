@@ -435,7 +435,23 @@ function parseRow(headers, row) {
     garmentCat: get('garmentCat'),
     intendedUse: get('intendedUse'),
     useDesc: get('useDesc'),
-    submittedAt: r[1] ? String(r[1]).substring(0,16) : '',
+    submittedAt: (() => {
+      const v = r[1];
+      if (!v) return '';
+      if (typeof v === 'number') {
+        // Excel serial: days since Dec 30 1899, encodes wall-clock (local) time directly
+        const ms = Math.round((v - 25569) * 86400 * 1000);
+        const d = new Date(ms);
+        // Use UTC methods so we read the serial as-is without timezone conversion
+        const YY = d.getUTCFullYear();
+        const MM = String(d.getUTCMonth()+1).padStart(2,'0');
+        const DD = String(d.getUTCDate()).padStart(2,'0');
+        const hh = String(d.getUTCHours()).padStart(2,'0');
+        const mm = String(d.getUTCMinutes()).padStart(2,'0');
+        return `${YY}-${MM}-${DD} ${hh}:${mm}`;
+      }
+      return String(v).substring(0, 16);
+    })(),
     s1, s1Override,
     s2, s2Origin, s2Comp, s2Trim, s2TrimOverride, s2Transfo, s2TransfoOverride, s2Interface,
     s3, s3_base: s3, s3WasteOverride, crochetVert: 'pending',
