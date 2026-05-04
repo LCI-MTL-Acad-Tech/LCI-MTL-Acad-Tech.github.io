@@ -1201,17 +1201,23 @@ function applyJuryJSON(fileOrObj, lock=true) {
   function apply(data) {
     const students = allSubmissions.filter(s => !s.isJury);
     const scores = data.scores || data;
+    const jsonKeys = Object.keys(scores);
+    console.log('EcoScale jury JSON — keys in file:', jsonKeys.length, 'first 3:', jsonKeys.slice(0,3));
+    let matched = 0;
     students.forEach((s, idx) => {
       const key = juryKey(s);
+      if (idx < 3) console.log('EcoScale jury — submission key:', JSON.stringify(key), 'submittedAt:', JSON.stringify(s.submittedAt), 'studentNo:', JSON.stringify(s.studentNo));
       // Try per-submission key first, then legacy student-level fallbacks
       const entry = scores[key] || scores[s.studentNo] || scores[s.studentName];
       if (!entry) return;
+      matched++;
       const cv = entry.crochetVert || 'pending';
       juryScores[key] = cv;
       s.crochetVert = cv;
           s.total = s.s1 + s.s2 + s.s3 + s.s4;
       s.passed = s.total >= passThreshold;
     });
+    console.log('EcoScale jury — matched', matched, '/', students.length, 'submissions');
     juryLocked = lock;
     juryDirty = false;
     updateJuryBar();
