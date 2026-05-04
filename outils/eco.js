@@ -1138,7 +1138,11 @@ function setCrochetVert(key, decision) {
 }
 
 function juryKey(s) {
-  return (s.studentNo && s.studentNo !== 'nan' && s.studentNo !== '') ? s.studentNo : s.studentName;
+  // Per-submission key: studentNo + completion timestamp
+  // Unique per garment, stable across re-exports of the same Excel
+  const base = (s.studentNo && s.studentNo !== 'nan' && s.studentNo !== '')
+    ? s.studentNo : s.studentName;
+  return s.submittedAt ? base + '_' + s.submittedAt : base;
 }
 
 function setJuryScore(idx, val) {
@@ -1199,7 +1203,8 @@ function applyJuryJSON(fileOrObj, lock=true) {
     const scores = data.scores || data;
     students.forEach((s, idx) => {
       const key = juryKey(s);
-      const entry = scores[key] || scores[s.studentName] || scores[s.studentNo];
+      // Try per-submission key first, then legacy student-level fallbacks
+      const entry = scores[key] || scores[s.studentNo] || scores[s.studentName];
       if (!entry) return;
       const cv = entry.crochetVert || 'pending';
       juryScores[key] = cv;
