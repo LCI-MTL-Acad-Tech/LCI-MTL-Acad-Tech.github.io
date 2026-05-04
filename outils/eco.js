@@ -580,8 +580,15 @@ function renderDashboard() {
   // Filter
   let filtered = students.filter(s => {
     if (filterProfile !== 'all' && !s.profile.includes(filterProfile)) return false;
-    if (filterStatus === 'pass' && !s.passed) return false;
-    if (filterStatus === 'fail' && (s.passed || s.crochetVert==='pending')) return false;
+    if (filterStatus === 'pass') {
+      // granted by jury, OR scored above threshold with no jury override
+      const ok = s.crochetVert === 'granted' || (s.crochetVert === 'pending' && s.passed);
+      if (!ok) return false;
+    }
+    if (filterStatus === 'fail') {
+      const ok = s.crochetVert === 'refused' || (s.crochetVert === 'pending' && !s.passed);
+      if (!ok) return false;
+    }
     if (filterStatus === 'pending' && s.crochetVert !== 'pending') return false;
     return true;
   });
@@ -653,10 +660,10 @@ function renderDashboard() {
       <option value="date" ${sortKey==='date'?'selected':''}>Date</option>
     </select>
     <select class="filter-select" onchange="setFilterStatus(this.value)">
-      <option value="all">${t('filterAll').replace('profils','statuts').replace('profiles','statuses')}</option>
-      <option value="pass">${lang==='fr'?'Certifié·e·s (≥ '+passThreshold+')':'Certified (≥ '+passThreshold+')'}</option>
-      <option value="fail">${lang==='fr'?'Non certifié·e·s (< '+passThreshold+')':'Not certified (< '+passThreshold+')'}</option>
-      <option value="pending">${t('filterPending')}</option>
+      <option value="all" ${filterStatus==='all'?'selected':''}>${t('filterAll').replace('profils','statuts').replace('profiles','statuses')}</option>
+      <option value="pass" ${filterStatus==='pass'?'selected':''}>${lang==='fr'?'Certifié·e·s (≥ '+passThreshold+')':'Certified (≥ '+passThreshold+')'}</option>
+      <option value="fail" ${filterStatus==='fail'?'selected':''}>${lang==='fr'?'Non certifié·e·s (< '+passThreshold+')':'Not certified (< '+passThreshold+')'}</option>
+      <option value="pending" ${filterStatus==='pending'?'selected':''}>${t('filterPending')}</option>
     </select>
     ${profiles.length > 1 ? `<select class="filter-select" onchange="setFilterProfile(this.value)">
       <option value="all">${t('filterAll')}</option>
@@ -1217,23 +1224,17 @@ function applyJuryJSON(fileOrObj, lock=true) {
   function apply(data) {
     const students = allSubmissions.filter(s => !s.isJury);
     const scores = data.scores || data;
-    const jsonKeys = Object.keys(scores);
-    console.log('EcoScale jury JSON — keys in file:', jsonKeys.length, 'first 3:', jsonKeys.slice(0,3));
-    let matched = 0;
     students.forEach((s, idx) => {
       const key = juryKey(s);
-      if (idx < 3) console.log('EcoScale jury — submission key:', JSON.stringify(key), 'submittedAt:', JSON.stringify(s.submittedAt), 'studentNo:', JSON.stringify(s.studentNo));
       // Try per-submission key first, then legacy student-level fallbacks
       const entry = scores[key] || scores[s.studentNo] || scores[s.studentName];
       if (!entry) return;
-      matched++;
       const cv = entry.crochetVert || 'pending';
       juryScores[key] = cv;
       s.crochetVert = cv;
           s.total = s.s1 + s.s2 + s.s3 + s.s4;
       s.passed = s.total >= passThreshold;
     });
-    console.log('EcoScale jury — matched', matched, '/', students.length, 'submissions');
     juryLocked = lock;
     juryDirty = false;
     updateJuryBar();
