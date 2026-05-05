@@ -152,6 +152,8 @@ function loadFiles(fileList) {
             planned_absences:    ctx.planned_absences    ?? students[existing].raw.context?.planned_absences    ?? [],
             work_days:           ctx.work_days           ?? students[existing].raw.context?.work_days           ?? [1,2,3,4,5],
             work_hours:          ctx.work_hours          ?? students[existing].raw.context?.work_hours,
+            work_hours_by_day:   ctx.work_hours_by_day   ?? students[existing].raw.context?.work_hours_by_day   ?? {},
+            work_hours_date_overrides: ctx.work_hours_date_overrides ?? students[existing].raw.context?.work_hours_date_overrides ?? {},
             calendar_week_start: ctx.calendar_week_start ?? students[existing].raw.context?.calendar_week_start ?? 1,
           },
         };
@@ -206,6 +208,8 @@ function loadFiles(fileList) {
             planned_absences:    configByUUID[uid].planned_absences    ?? base.context?.planned_absences    ?? [],
             work_days:           configByUUID[uid].work_days           ?? base.context?.work_days           ?? [1,2,3,4,5],
             work_hours:          configByUUID[uid].work_hours          ?? base.context?.work_hours,
+            work_hours_by_day:   configByUUID[uid].work_hours_by_day   ?? base.context?.work_hours_by_day   ?? {},
+            work_hours_date_overrides: configByUUID[uid].work_hours_date_overrides ?? base.context?.work_hours_date_overrides ?? {},
             calendar_week_start: configByUUID[uid].calendar_week_start ?? base.context?.calendar_week_start ?? 1,
           },
         };
@@ -339,7 +343,6 @@ function buildRow(data) {
   const workDays       = ctx.work_days   || [1,2,3,4,5];
   const workHours      = ctx.work_hours  || { h: 7, m: 30 };
   const absenceDates   = (ctx.planned_absences || []).map(a => a.date);
-  const hoursPerDay    = (workHours.h * 60 + workHours.m) / 60;  // decimal for math
   const totalTarget    = parseFloat(ctx.total_hours_target) || null;
 
   // Real work-days elapsed: start → yesterday (today not yet finished)
@@ -350,15 +353,35 @@ function buildRow(data) {
     ? countWorkDays(startDate, yesterdayISO, workDays, absenceDates)
     : 0;
 
+  // Sum expected minutes day-by-day, respecting per-day schedule when set.
+  function sumExpectedMinutes(from, to) {
+    if (!from || !to) return 0;
+    const dateOverrides = ctx.work_hours_date_overrides || {};
+    let mins = 0;
+    let cur = new Date(from + "T12:00:00");
+    const end = new Date(to + "T12:00:00");
+    while (cur <= end) {
+      const ds  = cur.toISOString().slice(0, 10);
+      const dow = cur.getDay();
+      if (workDays.includes(dow) && !absenceDates.includes(ds)) {
+        const override = dateOverrides[ds];
+        mins += override ? workHoursToMinutes(override) : getWorkMinutesForDay(ctx, dow);
+      }
+      cur.setDate(cur.getDate() + 1);
+    }
+    return mins;
+  }
+
   // Expected hours so far
   const expectedHours = totalTarget
     ? (() => {
-        const totalWorkDays = startDate && endDate
-          ? countWorkDays(startDate, endDate, workDays, absenceDates)
-          : 1;
-        return +(totalTarget * (workDaysElapsed / Math.max(totalWorkDays, 1))).toFixed(1);
+        const totalMins   = sumExpectedMinutes(startDate, endDate);
+        const elapsedMins = sumExpectedMinutes(startDate, yesterdayISO);
+        return totalMins > 0
+          ? +(totalTarget * (elapsedMins / totalMins)).toFixed(1)
+          : 0;
       })()
-    : +(workDaysElapsed * hoursPerDay).toFixed(1);
+    : +(sumExpectedMinutes(startDate, yesterdayISO) / 60).toFixed(1);
 
   const actualHours = +(logs.reduce((s, l) =>
     s + (l.task_total_minutes || l.day_duration_minutes || 0), 0) / 60).toFixed(1);
@@ -1448,8 +1471,12 @@ function buildDetailHTML(s) {
   ).join(" ");
 
   // Work hours display
-  const wh = ctx.work_hours;
-  const whStr = wh ? `${wh.h}h${String(wh.m).padStart(2,"0")}` : null;
+  const wh    = ctx.work_hours;
+  const byDay = ctx.work_hours_by_day;
+  const hasVariableSchedule = byDay && Object.keys(byDay).length > 0;
+  const whStr = hasVariableSchedule
+    ? "Horaire variable"
+    : (wh ? `${wh.h}h${String(wh.m).padStart(2,"0")}` : null);
 
   // Planned absences summary
   const absCount = (ctx.planned_absences || []).length;

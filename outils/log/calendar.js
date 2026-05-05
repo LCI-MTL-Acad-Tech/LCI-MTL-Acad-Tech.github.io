@@ -236,8 +236,6 @@ function renderHoursPanel() {
   const logs = calData.logs || [];
   const lang = getCurrentLang();
 
-  const workHours  = ctx.work_hours || { h: 7, m: 30 };
-  const perDayMins = workHoursToMinutes(workHours);
   const target     = parseFloat(ctx.total_hours_target) || null;
   const workDays   = ctx.work_days   || [1,2,3,4,5];
   const absences   = (ctx.planned_absences || []).map(a => a.date);
@@ -247,19 +245,21 @@ function renderHoursPanel() {
   const loggedMins = logs.reduce((s, l) =>
     s + (l.task_total_minutes || l.day_duration_minutes || 0), 0);
 
-  // Remaining planned working days (from tomorrow to end, inclusive)
+  // Remaining planned minutes (from tomorrow to end), respecting per-day schedule
   const endDate = parseDate(ctx.scheduled_end_date);
+  const dateOverrides = ctx.work_hours_date_overrides || {};
   let   cur     = parseDate(today);
   cur = addDays(cur, 1); // start from tomorrow
-  let   plannedDays = 0;
+  let   plannedMins = 0;
   while (cur <= endDate) {
     const ds  = isoDate(cur);
     const dow = cur.getDay();
-    if (workDays.includes(dow) && !absences.includes(ds)) plannedDays++;
+    if (workDays.includes(dow) && !absences.includes(ds)) {
+      const override = dateOverrides[ds];
+      plannedMins += override ? workHoursToMinutes(override) : getWorkMinutesForDay(ctx, dow);
+    }
     cur = addDays(cur, 1);
   }
-
-  const plannedMins = plannedDays * perDayMins;
   const totalPlanned = loggedMins + plannedMins;
 
   // Margin vs target
@@ -381,6 +381,7 @@ function openDayModal(date, isCurrentlyAbsent) {
   const lang = getCurrentLang();
   const d    = parseDate(date);
   const ctx  = calData.context;
+  const dow  = d.getDay();
 
   document.getElementById("absence-modal-title").textContent =
     formatShortDate(d, lang);
@@ -391,6 +392,15 @@ function openDayModal(date, isCurrentlyAbsent) {
 
   document.getElementById("absence-reason-input").value =
     absObj?.reason || "";
+
+  // Per-day hours override: show current scheduled minutes for this DOW
+  const byDay   = ctx.work_hours_by_day || {};
+  const dateOverride = ctx.work_hours_date_overrides?.[date];
+  const wh = dateOverride ?? byDay[dow] ?? ctx.work_hours ?? { h: 7, m: 30 };
+  const hoursEl = document.getElementById("day-modal-hours-h");
+  const minsEl  = document.getElementById("day-modal-hours-m");
+  if (hoursEl) hoursEl.value = wh.h ?? 7;
+  if (minsEl)  minsEl.value  = wh.m ?? 30;
 
   // Show/hide the two panels
   const modPanel = document.getElementById("day-modal-modality");
@@ -463,6 +473,23 @@ function confirmAbsence() {
     ctx.planned_absences.push({ date, reason });
     ctx.planned_absences.sort((a,b) => a.date.localeCompare(b.date));
   } else {
+    // Save hours override for this specific date
+    const hoursEl = document.getElementById("day-modal-hours-h");
+    const minsEl  = document.getElementById("day-modal-hours-m");
+    if (hoursEl && minsEl) {
+      const h = parseInt(hoursEl.value) || 0;
+      const m = parseInt(minsEl.value)  || 0;
+      if (!ctx.work_hours_date_overrides) ctx.work_hours_date_overrides = {};
+      // If values match the effective DOW default, remove the override (keep it clean)
+      const dow = parseDate(date).getDay();
+      const def = (ctx.work_hours_by_day || {})[dow] ?? ctx.work_hours ?? { h: 7, m: 30 };
+      if (h === (def.h ?? 7) && m === (def.m ?? 30)) {
+        delete ctx.work_hours_date_overrides[date];
+      } else {
+        ctx.work_hours_date_overrides[date] = { h, m };
+      }
+    }
+
     // Save modality
     const selected = ["onsite","remote","hybrid"].find(m => {
       const btn = document.getElementById("mod-btn-" + m);

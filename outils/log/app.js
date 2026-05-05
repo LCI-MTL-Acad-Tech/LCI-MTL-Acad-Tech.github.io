@@ -153,6 +153,12 @@ function migrateData(data) {
     if (data.context.calendar_week_start === undefined) {
       data.context.calendar_week_start = 1; // Monday
     }
+    if (data.context.work_hours_by_day === undefined) {
+      data.context.work_hours_by_day = {}; // empty = uniform schedule
+    }
+    if (data.context.work_hours_date_overrides === undefined) {
+      data.context.work_hours_date_overrides = {}; // specific-date overrides
+    }
   }
 
   // v1.4 → v1.5: backfill created_at, future_filing, and learning_refs
@@ -558,6 +564,25 @@ function workHoursToString(wh) {
 // Returns decimal hours for backward compatibility with hub.js expected_hours math.
 function workHoursToDecimal(wh) {
   return workHoursToMinutes(wh) / 60;
+}
+
+// Returns the scheduled minutes for a specific day-of-week (0=Sun…6=Sat).
+// Uses work_hours_by_day[dow] if set, otherwise falls back to work_hours.
+function getWorkMinutesForDay(ctx, dow) {
+  const byDay = ctx?.work_hours_by_day;
+  if (byDay && byDay[dow] !== undefined) {
+    return workHoursToMinutes(byDay[dow]);
+  }
+  return workHoursToMinutes(ctx?.work_hours);
+}
+
+// Returns a display string for the scheduled hours of a specific day-of-week.
+function getWorkHoursStringForDay(ctx, dow) {
+  const byDay = ctx?.work_hours_by_day;
+  if (byDay && byDay[dow] !== undefined) {
+    return workHoursToString(byDay[dow]);
+  }
+  return workHoursToString(ctx?.work_hours);
 }
 
 // ── Merge logic ──────────────────────────────────────────────
@@ -1270,6 +1295,8 @@ function sidebarLoadFiles(fileList) {
             planned_absences:    cfg.context.planned_absences    ?? existing.context?.planned_absences    ?? [],
             work_days:           cfg.context.work_days           ?? existing.context?.work_days           ?? [1,2,3,4,5],
             work_hours:          cfg.context.work_hours          ?? existing.context?.work_hours,
+            work_hours_by_day:   cfg.context.work_hours_by_day   ?? existing.context?.work_hours_by_day ?? {},
+            work_hours_date_overrides: cfg.context.work_hours_date_overrides ?? existing.context?.work_hours_date_overrides ?? {},
             calendar_week_start: cfg.context.calendar_week_start ?? existing.context?.calendar_week_start ?? 1,
             // Overlay non-schedule fields too
             total_hours_target:  cfg.context.total_hours_target  ?? existing.context?.total_hours_target,

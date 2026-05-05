@@ -69,10 +69,15 @@ function prefillFromCache() {
 
   if (data && data.context) {
     const ctx = data.context;
-    // Work hours
+    // Work hours — uniform or variable
     if (ctx.work_hours) {
       setVal("ctx-work-hours-h", ctx.work_hours.h);
       setVal("ctx-work-hours-m", ctx.work_hours.m);
+    }
+    if (ctx.work_hours_by_day && Object.keys(ctx.work_hours_by_day).length > 0) {
+      const radio = document.querySelector("input[name='work-hours-mode'][value='variable']");
+      if (radio) { radio.checked = true; onWorkHoursModeChange(); }
+      buildWorkHoursByDayRows(ctx.work_hours_by_day);
     }
     // Start time and lunch break
     if (ctx.work_start_time) setVal("ctx-start-time", ctx.work_start_time);
@@ -98,7 +103,74 @@ function setVal(id, val) {
   if (el && val) el.value = val;
 }
 
-// ── Program dropdown ─────────────────────────────────────────
+// ── Variable work hours per day ───────────────────────────────
+// Day-of-week names (JS: 0=Sun … 6=Sat) keyed by DOW integer.
+const DOW_KEYS = {
+  0: "field.day_sun", 1: "field.day_mon", 2: "field.day_tue",
+  3: "field.day_wed", 4: "field.day_thu", 5: "field.day_fri", 6: "field.day_sat",
+};
+const DOW_NAMES_FR = { 0:"Dim", 1:"Lun", 2:"Mar", 3:"Mer", 4:"Jeu", 5:"Ven", 6:"Sam" };
+const DOW_NAMES_EN = { 0:"Sun", 1:"Mon", 2:"Tue", 3:"Wed", 4:"Thu", 5:"Fri", 6:"Sat" };
+
+function buildWorkHoursByDayRows(workHoursByDay) {
+  const container = document.getElementById("work-hours-by-day-rows");
+  if (!container) return;
+  const lang     = getCurrentLang?.() || "fr-CA";
+  const dayNames = lang === "fr-CA" ? DOW_NAMES_FR : DOW_NAMES_EN;
+
+  // Collect currently checked work-day DOWs in order 1-6,0
+  const activeDows = [1,2,3,4,5,6,0].filter(dow => {
+    const cb = document.querySelector(`.ctx-work-day[value="${dow}"]`);
+    return cb?.checked;
+  });
+
+  if (!activeDows.length) {
+    container.innerHTML = `<p class="form-hint" data-i18n="setup.work_hours_no_days"></p>`;
+    return;
+  }
+
+  container.innerHTML = activeDows.map(dow => {
+    const wh = workHoursByDay?.[dow] ?? null;
+    const h  = wh?.h ?? document.getElementById("ctx-work-hours-h")?.value ?? 7;
+    const m  = wh?.m ?? document.getElementById("ctx-work-hours-m")?.value ?? 30;
+    return `
+      <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-2)">
+        <span style="min-width:3.5rem;font-size:1.4rem;font-weight:500">${dayNames[dow]}</span>
+        <input type="number" class="ctx-byday-h" data-dow="${dow}" min="0" max="12" value="${h}"
+          style="max-width:5.5rem" aria-label="Heures ${dayNames[dow]}">
+        <span style="font-size:1.4rem;color:var(--text-muted)">h</span>
+        <input type="number" class="ctx-byday-m" data-dow="${dow}" min="0" max="59" step="5" value="${m}"
+          style="max-width:5.5rem" aria-label="Min ${dayNames[dow]}">
+        <span style="font-size:1.4rem;color:var(--text-muted)">min</span>
+      </div>`;
+  }).join("");
+}
+
+function onWorkHoursModeChange() {
+  const mode = document.querySelector("input[name='work-hours-mode']:checked")?.value || "uniform";
+  document.getElementById("work-hours-uniform").style.display = mode === "uniform" ? "" : "none";
+  document.getElementById("work-hours-variable").style.display = mode === "variable" ? "" : "none";
+  if (mode === "variable") buildWorkHoursByDayRows(null);
+}
+
+// Re-build the by-day rows whenever a work-day checkbox changes
+function onWorkDayChange() {
+  const mode = document.querySelector("input[name='work-hours-mode']:checked")?.value || "uniform";
+  if (mode === "variable") buildWorkHoursByDayRows(null);
+}
+
+function collectWorkHoursByDay() {
+  const rows = {};
+  document.querySelectorAll(".ctx-byday-h").forEach(hEl => {
+    const dow = parseInt(hEl.dataset.dow);
+    const mEl = document.querySelector(`.ctx-byday-m[data-dow="${dow}"]`);
+    rows[dow] = {
+      h: parseInt(hEl.value) || 0,
+      m: parseInt(mEl?.value) || 0,
+    };
+  });
+  return rows;
+}
 // Builds the program <select> from PROGRAMS (courses.js).
 // Called once on DOMContentLoaded.
 function buildProgramDropdown() {
@@ -312,9 +384,11 @@ function saveContextAndNext() {
   const startDate = document.getElementById("ctx-start-date").value;
   const endDate   = document.getElementById("ctx-end-date").value;
 
-  // Work hours: read H and M as separate integers
+  // Work hours: uniform or variable per day
+  const hoursMode = document.querySelector("input[name='work-hours-mode']:checked")?.value || "uniform";
   const workH = parseInt(document.getElementById("ctx-work-hours-h").value) || 7;
   const workM = parseInt(document.getElementById("ctx-work-hours-m").value) || 30;
+  const workHoursByDay = hoursMode === "variable" ? collectWorkHoursByDay() : {};
 
   // Start time and lunch break
   const startTime   = document.getElementById("ctx-start-time").value || "08:30";
@@ -333,6 +407,8 @@ function saveContextAndNext() {
     calendar_week_start:  parseInt(document.getElementById("ctx-cal-week-start").value ?? "1"),
     work_days:            workDays.length ? workDays : [1,2,3,4,5],
     work_hours:           { h: workH, m: workM },
+    work_hours_by_day:    workHoursByDay,
+    work_hours_date_overrides: {},
     work_start_time:      startTime,
     lunch_minutes:        lunchMins,
     total_hours_target:   parseFloat(document.getElementById("ctx-total-hours").value) || null,

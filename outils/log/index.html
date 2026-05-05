@@ -241,13 +241,13 @@
             <div class="form-group mb-4">
               <label data-i18n="setup.work_days">Jours de travail</label>
               <div style="display:flex;flex-wrap:wrap;gap:var(--sp-3);margin-top:var(--sp-2)">
-                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="1" checked><span data-i18n="field.day_mon">Lundi</span></label>
-                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="2" checked><span data-i18n="field.day_tue">Mardi</span></label>
-                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="3" checked><span data-i18n="field.day_wed">Mercredi</span></label>
-                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="4" checked><span data-i18n="field.day_thu">Jeudi</span></label>
-                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="5" checked><span data-i18n="field.day_fri">Vendredi</span></label>
-                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="6"><span data-i18n="field.day_sat">Samedi</span></label>
-                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="0"><span data-i18n="field.day_sun">Dimanche</span></label>
+                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="1" checked onchange="onWorkDayChange()"><span data-i18n="field.day_mon">Lundi</span></label>
+                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="2" checked onchange="onWorkDayChange()"><span data-i18n="field.day_tue">Mardi</span></label>
+                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="3" checked onchange="onWorkDayChange()"><span data-i18n="field.day_wed">Mercredi</span></label>
+                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="4" checked onchange="onWorkDayChange()"><span data-i18n="field.day_thu">Jeudi</span></label>
+                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="5" checked onchange="onWorkDayChange()"><span data-i18n="field.day_fri">Vendredi</span></label>
+                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="6" onchange="onWorkDayChange()"><span data-i18n="field.day_sat">Samedi</span></label>
+                <label class="modality-label"><input type="checkbox" class="ctx-work-day" value="0" onchange="onWorkDayChange()"><span data-i18n="field.day_sun">Dimanche</span></label>
               </div>
             </div>
 
@@ -260,10 +260,26 @@
                 <div class="form-hint" data-i18n="setup.work_start_hint"></div>
               </div>
 
-              <!-- Work hours H + M -->
-              <div class="form-group">
+              <!-- Work hours: uniform or variable per day -->
+              <div class="form-group" id="work-hours-group">
                 <label data-i18n="setup.work_hours">Heures par jour</label>
-                <div style="display:flex;align-items:center;gap:var(--sp-2)">
+
+                <!-- Toggle uniform / variable -->
+                <div style="display:flex;gap:var(--sp-3);margin-top:var(--sp-2);margin-bottom:var(--sp-3);flex-wrap:wrap">
+                  <label class="modality-label">
+                    <input type="radio" name="work-hours-mode" value="uniform" checked
+                      onchange="onWorkHoursModeChange()">
+                    <span data-i18n="setup.work_hours_uniform">Uniforme (même durée chaque jour)</span>
+                  </label>
+                  <label class="modality-label">
+                    <input type="radio" name="work-hours-mode" value="variable"
+                      onchange="onWorkHoursModeChange()">
+                    <span data-i18n="setup.work_hours_variable">Variable (durée différente par jour)</span>
+                  </label>
+                </div>
+
+                <!-- Uniform: single h+m pair -->
+                <div id="work-hours-uniform" style="display:flex;align-items:center;gap:var(--sp-2)">
                   <input type="number" id="ctx-work-hours-h" min="0" max="12" value="7"
                     style="max-width:6rem" aria-label="Heures">
                   <span style="font-size:1.4rem;color:var(--text-muted)">h</span>
@@ -271,6 +287,12 @@
                     style="max-width:6rem" aria-label="Minutes">
                   <span style="font-size:1.4rem;color:var(--text-muted)">min</span>
                 </div>
+
+                <!-- Variable: one row per active work day -->
+                <div id="work-hours-variable" style="display:none">
+                  <div id="work-hours-by-day-rows"></div>
+                </div>
+
                 <div class="form-hint" data-i18n="setup.work_hours_hint"></div>
               </div>
 
