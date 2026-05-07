@@ -867,6 +867,13 @@ function initPage() {
       updateThemeButton();
     }
   });
+
+  // Patch any static upload-link anchors so UPLOAD_FORM_URL is the single source of truth
+  const uploadUrl = getUploadFormUrl();
+  ["done-form-link", "log-form-link"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.href = uploadUrl;
+  });
 }
 
 // ── Reset / start over ────────────────────────────────────────
@@ -1017,7 +1024,7 @@ function alwaysRemindUpload(type) {
 // The form URL is read from a <meta name="upload-form-url"> tag so
 // it can be configured per deployment without touching JS.
 
-const UPLOAD_FORM_URL = "https://lcieducation-my.sharepoint.com/:f:/g/personal/elisa_schaeffer_collegelasalle_com/IgDuTArLyqXOSYc0rdHnAhTOAf2HQnWL01dYrthgl8k5RNk?e=lD2Jm2";
+const UPLOAD_FORM_URL = "https://lcieducation-my.sharepoint.com/:f:/g/personal/elisa_schaeffer_collegelasalle_com/IgDuTArLyqXOSYc0rdHnAhTOAf2HQnWL01dYrthgl8k5RNk?e=mXO69B";
 
 function getUploadFormUrl() {
   const meta = document.querySelector('meta[name="upload-form-url"]');

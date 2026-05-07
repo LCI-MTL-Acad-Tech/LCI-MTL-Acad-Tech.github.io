@@ -111,12 +111,43 @@ function renderAll() {
   renderHoursPanel();
   renderAbsencesList();
   renderLegend();
+  populateDateInputs();
+}
+
+// Populate the sidebar date inputs from calData, or leave blank if missing.
+function populateDateInputs() {
+  const ctx = calData?.context || {};
+  const si = document.getElementById("cal-start-date-input");
+  const ei = document.getElementById("cal-end-date-input");
+  if (si) si.value = ctx.start_date || "";
+  if (ei) ei.value = ctx.scheduled_end_date || "";
+}
+
+// Called when either date input changes — save and re-render.
+function onCalDateChange() {
+  const si = document.getElementById("cal-start-date-input");
+  const ei = document.getElementById("cal-end-date-input");
+  if (!calData) return;
+  if (si) calData.context.start_date         = si.value || null;
+  if (ei) calData.context.scheduled_end_date = ei.value || null;
+  persistAndRefresh();
 }
 
 function renderGrid() {
   const ctx  = calData.context;
   const lang = getCurrentLang();
   const logs = calData.logs || [];
+
+  // Guard: both dates required — show a hint if end date is missing
+  if (!ctx.start_date || !ctx.scheduled_end_date) {
+    document.getElementById("cal-grid").innerHTML =
+      `<p style="color:var(--text-muted);padding:var(--sp-4)" data-i18n="cal.missing_dates">${
+        getCurrentLang() === "fr-CA"
+          ? "Les dates de début et de fin de stage sont nécessaires pour afficher le calendrier. Va dans <a href=\"index.html\">Configuration</a> pour les ajouter."
+          : "Start and end dates are required to display the calendar. Go to <a href=\"index.html\">Setup</a> to add them."
+      }</p>`;
+    return;
+  }
 
   const startDate  = parseDate(ctx.start_date);
   const endDate    = parseDate(ctx.scheduled_end_date);
@@ -235,6 +266,12 @@ function renderHoursPanel() {
   const ctx  = calData.context;
   const logs = calData.logs || [];
   const lang = getCurrentLang();
+
+  // Guard: can't compute hours without an end date
+  if (!ctx.scheduled_end_date) {
+    document.getElementById("cal-hours-panel").innerHTML = "";
+    return;
+  }
 
   const target     = parseFloat(ctx.total_hours_target) || null;
   const workDays   = ctx.work_days   || [1,2,3,4,5];

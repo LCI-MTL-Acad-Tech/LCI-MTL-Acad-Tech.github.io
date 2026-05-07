@@ -106,6 +106,7 @@ const LANG = {
     "setup.tools_to_learn":   "Quels outils prévois-tu apprendre ou améliorer?",
 
     // Setup — Company pathway
+    "setup.optional_section_hint": "Ces champs sont optionnels — tu peux les laisser vides et les compléter plus tard depuis la page de configuration.",
     "setup.org_name":         "Nom de l'organisation",
     "setup.industry":         "Secteur d'activité",
     "setup.city":             "Ville",
@@ -152,6 +153,7 @@ const LANG = {
     "cal.margin_ahead":       "En avance",
     "cal.margin_behind":      "En retard",
     "cal.absences_title":     "Absences planifiées",
+    "cal.dates_title":        "Dates du stage",
     "cal.absence_add":        "Ajouter une absence",
     "cal.day_plan_title":         "Planifier cette journée",
     "cal.modality_label":         "Modalité prévue",
@@ -676,6 +678,7 @@ const LANG = {
     "cal.margin_ahead":       "Ahead",
     "cal.margin_behind":      "Behind",
     "cal.absences_title":     "Planned absences",
+    "cal.dates_title":        "Internship dates",
     "cal.absence_add":        "Add absence",
     "cal.day_plan_title":         "Plan this day",
     "cal.modality_label":         "Planned modality",
@@ -1064,6 +1067,7 @@ const LANG = {
     "setup.success":          "What does success look like for you personally at the end of this internship?",
     "setup.tools_known":      "Which tools do you already know going into this internship?",
     "setup.tools_to_learn":   "Which tools do you plan to learn or improve?",
+    "setup.optional_section_hint": "These fields are optional — you can leave them blank and fill them in later from the configuration page.",
     "setup.org_name":         "Organization name",
     "setup.industry":         "Industry / sector",
     "setup.city":             "City",

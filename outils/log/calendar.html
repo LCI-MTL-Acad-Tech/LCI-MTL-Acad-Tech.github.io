@@ -2,7 +2,7 @@
 <html lang="fr" data-theme="light" data-page-title-key="nav.title.calendar">
 <head>
   <meta charset="UTF-8">
-  <meta name="upload-form-url" content="https://forms.cloud.microsoft/r/LE4Dc2gZaE">
+  <meta name="upload-form-url" content="https://lcieducation-my.sharepoint.com/:f:/g/personal/elisa_schaeffer_collegelasalle_com/IgDuTArLyqXOSYc0rdHnAhTOAf2HQnWL01dYrthgl8k5RNk?e=mXO69B">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title></title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -245,7 +245,24 @@
           <!-- Sidebar -->
           <div class="cal-sidebar">
 
-            <!-- Hours math -->
+            <!-- Internship dates (editable inline) -->
+            <div class="card mb-4">
+              <div class="section-title mb-3" data-i18n="cal.dates_title">Dates du stage</div>
+              <div style="display:flex;flex-direction:column;gap:var(--sp-3)">
+                <div class="form-group" style="margin:0">
+                  <label style="font-size:1.2rem;color:var(--text-muted)" data-i18n="field.start_date"></label>
+                  <input type="date" id="cal-start-date-input"
+                    style="margin-top:var(--sp-1);width:100%"
+                    onchange="onCalDateChange()">
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label style="font-size:1.2rem;color:var(--text-muted)" data-i18n="field.end_date"></label>
+                  <input type="date" id="cal-end-date-input"
+                    style="margin-top:var(--sp-1);width:100%"
+                    onchange="onCalDateChange()">
+                </div>
+              </div>
+            </div>
             <div class="card mb-4">
               <div class="section-title mb-4" data-i18n="cal.hours_target">Objectif</div>
               <div id="cal-hours-panel"></div>
