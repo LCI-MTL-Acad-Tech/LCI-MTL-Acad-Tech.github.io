@@ -356,7 +356,7 @@ std::cout &lt;&lt; <span class="str">"Fini !\n"</span>;       <span class="cm">/
 int main() {
     int x = 6, y = 7;
     std::cout &lt;&lt; x &lt;&lt; " x " &lt;&lt; y
-              &lt;&lt; " = " &lt;&lt; x * y &lt;&lt; "\n";
+              &lt;&lt; " = " &lt;&lt; x * y &lt;&lt; <span class="str">"\n"</span>;
     return 0;
 }`,
       question:{ fr:`Même logique qu'en C# — quelle est la sortie ?`, en:`Same logic as in C# — what is the output?` },
@@ -401,7 +401,7 @@ int main() {
     int total = 0;
     for (int i = 1; i &lt;= 5; i++)
         total += i;
-    std::cout &lt;&lt; total &lt;&lt; "\n";
+    std::cout &lt;&lt; total &lt;&lt; <span class="str">"\n"</span>;
     return 0;
 }`,
       question:{ fr:`La boucle for est identique à C#. Calcule la sortie.`, en:`The for loop is identical to C#. Calculate the output.` },
