@@ -283,10 +283,13 @@ function switchPath(path){
 // ── Shared concept block (above path tabs) ────────────────────
 // Escape literal newlines inside string-literal spans so \n renders as text
 function fixCodeNewlines(html){
-  // Replace actual newline chars inside <span class="str">...</span> with \n text
-  return html.replace(/<span class="str">([\s\S]*?)<\/span>/g, (match, inner) =>
+  // 1. Fix newlines inside <span class="str">...</span>
+  html = html.replace(/<span class="str">([\s\S]*?)<\/span>/g, (match, inner) =>
     '<span class="str">' + inner.replace(/\n/g, '\\n') + '</span>'
   );
+  // 2. Fix bare "\n" patterns not inside a span (e.g. << "\n" without str wrapper)
+  html = html.replace(/"\n"/g, '<span class="str">"\\n"</span>');
+  return html;
 }
 
 function renderSharedConcept(S){
