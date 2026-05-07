@@ -350,7 +350,8 @@ function renderHoursPanel() {
       </div>`;
   }
 
-  const perDayStr = workHoursToString(workHours);
+  const perDayStr = workHoursToString(ctx.work_hours);
+  const hasVariableSchedule = ctx.work_hours_by_day && Object.keys(ctx.work_hours_by_day).length > 0;
 
   document.getElementById("cal-hours-panel").innerHTML = `
     <div class="hours-row">
@@ -360,9 +361,7 @@ function renderHoursPanel() {
     <div class="hours-row">
       <span class="hours-row-label">${t("cal.hours_planned")}</span>
       <span class="hours-row-val">${plannedStr}
-        <span style="font-size:1.1rem;color:var(--text-subtle);font-weight:400">
-          (${plannedDays} × ${perDayStr})
-        </span>
+        ${!hasVariableSchedule ? `<span style="font-size:1.1rem;color:var(--text-subtle);font-weight:400">(${perDayStr}/jr)</span>` : ""}
       </span>
     </div>
     <div class="hours-row">
