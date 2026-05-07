@@ -65,6 +65,7 @@ const LS = {
   LANG:          "lang",
   DOWNLOADS:     "internship_downloads",      // { "YYYY-MM-DD": ["c"|"d"|"w"|"f"] } — survives reset
   UPLOAD_REMIND: "internship_upload_remind",  // { "c"|"d"|"w"|"f": "YYYY-MM-DD"|"always"|null }
+  MILESTONES:    "internship_milestones",     // { [project_id]: { exported_at, exported_by, file_title, project } }
 };
 
 // ── Storage helpers ──────────────────────────────────────────
@@ -212,6 +213,20 @@ function clearReportData() {
 function saveData(data) {
   data.meta.last_modified = new Date().toISOString();
   localStorage.setItem(LS.DATA, JSON.stringify(data));
+}
+
+// ── Milestone storage ─────────────────────────────────────────
+// Stored as { [project_id]: { exported_at, exported_by, file_title, project } }.
+// Loading a file for the same project_id replaces only if its exported_at is newer.
+function loadMilestones() {
+  try {
+    const raw = localStorage.getItem(LS.MILESTONES);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+
+function saveMilestones(milestones) {
+  localStorage.setItem(LS.MILESTONES, JSON.stringify(milestones));
 }
 
 function loadCache() {
@@ -1236,11 +1251,36 @@ function sidebarLoadFiles(fileList) {
     }
 
     const isFr  = getCurrentLang() === "fr-CA";
-    const counts = { config: 0, log: 0, merged: 0, error: 0 };
+    const counts = { config: 0, log: 0, merged: 0, milestones: 0, error: 0 };
 
-    // Separate config files from log files
-    const configs  = valid.filter(p => p.data.meta?.type === "config");
-    const logFiles = valid.filter(p => p.data.meta?.type !== "config");
+    // Separate file types
+    const milestoneFiles = valid.filter(p => p.data.meta?.type === "milestones");
+    const configs        = valid.filter(p => p.data.meta?.type === "config");
+    const logFiles       = valid.filter(p => !["config","milestones"].includes(p.data.meta?.type));
+
+    // ── Process milestone files ───────────────────────────────
+    milestoneFiles.forEach(({ data: mf }) => {
+      if (!Array.isArray(mf.projects)) { counts.error++; return; }
+      const existing = loadMilestones(); // { [project_id]: { exported_at, … } }
+      const fileExportedAt = mf.meta?.exported_at || new Date().toISOString();
+      const exportedBy     = mf.meta?.exported_by  || "";
+      const fileTitle      = mf.title || "";
+      mf.projects.forEach(project => {
+        if (!project.id || !Array.isArray(project.milestones)) return;
+        const current = existing[project.id];
+        // Replace only if this file is newer than what we have for this project
+        if (!current || fileExportedAt >= current.exported_at) {
+          existing[project.id] = {
+            exported_at: fileExportedAt,
+            exported_by: exportedBy,
+            file_title:  fileTitle,
+            project,
+          };
+          counts.milestones++;
+        }
+      });
+      saveMilestones(existing);
+    });
 
     // ── Process log/full files ────────────────────────────────
     if (logFiles.length) {
@@ -1299,6 +1339,8 @@ function sidebarLoadFiles(fileList) {
           pathway:        cfg.pathway        || existing.pathway,
           context: {
             ...existing.context,
+            start_date:          cfg.context.start_date          || existing.context?.start_date,
+            scheduled_end_date:  cfg.context.scheduled_end_date  || existing.context?.scheduled_end_date,
             planned_absences:    cfg.context.planned_absences    ?? existing.context?.planned_absences    ?? [],
             work_days:           cfg.context.work_days           ?? existing.context?.work_days           ?? [1,2,3,4,5],
             work_hours:          cfg.context.work_hours          ?? existing.context?.work_hours,
@@ -1348,13 +1390,16 @@ function sidebarLoadFiles(fileList) {
 
     // ── Summary status ────────────────────────────────────────
     const parts = [];
-    const total = counts.log + counts.merged + counts.config;
+    const total = counts.log + counts.merged + counts.config + counts.milestones;
     if (counts.log || counts.merged) {
       const n = counts.log + counts.merged;
       parts.push(`${n} ${isFr ? (n > 1 ? "journaux" : "journal") : (n > 1 ? "logs" : "log")}`);
     }
     if (counts.config) {
       parts.push(`${counts.config} config`);
+    }
+    if (counts.milestones) {
+      parts.push(`${counts.milestones} ${isFr ? (counts.milestones > 1 ? "projets jalons" : "projet jalons") : (counts.milestones > 1 ? "milestone projects" : "milestone project")}`);
     }
     if (counts.error) {
       parts.push(`⚠ ${counts.error} ${isFr ? "erreur(s)" : "error(s)"}`);

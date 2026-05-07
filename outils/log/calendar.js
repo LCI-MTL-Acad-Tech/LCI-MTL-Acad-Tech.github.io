@@ -9,14 +9,17 @@
 let calData      = null; // loaded internship data
 let calDownloads = {};   // { "YYYY-MM-DD": ["d"|"w"|"f"] }
 let pendingAbsenceDate = null; // date being edited in the modal
+let calMilestones    = {};    // { [project_id]: { exported_at, exported_by, file_title, project } }
+let hiddenProjects   = new Set(); // project_ids hidden via sidebar checkboxes
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   initPage(); // calls applyLanguage internally; MutationObserver re-renders on change
   initFileSidebar();
 
-  calData      = loadData();
-  calDownloads = getDownloads();
+  calData       = loadData();
+  calDownloads  = getDownloads();
+  calMilestones = loadMilestones();
 
   if (calData && calData.context?.start_date) {
     showCalendar();
@@ -112,6 +115,7 @@ function renderAll() {
   renderAbsencesList();
   renderLegend();
   populateDateInputs();
+  renderMilestonesPanel();
 }
 
 // Populate the sidebar date inputs from calData, or leave blank if missing.
@@ -228,6 +232,20 @@ function renderGrid() {
       if (hasWeekly)          badges.push(`<span class="cal-badge" title="${t("cal.legend_weekly")}">⭐</span>`);
       if (isFutureWrapDay)    badges.push(`<span class="cal-badge" title="${t("cal.legend_weekly_due")}" style="opacity:.5">☆</span>`);
       if (hasFinal)           badges.push(`<span class="cal-badge" title="${t("cal.legend_final")}">🏅</span>`);
+
+      // Milestone flags for this date (visible projects only)
+      Object.values(calMilestones).forEach(({ project }) => {
+        if (hiddenProjects.has(project.id)) return;
+        const emoji = project.emoji || "🚩";
+        project.milestones
+          .filter(m => m.date === ds)
+          .forEach(m => {
+            badges.push(`<span class="cal-badge cal-milestone-flag"
+              title="${escHtml(project.name + ': ' + m.title)}"
+              style="cursor:pointer"
+              onclick="event.stopPropagation();showMilestonePopup('${escHtml(project.id)}','${escHtml(m.id)}')">${emoji}</span>`);
+          });
+      });
 
       // Absence note
       const absObj = isAbs ? (ctx.planned_absences || []).find(a => a.date === ds) : null;
@@ -558,6 +576,119 @@ function removeAbsenceByDate(date) {
   persistAndRefresh();
 }
 
+// ── Milestones ────────────────────────────────────────────────
+
+// Render the milestones sidebar card: project checkboxes + export button.
+function renderMilestonesPanel() {
+  const container = document.getElementById("cal-milestones-panel");
+  if (!container) return;
+  const lang = getCurrentLang();
+  const isFr = lang === "fr-CA";
+  const entries = Object.values(calMilestones);
+
+  if (!entries.length) {
+    container.innerHTML = `<p style="font-size:1.3rem;color:var(--text-muted)">—</p>`;
+    return;
+  }
+
+  const rows = entries.map(({ exported_by, file_title, project }) => {
+    const pid     = project.id;
+    const checked = !hiddenProjects.has(pid) ? "checked" : "";
+    const emoji   = project.emoji || "🚩";
+    const count   = project.milestones?.length || 0;
+    const byLine  = exported_by
+      ? `<div style="font-size:1.1rem;color:var(--text-muted);margin-left:2.2rem">${escHtml(exported_by)}</div>`
+      : "";
+    return `
+      <label style="display:flex;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-1);cursor:pointer;font-size:1.3rem">
+        <input type="checkbox" ${checked} onchange="toggleMilestoneProject('${pid}',this.checked)">
+        <span style="font-size:1.5rem;line-height:1">${emoji}</span>
+        <span style="flex:1">${escHtml(project.name)}</span>
+        <span style="color:var(--text-muted);font-size:1.2rem">${count}</span>
+      </label>
+      ${byLine}`;
+  }).join("");
+
+  container.innerHTML = rows + `
+    <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap;margin-top:var(--sp-3)">
+      <button class="btn btn--ghost btn--sm" onclick="exportMilestones()"
+        data-i18n="cal.milestones_export">${isFr ? "Exporter" : "Export"}</button>
+      <button class="btn btn--ghost btn--sm" style="color:var(--danger)" onclick="clearMilestones()"
+        data-i18n="cal.milestones_clear">${isFr ? "Effacer tout" : "Clear all"}</button>
+    </div>`;
+}
+
+function toggleMilestoneProject(pid, visible) {
+  if (visible) hiddenProjects.delete(pid);
+  else         hiddenProjects.add(pid);
+  renderGrid(); // only re-render grid, not panel (avoids checkbox flicker)
+}
+
+// Show a popup with milestone details — dismisses on outside click.
+function showMilestonePopup(projectId, milestoneId) {
+  document.getElementById("cal-milestone-popup")?.remove();
+  const entry = calMilestones[projectId];
+  if (!entry) return;
+  const m = entry.project.milestones?.find(x => x.id === milestoneId);
+  if (!m) return;
+  const emoji = entry.project.emoji || "🚩";
+
+  const popup = document.createElement("div");
+  popup.id = "cal-milestone-popup";
+  popup.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+    z-index:8000;background:var(--bg-card);border:1px solid var(--border);
+    border-radius:var(--r-lg);padding:var(--sp-4);max-width:36rem;width:90%;
+    box-shadow:0 8px 32px rgba(0,0,0,.25)`;
+  popup.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:var(--sp-3)">
+      <span style="font-size:2.2rem;flex-shrink:0;line-height:1">${emoji}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:1.5rem;margin-bottom:var(--sp-1)">${escHtml(m.title)}</div>
+        <div style="font-size:1.3rem;color:var(--text-muted);margin-bottom:var(--sp-1)">${escHtml(entry.project.name)}</div>
+        <div style="font-size:1.2rem;color:var(--text-muted)">${m.date}</div>
+        ${m.description ? `<div style="font-size:1.3rem;margin-top:var(--sp-2)">${escHtml(m.description)}</div>` : ""}
+        ${entry.exported_by ? `<div style="font-size:1.1rem;color:var(--text-muted);margin-top:var(--sp-2)">@ ${escHtml(entry.exported_by)}</div>` : ""}
+      </div>
+      <button onclick="document.getElementById('cal-milestone-popup')?.remove()"
+        style="background:none;border:none;cursor:pointer;font-size:1.8rem;color:var(--text-muted);padding:0;line-height:1;flex-shrink:0">×</button>
+    </div>`;
+
+  document.body.appendChild(popup);
+  setTimeout(() => {
+    document.addEventListener("click", function dismiss(e) {
+      if (!popup.contains(e.target)) {
+        popup.remove();
+        document.removeEventListener("click", dismiss);
+      }
+    });
+  }, 0);
+}
+
+// Export all loaded milestone projects as a single JSON file.
+function exportMilestones() {
+  const lang = getCurrentLang();
+  const isFr = lang === "fr-CA";
+  const payload = {
+    meta: {
+      type: "milestones",
+      exported_at: new Date().toISOString(),
+    },
+    projects: Object.values(calMilestones).map(e => e.project),
+  };
+  downloadJSON(payload, `${isFr ? "jalons" : "milestones"}_${new Date().toISOString().slice(0,10)}.json`);
+}
+
+// Remove all milestone projects from localStorage and re-render.
+function clearMilestones() {
+  const lang = getCurrentLang();
+  if (!confirm(lang === "fr-CA" ? "Supprimer tous les jalons ?" : "Delete all milestones?")) return;
+  calMilestones = {};
+  hiddenProjects.clear();
+  saveMilestones({});
+  renderGrid();
+  renderMilestonesPanel();
+}
+
 // ── Persist & refresh ─────────────────────────────────────────
 function persistAndRefresh() {
   // Only save back to localStorage if the data came from there
@@ -592,9 +723,12 @@ function persistAndRefresh() {
 
 // ── Sidebar hook ─────────────────────────────────────────────
 function onSidebarLoad() {
-  calData      = loadData();
-  calDownloads = getDownloads();
+  calData       = loadData();
+  calDownloads  = getDownloads();
+  calMilestones = loadMilestones();
   if (calData?.context?.start_date) {
     showCalendar();
+  } else {
+    renderMilestonesPanel(); // still render milestone panel even without student data
   }
 }
