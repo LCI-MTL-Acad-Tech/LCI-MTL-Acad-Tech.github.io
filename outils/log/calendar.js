@@ -182,6 +182,10 @@ function renderGrid() {
   const dowOrder = [];
   for (let i = 0; i < 7; i++) dowOrder.push((weekStart + i) % 7);
 
+  // Build modality lookup: { "YYYY-MM-DD": "onsite"|"remote"|"hybrid" }
+  const modalityMap = {};
+  (ctx.planned_modalities || []).forEach(m => { modalityMap[m.date] = m.modality; });
+
   // Header
   const gridCols = `repeat(7, 1fr)`;
   const headerHTML = `
