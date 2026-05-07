@@ -258,18 +258,41 @@ function renderGrid() {
         : isAbs ? `<div class="cal-absence-chip">✗</div>` : "";
 
       const plannedMod = !isAbs ? modalityMap[ds] : null;
-      const modDot = plannedMod
-        ? `<div class="cal-mod-dot cal-mod-dot--${plannedMod}" title="${t('cal.legend_plan_' + plannedMod)}"></div>`
-        : "";
+      const modIndicator = (() => {
+        if (isAbs) {
+          return `<div class="cal-absence-x" title="${t('cal.legend_absence')}"></div>`;
+        }
+        if (!plannedMod) return "";
+        const title = t("cal.legend_plan_" + plannedMod);
+        if (plannedMod === "onsite") {
+          // Green filled rectangle
+          return `<svg class="cal-mod-indicator" viewBox="0 0 22 22" aria-label="${title}">
+            <rect x="4" y="4" width="14" height="9" rx="2" fill="#3B6D11"/>
+          </svg>`;
+        }
+        if (plannedMod === "remote") {
+          // Blue triangle — right-angle at top-right corner
+          return `<svg class="cal-mod-indicator" viewBox="0 0 22 22" aria-label="${title}">
+            <polygon points="5,4 18,4 18,17" fill="#185FA5"/>
+          </svg>`;
+        }
+        if (plannedMod === "hybrid") {
+          // Amber/yellow rectangle
+          return `<svg class="cal-mod-indicator" viewBox="0 0 22 22" aria-label="${title}">
+            <rect x="4" y="4" width="14" height="9" rx="2" fill="#BA7517"/>
+          </svg>`;
+        }
+        return "";
+      })();
       const onclick = (isIntern && (isWork || isAbs))
         ? `onclick="openDayModal('${ds}', ${isAbs}, '${ds}')"` : "";
 
       rowHTML += `
         <div class="${cellClass}" ${onclick}>
+          ${modIndicator}
           <div class="cal-day-num">${cur.getDate()}</div>
           ${badges.length ? `<div class="cal-badges">${badges.join("")}</div>` : ""}
           ${absNote}
-          ${modDot}
           <span class="cal-month-label">${shortMonth(cur, lang)}</span>
         </div>`;
 
@@ -417,11 +440,17 @@ function renderLegend() {
     { badge: "⭐", key: "cal.legend_weekly" },
     { badge: "☆",  key: "cal.legend_weekly_due" },
     { badge: "🏅", key: "cal.legend_final" },
+    { svg: `<svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><rect x="0" y="0" width="14" height="9" rx="2" fill="#3B6D11"/></svg>`, key: "cal.legend_plan_onsite" },
+    { svg: `<svg width="18" height="14" viewBox="0 0 18 14" aria-hidden="true"><polygon points="0,0 14,0 14,14" fill="#185FA5"/></svg>`, key: "cal.legend_plan_remote" },
+    { svg: `<svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><rect x="0" y="0" width="14" height="9" rx="2" fill="#BA7517"/></svg>`, key: "cal.legend_plan_hybrid" },
+    { svg: `<svg width="18" height="14" viewBox="0 0 18 14" aria-hidden="true"><line x1="1" y1="1" x2="13" y2="13" stroke="#A32D2D" stroke-width="2.5" stroke-linecap="round"/><line x1="13" y1="1" x2="1" y2="13" stroke="#A32D2D" stroke-width="2.5" stroke-linecap="round"/></svg>`, key: "cal.legend_absent_mark" },
   ];
 
   el.innerHTML = items.map(item => {
     const left = item.badge
       ? `<span style="font-size:1.4rem;width:2rem;text-align:center">${item.badge}</span>`
+      : item.svg
+      ? `<span style="width:2rem;display:inline-flex;align-items:center">${item.svg}</span>`
       : `<div class="cal-legend-swatch" style="${item.swatch}"></div>`;
     return `
       <div class="cal-legend-item">
@@ -581,6 +610,115 @@ function removeAbsenceByDate(date) {
 
 // ── Milestones ────────────────────────────────────────────────
 
+// ── Milestone editor ──────────────────────────────────────────
+let _editingProjectId = null; // null = new project
+
+function openMilestoneEditor(projectId) {
+  _editingProjectId = projectId || null;
+  const editor = document.getElementById("cal-milestone-editor");
+  const panel  = document.getElementById("cal-milestones-panel");
+  const btn    = document.getElementById("cal-milestone-define-btn");
+  if (!editor || !panel) return;
+
+  // Pre-fill if editing existing project
+  const existing = projectId ? calMilestones[projectId] : null;
+  const proj = existing?.project;
+  document.getElementById("ms-project-name").value  = proj?.name  || "";
+  document.getElementById("ms-project-emoji").value = proj?.emoji || "";
+
+  // Render milestone rows
+  const rows = document.getElementById("ms-rows");
+  rows.innerHTML = "";
+  const milestones = proj?.milestones?.length ? proj.milestones : [{ id: generateUUID(), date: "", title: "" }];
+  milestones.forEach(m => _appendMilestoneRow(m.date, m.title, m.id));
+
+  editor.style.display = "";
+  panel.style.display  = "none";
+  if (btn) btn.style.display = "none";
+}
+
+function closeMilestoneEditor() {
+  const editor = document.getElementById("cal-milestone-editor");
+  const panel  = document.getElementById("cal-milestones-panel");
+  const btn    = document.getElementById("cal-milestone-define-btn");
+  if (editor) editor.style.display = "none";
+  if (panel)  panel.style.display  = "";
+  if (btn)    btn.style.display    = "";
+  _editingProjectId = null;
+}
+
+function addMilestoneRow() {
+  _appendMilestoneRow("", "", generateUUID());
+}
+
+function _appendMilestoneRow(date, title, id) {
+  const rows = document.getElementById("ms-rows");
+  const lang = getCurrentLang();
+  const isFr = lang === "fr-CA";
+  const div = document.createElement("div");
+  div.className = "repeatable-block";
+  div.dataset.msId = id;
+  div.style.padding = "var(--sp-3)";
+  div.innerHTML = `
+    <button class="repeatable-block-remove btn btn--icon btn--sm"
+      onclick="this.closest('.repeatable-block').remove()"
+      title="${isFr ? 'Supprimer' : 'Remove'}">✕</button>
+    <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:flex-end">
+      <div class="form-group" style="margin:0;flex:0 0 auto">
+        <label style="font-size:1.2rem;color:var(--text-muted)">${isFr ? "Date" : "Date"}</label>
+        <input type="date" class="ms-date" value="${date}" style="margin-top:var(--sp-1)">
+      </div>
+      <div class="form-group" style="margin:0;flex:1;min-width:10rem">
+        <label style="font-size:1.2rem;color:var(--text-muted)">${isFr ? "Titre" : "Title"}</label>
+        <input type="text" class="ms-title" value="${title}" style="margin-top:var(--sp-1);width:100%">
+      </div>
+    </div>`;
+  rows.appendChild(div);
+}
+
+function saveMilestoneEditor() {
+  const lang = getCurrentLang();
+  const isFr = lang === "fr-CA";
+
+  const name  = document.getElementById("ms-project-name").value.trim();
+  const emoji = document.getElementById("ms-project-emoji").value.trim() || "🚩";
+
+  if (!name) {
+    document.getElementById("ms-project-name").focus();
+    return;
+  }
+
+  // Collect milestone rows — skip empty ones
+  const milestones = [];
+  document.querySelectorAll("#ms-rows .repeatable-block").forEach(row => {
+    const date  = row.querySelector(".ms-date")?.value  || "";
+    const title = row.querySelector(".ms-title")?.value.trim() || "";
+    if (date || title) {
+      milestones.push({ id: row.dataset.msId || generateUUID(), date, title });
+    }
+  });
+
+  if (!milestones.length) {
+    alert(isFr ? "Ajoute au moins un jalon." : "Add at least one milestone.");
+    return;
+  }
+
+  const projectId = _editingProjectId || ("proj-" + generateUUID().slice(0, 8));
+  const now = new Date().toISOString();
+  const studentEmail = loadData()?.profile?.email || "";
+
+  calMilestones[projectId] = {
+    exported_at: now,
+    exported_by: studentEmail,
+    file_title:  "",
+    project: { id: projectId, name, emoji, milestones },
+  };
+  saveMilestones(calMilestones);
+  closeMilestoneEditor();
+  renderGrid();
+  renderMilestonesPanel();
+}
+
 // Render the milestones sidebar card: project checkboxes + export button.
 function renderMilestonesPanel() {
   const container = document.getElementById("cal-milestones-panel");
@@ -603,12 +741,16 @@ function renderMilestonesPanel() {
       ? `<div style="font-size:1.1rem;color:var(--text-muted);margin-left:2.2rem">${escHtml(exported_by)}</div>`
       : "";
     return `
-      <label style="display:flex;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-1);cursor:pointer;font-size:1.3rem">
-        <input type="checkbox" ${checked} onchange="toggleMilestoneProject('${pid}',this.checked)">
-        <span style="font-size:1.5rem;line-height:1">${emoji}</span>
-        <span style="flex:1">${escHtml(project.name)}</span>
-        <span style="color:var(--text-muted);font-size:1.2rem">${count}</span>
-      </label>
+      <div style="display:flex;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-1)">
+        <label style="display:flex;align-items:center;gap:var(--sp-2);cursor:pointer;font-size:1.3rem;flex:1;min-width:0">
+          <input type="checkbox" ${checked} onchange="toggleMilestoneProject('${pid}',this.checked)">
+          <span style="font-size:1.5rem;line-height:1">${emoji}</span>
+          <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(project.name)}</span>
+          <span style="color:var(--text-muted);font-size:1.2rem;flex-shrink:0">${count}</span>
+        </label>
+        <button class="btn btn--ghost btn--sm" style="flex-shrink:0;padding:2px 6px"
+          onclick="openMilestoneEditor('${pid}')" title="${isFr ? 'Modifier' : 'Edit'}">✎</button>
+      </div>
       ${byLine}`;
   }).join("");
 

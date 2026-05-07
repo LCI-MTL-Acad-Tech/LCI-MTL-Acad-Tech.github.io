@@ -166,14 +166,36 @@
     }
     .cal-upload-zone:hover { border-color: var(--accent); background: var(--tag-bg); }
 
-    /* ── Planned modality dot on calendar cell ── */
-    .cal-mod-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      margin: 2px auto 0; flex-shrink: 0;
+    /* ── Planned modality indicator — top-right corner ── */
+    .cal-mod-indicator {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 22px;
+      height: 22px;
+      pointer-events: none;
     }
-    .cal-mod-dot--onsite  { background: var(--accent); }
-    .cal-mod-dot--remote  { background: var(--color-blue-400, #5ba8c4); }
-    .cal-mod-dot--hybrid  { background: linear-gradient(135deg, var(--accent) 50%, var(--color-blue-400, #5ba8c4) 50%); }
+    /* Absence X — top-right, drawn via pseudo-elements */
+    .cal-absence-x {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 14px;
+      height: 14px;
+      pointer-events: none;
+    }
+    .cal-absence-x::before,
+    .cal-absence-x::after {
+      content: "";
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 14px; height: 3px;
+      background: #A32D2D;
+      border-radius: 2px;
+      transform-origin: center;
+    }
+    .cal-absence-x::before { transform: translate(-50%, -50%) rotate(45deg); }
+    .cal-absence-x::after  { transform: translate(-50%, -50%) rotate(-45deg); }
 
     /* ── Modality selector buttons in day modal ── */
     .mod-btn { border: 1.5px solid var(--border); min-width: 9rem; }
@@ -268,7 +290,41 @@
               <div class="flex items-center justify-between mb-3">
                 <div class="section-title" style="border:none;margin:0;padding:0"
                   data-i18n="cal.milestones_title">Jalons</div>
+                <button class="btn btn--ghost btn--sm" onclick="openMilestoneEditor()"
+                  id="cal-milestone-define-btn" data-i18n="cal.milestones_define">Définir un projet</button>
               </div>
+              <p class="form-hint mb-3" data-i18n="cal.milestones_teamlead_hint"></p>
+
+              <!-- Inline editor — hidden by default -->
+              <div id="cal-milestone-editor" style="display:none">
+                <div class="form-group mb-3">
+                  <label style="font-size:1.2rem;color:var(--text-muted)" data-i18n="cal.milestones_project_name"></label>
+                  <input type="text" id="ms-project-name" style="width:100%;margin-top:var(--sp-1)"
+                    data-i18n-placeholder="cal.milestones_project_name_placeholder">
+                </div>
+                <div class="form-group mb-4">
+                  <label style="font-size:1.2rem;color:var(--text-muted)" data-i18n="cal.milestones_project_emoji"></label>
+                  <input type="text" id="ms-project-emoji" style="width:6rem;margin-top:var(--sp-1);font-size:1.8rem;text-align:center"
+                    maxlength="4" placeholder="🚩">
+                  <div class="form-hint" data-i18n="cal.milestones_emoji_hint"></div>
+                </div>
+
+                <div style="font-size:1.2rem;font-weight:600;color:var(--text-muted);margin-bottom:var(--sp-2)"
+                  data-i18n="cal.milestones_milestones_label">Jalons</div>
+                <div id="ms-rows"></div>
+                <button class="add-block-btn mt-2" onclick="addMilestoneRow()" style="font-size:1.3rem">
+                  + <span data-i18n="cal.milestones_add_another">Ajouter un jalon</span>
+                </button>
+
+                <div style="display:flex;gap:var(--sp-2);margin-top:var(--sp-4);flex-wrap:wrap">
+                  <button class="btn btn--primary btn--sm" onclick="saveMilestoneEditor()"
+                    data-i18n="cal.milestones_save">Enregistrer</button>
+                  <button class="btn btn--ghost btn--sm" onclick="closeMilestoneEditor()"
+                    data-i18n="cal.milestones_discard">Annuler</button>
+                </div>
+                <div class="form-hint mt-2" data-i18n="cal.milestones_save_hint"></div>
+              </div>
+
               <div id="cal-milestones-panel">
                 <p style="font-size:1.3rem;color:var(--text-muted)">—</p>
               </div>
