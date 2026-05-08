@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premier jour de stage — Day One</title>
+<style>
+  :root {
+    --blue: #00587c;
+    --blue-dim: #004a69;
+    --red: #eb2d37;
+    --cream: #f8f5e9;
+    --charcoal: #07181e;
+    --light: #e8f2f7;
+    --card-bg: #ffffff;
+    --card-border: #d0e4ec;
+    --text: #07181e;
+    --text-dim: #3a5560;
+    --text-faint: #6a8a96;
+    --divider: #c8dde6;
+    --note-bg: #f0f7fb;
+    --warn-bg: #fff3f3;
+    --warn-border: #eb2d37;
+    --body-bg: #f8f5e9;
+    --header-bg: #00587c;
+    --toggle-bg: #cce3ed;
+    --toggle-knob: #00587c;
+  }
+
+  [data-theme="dark"] {
+    --blue: #3db0dc;
+    --blue-dim: #2a90b8;
+    --red: #ff5a62;
+    --cream: #0d2028;
+    --charcoal: #e8f2f7;
+    --light: #0f2a36;
+    --card-bg: #102030;
+    --card-border: #1e3d50;
+    --text: #ddeef5;
+    --text-dim: #8ab8cc;
+    --text-faint: #5a8899;
+    --divider: #1e3d50;
+    --note-bg: #0d2535;
+    --warn-bg: #2a0d0f;
+    --warn-border: #ff5a62;
+    --body-bg: #071820;
+    --header-bg: #051520;
+    --toggle-bg: #1e3d50;
+    --toggle-knob: #3db0dc;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--body-bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.5;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  header {
+    background: var(--header-bg);
+    color: white;
+    padding: 24px 40px 20px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  header .header-text h1 {
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  header .header-text .sub {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-top: 3px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  header .header-text .schedule {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-top: 8px;
+  }
+
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .toggle-label {
+    font-size: 11px;
+    opacity: 0.7;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: white;
+  }
+
+  .toggle {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    cursor: pointer;
+  }
+
+  .toggle input { opacity: 0; width: 0; height: 0; }
+
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: var(--toggle-bg);
+    border-radius: 11px;
+    transition: background 0.3s;
+  }
+
+  .toggle-knob {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+  }
+
+  .toggle input:checked + .toggle-track { background: #1e3d50; }
+  .toggle input:checked ~ .toggle-knob { transform: translateX(18px); }
+
+  .container {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 28px 24px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--divider);
+  }
+
+  .section-block { margin-bottom: 36px; }
+
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin-bottom: 32px;
+  }
+
+  .col-fr { padding-right: 24px; border-right: 1px solid var(--divider); }
+  .col-en { padding-left: 24px; }
+
+  .lang-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 14px;
+  }
+
+  .step {
+    margin-bottom: 12px;
+    padding: 14px 16px;
+    background: var(--card-bg);
+    border-radius: 6px;
+    border: 1px solid var(--card-border);
+    border-left: 3px solid var(--blue);
+    transition: background 0.3s, border-color 0.3s;
+  }
+
+  .step.warn {
+    border-left-color: var(--red);
+    background: var(--warn-bg);
+    border-color: var(--warn-border);
+    border-left: 3px solid var(--red);
+  }
+
+  .step.note {
+    border-left-color: var(--text-faint);
+    background: var(--note-bg);
+    border-left: 3px solid var(--text-faint);
+    border-color: var(--card-border);
+  }
+
+  .step-number {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 4px;
+  }
+
+  .step.warn .step-number { color: var(--red); }
+  .step.note .step-number { color: var(--text-faint); }
+
+  .step h2 {
+    font-size: 13.5px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    line-height: 1.3;
+    color: var(--text);
+  }
+
+  .step p {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.55;
+  }
+
+  .step p + p { margin-top: 5px; }
+
+  .step a {
+    color: var(--blue);
+    font-weight: 600;
+    word-break: break-all;
+  }
+
+  .hl {
+    background: var(--note-bg);
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-top: 8px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    border: 1px solid var(--card-border);
+  }
+
+  .hl strong { color: var(--text); }
+
+  .pill {
+    display: inline-block;
+    font-family: monospace;
+    font-size: 11.5px;
+    background: var(--light);
+    color: var(--blue);
+    padding: 1px 7px;
+    border-radius: 3px;
+    border: 1px solid var(--card-border);
+  }
+
+  [data-theme="dark"] .pill {
+    background: #0d2535;
+    border-color: #1e3d50;
+  }
+
+  footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-faint);
+    padding: 20px;
+    margin-top: 8px;
+  }
+
+  @media print {
+    [data-theme="dark"] {
+      --blue: #00587c; --red: #c0000a; --body-bg: white;
+      --header-bg: #00587c; --card-bg: white; --card-border: #ccc;
+      --text: #000; --text-dim: #222; --text-faint: #666;
+      --divider: #ccc; --note-bg: #f0f0f0; --warn-bg: #fff3f3; --light: #eef4f8;
+    }
+    body { font-size: 9.5pt; }
+    header { padding: 12px 20px; }
+    header .header-text h1 { font-size: 12pt; }
+    .toggle-wrap { display: none; }
+    .container { padding: 12px 10px; }
+    .col-fr { padding-right: 12px; }
+    .col-en { padding-left: 12px; }
+    .step { padding: 8px 10px; margin-bottom: 7px; page-break-inside: avoid; }
+    .step h2 { font-size: 10pt; }
+    .step p { font-size: 9pt; }
+    header, .step, .hl, .pill { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  @media (max-width: 720px) {
+    .columns { grid-template-columns: 1fr; }
+    .col-fr { padding-right: 0; border-right: none; border-bottom: 1px solid var(--divider); padding-bottom: 24px; margin-bottom: 24px; }
+    .col-en { padding-left: 0; }
+    header { flex-direction: column; gap: 12px; padding: 18px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-text">
+    <div class="sub">Collège LaSalle Montréal — Innovation Hub</div>
+    <h1>Premier jour de stage &nbsp;/&nbsp; Day One</h1>
+    <div class="schedule">Rejoins le vocal AllHands sur Discord vers 9 h &nbsp;·&nbsp; Join the AllHands voice channel on Discord around 9 AM</div>
+    <div class="schedule" style="opacity:0.6; font-size:11px; margin-top:3px;">Si tu as un engagement important le matin, tu dois être présent·e avant 15 h &nbsp;·&nbsp; If you have a morning commitment, be there by 3 PM at the latest</div>
+  </div>
+  <div class="toggle-wrap">
+    <span class="toggle-label">Dark</span>
+    <label class="toggle">
+      <input type="checkbox" id="theme-toggle" onchange="toggleTheme()">
+      <span class="toggle-track"></span>
+      <span class="toggle-knob"></span>
+    </label>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ══ 1. DISCORD ══ -->
+  <div class="section-block">
+    <div class="section-label">1. Discord — Matin &nbsp;/&nbsp; Morning</div>
+    <div class="columns">
+      <div class="col-fr">
+        <div class="lang-label">Français</div>
+
+        <div class="step">
+          <div class="step-number">Dès que tu es connecté·e</div>
+          <h2>Vérifie #innohub et rejoins le vocal AllHands</h2>
+          <p>Consulte les nouvelles indications épinglées sur le canal <span class="pill">#innohub</span>. Rejoins ensuite le canal vocal <span class="pill">AllHands</span> — fortement encouragé vers 9 h, mais au plus tard à 15 h si tu as un engagement le matin.</p>
+          <p>Si tu es complètement indisponible le lundi, écris un message clair sur <strong>chacun de tes canaux d'équipe</strong> pour te présenter, expliquer qui tu es et ce que tu pourras apporter au projet.</p>
+        </div>
+
+        <div class="step warn">
+          <div class="step-number">Chef·fe d'équipe — présence essentielle</div>
+          <h2>Sois présent·e le lundi ou désigne un·e délégué·e</h2>
+          <p>Il est très important que les chefs d'équipe soient disponibles le premier jour. Si tu ne peux vraiment pas être là, demande à un·e autre membre de l'équipe d'assumer le rôle de chef·fe délégué·e pour la journée et indique-le clairement dans le fil de l'équipe.</p>
+        </div>
+
+        <div class="step note">
+          <div class="step-number">Si tu n'as pas encore rejoint Discord</div>
+          <h2>Complète les étapes de <a href="https://lci-mtl-acad-tech.github.io/outils/log/setup.html">setup.html</a> en priorité</h2>
+          <p>Rejoins le serveur, publie ton introduction sur <span class="pill">#intro</span>, et attends que ton rôle soit activé avant de continuer.</p>
+        </div>
+
+        <div class="step note">
+          <div class="step-number">Si tu n'es pas à l'aise avec la langue utilisée</div>
+          <h2>Dis-le dès que possible</h2>
+          <p>Si les échanges dans ton équipe se déroulent uniquement dans une langue avec laquelle tu n'es pas à l'aise, signale-le le plus tôt possible. L'équipe peut décider ensemble qui assurera les traductions, ou si tout le monde s'exprimera dans les deux langues. Chaque personne a le droit de contribuer confortablement dans la langue de ses études.</p>
+        </div>
+
+      </div>
+      <div class="col-en">
+        <div class="lang-label">English</div>
+
+        <div class="step">
+          <div class="step-number">As soon as you're online</div>
+          <h2>Check #innohub and join the AllHands voice channel</h2>
+          <p>Check for any new pinned instructions on <span class="pill">#innohub</span>. Then join the <span class="pill">AllHands</span> voice channel — strongly encouraged around 9 AM, but no later than 3 PM if you have a morning commitment.</p>
+          <p>If you are completely unavailable on Monday, post a clear message on <strong>each of your team channels</strong> introducing yourself and explaining who you are and what you will be able to contribute.</p>
+        </div>
+
+        <div class="step warn">
+          <div class="step-number">Team lead — presence is essential</div>
+          <h2>Be present on Monday or designate a delegate</h2>
+          <p>It is very important that team leads are available on the first day. If you truly cannot be there, ask another team member to act as delegate team lead for the day and make this clear in the team thread.</p>
+        </div>
+
+        <div class="step note">
+          <div class="step-number">If you haven't joined Discord yet</div>
+          <h2>Complete the steps at <a href="https://lci-mtl-acad-tech.github.io/outils/log/setup.html">setup.html</a> first</h2>
+          <p>Join the server, post your introduction in <span class="pill">#intro</span>, and wait for your role to be activated before continuing.</p>
+        </div>
+
+        <div class="step note">
+          <div class="step-number">If you're not comfortable with the language being used</div>
+          <h2>Speak up as soon as possible</h2>
+          <p>If your team discussions are happening only in a language you are not comfortable with, raise it as early as you can. The team can decide together who will translate, or whether everyone will communicate in both languages. Everyone has the right to contribute comfortably in the language of their studies.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 2. PROJETS ET ÉQUIPES ══ -->
+  <div class="section-block">
+    <div class="section-label">2. Projets et compositions d'équipes &nbsp;/&nbsp; Projects and Team Compositions</div>
+    <div class="columns">
+      <div class="col-fr">
+        <div class="lang-label">Français</div>
+
+        <div class="step">
+          <div class="step-number">Canaux de projet</div>
+          <h2>Consulte le canal Discord de chacun de tes projets</h2>
+          <p>Les détails de chaque projet se trouvent sur le canal correspondant dans la catégorie InnoHub. Les compositions d'équipes proposées y sont aussi partagées — plusieurs projets ont plus d'une équipe.</p>
+          <p>Utilise la fonction <strong>Parcourir les canaux</strong> de Discord pour trouver tes canaux de projet. Tu peux également ajuster tes préférences de notification canal par canal (la version bureau offre le plus de fonctionnalités ; la version mobile est la plus limitée).</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Chef·fe d'équipe</div>
+          <h2>Identifie ou confirme le chef ou la cheffe d'équipe</h2>
+          <p>Il est possible qu'un·e chef·fe d'équipe soit déjà indiqué·e dans les captures d'écran partagées. Si tu souhaites avoir deux co-chef·fes ou si tu as un doute sur qui assume ce rôle, tague <strong>@satuelisa</strong> dans le fil de ton équipe.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Liaison client</div>
+          <h2>Identifie l'agent·e de liaison</h2>
+          <p>Si ton projet n'a qu'une seule équipe, le chef ou la cheffe d'équipe assume également la liaison avec le client. Si ton projet a plusieurs équipes et qu'aucune liaison n'a été désignée, les chefs d'équipe négocient dans un fil sur le canal du projet et taguent <strong>@satuelisa</strong> une fois la décision prise.</p>
+        </div>
+
+      </div>
+      <div class="col-en">
+        <div class="lang-label">English</div>
+
+        <div class="step">
+          <div class="step-number">Project channels</div>
+          <h2>Check the Discord channel for each of your projects</h2>
+          <p>Project details are shared on the corresponding channel in the InnoHub category. Proposed team compositions are also posted there — many projects have more than one team.</p>
+          <p>Use Discord's <strong>Browse Channels</strong> feature to find your project channels. You can also manage notification preferences on a per-channel basis (the desktop version offers the most functionality; mobile is the most limited).</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Team lead</div>
+          <h2>Identify or confirm the team lead</h2>
+          <p>A team lead may already be indicated in the shared screenshots. If you want two co-leads or are unsure who the lead is, tag <strong>@satuelisa</strong> in your team thread.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Client liaison</div>
+          <h2>Identify the client liaison</h2>
+          <p>If your project has only one team, the team lead also serves as client liaison. If your project has multiple teams and no liaison has been appointed, the team leads negotiate in a thread on the project channel and tag <strong>@satuelisa</strong> once a decision is made.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 3. PREMIÈRE RÉUNION ══ -->
+  <div class="section-block">
+    <div class="section-label">3. Première réunion d'équipe &nbsp;/&nbsp; First Team Meeting</div>
+    <div class="columns">
+      <div class="col-fr">
+        <div class="lang-label">Français</div>
+
+        <div class="step">
+          <div class="step-number">Chef·fe d'équipe — action requise</div>
+          <h2>Crée un fil d'équipe et planifie la réunion</h2>
+          <p>Crée un fil clairement nommé sur le canal Discord de ton projet. Utilise-le pour planifier la première réunion d'équipe (en ligne ou en présentiel) durant la première semaine. Une fois l'heure et le mode confirmés, tague <strong>@satuelisa</strong>.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Tous les membres — avant la réunion</div>
+          <h2>Partage tes tâches et ta disponibilité dans le fil d'équipe</h2>
+          <p>Poste dans le fil de ton équipe la liste de tes tâches assignées et le nombre d'heures pour <strong>chaque projet spécifique</strong>. Tu trouveras ces informations dans la capture d'écran épinglée dans ton chat MS Teams avec Elisa.</p>
+          <p>Prépare aussi un calendrier détaillé de ta disponibilité — il sera utilisé lors de la réunion pour planifier qui fait quoi et quand.</p>
+          <p>Rappel : la plupart des stagiaires travaillent sur <strong>plus d'un projet</strong>. C'est une belle opportunité, mais aussi un vrai défi en termes d'organisation et de communication. Dans un environnement professionnel, trouver un créneau commun où tout le monde est disponible est rarement simple. Utiliser ton calendrier Outlook associé à ton courriel du collège est une excellente façon d'apprendre à travailler comme un·e vrai·e professionnel·le.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Lors de la réunion — chef·fe d'équipe</div>
+          <h2>Crée le calendrier de jalons et partage-le avec l'équipe</h2>
+          <p>Pendant la réunion, le chef ou la cheffe d'équipe utilise l'outil de journal pour créer un calendrier de jalons à partir des disponibilités de chaque membre :</p>
+          <div class="hl">👉 <a href="https://lci-mtl-acad-tech.github.io/outils/log">lci-mtl-acad-tech.github.io/outils/log</a></div>
+          <p style="margin-top:8px;">Le chef ou la cheffe d'équipe exporte le fichier JSON et le partage avec les membres pour qu'ils puissent l'importer. <strong>Conserve tous tes fichiers JSON dans un dossier dédié sur ton ordinateur — tu en auras besoin tout au long du stage.</strong></p>
+        </div>
+
+        <div class="step note">
+          <div class="step-number">Ajustements d'heures</div>
+          <h2>Les heures par tâche peuvent être ajustées en équipe</h2>
+          <p>Chaque membre peut modifier la répartition des heures entre ses tâches, à condition que son total d'heures reste conforme à ce qui est indiqué dans son document B. En revanche, il n'est pas possible de changer d'équipe ou de projet — le Hub fonctionne comme une entreprise, pas comme un cours.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Si tu as plusieurs équipes sur un même projet</div>
+          <h2>Les chefs d'équipe se rencontrent durant la deuxième semaine</h2>
+          <p>Si un projet compte plusieurs équipes, les chefs d'équipe doivent se rencontrer au plus tard durant la deuxième semaine afin de coordonner les communications avec le client et les présentations finales — sous la coordination de la liaison client.</p>
+        </div>
+
+      </div>
+      <div class="col-en">
+        <div class="lang-label">English</div>
+
+        <div class="step">
+          <div class="step-number">Team lead — action required</div>
+          <h2>Create a team thread and plan the meeting</h2>
+          <p>Create a clearly named thread on your project's Discord channel. Use it to plan the first team meeting (online or in person) during the first week. Once the time and format are confirmed, tag <strong>@satuelisa</strong>.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">All members — before the meeting</div>
+          <h2>Share your tasks and availability in the team thread</h2>
+          <p>Post in your team thread the list of your assigned tasks and hours for <strong>each specific project</strong>. You will find this in the screenshot pinned in your MS Teams chat with Elisa.</p>
+          <p>Also prepare a detailed calendar of your availability — it will be used during the meeting to plan who does what and when.</p>
+          <p>Reminder: most interns work on <strong>more than one project</strong>. This is a great opportunity, but also a real challenge in terms of organization and communication skills. In a professional environment, finding a shared time slot that works for everyone is rarely straightforward. Using your Outlook calendar linked to your college email is a great way to learn to operate like a true professional.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">During the meeting — team lead</div>
+          <h2>Create the milestone calendar and share it with the team</h2>
+          <p>During the meeting, the team lead uses the log tool to create a milestone calendar based on each member's availability:</p>
+          <div class="hl">👉 <a href="https://lci-mtl-acad-tech.github.io/outils/log">lci-mtl-acad-tech.github.io/outils/log</a></div>
+          <p style="margin-top:8px;">The team lead exports the JSON file and shares it with team members for import. <strong>Keep all your JSON files in a dedicated folder on your computer — you will need them throughout the internship.</strong></p>
+        </div>
+
+        <div class="step note">
+          <div class="step-number">Hour adjustments</div>
+          <h2>Hours per task can be adjusted within your team</h2>
+          <p>Each member may redistribute hours across their tasks, as long as their total remains consistent with what is shown in their Document B. Switching teams or projects is not possible — the Hub operates like a company, not a course.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">If a project has multiple teams</div>
+          <h2>Team leads meet during the second week</h2>
+          <p>If a project has multiple teams, the team leads should meet no later than the second week to coordinate client communications and final presentations — under the coordination of the client liaison.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 4. CLIENT ══ -->
+  <div class="section-block">
+    <div class="section-label">4. Client &nbsp;/&nbsp; Client</div>
+    <div class="columns">
+      <div class="col-fr">
+        <div class="lang-label">Français</div>
+
+        <div class="step">
+          <div class="step-number">Disponibilité du client</div>
+          <h2>Le client n'est pas toujours joignable immédiatement</h2>
+          <p>Pour certains projets, le client peut être présent dès le premier jour. Pour d'autres, la liaison établira le contact plus tard. Si le client ne répond pas, le chef ou la cheffe d'équipe prend les décisions ou invite l'équipe à proposer des solutions.</p>
+          <p><strong>L'absence de réponse du client n'est jamais une raison d'arrêter de travailler.</strong> L'équipe doit toujours avancer en construisant le meilleur prototype possible selon sa compréhension actuelle des besoins du client.</p>
+        </div>
+
+      </div>
+      <div class="col-en">
+        <div class="lang-label">English</div>
+
+        <div class="step">
+          <div class="step-number">Client availability</div>
+          <h2>The client is not always immediately reachable</h2>
+          <p>For some projects, the client may be present from day one. For others, the liaison will establish contact at a later time. If the client is not responding, the team lead makes decisions or invites the team to propose solutions.</p>
+          <p><strong>A client not answering questions is never an excuse to stop working.</strong> The team should always keep building the best prototype they can based on their current understanding of the client's needs.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 5. TES TÂCHES ══ -->
+  <div class="section-block">
+    <div class="section-label">5. Tes tâches &nbsp;/&nbsp; Your Tasks</div>
+    <div class="columns">
+      <div class="col-fr">
+        <div class="lang-label">Français</div>
+
+        <div class="step">
+          <div class="step-number">Si ton enseignant·e te demande tes tâches</div>
+          <h2>Utilise ta liste de 4 à 6 tâches</h2>
+          <p>C'est la liste que nous avons inscrite dans ton document C, ou la liste personnalisée que tu as reçue après ton assignation aux projets. Les deux sont épinglées dans ton chat MS Teams avec Elisa.</p>
+          <p>En cas de doute, la capture d'écran de ton plan de tâches se trouve juste avant cette liste dans le chat — elle indique tes projets et les heures associées.</p>
+          <p>Si ton enseignant·e veut en savoir plus sur tes projets, tu peux lui faire un résumé de ce que tu sais. Les enseignants superviseurs sont également les bienvenus sur Discord — ils peuvent contacter Elisa sur MS Teams pour obtenir le lien d'invitation.</p>
+        </div>
+
+      </div>
+      <div class="col-en">
+        <div class="lang-label">English</div>
+
+        <div class="step">
+          <div class="step-number">If your supervising teacher asks about your tasks</div>
+          <h2>Use your list of 4 to 6 tasks</h2>
+          <p>That is the list we entered in your Document C, or the personalized list you received after being assigned to your projects. Both are pinned in your MS Teams chat with Elisa.</p>
+          <p>If in doubt, the screenshot of your task plan is pinned just before that list in the chat — it shows your projects and the associated hours.</p>
+          <p>If your teacher wants to know more about your projects, you can summarize what you know. Supervising teachers are also welcome to join Discord — they can contact Elisa on MS Teams to get the invitation link.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 6. JOURNAL ET FIN DE JOURNÉE ══ -->
+  <div class="section-block">
+    <div class="section-label">6. Journal de bord &nbsp;/&nbsp; Daily Log</div>
+    <div class="columns">
+      <div class="col-fr">
+        <div class="lang-label">Français</div>
+
+        <div class="step">
+          <div class="step-number">Chaque jour, y compris aujourd'hui</div>
+          <h2>Remplis ton journal de bord en fin de journée</h2>
+          <p>Ouvre l'outil de journal et enregistre les heures travaillées et les tâches accomplies. C'est obligatoire tous les jours de stage, dès le premier jour.</p>
+          <div class="hl">👉 <a href="https://lci-mtl-acad-tech.github.io/outils/log">lci-mtl-acad-tech.github.io/outils/log</a></div>
+          <p style="margin-top:8px;">L'outil génère aussi un <strong>rapport hebdomadaire</strong> — assure-toi de le remplir chaque semaine. Si ton enseignant·e supervisant a des questions spécifiques auxquelles tu dois répondre dans tes rapports, l'outil peut être configuré pour inclure ces questions. Tu peux ainsi rédiger tes réponses directement dans l'outil, puis les copier-coller dans le format de rapport demandé par ton enseignant·e.</p>
+        </div>
+
+      </div>
+      <div class="col-en">
+        <div class="lang-label">English</div>
+
+        <div class="step">
+          <div class="step-number">Every day, including today</div>
+          <h2>Fill in your daily log at the end of the day</h2>
+          <p>Open the log tool and record the hours worked and tasks accomplished. This is required every internship day, starting from day one.</p>
+          <div class="hl">👉 <a href="https://lci-mtl-acad-tech.github.io/outils/log">lci-mtl-acad-tech.github.io/outils/log</a></div>
+          <p style="margin-top:8px;">The tool also generates a <strong>weekly report</strong> — make sure to fill it in each week. If your supervising teacher has specific questions you need to answer in your reports, the tool can be configured to include those questions. You can then write your answers directly in the tool and copy-paste them into your teacher's report format.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 7. OÙ POSER TES QUESTIONS ══ -->
+  <div class="section-block">
+    <div class="section-label">7. Où poser tes questions &nbsp;/&nbsp; Where to Ask Questions</div>
+    <div class="columns">
+      <div class="col-fr">
+        <div class="lang-label">Français</div>
+
+        <div class="step note">
+          <div class="step-number">Référence complète</div>
+          <h2>Consulte les règles de communication sur setup.html</h2>
+          <p>Les règles complètes sur quoi poster où (Discord, MS Teams, message privé) se trouvent dans les instructions de démarrage :</p>
+          <div class="hl">👉 <a href="https://lci-mtl-acad-tech.github.io/outils/log/setup.html">lci-mtl-acad-tech.github.io/outils/log/setup.html</a></div>
+          <p style="margin-top:8px;">La plupart des questions que tu te poses intéressent aussi les autres stagiaires. Il n'est pas logique de les poser en message privé — pose-les dans le bon canal Discord pour que tout le monde puisse en bénéficier.</p>
+        </div>
+
+      </div>
+      <div class="col-en">
+        <div class="lang-label">English</div>
+
+        <div class="step note">
+          <div class="step-number">Full reference</div>
+          <h2>See the communication rules on setup.html</h2>
+          <p>The complete rules on what to post where (Discord, MS Teams, private message) are in the onboarding instructions:</p>
+          <div class="hl">👉 <a href="https://lci-mtl-acad-tech.github.io/outils/log/setup.html">lci-mtl-acad-tech.github.io/outils/log/setup.html</a></div>
+          <p style="margin-top:8px;">Most questions you have are also of interest to other interns. It makes no sense to ask them in a private message — post them in the right Discord channel so everyone can benefit.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Collège LaSalle Montréal &nbsp;·&nbsp; Innovation Hub &nbsp;·&nbsp; Mai / May 2026
+</footer>
+
+<script>
+  function toggleTheme() {
+    const isDark = document.getElementById('theme-toggle').checked;
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  }
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.getElementById('theme-toggle').checked = true;
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+</script>
+
+</body>
+</html>
