@@ -37,13 +37,16 @@ function setLang(lang) {
   const heroTitle = document.getElementById('hero-title');
   const heroSub = document.getElementById('hero-sub');
   const searchInput = document.getElementById('search-input');
+  const headerSub = document.getElementById('header-sub');
   if (lang === 'en') {
+    if (headerSub) headerSub.textContent = 'Innovation Hub';
     heroTitle.textContent = 'Frequently Asked Questions';
     heroSub.textContent = 'Everything you need to know to do your internship at the Innovation Hub.';
     if (searchInput) searchInput.placeholder = 'Search…';
   } else {
+    if (headerSub) headerSub.textContent = 'Pôle d\u2019innovation';
     heroTitle.textContent = 'Questions fréquentes';
-    heroSub.textContent = "Tout ce qu'il faut savoir pour faire ton stage à l'Innovation Hub.";
+    heroSub.textContent = "Tout ce qu'il faut savoir pour faire ton stage au Pôle d'innovation.";
     if (searchInput) searchInput.placeholder = 'Rechercher…';
   }
 
