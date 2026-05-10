@@ -215,12 +215,15 @@ function renderItem(id, content, lang) {
 }
 
 function loadAndInit() {
+  // Wire all buttons immediately — no data needed for theme/lang toggles
+  wireButtons();
+
   fetch('faq.json')
     .then(r => r.json())
     .then(data => {
       FAQ = data;
       currentLang = getInitialLang();
-      initApp();
+      setLang(currentLang);
     })
     .catch(err => {
       document.getElementById('faq-content').innerHTML =
@@ -229,13 +232,15 @@ function loadAndInit() {
     });
 }
 
-function initApp() {
-  const initialTheme = getInitialTheme();
-  if (initialTheme === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    const _icon = document.getElementById('theme-icon');
-    if (_icon) _icon.className = 'ti ti-sun';
-  }
+function wireButtons() {
+  try {
+    const initialTheme = getInitialTheme();
+    if (initialTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      const _icon = document.getElementById('theme-icon');
+      if (_icon) _icon.className = 'ti ti-sun';
+    }
+  } catch(e) {}
 
   document.getElementById('lang-toggle').addEventListener('click', function() {
     setLang(currentLang === 'fr' ? 'en' : 'fr');
@@ -283,12 +288,13 @@ function initApp() {
       qBtn.setAttribute('aria-expanded', String(!isOpen));
     }
   });
+}
 
-  try { setLang(currentLang); } catch(e) {}
-
+function initApp() {
+  // Called after FAQ data is loaded — handles deep links
   if (location.hash) {
     const hash = location.hash.slice(1);
-    const validCats = ['avant','demarrage','semaine1','modalite','notation','outil','espaces','communication','equipe','taches','outil-log','fichiers','ip','conduite','multiprojet'];
+    const validCats = ['avant','demarrage','semaine1','modalite','notation','outil','espaces','communication','equipe','taches','outil-log','fichiers','ip','conduite','multiprojet','productivite','interpersonnel','organisation'];
     if (validCats.includes(hash)) {
       filterCat(hash);
       setTimeout(() => {
@@ -296,7 +302,6 @@ function initApp() {
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
     } else if (hash.startsWith('faq-')) {
-      // Deep link to a specific question
       setTimeout(() => {
         const el = document.getElementById(hash);
         if (el) {
