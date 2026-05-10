@@ -289,8 +289,8 @@ header {
 
 .section-header {
   display: flex;
-  align-items: baseline;
-  gap: 10px;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 20px;
   padding-bottom: 12px;
   border-bottom: 2px solid var(--accent);
@@ -450,15 +450,34 @@ header {
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 4px 6px;
+  padding: 3px 6px;
   border-radius: var(--radius);
-  font-size: 14px;
-  opacity: 0;
-  transition: opacity 0.15s, color 0.15s;
-  margin-left: 6px;
+  font-size: 13px;
+  opacity: 1;
+  transition: color 0.15s;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-left: auto;
 }
-.section-header:hover .share-btn { opacity: 1; }
-.share-btn.copied { color: var(--accent); opacity: 1; }
+.section-header .share-btn:hover { color: var(--accent); }
+.share-btn.copied { color: var(--accent); }
+
+.q-share-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 11px;
+  opacity: 1;
+  transition: color 0.15s;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-left: 6px;
+  border-radius: var(--radius);
+}
+.q-share-btn:hover { color: var(--accent); }
+.q-share-btn.copied { color: var(--accent); }
 
 .no-results {
   text-align: center;
@@ -496,6 +515,64 @@ footer {
   .content { padding: 20px 20px 40px; }
 }
 
+
+.resources {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.resources-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-right: 4px;
+}
+.resources a {
+  font-size: 13px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border-hover);
+  background: var(--bg);
+  color: var(--accent);
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.resources a:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent);
+  opacity: 1;
+}
+#copy-toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  background: var(--charcoal);
+  color: #f0ece0;
+  font-family: 'Modern Gothic', system-ui, sans-serif;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 999;
+  white-space: nowrap;
+}
+[data-theme="dark"] #copy-toast {
+  background: var(--bg-tertiary);
+  color: var(--text);
+  border: 1px solid var(--border-hover);
+}
+#copy-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 
@@ -526,6 +603,12 @@ footer {
     <button class="clear-btn" id="clear-btn" aria-label="Effacer la recherche">
       <i class="ti ti-x" aria-hidden="true"></i>
     </button>
+  </div>
+  <div class="resources">
+    <span class="resources-label" data-fr="Ressources clés" data-en="Key resources">Ressources clés</span>
+    <a href="https://lci-mtl-acad-tech.github.io/outils/log/setup.html" target="_blank" data-fr="Avant le début" data-en="Before you start">Avant le début</a>
+    <a href="https://lci-mtl-acad-tech.github.io/outils/log/dayone.html" target="_blank" data-fr="Journée de départ" data-en="Start date">Journée de départ</a>
+    <a href="https://lci-mtl-acad-tech.github.io/outils/log/" target="_blank" data-fr="Outil de journal" data-en="Log tool">Outil de journal</a>
   </div>
 </div>
 
@@ -637,14 +720,14 @@ const FAQ = [
       a: `<p>Remplis le <strong>formulaire de démarrage</strong> dès que possible :</p>
 <p><a href="https://forms.cloud.microsoft/r/Xe8bhS7yWQ" target="_blank">forms.cloud.microsoft/r/Xe8bhS7yWQ ↗</a></p>
 <p>Indique les projets sur lesquels tu travailles, si tu souhaites être chef·fe d'équipe ou agent·e de liaison, et ton niveau de français et d'anglais.</p>
-<div class="note">Ta <strong>date de début</strong> et les projets qui te sont assignés figurent sur ton <strong>document B</strong>. La composition des équipes sera communiquée le <strong>mercredi après-midi</strong> à tou·tes les stagiaires ayant correctement rempli tous les formulaires requis.</div>`
+<div class="note">Ta <strong>date de début</strong> et les projets qui te sont assignés figurent sur ton <strong>document B</strong>. Consulte aussi les <a href="https://lci-mtl-acad-tech.github.io/outils/log/setup.html" target="_blank">instructions détaillées ↗</a> pour toutes les étapes avant le début. La composition des équipes sera communiquée le <strong>mercredi après-midi</strong> à tou·tes les stagiaires ayant correctement rempli tous les formulaires requis.</div>`
     },
     en: {
       q: "What do I need to do as soon as I know my projects?",
       a: `<p>Fill out the <strong>onboarding form</strong> as soon as possible:</p>
 <p><a href="https://forms.cloud.microsoft/r/Xe8bhS7yWQ" target="_blank">forms.cloud.microsoft/r/Xe8bhS7yWQ ↗</a></p>
 <p>Indicate which projects you are working on, whether you would like to be a team lead or client liaison, and your French and English proficiency levels.</p>
-<div class="note">Your <strong>start date</strong> and assigned projects are listed on your <strong>Document B</strong>. Team formation will be communicated on <strong>Wednesday afternoon</strong> to all interns who have properly filled in all the required forms.</div>`
+<div class="note">Your <strong>start date</strong> and assigned projects are listed on your <strong>Document B</strong>. See also the <a href="https://lci-mtl-acad-tech.github.io/outils/log/setup.html" target="_blank">detailed instructions ↗</a> for all steps before your start date. Team formation will be communicated on <strong>Wednesday afternoon</strong> to all interns who have properly filled in all the required forms.</div>`
     }
   },
   {
@@ -763,13 +846,13 @@ const FAQ = [
       q: "Quelle est la priorité le jour de départ?",
       a: `<p>Ta journée de départ donne le coup d'envoi — les équipe(s) se forment, les fils de discussion s'ouvrent, et la planification de la semaine commence.</p>
 <p><strong>Priorité principale :</strong> coordonne-toi avec tes équipe(s) sur Discord.</p>
-<p>La journée de départ se fait <strong>à distance par défaut</strong>. La présence en personne n'est disponible que le mardi suivant (9 h – 17 h).</p>`
+<p>La journée de départ se fait <strong>à distance par défaut</strong>. Consulte les <a href="https://lci-mtl-acad-tech.github.io/outils/log/dayone.html" target="_blank">instructions de la journée de départ ↗</a> pour le déroulement complet. La présence en personne n'est disponible que le mardi suivant (9 h – 17 h).</p>`
     },
     en: {
       q: "What is the priority on the start date?",
       a: `<p>Your start date is the kickoff day — teams form, threads open, and planning for the week begins.</p>
 <p><strong>Main priority:</strong> coordinate with your team(s)s on Discord.</p>
-<p>The start date is <strong>remote by default</strong>. In-person attendance is only available the following Tuesday (9 AM – 5 PM).</p>`
+<p>The start date is <strong>remote by default</strong>. See the <a href="https://lci-mtl-acad-tech.github.io/outils/log/dayone.html" target="_blank">start date instructions ↗</a> for the full walkthrough. In-person attendance is only available the following Tuesday (9 AM – 5 PM).</p>`
     }
   },
   {
@@ -2366,9 +2449,23 @@ function clearSearch() {
   render();
 }
 
+function showCopyToast(lang) {
+  let toast = document.getElementById('copy-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'copy-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = lang === 'en' ? 'Link copied!' : 'Lien copié\u00a0!';
+  toast.classList.add('visible');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => toast.classList.remove('visible'), 2000);
+}
+
 function copyShareLink(catId) {
   const url = location.href.split('#')[0] + '#' + catId;
   navigator.clipboard.writeText(url).catch(() => {});
+  showCopyToast(currentLang);
 }
 
 function matchesSearch(item, query) {
@@ -2417,8 +2514,8 @@ function render() {
     html += `<section class="faq-section" data-cat="${cat}" id="${cat}">
       <div class="section-header">
         <h2>${heading}</h2>
-        <button class="share-btn" data-cat="${cat}" title="${currentLang === 'en' ? 'Copy link to this section' : 'Copier le lien vers cette section'}" aria-label="${currentLang === 'en' ? 'Copy link' : 'Copier le lien'}"><i class="ti ti-link" aria-hidden="true"></i></button>
         <span class="count-badge">${items.length}</span>
+        <button class="share-btn" data-cat="${cat}" title="${currentLang === 'en' ? 'Copy link to this section' : 'Copier le lien vers cette section'}" aria-label="${currentLang === 'en' ? 'Copy link' : 'Copier le lien'}">&#x1F517;</button>
       </div>`;
 
     items.forEach((item, idx) => {
@@ -2475,6 +2572,7 @@ function renderItem(id, content, lang) {
     <button class="faq-q" aria-expanded="false">
       ${langTag}
       <span>${content.q}</span>
+      <button class="q-share-btn" data-id="${id}" title="${currentLang === 'en' ? 'Copy link to this question' : 'Copier le lien vers cette question'}" aria-label="${currentLang === 'en' ? 'Copy link' : 'Copier le lien'}" tabindex="0">&#x1F517;</button>
       <i class="ti ti-chevron-down faq-chevron" aria-hidden="true"></i>
     </button>
     <div class="faq-a" role="region">${content.a}</div>
@@ -2509,6 +2607,16 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   document.getElementById('faq-sections').addEventListener('click', function(e) {
+    const qShareBtn = e.target.closest('.q-share-btn');
+    if (qShareBtn) {
+      e.stopPropagation();
+      const url = location.href.split('#')[0] + '#' + qShareBtn.dataset.id;
+      navigator.clipboard.writeText(url).catch(() => {});
+      qShareBtn.classList.add('copied');
+      setTimeout(() => qShareBtn.classList.remove('copied'), 1500);
+      showCopyToast(currentLang);
+      return;
+    }
     const shareBtn = e.target.closest('.share-btn');
     if (shareBtn) {
       copyShareLink(shareBtn.dataset.cat);
@@ -2528,13 +2636,24 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   if (location.hash) {
-    const cat = location.hash.slice(1);
-    const valid = ['avant','demarrage','semaine1','modalite','notation','outil','espaces','communication','equipe','taches','outil-log','fichiers','ip','conduite','multiprojet'];
-    if (valid.includes(cat)) {
-      filterCat(cat);
+    const hash = location.hash.slice(1);
+    const validCats = ['avant','demarrage','semaine1','modalite','notation','outil','espaces','communication','equipe','taches','outil-log','fichiers','ip','conduite','multiprojet'];
+    if (validCats.includes(hash)) {
+      filterCat(hash);
       setTimeout(() => {
-        const el = document.getElementById(cat);
+        const el = document.getElementById(hash);
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    } else if (hash.startsWith('faq-')) {
+      // Deep link to a specific question
+      setTimeout(() => {
+        const el = document.getElementById(hash);
+        if (el) {
+          el.classList.add('open');
+          el.querySelector('.faq-a').classList.add('visible');
+          el.querySelector('.faq-q').setAttribute('aria-expanded', 'true');
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       }, 100);
     }
   }
