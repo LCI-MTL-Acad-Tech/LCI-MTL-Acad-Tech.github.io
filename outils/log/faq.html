@@ -547,11 +547,15 @@ footer {
   transition: background 0.15s, border-color 0.15s;
   white-space: nowrap;
 }
-.resources a:hover {
-  background: var(--bg-tertiary);
-  border-color: var(--accent);
-  opacity: 1;
+.resources a::after {
+  content: ' ↗';
+  font-size: 11px;
+  opacity: 0.6;
+  vertical-align: super;
+  line-height: 1;
 }
+.resources a:hover { background: var(--bg-tertiary); border-color: var(--accent); opacity: 1; }
+.resources a:hover::after { opacity: 1; }
 #copy-toast {
   position: fixed;
   bottom: 28px;
