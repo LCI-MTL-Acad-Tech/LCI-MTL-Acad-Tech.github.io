@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -26,47 +27,47 @@
 }
 
 :root {
-  --blue: #00587c;
-  --blue-dark: #003f59;
-  --blue-light: #e6f1fb;
-  --red: #eb2d37;
-  --cream: #f8f5e9;
-  --charcoal: #07181e;
-  --cobalt: #685ef7;
-  --cobalt-light: #eeedfe;
-  --text: #07181e;
-  --text-muted: #4a5e66;
-  --bg: #ffffff;
-  --bg-secondary: #f8f5e9;
-  --bg-tertiary: #f0ede0;
-  --border: rgba(7,24,30,0.12);
-  --border-hover: rgba(7,24,30,0.25);
-  --accent: #00587c;
-  --tag-bg: #e6f1fb;
-  --tag-text: #003f59;
-  --highlight: #685ef7;
-  --highlight-bg: #eeedfe;
-  --answer-bg: #fafaf8;
-  --radius: 8px;
-  --radius-lg: 12px;
+–blue: #00587c;
+–blue-dark: #003f59;
+–blue-light: #e6f1fb;
+–red: #eb2d37;
+–cream: #f8f5e9;
+–charcoal: #07181e;
+–cobalt: #685ef7;
+–cobalt-light: #eeedfe;
+–text: #07181e;
+–text-muted: #4a5e66;
+–bg: #ffffff;
+–bg-secondary: #f8f5e9;
+–bg-tertiary: #f0ede0;
+–border: rgba(7,24,30,0.12);
+–border-hover: rgba(7,24,30,0.25);
+–accent: #00587c;
+–tag-bg: #e6f1fb;
+–tag-text: #003f59;
+–highlight: #685ef7;
+–highlight-bg: #eeedfe;
+–answer-bg: #fafaf8;
+–radius: 8px;
+–radius-lg: 12px;
 }
 
-[data-theme="dark"] {
-  --text: #f0ece0;
-  --text-muted: #8fa8b2;
-  --bg: #07181e;
-  --bg-secondary: #0d2630;
-  --bg-tertiary: #112e3a;
-  --border: rgba(240,236,224,0.1);
-  --border-hover: rgba(240,236,224,0.25);
-  --accent: #3da8d8;
-  --tag-bg: #0d2630;
-  --tag-text: #7ccaea;
-  --highlight: #9b93f9;
-  --highlight-bg: #1c1847;
-  --answer-bg: #0d2630;
-  --blue-light: #0d2630;
-  --cobalt-light: #1c1847;
+[data-theme=“dark”] {
+–text: #f0ece0;
+–text-muted: #8fa8b2;
+–bg: #07181e;
+–bg-secondary: #0d2630;
+–bg-tertiary: #112e3a;
+–border: rgba(240,236,224,0.1);
+–border-hover: rgba(240,236,224,0.25);
+–accent: #3da8d8;
+–tag-bg: #0d2630;
+–tag-text: #7ccaea;
+–highlight: #9b93f9;
+–highlight-bg: #1c1847;
+–answer-bg: #0d2630;
+–blue-light: #0d2630;
+–cobalt-light: #1c1847;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -74,309 +75,309 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Modern Gothic', system-ui, -apple-system, sans-serif;
-  font-weight: 400;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.55;
-  font-size: 16px;
-  transition: background 0.25s, color 0.25s;
+font-family: ‘Modern Gothic’, system-ui, -apple-system, sans-serif;
+font-weight: 400;
+background: var(–bg);
+color: var(–text);
+line-height: 1.55;
+font-size: 16px;
+transition: background 0.25s, color 0.25s;
 }
 
-a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+a { color: var(–accent); text-decoration: underline; text-underline-offset: 2px; }
 a:hover { opacity: 0.8; }
 
 .lci-color-logo {
-  font-family: 'LCI Education Color Logos', sans-serif;
-  speak: never;
-  line-height: 1;
-  -webkit-font-smoothing: antialiased;
+font-family: ‘LCI Education Color Logos’, sans-serif;
+speak: never;
+line-height: 1;
+-webkit-font-smoothing: antialiased;
 }
 
 header {
-  background: var(--charcoal);
-  padding: 20px 32px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  border-bottom: 3px solid var(--blue);
+background: var(–charcoal);
+padding: 20px 32px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 16px;
+position: sticky;
+top: 0;
+z-index: 100;
+border-bottom: 3px solid var(–blue);
 }
 
 .header-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+display: flex;
+align-items: center;
+gap: 14px;
 }
 
 .header-title {
-  color: #f0ece0;
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+color: #f0ece0;
+font-size: 15px;
+font-weight: 500;
+letter-spacing: -0.02em;
+line-height: 1.2;
 }
 
 .header-title span {
-  display: block;
-  font-size: 11px;
-  font-weight: 400;
-  opacity: 0.55;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+display: block;
+font-size: 11px;
+font-weight: 400;
+opacity: 0.55;
+letter-spacing: 0.04em;
+text-transform: uppercase;
 }
 
 .header-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+display: flex;
+align-items: center;
+gap: 8px;
 }
 
 .ctrl-btn {
-  background: rgba(240,236,224,0.08);
-  border: 1px solid rgba(240,236,224,0.15);
-  color: #f0ece0;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-family: 'Modern Gothic', sans-serif;
-  font-size: 13px;
-  cursor: pointer;
-  transition: background 0.2s;
-  white-space: nowrap;
+background: rgba(240,236,224,0.08);
+border: 1px solid rgba(240,236,224,0.15);
+color: #f0ece0;
+padding: 6px 14px;
+border-radius: 20px;
+font-family: ‘Modern Gothic’, sans-serif;
+font-size: 13px;
+cursor: pointer;
+transition: background 0.2s;
+white-space: nowrap;
 }
 
 .ctrl-btn:hover { background: rgba(240,236,224,0.16); }
-.ctrl-btn.active { background: var(--blue); border-color: var(--blue); }
+.ctrl-btn.active { background: var(–blue); border-color: var(–blue); }
 
 .hero {
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border);
-  padding: 40px 32px 32px;
+background: var(–bg-secondary);
+border-bottom: 1px solid var(–border);
+padding: 40px 32px 32px;
 }
 
 .hero h1 {
-  font-size: clamp(26px, 4vw, 38px);
-  font-weight: 400;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-  margin-bottom: 10px;
-  color: var(--text);
+font-size: clamp(26px, 4vw, 38px);
+font-weight: 400;
+letter-spacing: -0.03em;
+line-height: 1.05;
+margin-bottom: 10px;
+color: var(–text);
 }
 
 .hero p {
-  font-size: 15px;
-  color: var(--text-muted);
-  max-width: 560px;
+font-size: 15px;
+color: var(–text-muted);
+max-width: 560px;
 }
 
 .search-bar {
-  margin-top: 20px;
-  position: relative;
-  max-width: 520px;
-  display: flex;
-  align-items: center;
+margin-top: 20px;
+position: relative;
+max-width: 520px;
+display: flex;
+align-items: center;
 }
 
 .search-bar input {
-  width: 100%;
-  padding: 12px 40px 12px 42px;
-  border: 1px solid var(--border-hover);
-  border-radius: 24px;
-  font-family: 'Modern Gothic', sans-serif;
-  font-size: 15px;
-  background: var(--bg);
-  color: var(--text);
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+width: 100%;
+padding: 12px 40px 12px 42px;
+border: 1px solid var(–border-hover);
+border-radius: 24px;
+font-family: ‘Modern Gothic’, sans-serif;
+font-size: 15px;
+background: var(–bg);
+color: var(–text);
+outline: none;
+transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .search-bar input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(0,88,124,0.12);
+border-color: var(–accent);
+box-shadow: 0 0 0 3px rgba(0,88,124,0.12);
 }
 
 .search-icon {
-  position: absolute;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-muted);
-  font-size: 16px;
-  pointer-events: none;
+position: absolute;
+left: 15px;
+top: 50%;
+transform: translateY(-50%);
+color: var(–text-muted);
+font-size: 16px;
+pointer-events: none;
 }
 
 .clear-btn {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 15px;
-  padding: 4px;
-  display: none;
+position: absolute;
+right: 12px;
+top: 50%;
+transform: translateY(-50%);
+background: none;
+border: none;
+color: var(–text-muted);
+cursor: pointer;
+font-size: 15px;
+padding: 4px;
+display: none;
 }
 
 .main {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 0;
-  max-width: 1000px;
-  margin: 0 auto;
-  min-height: calc(100vh - 200px);
+display: grid;
+grid-template-columns: 220px 1fr;
+gap: 0;
+max-width: 1000px;
+margin: 0 auto;
+min-height: calc(100vh - 200px);
 }
 
 .sidebar {
-  padding: 28px 16px 28px 32px;
-  border-right: 1px solid var(--border);
-  position: sticky;
-  top: 65px;
-  height: calc(100vh - 65px);
-  overflow-y: auto;
+padding: 28px 16px 28px 32px;
+border-right: 1px solid var(–border);
+position: sticky;
+top: 65px;
+height: calc(100vh - 65px);
+overflow-y: auto;
 }
 
 .sidebar-label {
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 10px;
-  font-weight: 500;
+font-size: 10px;
+letter-spacing: 0.1em;
+text-transform: uppercase;
+color: var(–text-muted);
+margin-bottom: 10px;
+font-weight: 500;
 }
 
 .cat-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: none;
-  padding: 7px 10px;
-  border-radius: var(--radius);
-  font-family: 'Modern Gothic', sans-serif;
-  font-size: 13.5px;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-  line-height: 1.3;
+display: flex;
+align-items: center;
+gap: 8px;
+width: 100%;
+text-align: left;
+background: none;
+border: none;
+padding: 7px 10px;
+border-radius: var(–radius);
+font-family: ‘Modern Gothic’, sans-serif;
+font-size: 13.5px;
+color: var(–text-muted);
+cursor: pointer;
+transition: background 0.15s, color 0.15s;
+line-height: 1.3;
 }
 
-.cat-btn:hover { background: var(--bg-tertiary); color: var(--text); }
-.cat-btn.active { background: var(--highlight-bg); color: var(--highlight); font-weight: 500; }
+.cat-btn:hover { background: var(–bg-tertiary); color: var(–text); }
+.cat-btn.active { background: var(–highlight-bg); color: var(–highlight); font-weight: 500; }
 
 .cat-btn .cat-count {
-  margin-left: auto;
-  font-size: 11px;
-  background: var(--bg-tertiary);
-  color: var(--text-muted);
-  border-radius: 10px;
-  padding: 1px 7px;
-  min-width: 22px;
-  text-align: center;
+margin-left: auto;
+font-size: 11px;
+background: var(–bg-tertiary);
+color: var(–text-muted);
+border-radius: 10px;
+padding: 1px 7px;
+min-width: 22px;
+text-align: center;
 }
 
-.cat-btn.active .cat-count { background: var(--highlight-bg); color: var(--highlight); }
+.cat-btn.active .cat-count { background: var(–highlight-bg); color: var(–highlight); }
 
 .content {
-  padding: 28px 32px 60px;
+padding: 28px 32px 60px;
 }
 
 .section-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid var(--accent);
+display: flex;
+align-items: center;
+gap: 8px;
+margin-bottom: 20px;
+padding-bottom: 12px;
+border-bottom: 2px solid var(–accent);
 }
 
 .section-header h2 {
-  font-size: 18px;
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  color: var(--text);
+font-size: 18px;
+font-weight: 400;
+letter-spacing: -0.02em;
+color: var(–text);
 }
 
 .section-header .count-badge {
-  font-size: 12px;
-  background: var(--tag-bg);
-  color: var(--tag-text);
-  padding: 2px 9px;
-  border-radius: 10px;
+font-size: 12px;
+background: var(–tag-bg);
+color: var(–tag-text);
+padding: 2px 9px;
+border-radius: 10px;
 }
 
 .faq-section { margin-bottom: 40px; }
 
 .faq-item {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  margin-bottom: 8px;
-  overflow: hidden;
-  transition: border-color 0.2s;
+border: 1px solid var(–border);
+border-radius: var(–radius-lg);
+margin-bottom: 8px;
+overflow: hidden;
+transition: border-color 0.2s;
 }
 
-.faq-item:hover { border-color: var(--border-hover); }
-.faq-item.open { border-color: var(--accent); }
+.faq-item:hover { border-color: var(–border-hover); }
+.faq-item.open { border-color: var(–accent); }
 
 .faq-q {
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: none;
-  padding: 15px 18px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  cursor: pointer;
-  font-family: 'Modern Gothic', sans-serif;
-  font-size: 14.5px;
-  font-weight: 500;
-  color: var(--text);
-  line-height: 1.4;
-  transition: background 0.15s;
+width: 100%;
+text-align: left;
+background: none;
+border: none;
+padding: 15px 18px;
+display: flex;
+align-items: flex-start;
+gap: 12px;
+cursor: pointer;
+font-family: ‘Modern Gothic’, sans-serif;
+font-size: 14.5px;
+font-weight: 500;
+color: var(–text);
+line-height: 1.4;
+transition: background 0.15s;
 }
 
-.faq-q:hover { background: var(--bg-secondary); }
-.faq-item.open .faq-q { background: var(--bg-secondary); }
+.faq-q:hover { background: var(–bg-secondary); }
+.faq-item.open .faq-q { background: var(–bg-secondary); }
 
 .faq-chevron {
-  margin-left: auto;
-  flex-shrink: 0;
-  color: var(--text-muted);
-  font-size: 14px;
-  transition: transform 0.25s;
-  margin-top: 2px;
+margin-left: auto;
+flex-shrink: 0;
+color: var(–text-muted);
+font-size: 14px;
+transition: transform 0.25s;
+margin-top: 2px;
 }
 
-.faq-item.open .faq-chevron { transform: rotate(180deg); color: var(--accent); }
+.faq-item.open .faq-chevron { transform: rotate(180deg); color: var(–accent); }
 
 .faq-lang-tag {
-  flex-shrink: 0;
-  font-size: 10px;
-  font-weight: 400;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  background: var(--tag-bg);
-  color: var(--tag-text);
-  padding: 2px 7px;
-  border-radius: 4px;
-  margin-top: 2px;
-  display: none;
+flex-shrink: 0;
+font-size: 10px;
+font-weight: 400;
+letter-spacing: 0.06em;
+text-transform: uppercase;
+background: var(–tag-bg);
+color: var(–tag-text);
+padding: 2px 7px;
+border-radius: 4px;
+margin-top: 2px;
+display: none;
 }
 
 .faq-a {
-  display: none;
-  padding: 0 18px 18px 18px;
-  background: var(--answer-bg);
-  font-size: 14px;
-  color: var(--text);
-  line-height: 1.65;
+display: none;
+padding: 0 18px 18px 18px;
+background: var(–answer-bg);
+font-size: 14px;
+color: var(–text);
+line-height: 1.65;
 }
 
 .faq-a.visible { display: block; }
@@ -385,195 +386,195 @@ header {
 .faq-a p:last-child { margin-bottom: 0; }
 
 .faq-a ul, .faq-a ol {
-  padding-left: 20px;
-  margin-bottom: 10px;
+padding-left: 20px;
+margin-bottom: 10px;
 }
 
 .faq-a li { margin-bottom: 5px; }
 
 .faq-a table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-  margin: 10px 0;
+width: 100%;
+border-collapse: collapse;
+font-size: 13px;
+margin: 10px 0;
 }
 
 .faq-a th {
-  text-align: left;
-  font-weight: 500;
-  padding: 8px 10px;
-  border-bottom: 2px solid var(--border-hover);
-  color: var(--text-muted);
+text-align: left;
+font-weight: 500;
+padding: 8px 10px;
+border-bottom: 2px solid var(–border-hover);
+color: var(–text-muted);
 }
 
 .faq-a td {
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--border);
-  vertical-align: top;
+padding: 8px 10px;
+border-bottom: 1px solid var(–border);
+vertical-align: top;
 }
 
 .faq-a tr:last-child td { border-bottom: none; }
 
 .faq-a .note {
-  background: var(--blue-light);
-  border-left: 3px solid var(--accent);
-  padding: 10px 14px;
-  border-radius: 0 var(--radius) var(--radius) 0;
-  font-size: 13px;
-  margin: 10px 0;
-  color: var(--text);
+background: var(–blue-light);
+border-left: 3px solid var(–accent);
+padding: 10px 14px;
+border-radius: 0 var(–radius) var(–radius) 0;
+font-size: 13px;
+margin: 10px 0;
+color: var(–text);
 }
 
 .faq-a .warn {
-  background: #fff4e5;
-  border-left: 3px solid #e07a00;
-  padding: 10px 14px;
-  border-radius: 0 var(--radius) var(--radius) 0;
-  font-size: 13px;
-  margin: 10px 0;
-  color: var(--text);
+background: #fff4e5;
+border-left: 3px solid #e07a00;
+padding: 10px 14px;
+border-radius: 0 var(–radius) var(–radius) 0;
+font-size: 13px;
+margin: 10px 0;
+color: var(–text);
 }
 
-[data-theme="dark"] .faq-a .warn {
-  background: #251800;
-  border-left-color: #e09a00;
+[data-theme=“dark”] .faq-a .warn {
+background: #251800;
+border-left-color: #e09a00;
 }
 
 .faq-divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 4px 0;
+border: none;
+border-top: 1px solid var(–border);
+margin: 4px 0;
 }
 
 .section-header .share-btn {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 3px 6px;
-  border-radius: var(--radius);
-  font-size: 13px;
-  opacity: 1;
-  transition: color 0.15s;
-  flex-shrink: 0;
-  line-height: 1;
-  margin-left: auto;
+background: none;
+border: none;
+color: var(–text-muted);
+cursor: pointer;
+padding: 3px 6px;
+border-radius: var(–radius);
+font-size: 13px;
+opacity: 1;
+transition: color 0.15s;
+flex-shrink: 0;
+line-height: 1;
+margin-left: auto;
 }
-.section-header .share-btn:hover { color: var(--accent); }
-.share-btn.copied { color: var(--accent); }
+.section-header .share-btn:hover { color: var(–accent); }
+.share-btn.copied { color: var(–accent); }
 
 .q-share-btn {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 2px 4px;
-  font-size: 11px;
-  opacity: 1;
-  transition: color 0.15s;
-  flex-shrink: 0;
-  line-height: 1;
-  margin-left: 6px;
-  border-radius: var(--radius);
+background: none;
+border: none;
+color: var(–text-muted);
+cursor: pointer;
+padding: 2px 4px;
+font-size: 11px;
+opacity: 1;
+transition: color 0.15s;
+flex-shrink: 0;
+line-height: 1;
+margin-left: 6px;
+border-radius: var(–radius);
 }
-.q-share-btn:hover { color: var(--accent); }
-.q-share-btn.copied { color: var(--accent); }
+.q-share-btn:hover { color: var(–accent); }
+.q-share-btn.copied { color: var(–accent); }
 
 .no-results {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--text-muted);
-  display: none;
+text-align: center;
+padding: 60px 20px;
+color: var(–text-muted);
+display: none;
 }
 
 .no-results i { font-size: 36px; margin-bottom: 12px; display: block; }
 .no-results p { font-size: 14px; }
 
 .result-count {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 20px;
-  display: none;
+font-size: 13px;
+color: var(–text-muted);
+margin-bottom: 20px;
+display: none;
 }
 
 footer {
-  border-top: 1px solid var(--border);
-  padding: 20px 32px;
-  text-align: center;
-  font-size: 12px;
-  color: var(--text-muted);
+border-top: 1px solid var(–border);
+padding: 20px 32px;
+text-align: center;
+font-size: 12px;
+color: var(–text-muted);
 }
 
 @media (max-width: 680px) {
-  .main { grid-template-columns: 1fr; }
-  .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); padding: 16px 20px; display: flex; gap: 8px; overflow-x: auto; flex-wrap: nowrap; }
-  .sidebar-label { display: none; }
-  .cat-btn { white-space: nowrap; flex-shrink: 0; }
-  .cat-btn .cat-count { display: none; }
-  header { padding: 14px 20px; }
-  .hero { padding: 24px 20px; }
-  .content { padding: 20px 20px 40px; }
+.main { grid-template-columns: 1fr; }
+.sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(–border); padding: 16px 20px; display: flex; gap: 8px; overflow-x: auto; flex-wrap: nowrap; }
+.sidebar-label { display: none; }
+.cat-btn { white-space: nowrap; flex-shrink: 0; }
+.cat-btn .cat-count { display: none; }
+header { padding: 14px 20px; }
+.hero { padding: 24px 20px; }
+.content { padding: 20px 20px 40px; }
 }
-
 
 .resources {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 20px;
-  flex-wrap: wrap;
+display: flex;
+align-items: center;
+gap: 8px;
+margin-top: 20px;
+flex-wrap: wrap;
 }
 .resources-label {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--text-muted);
-  font-weight: 500;
-  margin-right: 4px;
+font-size: 12px;
+text-transform: uppercase;
+letter-spacing: 0.07em;
+color: var(–text-muted);
+font-weight: 500;
+margin-right: 4px;
 }
 .resources a {
-  font-size: 13px;
-  padding: 5px 12px;
-  border-radius: 20px;
-  border: 1px solid var(--border-hover);
-  background: var(--bg);
-  color: var(--accent);
-  text-decoration: none;
-  transition: background 0.15s, border-color 0.15s;
-  white-space: nowrap;
+font-size: 13px;
+padding: 5px 12px;
+border-radius: 20px;
+border: 1px solid var(–border-hover);
+background: var(–bg);
+color: var(–accent);
+text-decoration: none;
+transition: background 0.15s, border-color 0.15s;
+white-space: nowrap;
 }
 .resources a:hover {
-  background: var(--bg-tertiary);
-  border-color: var(--accent);
-  opacity: 1;
+background: var(–bg-tertiary);
+border-color: var(–accent);
+opacity: 1;
 }
 #copy-toast {
-  position: fixed;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%) translateY(12px);
-  background: var(--charcoal);
-  color: #f0ece0;
-  font-family: 'Modern Gothic', system-ui, sans-serif;
-  font-size: 14px;
-  padding: 10px 20px;
-  border-radius: 24px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s, transform 0.2s;
-  z-index: 999;
-  white-space: nowrap;
+position: fixed;
+bottom: 28px;
+left: 50%;
+transform: translateX(-50%) translateY(12px);
+background: var(–charcoal);
+color: #f0ece0;
+font-family: ‘Modern Gothic’, system-ui, sans-serif;
+font-size: 14px;
+padding: 10px 20px;
+border-radius: 24px;
+opacity: 0;
+pointer-events: none;
+transition: opacity 0.2s, transform 0.2s;
+z-index: 999;
+white-space: nowrap;
 }
-[data-theme="dark"] #copy-toast {
-  background: var(--bg-tertiary);
-  color: var(--text);
-  border: 1px solid var(--border-hover);
+[data-theme=“dark”] #copy-toast {
+background: var(–bg-tertiary);
+color: var(–text);
+border: 1px solid var(–border-hover);
 }
 #copy-toast.visible {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
+opacity: 1;
+transform: translateX(-50%) translateY(0);
 }
 </style>
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 
 </head>
@@ -694,6 +695,21 @@ footer {
       <i class="ti ti-school" aria-hidden="true"></i>
       <span data-fr="Évaluation & notation" data-en="Grading">Évaluation & notation</span>
       <span class="cat-count" id="count-notation">0</span>
+    </button>
+    <button class="cat-btn" data-cat="productivite">
+      <i class="ti ti-brain" aria-hidden="true"></i>
+      <span data-fr="Productivité personnelle" data-en="Personal productivity">Productivité personnelle</span>
+      <span class="cat-count" id="count-productivite">0</span>
+    </button>
+    <button class="cat-btn" data-cat="interpersonnel">
+      <i class="ti ti-mood-smile" aria-hidden="true"></i>
+      <span data-fr="Relations interpersonnelles" data-en="Interpersonal skills">Relations interpersonnelles</span>
+      <span class="cat-count" id="count-interpersonnel">0</span>
+    </button>
+    <button class="cat-btn" data-cat="organisation">
+      <i class="ti ti-layout-kanban" aria-hidden="true"></i>
+      <span data-fr="Organisation du travail" data-en="Work organisation">Organisation du travail</span>
+      <span class="cat-count" id="count-organisation">0</span>
     </button>
   </nav>
 
@@ -2374,6 +2390,709 @@ const FAQ = [
 <div class="note">The log is not there to monitor you — it is there to let you document your learning and generate your final report. It is also concrete evidence of your work if a question arises about your hours or tasks.</div>`
     }
   },
+  // ── Productivité personnelle ──────────────────────────────────────
+  {
+    cat: "productivite",
+    fr: {
+      q: "Je n'arrive pas à me mettre au travail. Qu'est-ce que je peux faire?",
+      a: `<p>C'est une situation très fréquente, surtout dans un nouveau contexte professionnel. Avant tout, distingue deux cas très différents :</p>
+<ul>
+  <li><strong>Tu ne sais pas par où commencer.</strong> C'est un problème de clarté, pas de motivation. La solution : décompose la tâche. Qu'est-ce que tu peux faire dans les dix prochaines minutes, concrètement? Commence par ça uniquement.</li>
+  <li><strong>Tu sais quoi faire mais tu ne le fais pas.</strong> C'est un problème de discipline. La solution : crée une contrainte externe. Dis à quelqu'un ce que tu vas accomplir avant une heure donnée. Écris-le dans le journal de bord. Rends-toi redevable.</li>
+</ul>
+<p>Quelques techniques qui fonctionnent :</p>
+<ul>
+  <li><strong>La règle des deux minutes :</strong> si une tâche prend moins de deux minutes, fais-la tout de suite.</li>
+  <li><strong>Le time-boxing :</strong> bloque 25 minutes de travail concentré, puis prends 5 minutes de pause (technique Pomodoro). Répète. La limite de temps crée une urgence artificielle qui aide à démarrer.</li>
+  <li><strong>L'engagement public :</strong> annonce dans ton fil Discord ce que tu vas livrer avant la fin de la journée. Le regard (même virtuel) des coéquipier·es est un puissant moteur.</li>
+</ul>
+<div class="note">Si tu te retrouves régulièrement bloqué·e au démarrage, c'est peut-être que tes tâches ne sont pas assez décomposées. Une tâche bien définie a un début, une fin, et un résultat observable.</div>`
+    },
+    en: {
+      q: "I cannot get myself to start working. What can I do?",
+      a: `<p>This is very common, especially in a new professional context. First, distinguish between two very different situations:</p>
+<ul>
+  <li><strong>You do not know where to start.</strong> That is a clarity problem, not a motivation problem. The solution: break the task down. What is one thing you can do in the next ten minutes, concretely? Start with that alone.</li>
+  <li><strong>You know what to do but are not doing it.</strong> That is a discipline problem. The solution: create an external constraint. Tell someone what you will accomplish before a given time. Write it in your log. Make yourself accountable.</li>
+</ul>
+<p>Some techniques that work:</p>
+<ul>
+  <li><strong>The two-minute rule:</strong> if a task takes less than two minutes, do it immediately.</li>
+  <li><strong>Time-boxing:</strong> block 25 minutes of focused work, then take a 5-minute break (Pomodoro technique). Repeat. The time limit creates an artificial urgency that helps you start.</li>
+  <li><strong>Public commitment:</strong> announce in your Discord thread what you will deliver by end of day. The (even virtual) eyes of your teammates are a powerful driver.</li>
+</ul>
+<div class="note">If you regularly find yourself stuck at the start, your tasks may not be broken down enough. A well-defined task has a beginning, an end, and an observable result.</div>`
+    }
+  },
+  {
+    cat: "productivite",
+    fr: {
+      q: "Je manque de motivation. Est-ce que c'est normal et comment la retrouver?",
+      a: `<p>Oui, c'est tout à fait normal — même pour des projets qui t'intéressent. La motivation n'est pas un état stable; elle monte et descend.</p>
+<p>Quelques distinctions importantes :</p>
+<ul>
+  <li><strong>Manque de motivation passager :</strong> souvent lié à la fatigue, à une tâche ingrate, ou à un moment de doute. Ça passe. Baisse tes attentes pour la journée, fais quelque chose de concret et de faisable, et recommence demain.</li>
+  <li><strong>Manque de motivation persistant :</strong> si ça dure plusieurs jours, demande-toi si tu es surchargé·e, si quelque chose dans le projet te dérange, ou si tu traverses quelque chose de difficile en dehors du stage. Ce n'est pas une faiblesse — c'est un signal.</li>
+  <li><strong>Manque de motivation qui ressemble à de l'épuisement :</strong> fatigue constante, difficulté à te concentrer, irritabilité — ce sont des signes de surmenage. Parles-en à Elisa ou à ton·ta enseignant·e superviseur·e de stage.</li>
+</ul>
+<p>Pour retrouver l'élan :</p>
+<ul>
+  <li>Rappelle-toi pourquoi tu as choisi ce domaine d'études. Le stage est un aperçu du métier — même les parties moins glamour font partie de la réalité professionnelle.</li>
+  <li>Célèbre les petites victoires. Terminer une tâche, même mineure, libère de la dopamine et relance l'élan.</li>
+  <li>Change de tâche temporairement si tu es vraiment bloqué·e — parfois un autre angle relance l'intérêt.</li>
+</ul>`
+    },
+    en: {
+      q: "I lack motivation. Is that normal and how do I get it back?",
+      a: `<p>Yes, completely normal — even for projects you care about. Motivation is not a stable state; it rises and falls.</p>
+<p>Some important distinctions:</p>
+<ul>
+  <li><strong>Temporary lack of motivation:</strong> often linked to tiredness, an ungratifying task, or a moment of self-doubt. It passes. Lower your expectations for the day, do something concrete and achievable, and start fresh tomorrow.</li>
+  <li><strong>Persistent lack of motivation:</strong> if it lasts several days, ask yourself whether you are overloaded, whether something in the project is bothering you, or whether you are going through something difficult outside the internship. That is not a weakness — it is a signal.</li>
+  <li><strong>Motivation loss that looks like exhaustion:</strong> constant fatigue, difficulty concentrating, irritability — these are signs of burnout. Talk to Elisa or your teacher who supervises the internship.</li>
+</ul>
+<p>To regain momentum:</p>
+<ul>
+  <li>Remind yourself why you chose this field. The internship is a preview of the profession — even the less glamorous parts are part of the professional reality.</li>
+  <li>Celebrate small wins. Finishing a task, even a minor one, releases dopamine and rebuilds momentum.</li>
+  <li>Switch tasks temporarily if you are really stuck — sometimes a different angle reignites interest.</li>
+</ul>`
+    }
+  },
+  {
+    cat: "productivite",
+    fr: {
+      q: "Comment distinguer être occupé·e et être productif·ve?",
+      a: `<p>C'est une des distinctions les plus importantes de la vie professionnelle. Être occupé·e signifie que ton temps est rempli. Être productif·ve signifie que tu avances vers un résultat concret.</p>
+<p>Quelques pièges fréquents :</p>
+<ul>
+  <li>Participer à des réunions sans contribuer ni en retirer quelque chose d'utile</li>
+  <li>Peaufiner un travail déjà suffisant au lieu de passer à la prochaine tâche</li>
+  <li>Répondre à des messages non urgents au fur et à mesure qu'ils arrivent</li>
+  <li>Faire semblant d'avancer pour ne pas avoir à dire qu'on est bloqué·e</li>
+</ul>
+<p>Une heuristique simple : en fin de journée, pose-toi la question <em>« Qu'est-ce que j'ai livré aujourd'hui? »</em> Si tu n'as pas de réponse claire, la journée était occupée mais pas forcément productive.</p>
+<div class="note">Les heures dans ton journal de bord comptent — mais ce qui compte encore plus, c'est ce que tu as accompli pendant ces heures. Les deux ensemble donnent une image honnête de ta progression.</div>`
+    },
+    en: {
+      q: "How do I tell the difference between being busy and being productive?",
+      a: `<p>This is one of the most important distinctions in professional life. Being busy means your time is full. Being productive means you are moving toward a concrete result.</p>
+<p>Common traps:</p>
+<ul>
+  <li>Attending meetings without contributing or taking anything useful away</li>
+  <li>Polishing work that is already good enough instead of moving to the next task</li>
+  <li>Answering non-urgent messages as they come in</li>
+  <li>Pretending to make progress to avoid admitting you are stuck</li>
+</ul>
+<p>A simple heuristic: at the end of the day, ask yourself <em>"What did I actually deliver today?"</em> If you do not have a clear answer, the day was busy but not necessarily productive.</p>
+<div class="note">The hours in your log count — but what counts even more is what you accomplished during those hours. Both together give an honest picture of your progress.</div>`
+    }
+  },
+  {
+    cat: "productivite",
+    fr: {
+      q: "Comment gérer mon énergie et savoir quand m'arrêter?",
+      a: `<p>Travailler plus longtemps n'est pas toujours travailler mieux. Au-delà d'un certain seuil, la qualité de ton travail baisse et ton humeur avec elle — ce qui affecte ton équipe autant que toi.</p>
+<ul>
+  <li><strong>Respecte des heures de fin.</strong> Décider à l'avance à quelle heure tu arrêtes crée une contrainte saine et t'incite à prioriser plutôt qu'à étirer le temps.</li>
+  <li><strong>Fais de vraies pauses.</strong> Une pause signifie quitter l'écran, bouger, et ne pas penser au travail — pas consulter Discord en mangeant.</li>
+  <li><strong>Reconnais les signes de fatigue cognitive :</strong> tu relis la même ligne plusieurs fois, tu fais des erreurs inhabituelles, tu te sens irritable. C'est le signal d'arrêter, pas de te forcer.</li>
+  <li><strong>Ne t'excuse pas de ne pas être disponible en dehors de tes heures de travail.</strong> Le stage a des heures. En dehors, tu as le droit de déconnecter.</li>
+</ul>
+<div class="note">Un stage épuisant n'est pas un badge d'honneur. Arriver reposé·e et concentré·e chaque jour vaut mieux que d'accumuler des heures de qualité médiocre.</div>`
+    },
+    en: {
+      q: "How do I manage my energy and know when to stop?",
+      a: `<p>Working longer is not always working better. Beyond a certain point, the quality of your work drops and so does your mood — which affects your team as much as it affects you.</p>
+<ul>
+  <li><strong>Set an end time in advance.</strong> Deciding when you will stop creates a healthy constraint and pushes you to prioritize rather than stretch time.</li>
+  <li><strong>Take real breaks.</strong> A break means stepping away from the screen, moving, and not thinking about work — not checking Discord while eating.</li>
+  <li><strong>Recognize signs of cognitive fatigue:</strong> re-reading the same line, making unusual mistakes, feeling irritable. That is the signal to stop, not to push through.</li>
+  <li><strong>Do not apologize for being unavailable outside your working hours.</strong> The internship has hours. Outside them, you have the right to disconnect.</li>
+</ul>
+<div class="note">An exhausting internship is not a badge of honour. Arriving rested and focused every day is worth more than accumulating hours of poor-quality work.</div>`
+    }
+  },
+  {
+    cat: "productivite",
+    fr: {
+      q: "Comment communiquer quand je suis en retard sur mes tâches ou surchargé·e?",
+      a: `<p>Le silence est toujours la pire option. Si tu es en retard ou débordé·e, dis-le tôt — pas quand c'est déjà trop tard pour que ton équipe s'adapte.</p>
+<p><strong>Si tu es en retard sur une tâche :</strong></p>
+<ul>
+  <li>Préviens ton·ta chef·fe d'équipe dès que tu le sais — pas le jour de l'échéance</li>
+  <li>Donne une nouvelle estimation réaliste et tiens-la</li>
+  <li>Explique brièvement la cause sans te noyer dans les excuses</li>
+</ul>
+<p><strong>Si tu es surchargé·e :</strong></p>
+<ul>
+  <li>Fais la liste de tout ce qu'on te demande et dis clairement que tu ne peux pas tout faire dans les délais</li>
+  <li>Demande à ton·ta chef·fe d'équipe de t'aider à prioriser — c'est leur rôle</li>
+  <li>Si la surcharge vient de plusieurs projets, contacte Elisa</li>
+</ul>
+<div class="note">Dire « je suis débordé·e » est professionnel. Disparaître ou livrer du travail bâclé sans prévenir ne l'est pas.</div>`
+    },
+    en: {
+      q: "How do I communicate when I am behind on tasks or overworked?",
+      a: `<p>Silence is always the worst option. If you are behind or overwhelmed, say so early — not when it is already too late for your team to adapt.</p>
+<p><strong>If you are behind on a task:</strong></p>
+<ul>
+  <li>Tell your team lead as soon as you know — not on the day of the deadline</li>
+  <li>Give a realistic new estimate and stick to it</li>
+  <li>Briefly explain the cause without drowning in apologies</li>
+</ul>
+<p><strong>If you are overloaded:</strong></p>
+<ul>
+  <li>List everything being asked of you and say clearly that you cannot do it all within the deadlines</li>
+  <li>Ask your team lead to help you prioritize — that is their role</li>
+  <li>If the overload comes from multiple projects, contact Elisa</li>
+</ul>
+<div class="note">Saying "I am overwhelmed" is professional. Disappearing or delivering sloppy work without warning is not.</div>`
+    }
+  },
+
+  // ── Relations interpersonnelles ───────────────────────────────────
+  {
+    cat: "interpersonnel",
+    fr: {
+      q: "Comment réguler mes réactions émotionnelles au travail?",
+      a: `<p>Les émotions au travail sont normales. Le but n'est pas de les effacer, mais de ne pas les laisser dicter tes réactions — surtout dans des communications écrites qui restent visibles.</p>
+<ul>
+  <li><strong>La pause avant d'envoyer.</strong> Si tu as envie de répondre à chaud à un message qui t'a irrité·e ou blessé·e, rédige la réponse — mais attends avant de l'envoyer. Relis-la dans cinq minutes. Souvent, tu la réécriras.</li>
+  <li><strong>Nomme ce que tu ressens pour toi-même.</strong> «  Je suis frustré·e parce que... » est une pensée utile. La transformer en message agressif ne l'est pas.</li>
+  <li><strong>Sépare la situation de la personne.</strong> Une décision que tu trouves mauvaise, un commentaire maladroit, un retard qui t'a mis·e dans une position difficile — tout ça peut être adressé sans attaquer la personne.</li>
+  <li><strong>Reconnais tes propres signaux d'alarme.</strong> Quand remarques-tu que tu commences à t'agacer? Apprendre à reconnaître ce moment te donne le choix de réagir différemment.</li>
+</ul>
+<div class="note">Tout le monde a des mauvaises journées. Si tu as réagi de façon disproportionnée, reconnaître-le brièvement et aller de l'avant est toujours mieux que de l'ignorer.</div>`
+    },
+    en: {
+      q: "How do I regulate my emotional responses at work?",
+      a: `<p>Emotions at work are normal. The goal is not to erase them, but to not let them dictate your reactions — especially in written communications that remain visible.</p>
+<ul>
+  <li><strong>The pause before sending.</strong> If you want to respond hotly to a message that irritated or hurt you, draft the reply — but wait before sending it. Re-read it in five minutes. Often you will rewrite it.</li>
+  <li><strong>Name what you are feeling, for yourself.</strong> "I am frustrated because..." is a useful thought. Turning it into an aggressive message is not.</li>
+  <li><strong>Separate the situation from the person.</strong> A decision you think is wrong, a clumsy comment, a delay that put you in a difficult position — all of this can be addressed without attacking the person.</li>
+  <li><strong>Recognise your own warning signals.</strong> When do you notice yourself starting to get irritated? Learning to spot that moment gives you the choice to respond differently.</li>
+</ul>
+<div class="note">Everyone has bad days. If you reacted disproportionately, acknowledging it briefly and moving forward is always better than ignoring it.</div>`
+    }
+  },
+  {
+    cat: "interpersonnel",
+    fr: {
+      q: "Comment toujours partir du principe que les autres ont de bonnes intentions?",
+      a: `<p>C'est une des compétences les plus précieuses du travail en équipe — et souvent la plus difficile à pratiquer quand on est fatigué·e ou sous pression.</p>
+<p>La règle de base : <strong>avant de conclure que quelqu'un est de mauvaise foi, négligent ou hostile, demande-toi s'il existe une explication plus simple et plus charitable.</strong></p>
+<ul>
+  <li>Un message bref et sec est peut-être juste une personne pressée — pas quelqu'un qui t'en veut.</li>
+  <li>Un silence prolongé est peut-être dû à une surcharge — pas un manque de respect.</li>
+  <li>Un retour critique sur ton travail est presque toujours une tentative d'aider — pas une attaque personnelle.</li>
+</ul>
+<p>Quand tu n'es pas sûr·e : <strong>pose la question directement.</strong> « J'ai eu l'impression que mon message t'avait dérangé·e — est-ce que c'est le cas? » vaut infiniment mieux que de ruminer une interprétation peut-être fausse.</p>
+<div class="note">Accorder le bénéfice du doute ne veut pas dire ignorer les problèmes réels. Si un comportement se répète et te pose problème, adresse-le — mais avec l'hypothèse de départ que l'autre ne cherchait pas à nuire.</div>`
+    },
+    en: {
+      q: "How do I always assume that others have good intentions?",
+      a: `<p>This is one of the most valuable skills in teamwork — and often the hardest to practise when you are tired or under pressure.</p>
+<p>The basic rule: <strong>before concluding that someone is acting in bad faith, is careless, or is hostile, ask yourself whether there is a simpler and more charitable explanation.</strong></p>
+<ul>
+  <li>A short, terse message might just be someone in a hurry — not someone who has it in for you.</li>
+  <li>A prolonged silence might be due to overload — not disrespect.</li>
+  <li>Critical feedback on your work is almost always an attempt to help — not a personal attack.</li>
+</ul>
+<p>When you are not sure: <strong>ask directly.</strong> "I had the impression my message bothered you — was that the case?" is infinitely better than ruminating on an interpretation that may be wrong.</p>
+<div class="note">Giving the benefit of the doubt does not mean ignoring real problems. If a behaviour repeats and causes issues, address it — but start from the assumption that the other person was not trying to cause harm.</div>`
+    }
+  },
+  {
+    cat: "interpersonnel",
+    fr: {
+      q: "Comment éviter les suppositions et les malentendus?",
+      a: `<p>La plupart des conflits d'équipe ne viennent pas de mauvaises intentions — ils viennent d'informations manquantes que chacun a comblées avec ses propres suppositions.</p>
+<ul>
+  <li><strong>Vérifie avant de conclure.</strong> Si tu penses savoir ce que quelqu'un voulait dire ou ce qu'il ou elle attend de toi, confirme-le. Ça prend trente secondes et ça évite des heures de travail dans la mauvaise direction.</li>
+  <li><strong>Exprime tes attentes explicitement.</strong> Ne présume pas que les autres savent ce dont tu as besoin, quand tu en as besoin, et sous quelle forme.</li>
+  <li><strong>Reformule ce que tu as compris.</strong> Après une réunion ou une conversation importante, résume ta compréhension en quelques lignes dans le fil Discord. C'est une habitude simple qui prévient beaucoup de confusions.</li>
+  <li><strong>Pose des questions au lieu de supposer.</strong> «  Est-ce que tu voulais dire que... ? » est toujours approprié.</li>
+</ul>`
+    },
+    en: {
+      q: "How do I avoid assumptions and misunderstandings?",
+      a: `<p>Most team conflicts do not come from bad intentions — they come from missing information that everyone has filled in with their own assumptions.</p>
+<ul>
+  <li><strong>Check before concluding.</strong> If you think you know what someone meant or what they expect from you, confirm it. It takes thirty seconds and saves hours of work in the wrong direction.</li>
+  <li><strong>State your expectations explicitly.</strong> Do not assume others know what you need, when you need it, and in what form.</li>
+  <li><strong>Summarise what you understood.</strong> After a meeting or important conversation, write a few lines of your understanding in the Discord thread. It is a simple habit that prevents a lot of confusion.</li>
+  <li><strong>Ask questions instead of assuming.</strong> "Did you mean that...?" is always appropriate.</li>
+</ul>`
+    }
+  },
+  {
+    cat: "interpersonnel",
+    fr: {
+      q: "Comment donner un retour constructif à un·e coéquipier·e?",
+      a: `<p>Un bon retour est <strong>concret, bienveillant et actionnable</strong>. Il porte sur le travail — pas sur la personne.</p>
+<p>Structure suggérée :</p>
+<ol>
+  <li><strong>Ce qui fonctionne bien.</strong> Commence par reconnaître ce qui est réussi — sincèrement, pas pour adoucir un coup. Ça montre que tu as regardé l'ensemble du travail.</li>
+  <li><strong>Ce qui pourrait être amélioré, précisément.</strong> «  Cette section est confuse » n'est pas un retour actionnable. «  Dans cette section, les étapes 2 et 3 semblent inversées — est-ce intentionnel? » l'est.</li>
+  <li><strong>Une suggestion, si tu en as une.</strong> Offre une piste, pas une solution imposée.</li>
+</ol>
+<p>Avant de donner un retour, vérifie que c'est le bon moment : <em>«  J'ai quelques remarques sur ta partie — est-ce que c'est un bon moment pour en parler? »</em> Personne ne reçoit bien un retour quand il ou elle est déjà sous pression.</p>
+<div class="note">La différence entre une critique et un retour constructif, c'est l'intention et la forme. Une critique dit ce qui ne va pas. Un retour constructif dit ce qui ne va pas <em>et ouvre une voie vers mieux</em>.</div>`
+    },
+    en: {
+      q: "How do I give constructive feedback to a teammate?",
+      a: `<p>Good feedback is <strong>specific, kind, and actionable</strong>. It is about the work — not the person.</p>
+<p>A suggested structure:</p>
+<ol>
+  <li><strong>What is working well.</strong> Start by acknowledging what is successful — sincerely, not to soften a blow. It shows you looked at the whole work.</li>
+  <li><strong>What could be improved, specifically.</strong> "This section is confusing" is not actionable feedback. "In this section, steps 2 and 3 seem reversed — is that intentional?" is.</li>
+  <li><strong>A suggestion, if you have one.</strong> Offer a direction, not an imposed solution.</li>
+</ol>
+<p>Before giving feedback, check that it is the right moment: <em>"I have a few comments on your section — is now a good time?"</em> Nobody receives feedback well when they are already under pressure.</p>
+<div class="note">The difference between criticism and constructive feedback is intention and form. Criticism says what is wrong. Constructive feedback says what is wrong <em>and opens a path toward better</em>.</div>`
+    }
+  },
+  {
+    cat: "interpersonnel",
+    fr: {
+      q: "Comment recevoir un retour sans me mettre sur la défensive?",
+      a: `<p>Recevoir un retour est une compétence qui s'apprend — et qui n'est pas naturelle, surtout quand tu as mis beaucoup de toi-même dans un travail.</p>
+<ul>
+  <li><strong>Écoute pour comprendre, pas pour répondre.</strong> Laisse la personne finir avant de réagir. Tu n'as pas à te défendre immédiatement.</li>
+  <li><strong>Pose des questions pour clarifier.</strong> «  Quand tu dis que c'est peu clair, tu penses à quelle partie précisément? »</li>
+  <li><strong>Sépare ton travail de toi-même.</strong> Une critique de ta PR n'est pas une critique de ta valeur en tant que personne ou professionnel·le.</li>
+  <li><strong>Prends le temps de digérer.</strong> Tu n'as pas à être d'accord immédiatement. «  Merci, je vais y réfléchir » est une réponse parfaitement valable.</li>
+  <li><strong>Demande du temps si tu en as besoin.</strong> Si tu te sens sur la défensive au point de ne pas pouvoir écouter correctement, il est acceptable de dire «  Je préfère qu'on en reparle dans une heure. »</li>
+</ul>`
+    },
+    en: {
+      q: "How do I receive feedback without becoming defensive?",
+      a: `<p>Receiving feedback is a skill that is learned — and not a natural one, especially when you have put a lot of yourself into a piece of work.</p>
+<ul>
+  <li><strong>Listen to understand, not to respond.</strong> Let the person finish before reacting. You do not have to defend yourself immediately.</li>
+  <li><strong>Ask questions to clarify.</strong> "When you say it is unclear, which part specifically do you mean?"</li>
+  <li><strong>Separate your work from yourself.</strong> A critique of your PR is not a critique of your worth as a person or a professional.</li>
+  <li><strong>Give yourself time to process.</strong> You do not have to agree immediately. "Thank you, I will think about it" is a perfectly valid response.</li>
+  <li><strong>Ask for time if you need it.</strong> If you feel too defensive to listen properly, it is acceptable to say "I would rather come back to this in an hour."</li>
+</ul>`
+    }
+  },
+  {
+    cat: "interpersonnel",
+    fr: {
+      q: "Comment proposer de l'aide sans imposer des conseils non sollicités?",
+      a: `<p>Vouloir aider est une bonne chose. Mais l'aide imposée peut sembler condescendante — même quand l'intention est sincère. La règle d'or : <strong>demande toujours avant d'expliquer ou de résoudre.</strong></p>
+<ul>
+  <li>«  Tu as l'air bloqué·e — tu veux qu'on en parle? »</li>
+  <li>«  J'ai déjà eu un problème similaire — tu veux que je te partage comment j'ai fait? »</li>
+  <li>«  Est-ce que tu cherches une réponse directe, ou plutôt quelqu'un avec qui réfléchir? »</li>
+</ul>
+<p>Cette dernière question est particulièrement utile : certaines personnes veulent qu'on les guide, d'autres veulent juste être écoutées et trouver elles-mêmes. Demander évite de répondre à côté.</p>
+<div class="note">Si quelqu'un ne veut pas de ton aide, ce n'est pas un rejet — c'est une information sur ce dont il ou elle a besoin en ce moment. Respecte-le.</div>`
+    },
+    en: {
+      q: "How do I offer help without imposing unsolicited advice?",
+      a: `<p>Wanting to help is a good thing. But imposed help can come across as condescending — even when the intention is genuine. The golden rule: <strong>always ask before explaining or solving.</strong></p>
+<ul>
+  <li>"You seem stuck — do you want to talk through it?"</li>
+  <li>"I had a similar problem once — do you want me to share how I handled it?"</li>
+  <li>"Are you looking for a direct answer, or more someone to think with?"</li>
+</ul>
+<p>That last question is particularly useful: some people want to be guided, others just want to be heard and find the answer themselves. Asking avoids giving the wrong kind of help.</p>
+<div class="note">If someone does not want your help, that is not a rejection — it is information about what they need right now. Respect it.</div>`
+    }
+  },
+  {
+    cat: "interpersonnel",
+    fr: {
+      q: "Comment demander de l'aide de façon efficace et respectueuse?",
+      a: `<p>Une bonne demande d'aide respecte le temps de l'autre et donne à la personne les informations dont elle a besoin pour vraiment t'aider.</p>
+<p>Avant de demander, précise :</p>
+<ul>
+  <li><strong>Ce que tu essaies de faire</strong> — pas juste «  ça marche pas »</li>
+  <li><strong>Ce que tu as déjà essayé</strong> — montre que tu as fait l'effort d'abord</li>
+  <li><strong>Où tu es bloqué·e précisément</strong> — un message d'erreur, une décision, un concept?</li>
+  <li><strong>Ce que tu attends de l'autre</strong> — une réponse directe? Une vérification? Une opinion?</li>
+</ul>
+<p>Exemple : «  J'essaie de connecter l'API à la base de données. J'ai suivi la doc mais j'obtiens une erreur 401 même avec les bonnes clés. J'ai vérifié les variables d'environnement. Est-ce que tu as déjà eu ça? »</p>
+<p>C'est infiniment plus utile que : «  Ça marche pas, tu peux regarder? »</p>
+<div class="note">Formuler clairement ta demande t'aide souvent à trouver la solution toi-même en cours de route — c'est l'effet «  canard en caoutchouc ».</div>`
+    },
+    en: {
+      q: "How do I ask for help effectively and respectfully?",
+      a: `<p>A good request for help respects the other person's time and gives them the information they need to actually help you.</p>
+<p>Before asking, clarify:</p>
+<ul>
+  <li><strong>What you are trying to do</strong> — not just "it does not work"</li>
+  <li><strong>What you have already tried</strong> — show that you made the effort first</li>
+  <li><strong>Exactly where you are stuck</strong> — an error message, a decision, a concept?</li>
+  <li><strong>What you expect from the other person</strong> — a direct answer? A review? An opinion?</li>
+</ul>
+<p>Example: "I am trying to connect the API to the database. I followed the docs but I am getting a 401 error even with the correct keys. I have checked the environment variables. Have you seen this before?"</p>
+<p>That is infinitely more useful than: "It does not work, can you look at it?"</p>
+<div class="note">Clearly formulating your question often helps you find the solution yourself along the way — this is the "rubber duck" effect.</div>`
+    }
+  },
+  {
+    cat: "interpersonnel",
+    fr: {
+      q: "Comment éviter de parler des autres dans leur dos?",
+      a: `<p>Dans un environnement professionnel, parler de quelqu'un en son absence — même avec de bonnes intentions — peut facilement être perçu comme du commérage, surtout si ça touche à sa performance ou à son comportement.</p>
+<p>La distinction à retenir :</p>
+<ul>
+  <li><strong>Discuter d'une situation de travail avec Elisa ou un·e chef·fe d'équipe</strong> pour trouver une solution → c'est approprié et même nécessaire.</li>
+  <li><strong>Relater à un·e collègue les erreurs ou comportements d'un·e autre</strong> sans que ça serve à résoudre quoi que ce soit → c'est du commérage, même si tu ne le perçois pas comme tel.</li>
+</ul>
+<p>Avant de parler d'un·e coéquipier·e à quelqu'un d'autre, demande-toi :</p>
+<ul>
+  <li>Est-ce que cette conversation va aider à résoudre le problème?</li>
+  <li>Est-ce que j'ai d'abord essayé d'en parler directement à la personne concernée?</li>
+  <li>Est-ce que je serais à l'aise si cette personne entendait ce que je dis?</li>
+</ul>
+<div class="note">Si tu as un problème avec un·e coéquipier·e, adresse-le à lui ou à elle directement d'abord — ou à Elisa si la situation est délicate. Pas aux autres membres de l'équipe.</div>`
+    },
+    en: {
+      q: "How do I avoid talking about others behind their back?",
+      a: `<p>In a professional environment, talking about someone in their absence — even with good intentions — can easily be perceived as gossip, especially if it touches on their performance or behaviour.</p>
+<p>The distinction to keep in mind:</p>
+<ul>
+  <li><strong>Discussing a work situation with Elisa or a team lead</strong> to find a solution → appropriate and even necessary.</li>
+  <li><strong>Recounting a colleague's mistakes or behaviour to another colleague</strong> without it serving to resolve anything → that is gossip, even if you do not perceive it that way.</li>
+</ul>
+<p>Before talking about a teammate to someone else, ask yourself:</p>
+<ul>
+  <li>Will this conversation help resolve the problem?</li>
+  <li>Have I first tried talking directly to the person involved?</li>
+  <li>Would I be comfortable if this person heard what I am saying?</li>
+</ul>
+<div class="note">If you have a problem with a teammate, address it to them directly first — or to Elisa if the situation is sensitive. Not to other team members.</div>`
+    }
+  },
+  {
+    cat: "interpersonnel",
+    fr: {
+      q: "Comment désamorcer une situation tendue dans l'équipe?",
+      a: `<p>Les tensions montent parfois vite — surtout sous la pression des échéances ou quand la communication a été maladroite. Voici comment éviter l'escalade :</p>
+<ul>
+  <li><strong>Ne réponds pas à l'agressivité par l'agressivité.</strong> Si quelqu'un est brusque avec toi, une réponse calme et factuelle est presque toujours plus efficace qu'une riposte.</li>
+  <li><strong>Nomme la tension sans accuser.</strong> «  J'ai l'impression qu'il y a une incompréhension — est-ce qu'on peut en parler? » ouvre une porte. «  Tu as été vraiment irrespectueux·se » la ferme.</li>
+  <li><strong>Crée une pause.</strong> Si la conversation tourne mal à l'écrit, propose de continuer en voix ou à un autre moment. Le texte amplifie les conflits.</li>
+  <li><strong>Sépare les personnes du problème.</strong> L'objectif n'est pas de gagner l'argument — c'est de résoudre la situation et de continuer à travailler ensemble.</li>
+  <li><strong>Si la situation dépasse le cadre de l'équipe, implique Elisa.</strong> Tu n'as pas à gérer des conflits sérieux seul·e.</li>
+</ul>
+<div class="note">Être la personne qui désescalade une tension est une compétence rare et très appréciée. Ce n'est pas une faiblesse — c'est du leadership.</div>`
+    },
+    en: {
+      q: "How do I de-escalate a tense situation in the team?",
+      a: `<p>Tensions can rise quickly — especially under deadline pressure or when communication has been clumsy. Here is how to avoid escalation:</p>
+<ul>
+  <li><strong>Do not respond to aggression with aggression.</strong> If someone is brusque with you, a calm, factual response is almost always more effective than a sharp reply.</li>
+  <li><strong>Name the tension without accusing.</strong> "I feel like there is a misunderstanding — can we talk about it?" opens a door. "You were really disrespectful" closes it.</li>
+  <li><strong>Create a pause.</strong> If a written conversation is going badly, suggest continuing by voice or at another time. Text amplifies conflict.</li>
+  <li><strong>Separate people from the problem.</strong> The goal is not to win the argument — it is to resolve the situation and keep working together.</li>
+  <li><strong>If the situation goes beyond the team, involve Elisa.</strong> You do not have to handle serious conflicts alone.</li>
+</ul>
+<div class="note">Being the person who de-escalates a tension is a rare and highly valued skill. It is not a weakness — it is leadership.</div>`
+    }
+  },
+  {
+    cat: "interpersonnel",
+    fr: {
+      q: "Comment être attentif·ve aux différences culturelles et linguistiques dans l'équipe?",
+      a: `<p>Dans une équipe multilingue et multiculturelle, les malentendus viennent souvent non pas de ce qui est dit, mais de <em>comment</em> c'est dit — et de ce que chacun·e en interprète.</p>
+<ul>
+  <li><strong>La directivité :</strong> certaines cultures considèrent qu'un retour direct est respectueux; d'autres le perçoivent comme brutal. Un «  c'est incorrect » peut sonner agressif pour quelqu'un habitué à des formulations plus indirectes.</li>
+  <li><strong>Le silence :</strong> pour certains, ne pas répondre rapidement est impoli; pour d'autres, c'est une marque de réflexion sérieuse. Vérifiez avant de conclure.</li>
+  <li><strong>L'humour :</strong> ce qui est drôle dans une langue ne l'est pas forcément dans une autre — et ce qui semble léger peut blesser dans un contexte différent.</li>
+  <li><strong>La langue de travail :</strong> si quelqu'un fait une erreur de langue dans un message, ne la corrige pas publiquement à moins qu'on te le demande. C'est humiliant.</li>
+</ul>
+<div class="note">En cas de doute sur la signification d'un message, pose la question. «  Je ne suis pas sûr·e d'avoir bien compris — tu voulais dire...? » est toujours la bonne approche.</div>`
+    },
+    en: {
+      q: "How do I stay sensitive to cultural and linguistic differences in the team?",
+      a: `<p>In a multilingual and multicultural team, misunderstandings often come not from what is said, but from <em>how</em> it is said — and what each person reads into it.</p>
+<ul>
+  <li><strong>Directness:</strong> some cultures consider direct feedback respectful; others find it harsh. An "that is incorrect" can sound aggressive to someone used to softer phrasing.</li>
+  <li><strong>Silence:</strong> for some, not replying quickly is rude; for others, it is a sign of serious reflection. Check before concluding.</li>
+  <li><strong>Humour:</strong> what is funny in one language is not necessarily funny in another — and what feels light-hearted may hurt in a different context.</li>
+  <li><strong>Working language:</strong> if someone makes a language error in a message, do not correct it publicly unless asked. It is humiliating.</li>
+</ul>
+<div class="note">When in doubt about the meaning of a message, ask. "I am not sure I understood correctly — did you mean...?" is always the right approach.</div>`
+    }
+  },
+
+  // ── Organisation du travail ───────────────────────────────────────
+  {
+    cat: "organisation",
+    fr: {
+      q: "Comment organiser mon propre travail de façon efficace?",
+      a: `<p>Un bon système personnel n'a pas besoin d'être complexe — il doit juste être cohérent et utilisé.</p>
+<p><strong>Les bases :</strong></p>
+<ul>
+  <li><strong>Une liste de tâches active</strong> : au début de chaque journée, note les trois choses que tu veux absolument accomplir. Pas dix — trois. Tout le reste est bonus.</li>
+  <li><strong>Des tâches bien définies</strong> : une tâche n'est pas «  travailler sur le module de connexion » — c'est «  écrire le test unitaire pour la validation du formulaire ». Plus c'est précis, plus c'est actionnable.</li>
+  <li><strong>Un endroit unique pour tes notes</strong> : choisir un outil et s'y tenir. Avoir des notes dans cinq endroits différents est pire que de n'en avoir nulle part.</li>
+  <li><strong>Bloquer du temps</strong> : assigne des plages horaires à tes tâches dans ton calendrier, comme des réunions. Ce qui n'est pas planifié n'existe pas.</li>
+</ul>
+<p><strong>Outils gratuits utiles :</strong></p>
+<ul>
+  <li><a href="https://trello.com" target="_blank">Trello ↗</a> — tableau kanban simple, très visuel, plan gratuit généreux</li>
+  <li><a href="https://notion.so" target="_blank">Notion ↗</a> — notes, bases de données, listes de tâches; plan gratuit personnel disponible</li>
+  <li><a href="https://obsidian.md" target="_blank">Obsidian ↗</a> — prise de notes en Markdown, entièrement local, gratuit</li>
+</ul>`
+    },
+    en: {
+      q: "How do I organise my own work effectively?",
+      a: `<p>A good personal system does not need to be complex — it just needs to be consistent and actually used.</p>
+<p><strong>The basics:</strong></p>
+<ul>
+  <li><strong>An active task list:</strong> at the start of each day, write down the three things you absolutely want to accomplish. Not ten — three. Everything else is a bonus.</li>
+  <li><strong>Well-defined tasks:</strong> a task is not "work on the login module" — it is "write the unit test for form validation". The more specific, the more actionable.</li>
+  <li><strong>One place for your notes:</strong> pick a tool and stick to it. Having notes in five different places is worse than having none at all.</li>
+  <li><strong>Block time:</strong> assign time slots to your tasks in your calendar, like meetings. What is not scheduled does not exist.</li>
+</ul>
+<p><strong>Useful free tools:</strong></p>
+<ul>
+  <li><a href="https://trello.com" target="_blank">Trello ↗</a> — simple kanban board, very visual, generous free plan</li>
+  <li><a href="https://notion.so" target="_blank">Notion ↗</a> — notes, databases, task lists; free personal plan available</li>
+  <li><a href="https://obsidian.md" target="_blank">Obsidian ↗</a> — Markdown note-taking, fully local, free</li>
+</ul>`
+    }
+  },
+  {
+    cat: "organisation",
+    fr: {
+      q: "Comment organiser le travail en équipe?",
+      a: `<p>Un projet d'équipe sans organisation visible finit presque toujours en confusion. Quelques pratiques simples qui font une grande différence :</p>
+<ul>
+  <li><strong>Un tableau de tâches partagé</strong> : visible par tou·tes, mis à jour régulièrement. Chaque tâche a un·e responsable, un statut et une échéance. Trello ou GitHub Projects fonctionnent bien pour ça.</li>
+  <li><strong>Un standup asynchrone hebdomadaire</strong> : chaque membre poste dans le fil Discord : ce qu'il ou elle a fait, ce qu'il ou elle va faire, et ce qui le ou la bloque. Ça prend deux minutes et ça évite des heures de confusion.</li>
+  <li><strong>Des notes de réunion systématiques</strong> : toute décision prise en réunion doit être écrite quelque part d'accessible à tou·tes.</li>
+  <li><strong>Des jalons clairs</strong> : définir ensemble les dates de livraison intermédiaires, pas seulement la date finale.</li>
+</ul>
+<p><strong>Outils de collaboration gratuits :</strong></p>
+<ul>
+  <li><a href="https://trello.com" target="_blank">Trello ↗</a> — kanban partagé, plan gratuit jusqu'à 10 tableaux par espace</li>
+  <li><a href="https://github.com" target="_blank">GitHub Projects ↗</a> — intégré à ton dépôt, gratuit pour les dépôts publics</li>
+  <li><a href="https://miro.com" target="_blank">Miro ↗</a> — tableau blanc collaboratif en temps réel; plan gratuit (3 tableaux); <strong>plan étudiant·e gratuit disponible</strong> avec adresse courriel institutionnelle</li>
+  <li><a href="https://www.figma.com" target="_blank">Figma ↗</a> — design d'interfaces et prototypage collaboratif; <strong>plan Éducation gratuit</strong> pour les étudiant·es et enseignant·es vérifié·es</li>
+  <li><a href="https://www.canva.com" target="_blank">Canva ↗</a> — présentations, affiches, supports visuels; plan gratuit généreux; <strong>Canva for Education gratuit</strong> pour les établissements vérifiés</li>
+</ul>`
+    },
+    en: {
+      q: "How do we organise teamwork?",
+      a: `<p>A team project without visible organisation almost always ends in confusion. A few simple practices that make a big difference:</p>
+<ul>
+  <li><strong>A shared task board:</strong> visible to everyone, updated regularly. Each task has an owner, a status, and a deadline. Trello or GitHub Projects work well for this.</li>
+  <li><strong>A weekly async standup:</strong> each member posts in the Discord thread: what they did, what they are going to do, and what is blocking them. It takes two minutes and prevents hours of confusion.</li>
+  <li><strong>Systematic meeting notes:</strong> any decision made in a meeting must be written somewhere accessible to everyone.</li>
+  <li><strong>Clear milestones:</strong> define intermediate delivery dates together, not just the final deadline.</li>
+</ul>
+<p><strong>Free collaboration tools:</strong></p>
+<ul>
+  <li><a href="https://trello.com" target="_blank">Trello ↗</a> — shared kanban, free plan up to 10 boards per workspace</li>
+  <li><a href="https://github.com" target="_blank">GitHub Projects ↗</a> — built into your repo, free for public repositories</li>
+  <li><a href="https://miro.com" target="_blank">Miro ↗</a> — real-time collaborative whiteboard; free plan (3 boards); <strong>free student plan</strong> available with institutional email</li>
+  <li><a href="https://www.figma.com" target="_blank">Figma ↗</a> — interface design and collaborative prototyping; <strong>free Education plan</strong> for verified students and teachers</li>
+  <li><a href="https://www.canva.com" target="_blank">Canva ↗</a> — presentations, posters, visual materials; generous free plan; <strong>Canva for Education free</strong> for verified institutions</li>
+</ul>`
+    }
+  },
+  {
+    cat: "organisation",
+    fr: {
+      q: "Comment partager et présenter mon travail de façon claire?",
+      a: `<p>Partager ton travail, c'est aussi le rendre compréhensible pour quelqu'un qui n'était pas dans ta tête quand tu l'as fait. Quelques principes :</p>
+<ul>
+  <li><strong>Accompagne toujours un livrable d'un contexte.</strong> Un fichier déposé sans explication n'est utile à personne. Ajoute quelques lignes : ce que c'est, à quel stade tu en es, ce sur quoi tu attends un retour.</li>
+  <li><strong>Adapte le format à l'audience.</strong> Une démo technique pour des développeur·ses n'est pas la même chose qu'une présentation pour un·e client(s) non-technique.</li>
+  <li><strong>Utilise des visuels pour ce qui est complexe.</strong> Un diagramme, une maquette ou un tableau vaut souvent mieux que trois paragraphes.</li>
+</ul>
+<p><strong>Outils pour créer et partager des visuels :</strong></p>
+<ul>
+  <li><a href="https://miro.com" target="_blank">Miro ↗</a> — diagrammes, mind maps, parcours utilisateur·rice; plan gratuit (3 tableaux); plan étudiant·e gratuit disponible</li>
+  <li><a href="https://www.figma.com" target="_blank">Figma ↗</a> — maquettes d'interface, prototypes cliquables; plan Éducation gratuit pour étudiant·es vérifié·es</li>
+  <li><a href="https://www.canva.com" target="_blank">Canva ↗</a> — présentations, infographies, supports clients; plan gratuit; Canva for Education disponible</li>
+  <li><a href="https://excalidraw.com" target="_blank">Excalidraw ↗</a> — diagrammes rapides façon tableau blanc, entièrement gratuit, sans compte requis</li>
+</ul>`
+    },
+    en: {
+      q: "How do I share and present my work clearly?",
+      a: `<p>Sharing your work also means making it understandable to someone who was not in your head when you made it. A few principles:</p>
+<ul>
+  <li><strong>Always accompany a deliverable with context.</strong> A file dropped with no explanation is useful to no one. Add a few lines: what it is, what stage you are at, what feedback you are looking for.</li>
+  <li><strong>Adapt the format to the audience.</strong> A technical demo for developers is not the same as a presentation for a non-technical client(s).</li>
+  <li><strong>Use visuals for complex things.</strong> A diagram, a mockup, or a table is often worth more than three paragraphs.</li>
+</ul>
+<p><strong>Tools for creating and sharing visuals:</strong></p>
+<ul>
+  <li><a href="https://miro.com" target="_blank">Miro ↗</a> — diagrams, mind maps, user journeys; free plan (3 boards); free student plan available</li>
+  <li><a href="https://www.figma.com" target="_blank">Figma ↗</a> — interface mockups, clickable prototypes; free Education plan for verified students</li>
+  <li><a href="https://www.canva.com" target="_blank">Canva ↗</a> — presentations, infographics, client materials; free plan; Canva for Education available</li>
+  <li><a href="https://excalidraw.com" target="_blank">Excalidraw ↗</a> — quick whiteboard-style diagrams, fully free, no account required</li>
+</ul>`
+    }
+  }
+,
+  {
+    cat: "interpersonnel",
+    fr: {
+      q: "Comment trouver le bon équilibre entre m'investir dans mon propre travail et celui des autres?",
+      a: `<p>Dans un projet collectif, la tentation est parfois forte de regarder ce que font les autres, de signaler ce qui ne va pas, ou de vouloir intervenir pour «  aider ». Mais <strong>ta contribution principale reste ton propre travail</strong>, livré en bonne qualité et dans les délais.</p>
+<p>Quelques repères utiles :</p>
+<ul>
+  <li><strong>Un encouragement ou un rappel amical est toujours bien reçu.</strong> «  Ça avance pour ta partie? Tu as besoin de quelque chose? » — c'est du soutien d'équipe.</li>
+  <li><strong>S'impliquer excessivement dans les tâches d'un·e autre peut être mal perçu</strong> — même avec les meilleures intentions. Ça peut donner l'impression que tu ne fais pas confiance à la personne, ou que tu tentes de contrôler son travail.</li>
+  <li><strong>La supervision du travail des autres appartient aux chef·fes d'équipe.</strong> Si tu remarques un problème dans le travail d'un·e coéquipier·e, la bonne démarche est d'en parler à ton·ta chef·fe d'équipe — pas d'intervenir directement de façon répétée.</li>
+</ul>
+<div class="note">Faire confiance à tes coéquipier·es et à tes chef·fes d'équipe, c'est aussi une forme de respect professionnel. Tout le monde n'a pas la même façon de travailler — et ce n'est pas nécessairement un problème.</div>`
+    },
+    en: {
+      q: "How do I find the right balance between focusing on my own work and getting involved in others'?",
+      a: `<p>In a group project, it can be tempting to watch what others are doing, flag what seems wrong, or want to step in to "help". But <strong>your main contribution remains your own work</strong>, delivered with quality and on time.</p>
+<p>Some useful guidelines:</p>
+<ul>
+  <li><strong>An encouraging word or a friendly check-in is always welcome.</strong> "How is your part going? Do you need anything?" — that is team support.</li>
+  <li><strong>Getting excessively involved in someone else's tasks can be poorly received</strong> — even with the best intentions. It can give the impression that you do not trust the person, or that you are trying to control their work.</li>
+  <li><strong>Overseeing others' work belongs to the team leads.</strong> If you notice an issue in a teammate's work, the right step is to mention it to your team lead — not to intervene directly and repeatedly.</li>
+</ul>
+<div class="note">Trusting your teammates and your team leads is also a form of professional respect. Not everyone works the same way — and that is not necessarily a problem.</div>`
+    }
+  },
+  {
+    cat: "interpersonnel",
+    fr: {
+      q: "Comment donner un retour négatif à un·e coéquipier·e ou à un·e chef·fe d'équipe?",
+      a: `<p>Donner un retour négatif est l'une des situations les plus délicates en milieu professionnel. Mal géré, ça peut humilier, braquer ou fragiliser une relation de travail. Bien géré, ça peut franchement améliorer les choses.</p>
+<p><strong>La règle la plus importante : fais-le en tête-à-tête.</strong> Critiquer quelqu'un devant ses pairs — même indirectement, même doucement — remet en question sa compétence publiquement. C'est presque toujours contre-productif.</p>
+<p>Quelques principes :</p>
+<ul>
+  <li><strong>Choisis le bon moment.</strong> Pas pendant une réunion, pas quand la personne est visiblement sous pression, pas en public sur Discord.</li>
+  <li><strong>Parle de faits observables, pas de jugements.</strong> «  J'ai remarqué que les deux dernières tâches ont été livrées après l'échéance » plutôt que «  tu n'es pas fiable ».</li>
+  <li><strong>Exprime l'impact, pas l'accusation.</strong> «  Quand ça arrive, ça met mon travail en attente et je ne sais pas quoi faire » plutôt que «  tu bloques toute l'équipe ».</li>
+  <li><strong>Donne à l'autre la possibilité de répondre.</strong> Il ou elle a peut-être une explication que tu n'as pas.</li>
+  <li><strong>Pour un·e chef·fe d'équipe :</strong> c'est encore plus délicat. Si tu as un retour à faire, fais-le en privé, avec respect, et en reconnaissant leur rôle. Si tu estimes que la situation dépasse ce que tu peux gérer seul·e, parles-en à Elisa.</li>
+</ul>
+<div class="note">L'objectif d'un retour négatif n'est pas de te soulager — c'est d'améliorer la situation. Si tu ne peux pas imaginer comment ça pourrait aider concrètement, c'est peut-être que le moment ou la forme n'est pas le bon.</div>`
+    },
+    en: {
+      q: "How do I give negative feedback to a teammate or a team lead?",
+      a: `<p>Giving negative feedback is one of the most delicate situations in a professional environment. Handled poorly, it can humiliate, alienate, or damage a working relationship. Handled well, it can genuinely improve things.</p>
+<p><strong>The most important rule: do it one-on-one.</strong> Criticising someone in front of their peers — even indirectly, even gently — publicly questions their competence. It is almost always counterproductive.</p>
+<p>Some principles:</p>
+<ul>
+  <li><strong>Choose the right moment.</strong> Not during a meeting, not when the person is visibly under pressure, not publicly on Discord.</li>
+  <li><strong>Speak about observable facts, not judgements.</strong> "I noticed the last two tasks were delivered after the deadline" rather than "you are unreliable".</li>
+  <li><strong>Express the impact, not the accusation.</strong> "When that happens, my work is left waiting and I do not know what to do" rather than "you are blocking the whole team".</li>
+  <li><strong>Give the other person a chance to respond.</strong> They may have an explanation you are not aware of.</li>
+  <li><strong>For a team lead:</strong> this is even more delicate. If you have feedback to give, do it privately, respectfully, and while acknowledging their role. If you feel the situation is beyond what you can handle alone, talk to Elisa.</li>
+</ul>
+<div class="note">The goal of negative feedback is not to relieve yourself — it is to improve the situation. If you cannot picture how it could concretely help, perhaps the timing or the form is not right.</div>`
+    }
+  },
+  {
+    cat: "interpersonnel",
+    fr: {
+      q: "Pourquoi la connaissance de soi est-elle utile dans un environnement de travail diversifié?",
+      a: `<p>Mieux tu te connaïs, plus il t’est facile de comprendre pourquoi les autres réagissent parfois de façon inattendue à ce que tu fais — et pourquoi tu réagis toi-même de certaines façons à ce qu’ils font.</p>
+<p>Ce que ça veut dire concrètement :</p>
+<ul>
+  <li><strong>Tes propres schémas de communication ont une logique qui t’est familière</strong> — mais cette logique n’est pas universelle. Ce qui te semble direct et efficace peut sembler brusque à quelqu’un d’autre. Ce qui te semble poli et réservé peut sembler froid ou désintéressé.</li>
+  <li><strong>Les différences culturelles jouent un rôle réel.</strong> Les attentes autour de la hiérarchie, du consensus, de l’expression des désaccords, de la ponctualité ou même du silence varient énormément d’une culture à l’autre. Aucune n’est la bonne par défaut.</li>
+  <li><strong>Les différences neurologiques aussi.</strong> Certaines personnes traitent les interactions sociales, les environnements sensoriels, ou les changements imprévus très différemment. Ce qui est neutre pour toi peut être épuisant ou déstabilisant pour quelqu’un d’autre — et inversement.</li>
+</ul>
+<p>La connaissance de soi, c’est être capable de se demander : <em>« Est-ce que ma façon de communiquer est adaptée à la situation et à la personne en face de moi ? »</em> — pas seulement <em>« Est-ce que j’ai dit les bons mots ? »</em></p>
+<p><strong>Quand tu es confus·e face à la réaction de quelqu’un :</strong></p>
+<ul>
+  <li>Résiste à la tentation de combler le vide avec une supposition — surtout une négative.</li>
+  <li>Pose une question claire, dans un cadre détendu et sans pression : <em>« J’ai eu l’impression que mon message t’avait surpris·e — est-ce que je me trompe ? »</em> ou <em>« Je veux m’assurer qu’on est sur la même longueur d’onde — tu peux me dire comment tu as reçu ça ? »</em></li>
+  <li>Donne à l’autre le temps et l’espace de répondre honnêtement. Une question posée brusquement ou en public n’appelle pas une réponse honnête — elle appelle une réponse défensive.</li>
+</ul>
+<div class="note">Se connaître soi-même n’est pas un travail qu’on termine — c’est une pratique continue. Et dans un contexte professionnel multiculturel et multidisciplinaire comme le hub, c’est l’une des compétences les plus précieuses que tu puisses développer.</div>`
+    },
+    en: {
+      q: "Why is self-awareness useful in a diverse work environment?",
+      a: `<p>The better you know yourself, the easier it becomes to understand why others sometimes react unexpectedly to what you do — and why you react the way you do to what they do.</p>
+<p>What that means concretely:</p>
+<ul>
+  <li><strong>Your own communication patterns have a logic that feels natural to you</strong> — but that logic is not universal. What feels direct and efficient to you may feel blunt to someone else. What feels polite and reserved may come across as cold or disengaged.</li>
+  <li><strong>Cultural differences play a real role.</strong> Expectations around hierarchy, consensus, expressing disagreement, punctuality, and even silence vary enormously across cultures. None is the default correct one.</li>
+  <li><strong>Neurological differences do too.</strong> Some people process social interactions, sensory environments, or unexpected changes very differently. What is neutral to you may be exhausting or destabilising for someone else — and vice versa.</li>
+</ul>
+<p>Self-awareness means being able to ask yourself: <em>“Is my way of communicating adapted to this situation and to this person?”</em> — not just <em>“Did I say the right words?”</em></p>
+<p><strong>When you are confused by someone’s reaction:</strong></p>
+<ul>
+  <li>Resist the urge to fill the gap with an assumption — especially a negative one.</li>
+  <li>Ask a clear question, in a relaxed and low-pressure setting: <em>“I had the impression my message surprised you — am I wrong?”</em> or <em>“I want to make sure we are on the same page — can you tell me how you received that?”</em></li>
+  <li>Give the other person the time and space to answer honestly. A question asked abruptly or in public does not invite an honest answer — it invites a defensive one.</li>
+</ul>
+<div class="note">Knowing yourself is not a project you finish — it is an ongoing practice. And in a multicultural, multidisciplinary professional context like the hub, it is one of the most valuable skills you can develop.</div>`
+    }
+  },
+  {
+    cat: "interpersonnel",
+    fr: {
+      q: "Comment reconnaître et gérer les situations qui pourraient évoluer vers du harcèlement?",
+      a: `<p>Le harcèlement en milieu de travail commence rarement de façon évidente. Il s'installe souvent progressivement — un commentaire blessant, un ton de plus en plus condescendant, une pression répétée, une personne systématiquement ignorée ou rabaissée. Savoir le reconnaître tôt, que tu en sois l'auteur·rice, la cible, ou le témoin, fait toute la différence.</p>
+
+<p><strong>Si tu remarques que tu te comportes d'une façon qui pourrait être perçue comme du harcèlement :</strong></p>
+<p>Ça peut arriver — surtout sous pression ou quand on est frustré·e. L'important, c'est de le reconnaître rapidement.</p>
+<ul>
+  <li><strong>Arrête, excuse-toi publiquement et immédiatement.</strong> Pas dans un message privé si le commentaire a eu lieu devant tout le monde — l'excuse doit être visible au même endroit. « Je réalise que ce que je viens d'écrire était blessant. Ce n'était pas mon intention et je m'en excuse. »</li>
+  <li><strong>Reformule.</strong> Dis ce que tu voulais vraiment exprimer, sans l'agressivité ou la condescendance.</li>
+  <li><strong>Ajuste la façon dont tu interagis.</strong> Si tu remarques un schéma répété — tu coupes la parole, tu minimises les contributions d'une personne, tu utilises un ton différent avec certaines personnes — c'est un signal à prendre au sérieux.</li>
+</ul>
+
+<p><strong>Si tu te sens harcelé·e :</strong></p>
+<ul>
+  <li>Si tu te sens en mesure de le faire, exprime ton inconfort <strong>directement à la personne, en tête-à-tête, calmement</strong>. « Je veux te dire que certains commentaires m'ont mis·e mal à l'aise. Ce n'est peut-être pas ce que tu voulais, mais je préfère en parler directement. »</li>
+  <li>Si tu n'es pas à l'aise pour l'aborder toi-même, <strong>parles-en à Elisa</strong> — c'est exactement pour ce genre de situation qu'elle est disponible.</li>
+  <li>Si tu fais davantage confiance à ton·ta chef·fe d'équipe, tu peux aussi t'adresser à lui ou à elle en premier.</li>
+  <li><strong>Tu n'as pas à gérer ça seul·e</strong>, et le faire remonter n'est pas de la délation — c'est te protéger et protéger l'environnement de travail de tout le monde.</li>
+</ul>
+
+<p><strong>Si tu es témoin d'une situation qui ressemble à du harcèlement ou qui risque d'y évoluer :</strong></p>
+<p>Tu as le choix de comment intervenir — et tous les choix sont valables.</p>
+<ul>
+  <li><strong>Intervenir directement et désamorcer.</strong> Si tu te sens en mesure de le faire, tu peux interrompre calmement la dynamique : « Je pense qu'on peut continuer cette conversation différemment. » C'est une occasion de développer tes compétences interpersonnelles.</li>
+  <li><strong>Signaler à Elisa pour qu'elle intervienne.</strong> Elle peut agir de façon à t'impliquer si tu le souhaites, ou à gérer la situation de façon à te garder complètement en dehors de ça, de manière anonyme si nécessaire.</li>
+  <li><strong>Tu n'es pas obligé·e de choisir dans l'instant.</strong> Si tu n'es pas sûr·e, note ce que tu as observé (date, contexte, ce qui a été dit) et contacte Elisa quand tu te sens prêt·e.</li>
+</ul>
+<div class="note">Personne ne devrait se sentir mal à l'aise ou rabaissé·e au travail. Un environnement de travail sain est une responsabilité collective — pas seulement celle des responsables.</div>`
+    },
+    en: {
+      q: "How do I recognise and handle situations that could escalate into bullying?",
+      a: `<p>Workplace bullying rarely starts in an obvious way. It often builds gradually — a hurtful comment, an increasingly condescending tone, repeated pressure, someone being systematically ignored or put down. Recognising it early, whether you are the one doing it, the target, or a witness, makes all the difference.</p>
+
+<p><strong>If you notice yourself behaving in a way that could be perceived as bullying:</strong></p>
+<p>It can happen — especially under pressure or when you are frustrated. What matters is recognising it quickly.</p>
+<ul>
+  <li><strong>Stop, and apologise publicly and immediately.</strong> Not in a private message if the comment happened in front of others — the apology needs to be visible in the same place. "I realise what I just wrote was hurtful. That was not my intention and I am sorry."</li>
+  <li><strong>Rephrase.</strong> Say what you actually meant to express, without the aggression or condescension.</li>
+  <li><strong>Adjust how you interact.</strong> If you notice a repeated pattern — you cut people off, you minimise someone's contributions, you use a different tone with certain people — that is a signal worth taking seriously.</li>
+</ul>
+
+<p><strong>If you feel you are being bullied:</strong></p>
+<ul>
+  <li>If you feel able to, express your discomfort <strong>directly to the person, one-on-one, calmly</strong>. "I want to let you know that some comments have made me uncomfortable. That may not have been your intention, but I would rather bring it up directly."</li>
+  <li>If you are not comfortable addressing it yourself, <strong>bring it to Elisa</strong> — this is exactly the kind of situation she is available for.</li>
+  <li>If you trust your team lead more, you can also go to them first.</li>
+  <li><strong>You do not have to handle this alone</strong>, and raising it is not tattling — it is protecting yourself and protecting everyone's work environment.</li>
+</ul>
+
+<p><strong>If you witness a situation that looks like bullying or risks becoming one:</strong></p>
+<p>You have a choice in how to respond — and all choices are valid.</p>
+<ul>
+  <li><strong>Intervene directly and de-escalate.</strong> If you feel able to, you can calmly interrupt the dynamic: "I think we can continue this conversation differently." This is an opportunity to develop your interpersonal skills.</li>
+  <li><strong>Flag it to Elisa so she can intervene.</strong> She can act in a way that involves you if you wish, or handle the situation in a way that keeps you completely out of it — anonymously if needed.</li>
+  <li><strong>You do not have to decide in the moment.</strong> If you are unsure, note what you observed (date, context, what was said) and contact Elisa when you feel ready.</li>
+</ul>
+<div class="note">Nobody should feel uncomfortable or put down at work. A healthy work environment is a collective responsibility — not just that of those in charge.</div>`
+    }
+  }
+
 ];
 
 function getCookie(name) {
@@ -2478,7 +3197,7 @@ function render() {
   const container = document.getElementById('faq-sections');
   const noResults = document.getElementById('no-results');
   const resultCount = document.getElementById('result-count');
-  const cats = ['avant', 'demarrage', 'semaine1', 'modalite', 'notation', 'outil', 'espaces', 'communication', 'equipe', 'taches', 'outil-log', 'fichiers', 'ip', 'conduite', 'multiprojet'];
+  const cats = ['avant', 'demarrage', 'semaine1', 'modalite', 'notation', 'outil', 'espaces', 'communication', 'equipe', 'taches', 'outil-log', 'fichiers', 'ip', 'conduite', 'multiprojet', 'productivite', 'interpersonnel', 'organisation'];
 
   const catLabels = {
     avant:         { fr: 'Avant le début du stage', en: 'Before the internship starts' },
@@ -2495,7 +3214,10 @@ function render() {
     conduite:      { fr: 'Conduite professionnelle', en: 'Professional conduct' },
     multiprojet:   { fr: 'Travailler sur plusieurs projets', en: 'Working on multiple projects' },
     modalite:      { fr: 'Modalités de travail', en: 'Work modality' },
-    notation:      { fr: 'Évaluation & notation', en: 'Grading' }
+    notation:      { fr: 'Évaluation & notation', en: 'Grading' },
+    productivite:  { fr: 'Productivité personnelle', en: 'Personal productivity' },
+    interpersonnel:{ fr: 'Relations interpersonnelles', en: 'Interpersonal skills' },
+    organisation:  { fr: 'Organisation du travail', en: 'Work organisation' }
   };
 
   let totalVisible = 0;
@@ -2659,5 +3381,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
+
 </body>
 </html>
