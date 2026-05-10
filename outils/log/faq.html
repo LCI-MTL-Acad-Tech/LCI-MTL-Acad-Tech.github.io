@@ -849,11 +849,11 @@ const FAQ = [
       a: `<p>In order, as soon as possible:</p>
 <ol>
   <li><strong>Mark yourself as out of office on Outlook</strong> (institutional account) — create an "Out of office" event for the day so your colleagues and supervisors can see your status without having to reach out.</li>
-  <li><strong>Let your team(s)s know on Discord</strong> — a brief message in each of your active project threads is enough. Indicate whether you expect to be back the next day or if it is uncertain.</li>
+  <li><strong>Let your team(s) know on Discord</strong> — a brief message in each of your active project threads is enough. Indicate whether you expect to be back the next day or if it is uncertain.</li>
   <li><strong>Contact your teacher who supervises the internship</strong> if the absence risks extending beyond one day — by private message on MS Teams.</li>
   <li><strong>Update your calendar in the log tool</strong> as soon as you are able to — even retroactively. Mark the day as an absence and add a reason if you wish.</li>
 </ol>
-<div class="note">An unannounced absence leaves your team(s)s in the dark and can block their work. Two minutes of communication prevents a lot of confusion.</div>`
+<div class="note">An unannounced absence leaves your team(s) in the dark and can block their work. Two minutes of communication prevents a lot of confusion.</div>`
     }
   },
   {
@@ -867,7 +867,7 @@ const FAQ = [
     en: {
       q: "What is the priority on the start date?",
       a: `<p>Your start date is the kickoff day — teams form, threads open, and planning for the week begins.</p>
-<p><strong>Main priority:</strong> coordinate with your team(s)s on Discord.</p>
+<p><strong>Main priority:</strong> coordinate with your team(s) on Discord.</p>
 <p>The start date is <strong>remote by default</strong>. See the <a href="https://lci-mtl-acad-tech.github.io/outils/log/dayone.html" target="_blank">start date instructions ↗</a> for the full walkthrough. In-person attendance is only available the following Tuesday (9 AM – 5 PM).</p>`
     }
   },
@@ -1254,7 +1254,7 @@ const FAQ = [
     },
     en: {
       q: "How does the onboarding form affect team formation?",
-      a: `<p>The onboarding form allows Elisa to form the team(s)s. You need to indicate:</p>
+      a: `<p>The onboarding form allows Elisa to form the team(s). You need to indicate:</p>
 <ul>
   <li>The projects you are working on</li>
   <li>Whether you would like to be a team lead or client liaison</li>
@@ -3151,7 +3151,8 @@ function toggleTheme() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   const next = isDark ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', isDark ? '' : 'dark');
-  document.getElementById('theme-icon').className = isDark ? 'ti ti-moon' : 'ti ti-sun';
+  const icon = document.getElementById('theme-icon');
+  if (icon) icon.className = isDark ? 'ti ti-moon' : 'ti ti-sun';
   setCookie('faq_theme', next);
 }
 
@@ -3301,7 +3302,7 @@ function renderItem(id, content, lang) {
   </div>`;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+function initApp() {
   const initialTheme = getInitialTheme();
   if (initialTheme === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
@@ -3379,8 +3380,15 @@ document.addEventListener('DOMContentLoaded', function() {
       }, 100);
     }
   }
-});
+}
+
+// Script is at end of body — DOM is ready, no DOMContentLoaded needed
+initApp();
 </script>
 
+</body>
+</html>
+
+</script>
 </body>
 </html>
