@@ -107,28 +107,62 @@ function loadFiles(fileList) {
     const r = new FileReader();
     r.onload = e => {
       try { res({ data: JSON.parse(e.target.result), name: f.name }); }
-      catch { res(null); }
+      catch (err) {
+        console.error(`[LCI Hub] Failed to parse JSON: "${f.name}"`, err);
+        res(null);
+      }
     };
     r.readAsText(f);
   }));
 
   Promise.all(readers).then(parsed => {
     const enriched = parsed
-      .filter(p => p?.data)
-      .map(p => ({ ...p, type: detectFileType(p.data) }));
+      .filter(p => {
+        if (!p?.data) {
+          console.error(`[LCI Hub] File skipped — could not be read (null result).`);
+          return false;
+        }
+        return true;
+      })
+      .map(p => {
+        const type = detectFileType(p.data);
+        console.info(`[LCI Hub] "${p.name}" → detected type: ${type}`);
+        return { ...p, type };
+      });
 
     // Separate config files from log/report files
     const configFiles = enriched.filter(p => p.type === "config");
-    const valid = enriched.filter(p =>
-      p.data.profile?.full_name && p.type !== "config" && p.type !== "unknown"
-    );
+    const valid = enriched.filter(p => {
+      if (p.type === "unknown") {
+        console.warn(`[LCI Hub] "${p.name}" → type "unknown": no profile.full_name and no recognized meta.type.`, {
+          meta: p.data.meta,
+          has_full_name: !!p.data.profile?.full_name,
+          has_logs: !!(p.data.logs?.length),
+        });
+        return false;
+      }
+      if (p.type === "config") return false; // handled separately
+      if (!p.data.profile?.full_name) {
+        console.warn(`[LCI Hub] "${p.name}" → skipped: missing profile.full_name.`, p.data.profile);
+        return false;
+      }
+      return true;
+    });
 
-    // Build config context map: uuid → context (planned_absences, work_days, work_hours)
-    // Config files take precedence over context embedded in log files
+    // Build config context map: uuid → context
     const configByUUID = {};
-    configFiles.forEach(({ data: d }) => {
+    configFiles.forEach(({ data: d, name }) => {
       const uid = d.meta?.student_uuid || d.profile?.student_id;
-      if (uid && d.context) configByUUID[uid] = d.context;
+      if (uid && d.context) {
+        configByUUID[uid] = d.context;
+        console.info(`[LCI Hub] Config "${name}" → mapped to UUID ${uid}`);
+      } else {
+        console.warn(`[LCI Hub] Config "${name}" → skipped: missing student UUID or context.`, {
+          uuid: d.meta?.student_uuid,
+          student_id: d.profile?.student_id,
+          has_context: !!d.context,
+        });
+      }
     });
 
     if (!valid.length && !configFiles.length) {
@@ -138,7 +172,10 @@ function loadFiles(fileList) {
       // Only configs uploaded — merge context into existing rows and rebuild
       Object.entries(configByUUID).forEach(([uid, ctx]) => {
         const existing = students.findIndex(s => s.uuid === uid);
-        if (existing < 0) return;
+        if (existing < 0) {
+          console.warn(`[LCI Hub] Config for UUID ${uid} — no matching student row loaded yet. Load student files first.`);
+          return;
+        }
 
         // Preserve existing file type counts before rebuilding
         const prevCounts = students[existing].file_type_counts || {};
@@ -195,7 +232,13 @@ function loadFiles(fileList) {
         base = grp[0];
       } else {
         const merged = mergeInternshipFiles(grp);
-        base = merged.valid ? merged.data : grp[0];
+        if (merged.valid) {
+          base = merged.data;
+        } else {
+          console.error(`[LCI Hub] Merge failed for UUID ${uid} (${grp.length} files) — using first file as fallback.`,
+            { errors: merged.errors, warnings: merged.warnings });
+          base = grp[0];
+        }
       }
 
       // If a config file was uploaded for this student, overlay its context fields
@@ -241,6 +284,21 @@ function loadFiles(fileList) {
     const nS = students.length;
     const nF = valid.length;
     const nC = configFiles.length;
+    const nUnknown = enriched.filter(p => p.type === "unknown").length;
+    const nFailed  = parsed.filter(p => !p?.data).length;
+
+    console.group(`[LCI Hub] Load complete — ${nF} file(s) → ${nS} student(s)`);
+    console.info("Students loaded:", students.map(s => ({
+      name: s.name,
+      uuid: s.uuid,
+      logs: s.log_count,
+      file_types: s.file_type_counts,
+    })));
+    if (nC)       console.info(`Config files applied: ${nC}`);
+    if (nUnknown) console.warn(`Files of unknown type (skipped): ${nUnknown}`);
+    if (nFailed)  console.error(`Files that failed to parse: ${nFailed}`);
+    console.groupEnd();
+
     let statusMsg = `${nS} étudiant·e${nS > 1 ? "·s" : ""} chargé·e${nS > 1 ? "·s" : ""} — ${nF} fichier${nF > 1 ? "s" : ""} traité${nF > 1 ? "s" : ""}`;
     if (nC > 0) statusMsg += ` + ${nC} config`;
     setStatus(statusMsg + ".");
