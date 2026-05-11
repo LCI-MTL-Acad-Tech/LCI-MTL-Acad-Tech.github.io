@@ -129,7 +129,7 @@ function render() {
   const container = document.getElementById('faq-sections');
   const noResults = document.getElementById('no-results');
   const resultCount = document.getElementById('result-count');
-  const cats = ['avant', 'demarrage', 'demarrage_projet', 'semaine1', 'modalite', 'notation', 'outil', 'espaces', 'communication', 'equipe', 'chefequipe', 'taches', 'outil-log', 'fichiers', 'ip', 'conduite', 'multiprojet', 'productivite', 'interpersonnel', 'organisation'];
+  const cats = ['avant_stage','pendant_stage','outil_journal','evaluation','projets_methodes','chef_equipe','equipes_roles','fichiers_outils','regles_droits','competences_perso'];
 
   const catLabels = {
     avant:         { fr: 'Avant le début du stage', en: 'Before the internship starts' },
@@ -315,7 +315,7 @@ function initApp() {
   // Called after FAQ data is loaded — handles deep links
   if (location.hash) {
     const hash = location.hash.slice(1);
-    const validCats = ['avant','demarrage','demarrage_projet','semaine1','modalite','notation','outil','espaces','communication','equipe','chefequipe','taches','outil-log','fichiers','ip','conduite','multiprojet','productivite','interpersonnel','organisation'];
+    const validCats = ['avant_stage','pendant_stage','outil_journal','evaluation','projets_methodes','chef_equipe','equipes_roles','fichiers_outils','regles_droits','competences_perso'];
     if (validCats.includes(hash)) {
       filterCat(hash);
       setTimeout(() => {

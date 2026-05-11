@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="FAQ — Innovation Hub internship guide. Questions fréquentes pour les stagiaires de l'Innovation Hub.">
+<title>FAQ — Innovation Hub</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+@font-face {
+  font-family: 'Modern Gothic';
+  src: local('Modern Gothic'), local('Modern Gothic Regular'),
+       url('https://dam.lcieducation.com/1fipm6Snk5jh2rLnFu4uq2hg8_sNzVmOTU5OWM0YzA4MDQ5/ModernGothic-Regular.woff2') format('woff2');
+  font-weight: 400; font-display: swap;
+}
+@font-face {
+  font-family: 'Modern Gothic';
+  src: local('Modern Gothic Medium'),
+       url('https://dam.lcieducation.com/1fidCrXy5z5kbAmnhACmEhth5_sYWE3Njc1ZTY2OGYwM2E1/ModernGothic-Medium.woff2') format('woff2');
+  font-weight: 500; font-display: swap;
+}
+@font-face {
+  font-family: 'LCI Education Color Logos';
+  src: local('LCI Education Color Logos'),
+       url('https://dam.lcieducation.com/LCI-Education/Brand-management/Font/lci-color-logos.woff2?func=proxy') format('woff2');
+  font-display: block;
+}
+
+:root {
+  --blue: #00587c;
+  --blue-dark: #003f59;
+  --blue-light: #e6f1fb;
+  --red: #eb2d37;
+  --cream: #f8f5e9;
+  --charcoal: #07181e;
+  --cobalt: #685ef7;
+  --cobalt-light: #eeedfe;
+  --text: #07181e;
+  --text-muted: #4a5e66;
+  --bg: #ffffff;
+  --bg-secondary: #f8f5e9;
+  --bg-tertiary: #f0ede0;
+  --border: rgba(7,24,30,0.12);
+  --border-hover: rgba(7,24,30,0.25);
+  --accent: #00587c;
+  --tag-bg: #e6f1fb;
+  --tag-text: #003f59;
+  --highlight: #685ef7;
+  --highlight-bg: #eeedfe;
+  --answer-bg: #fafaf8;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+
+[data-theme="dark"] {
+  --text: #f0ece0;
+  --text-muted: #8fa8b2;
+  --bg: #07181e;
+  --bg-secondary: #0d2630;
+  --bg-tertiary: #112e3a;
+  --border: rgba(240,236,224,0.1);
+  --border-hover: rgba(240,236,224,0.25);
+  --accent: #3da8d8;
+  --tag-bg: #0d2630;
+  --tag-text: #7ccaea;
+  --highlight: #9b93f9;
+  --highlight-bg: #1c1847;
+  --answer-bg: #0d2630;
+  --blue-light: #0d2630;
+  --cobalt-light: #1c1847;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Modern Gothic', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  font-size: 16px;
+  transition: background 0.25s, color 0.25s;
+}
+
+a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+a:hover { opacity: 0.8; }
+
+.lci-color-logo {
+  font-family: 'LCI Education Color Logos', sans-serif;
+  speak: never;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+header {
+  background: var(--charcoal);
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 3px solid var(--blue);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.header-title {
+  color: #f0ece0;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.header-title span {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.55;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* iOS Safari tap fix */
+button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button i, button .ico { pointer-events: none; }
+
+.ctrl-btn {
+  background: rgba(240,236,224,0.08);
+  border: 1px solid rgba(240,236,224,0.15);
+  color: #f0ece0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-family: 'Modern Gothic', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.ctrl-btn:hover { background: rgba(240,236,224,0.16); }
+.ctrl-btn.active { background: var(--blue); border-color: var(--blue); }
+
+.hero {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 40px 32px 32px;
+}
+
+.hero h1 {
+  font-size: clamp(26px, 4vw, 38px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+
+.hero p {
+  font-size: 15px;
+  color: var(--text-muted);
+  max-width: 560px;
+}
+
+.search-bar {
+  margin-top: 20px;
+  position: relative;
+  max-width: 520px;
+  display: flex;
+  align-items: center;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 12px 40px 12px 42px;
+  border: 1px solid var(--border-hover);
+  border-radius: 24px;
+  font-family: 'Modern Gothic', sans-serif;
+  font-size: 15px;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-bar input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,88,124,0.12);
+}
+
+.search-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.clear-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 15px;
+  padding: 4px;
+  display: none;
+}
+
+.main {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 0;
+  max-width: 1000px;
+  margin: 0 auto;
+  min-height: calc(100vh - 200px);
+}
+
+.sidebar {
+  padding: 28px 16px 28px 32px;
+  border-right: 1px solid var(--border);
+  position: sticky;
+  top: 65px;
+  height: calc(100vh - 65px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-hover) transparent;
+}
+
+.sidebar::after {
+  content: '';
+  position: sticky;
+  bottom: 0;
+  display: block;
+  height: 32px;
+  margin-top: -32px;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none;
+}
+
+.sidebar-label {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.sidebar-group-label {
+  font-size: 9.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  margin: 10px 0 2px 10px;
+  opacity: 0.75;
+}
+
+.cat-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 5px 10px;
+  border-radius: var(--radius);
+  font-family: 'Modern Gothic', sans-serif;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  line-height: 1.3;
+}
+
+.cat-btn:hover { background: var(--bg-tertiary); color: var(--text); }
+.cat-btn.active { background: var(--highlight-bg); color: var(--highlight); font-weight: 500; }
+
+.cat-btn .cat-count {
+  margin-left: auto;
+  font-size: 11px;
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  border-radius: 10px;
+  padding: 1px 7px;
+  min-width: 22px;
+  text-align: center;
+}
+
+.cat-btn.active .cat-count { background: var(--highlight-bg); color: var(--highlight); }
+
+.content {
+  padding: 28px 32px 60px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--accent);
+}
+
+.section-header h2 {
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.section-header .count-badge {
+  font-size: 12px;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  padding: 2px 9px;
+  border-radius: 10px;
+}
+
+.faq-section { margin-bottom: 40px; }
+
+.faq-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+  position: relative;
+}
+
+.faq-item:hover { border-color: var(--border-hover); }
+.faq-item.open { border-color: var(--accent); }
+
+.faq-q {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 15px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  font-family: 'Modern Gothic', sans-serif;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.4;
+  transition: background 0.15s;
+}
+
+.faq-q:hover { background: var(--bg-secondary); }
+.faq-item.open .faq-q { background: var(--bg-secondary); }
+
+.faq-chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+  transition: transform 0.25s;
+  margin-top: 2px;
+}
+
+.faq-item.open .faq-chevron { transform: rotate(180deg); color: var(--accent); }
+
+.faq-lang-tag {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-top: 2px;
+  display: none;
+}
+
+.faq-a {
+  display: none;
+  padding: 0 18px 18px 18px;
+  background: var(--answer-bg);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.65;
+}
+
+.faq-a.visible { display: block; }
+
+.faq-a p { margin-bottom: 10px; }
+.faq-a p:last-child { margin-bottom: 0; }
+
+.faq-a ul, .faq-a ol {
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+
+.faq-a li { margin-bottom: 5px; }
+
+.faq-a table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 10px 0;
+}
+
+.faq-a th {
+  text-align: left;
+  font-weight: 500;
+  padding: 8px 10px;
+  border-bottom: 2px solid var(--border-hover);
+  color: var(--text-muted);
+}
+
+.faq-a td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.faq-a tr:last-child td { border-bottom: none; }
+
+.faq-a .note {
+  background: var(--blue-light);
+  border-left: 3px solid var(--accent);
+  padding: 10px 14px;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 13px;
+  margin: 10px 0;
+  color: var(--text);
+}
+
+.faq-a .warn {
+  background: #fff4e5;
+  border-left: 3px solid #e07a00;
+  padding: 10px 14px;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 13px;
+  margin: 10px 0;
+  color: var(--text);
+}
+
+[data-theme="dark"] .faq-a .warn {
+  background: #251800;
+  border-left-color: #e09a00;
+}
+
+.faq-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 4px 0;
+}
+
+.section-header .share-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  opacity: 1;
+  transition: color 0.15s;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-left: auto;
+}
+.section-header .share-btn:hover { color: var(--accent); }
+.share-btn.copied { color: var(--accent); }
+
+.q-share-btn {
+  position: absolute;
+  top: 12px;
+  right: 38px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 11px;
+  opacity: 1;
+  transition: color 0.15s;
+  line-height: 1;
+  border-radius: var(--radius);
+  z-index: 1;
+  user-select: none;
+}
+.q-share-btn:hover { color: var(--accent); }
+.q-share-btn.copied { color: var(--accent); }
+
+.no-results {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  display: none;
+}
+
+.no-results i { font-size: 36px; margin-bottom: 12px; display: block; }
+.no-results p { font-size: 14px; }
+
+.result-count {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  display: none;
+}
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: 20px 32px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+@media (max-width: 680px) {
+  .main { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); padding: 16px 20px; display: flex; gap: 8px; overflow-x: auto; flex-wrap: nowrap; }
+  .sidebar-label { display: none; }
+  .cat-btn { white-space: nowrap; flex-shrink: 0; }
+  .cat-btn .cat-count { display: none; }
+  header { padding: 14px 20px; }
+  .hero { padding: 24px 20px; }
+  .content { padding: 20px 20px 40px; }
+}
+
+
+.resources {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.resources-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-right: 4px;
+}
+.resources a {
+  font-size: 13px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border-hover);
+  background: var(--bg);
+  color: var(--accent);
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.resources a::after {
+  content: ' ↗';
+  font-size: 11px;
+  opacity: 0.6;
+  vertical-align: super;
+  line-height: 1;
+}
+.resources a:hover { background: var(--bg-tertiary); border-color: var(--accent); opacity: 1; }
+.resources a:hover::after { opacity: 1; }
+#copy-toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  background: var(--charcoal);
+  color: #f0ece0;
+  font-family: 'Modern Gothic', system-ui, sans-serif;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 999;
+  white-space: nowrap;
+}
+[data-theme="dark"] #copy-toast {
+  background: var(--bg-tertiary);
+  color: var(--text);
+  border: 1px solid var(--border-hover);
+}
+#copy-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="header-title">
+      Innovation Hub — FAQ
+      <span id="header-sub">Pôle d'innovation</span>
+    </div>
+  </div>
+  <div class="header-controls">
+    <button class="ctrl-btn" id="lang-toggle">EN</button>
+    <button class="ctrl-btn" id="theme-btn" aria-label="Basculer le mode sombre">
+      <i class="ti ti-moon" aria-hidden="true" id="theme-icon"></i>
+    </button>
+  </div>
+</header>
+
+<div class="hero">
+  <h1 id="hero-title">Questions fréquentes</h1>
+  <p id="hero-sub">Tout ce qu'il faut savoir pour faire ton stage au Pôle d'innovation.</p>
+  <div class="search-bar">
+    <i class="ti ti-search search-icon" aria-hidden="true"></i>
+    <input type="text" id="search-input" placeholder="Rechercher…" aria-label="Rechercher dans la FAQ">
+    <button class="clear-btn" id="clear-btn" aria-label="Effacer la recherche">
+      <i class="ti ti-x" aria-hidden="true"></i>
+    </button>
+  </div>
+  <div class="resources">
+    <span class="resources-label" data-fr="Ressources clés" data-en="Key resources">Ressources clés</span>
+    <a href="https://lci-mtl-acad-tech.github.io/outils/log/setup.html" target="_blank" data-fr="Avant le début" data-en="Before you start">Avant le début</a>
+    <a href="https://lci-mtl-acad-tech.github.io/outils/log/dayone.html" target="_blank" data-fr="Journée de départ" data-en="Start date">Journée de départ</a>
+    <a href="https://lci-mtl-acad-tech.github.io/outils/log/" target="_blank" data-fr="Outil de journal" data-en="Log tool">Outil de journal</a>
+  </div>
+</div>
+
+<div class="main">
+  <nav class="sidebar" aria-label="Catégories">
+    <div class="sidebar-label" data-fr="Catégories" data-en="Categories">Catégories</div>
+    <button class="cat-btn active" data-cat="all">
+      <i class="ti ti-list" aria-hidden="true"></i>
+      <span data-fr="Tout afficher" data-en="All topics">Tout afficher</span>
+      <span class="cat-count" id="count-all">0</span>
+    </button>
+    <button class="cat-btn" data-cat="avant_stage">
+      <i class="ti ti-clock" aria-hidden="true"></i>
+      <span data-fr="Avant le stage" data-en="Before the internship">Avant le stage</span>
+      <span class="cat-count" id="count-avant_stage">0</span>
+    </button>
+    <button class="cat-btn" data-cat="pendant_stage">
+      <i class="ti ti-calendar" aria-hidden="true"></i>
+      <span data-fr="Pendant le stage" data-en="During the internship">Pendant le stage</span>
+      <span class="cat-count" id="count-pendant_stage">0</span>
+    </button>
+    <button class="cat-btn" data-cat="outil_journal">
+      <i class="ti ti-tool" aria-hidden="true"></i>
+      <span data-fr="Outil de journal" data-en="Log tool">Outil de journal</span>
+      <span class="cat-count" id="count-outil_journal">0</span>
+    </button>
+    <button class="cat-btn" data-cat="evaluation">
+      <i class="ti ti-school" aria-hidden="true"></i>
+      <span data-fr="Évaluation" data-en="Grading">Évaluation</span>
+      <span class="cat-count" id="count-evaluation">0</span>
+    </button>
+    <button class="cat-btn" data-cat="projets_methodes">
+      <i class="ti ti-map" aria-hidden="true"></i>
+      <span data-fr="Projets & méthodes" data-en="Projects & methods">Projets & méthodes</span>
+      <span class="cat-count" id="count-projets_methodes">0</span>
+    </button>
+    <button class="cat-btn" data-cat="chef_equipe">
+      <i class="ti ti-crown" aria-hidden="true"></i>
+      <span data-fr="Chef·fe d'équipe" data-en="Team lead">Chef·fe d'équipe</span>
+      <span class="cat-count" id="count-chef_equipe">0</span>
+    </button>
+    <button class="cat-btn" data-cat="equipes_roles">
+      <i class="ti ti-users" aria-hidden="true"></i>
+      <span data-fr="Équipes & communication" data-en="Teams & communication">Équipes & communication</span>
+      <span class="cat-count" id="count-equipes_roles">0</span>
+    </button>
+    <button class="cat-btn" data-cat="fichiers_outils">
+      <i class="ti ti-folder" aria-hidden="true"></i>
+      <span data-fr="Fichiers & outils" data-en="Files & tools">Fichiers & outils</span>
+      <span class="cat-count" id="count-fichiers_outils">0</span>
+    </button>
+    <button class="cat-btn" data-cat="regles_droits">
+      <i class="ti ti-shield-lock" aria-hidden="true"></i>
+      <span data-fr="Règles & droits" data-en="Rules & rights">Règles & droits</span>
+      <span class="cat-count" id="count-regles_droits">0</span>
+    </button>
+    <button class="cat-btn" data-cat="competences_perso">
+      <i class="ti ti-heart" aria-hidden="true"></i>
+      <span data-fr="Compétences personnelles" data-en="Personal skills">Compétences personnelles</span>
+      <span class="cat-count" id="count-competences_perso">0</span>
+    </button>
+  </nav>
+
+  <main class="content" id="faq-content">
+    <div class="result-count" id="result-count"></div>
+    <div id="faq-sections"></div>
+    <div class="no-results" id="no-results" aria-live="polite">
+      <i class="ti ti-search-off" aria-hidden="true"></i>
+      <p data-fr="Aucun résultat trouvé. Essaie d'autres mots-clés." data-en="No results found. Try different keywords.">Aucun résultat trouvé. Essaie d'autres mots-clés.</p>
+    </div>
+  </main>
+</div>
+
+<footer>
+  Innovation Hub
+</footer>
+
+<script src="faq.js"></script>
+</body>
+</html>
