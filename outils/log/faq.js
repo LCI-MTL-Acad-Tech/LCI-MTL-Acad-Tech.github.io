@@ -103,21 +103,38 @@ function copyShareLink(catId) {
   showCopyToast(currentLang);
 }
 
+function normalize(str) {
+  if (!str) return '';
+  return str.toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')  // strip accent marks
+    .replace(/[·'''\-]/g, ' ')        // treat middle dots, apostrophes, hyphens as spaces
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function matchesSearch(item, query) {
   if (!query) return true;
-  const check = (str) => str && str.toLowerCase().includes(query);
-  return check(item.fr.q) || check(item.fr.a) || check(item.en.q) || check(item.en.a);
+  const words = normalize(query).split(' ').filter(w => w.length > 1);
+  if (words.length === 0) return true;
+  const haystack = normalize(
+    (item.fr.q || '') + ' ' + (item.fr.a || '') + ' ' +
+    (item.en.q || '') + ' ' + (item.en.a || '')
+  );
+  // Match if ALL words are found (AND logic) — tolerant of partial word matches
+  return words.every(word => haystack.includes(word));
 }
 
 function render() {
   const container = document.getElementById('faq-sections');
   const noResults = document.getElementById('no-results');
   const resultCount = document.getElementById('result-count');
-  const cats = ['avant', 'demarrage', 'semaine1', 'modalite', 'notation', 'outil', 'espaces', 'communication', 'equipe', 'chefequipe', 'taches', 'outil-log', 'fichiers', 'ip', 'conduite', 'multiprojet', 'productivite', 'interpersonnel', 'organisation'];
+  const cats = ['avant_stage','pendant_stage','outil_journal','evaluation','projets_methodes','chef_equipe','equipes_roles','fichiers_outils','regles_droits','competences_perso'];
 
   const catLabels = {
     avant:         { fr: 'Avant le début du stage', en: 'Before the internship starts' },
     demarrage:     { fr: 'Journée de départ', en: 'Start date' },
+    demarrage_projet: { fr: 'Démarrage de projet', en: 'Project kickoff' },
     semaine1:      { fr: 'Première semaine', en: 'First week' },
     outil:         { fr: 'Outil de journal de stage', en: 'Internship log tool' },
     espaces:       { fr: 'Espaces de travail', en: 'Workspace' },
@@ -254,7 +271,7 @@ function wireButtons() {
   document.getElementById('clear-btn').addEventListener('click', clearSearch);
 
   document.getElementById('search-input').addEventListener('input', function() {
-    currentSearch = this.value.toLowerCase().trim();
+    currentSearch = normalize(this.value);
     document.getElementById('clear-btn').style.display = currentSearch ? 'block' : 'none';
     render();
   });
@@ -298,7 +315,7 @@ function initApp() {
   // Called after FAQ data is loaded — handles deep links
   if (location.hash) {
     const hash = location.hash.slice(1);
-    const validCats = ['avant','demarrage','semaine1','modalite','notation','outil','espaces','communication','equipe','chefequipe','taches','outil-log','fichiers','ip','conduite','multiprojet','productivite','interpersonnel','organisation'];
+    const validCats = ['avant_stage','pendant_stage','outil_journal','evaluation','projets_methodes','chef_equipe','equipes_roles','fichiers_outils','regles_droits','competences_perso'];
     if (validCats.includes(hash)) {
       filterCat(hash);
       setTimeout(() => {

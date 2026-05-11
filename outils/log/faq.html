@@ -229,7 +229,7 @@ button i, button .ico { pointer-events: none; }
 
 .main {
   display: grid;
-  grid-template-columns: 220px 1fr;
+  grid-template-columns: 260px 1fr;
   gap: 0;
   max-width: 1000px;
   margin: 0 auto;
@@ -265,6 +265,16 @@ button i, button .ico { pointer-events: none; }
   color: var(--text-muted);
   margin-bottom: 10px;
   font-weight: 500;
+}
+
+.sidebar-group-label {
+  font-size: 9.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  margin: 10px 0 2px 10px;
+  opacity: 0.75;
 }
 
 .cat-btn {
@@ -644,100 +654,55 @@ footer {
       <span data-fr="Tout afficher" data-en="All topics">Tout afficher</span>
       <span class="cat-count" id="count-all">0</span>
     </button>
-    <button class="cat-btn" data-cat="avant">
+    <button class="cat-btn" data-cat="avant_stage">
       <i class="ti ti-clock" aria-hidden="true"></i>
-      <span data-fr="Avant le début" data-en="Before start">Avant le début</span>
-      <span class="cat-count" id="count-avant">0</span>
+      <span data-fr="Avant le stage" data-en="Before the internship">Avant le stage</span>
+      <span class="cat-count" id="count-avant_stage">0</span>
     </button>
-    <button class="cat-btn" data-cat="demarrage">
-      <i class="ti ti-rocket" aria-hidden="true"></i>
-      <span data-fr="Jour de départ" data-en="Start date">Jour de départ</span>
-      <span class="cat-count" id="count-demarrage">0</span>
+    <button class="cat-btn" data-cat="pendant_stage">
+      <i class="ti ti-calendar" aria-hidden="true"></i>
+      <span data-fr="Pendant le stage" data-en="During the internship">Pendant le stage</span>
+      <span class="cat-count" id="count-pendant_stage">0</span>
     </button>
-    <button class="cat-btn" data-cat="semaine1">
-      <i class="ti ti-calendar-week" aria-hidden="true"></i>
-      <span data-fr="Première semaine" data-en="First week">Première semaine</span>
-      <span class="cat-count" id="count-semaine1">0</span>
-    </button>
-    <button class="cat-btn" data-cat="outil">
+    <button class="cat-btn" data-cat="outil_journal">
       <i class="ti ti-tool" aria-hidden="true"></i>
       <span data-fr="Outil de journal" data-en="Log tool">Outil de journal</span>
-      <span class="cat-count" id="count-outil">0</span>
+      <span class="cat-count" id="count-outil_journal">0</span>
     </button>
-    <button class="cat-btn" data-cat="espaces">
-      <i class="ti ti-building" aria-hidden="true"></i>
-      <span data-fr="Espaces de travail" data-en="Workspace">Espaces de travail</span>
-      <span class="cat-count" id="count-espaces">0</span>
-    </button>
-    <button class="cat-btn" data-cat="communication">
-      <i class="ti ti-message-circle" aria-hidden="true"></i>
-      <span data-fr="Communication" data-en="Communication">Communication</span>
-      <span class="cat-count" id="count-communication">0</span>
-    </button>
-    <button class="cat-btn" data-cat="equipe">
-      <i class="ti ti-users" aria-hidden="true"></i>
-      <span data-fr="Équipes & rôles" data-en="Teams & roles">Équipes & rôles</span>
-      <span class="cat-count" id="count-equipe">0</span>
-    </button>
-    <button class="cat-btn" data-cat="chefequipe">
-      <i class="ti ti-crown" aria-hidden="true"></i>
-      <span data-fr="Rôle de chef·fe d'équipe" data-en="Team lead role">Rôle de chef·fe d'équipe</span>
-      <span class="cat-count" id="count-chefequipe">0</span>
-    </button>
-    <button class="cat-btn" data-cat="taches">
-      <i class="ti ti-subtask" aria-hidden="true"></i>
-      <span data-fr="Tâches & planification" data-en="Tasks & planning">Tâches & planification</span>
-      <span class="cat-count" id="count-taches">0</span>
-    </button>
-    <button class="cat-btn" data-cat="outil-log">
-      <i class="ti ti-file-text" aria-hidden="true"></i>
-      <span data-fr="Dans l'outil — détails" data-en="In the tool — details">Dans l'outil — détails</span>
-      <span class="cat-count" id="count-outil-log">0</span>
-    </button>
-    <button class="cat-btn" data-cat="fichiers">
-      <i class="ti ti-folder" aria-hidden="true"></i>
-      <span data-fr="Fichiers & versions" data-en="Files & versions">Fichiers & versions</span>
-      <span class="cat-count" id="count-fichiers">0</span>
-    </button>
-    <button class="cat-btn" data-cat="ip">
-      <i class="ti ti-shield-lock" aria-hidden="true"></i>
-      <span data-fr="PI & licences" data-en="IP & licences">PI & licences</span>
-      <span class="cat-count" id="count-ip">0</span>
-    </button>
-    <button class="cat-btn" data-cat="conduite">
-      <i class="ti ti-heart-handshake" aria-hidden="true"></i>
-      <span data-fr="Conduite professionnelle" data-en="Professional conduct">Conduite professionnelle</span>
-      <span class="cat-count" id="count-conduite">0</span>
-    </button>
-    <button class="cat-btn" data-cat="multiprojet">
-      <i class="ti ti-layout-grid" aria-hidden="true"></i>
-      <span data-fr="Multi-projets" data-en="Multi-project">Multi-projets</span>
-      <span class="cat-count" id="count-multiprojet">0</span>
-    </button>
-    <button class="cat-btn" data-cat="modalite">
-      <i class="ti ti-home" aria-hidden="true"></i>
-      <span data-fr="Modalités de travail" data-en="Work modality">Modalités de travail</span>
-      <span class="cat-count" id="count-modalite">0</span>
-    </button>
-    <button class="cat-btn" data-cat="notation">
+    <button class="cat-btn" data-cat="evaluation">
       <i class="ti ti-school" aria-hidden="true"></i>
-      <span data-fr="Évaluation & notation" data-en="Grading">Évaluation & notation</span>
-      <span class="cat-count" id="count-notation">0</span>
+      <span data-fr="Évaluation" data-en="Grading">Évaluation</span>
+      <span class="cat-count" id="count-evaluation">0</span>
     </button>
-    <button class="cat-btn" data-cat="productivite">
-      <i class="ti ti-brain" aria-hidden="true"></i>
-      <span data-fr="Productivité personnelle" data-en="Personal productivity">Productivité personnelle</span>
-      <span class="cat-count" id="count-productivite">0</span>
+    <button class="cat-btn" data-cat="projets_methodes">
+      <i class="ti ti-map" aria-hidden="true"></i>
+      <span data-fr="Projets & méthodes" data-en="Projects & methods">Projets & méthodes</span>
+      <span class="cat-count" id="count-projets_methodes">0</span>
     </button>
-    <button class="cat-btn" data-cat="interpersonnel">
-      <i class="ti ti-mood-smile" aria-hidden="true"></i>
-      <span data-fr="Relations interpersonnelles" data-en="Interpersonal skills">Relations interpersonnelles</span>
-      <span class="cat-count" id="count-interpersonnel">0</span>
+    <button class="cat-btn" data-cat="chef_equipe">
+      <i class="ti ti-crown" aria-hidden="true"></i>
+      <span data-fr="Chef·fe d'équipe" data-en="Team lead">Chef·fe d'équipe</span>
+      <span class="cat-count" id="count-chef_equipe">0</span>
     </button>
-    <button class="cat-btn" data-cat="organisation">
-      <i class="ti ti-layout-kanban" aria-hidden="true"></i>
-      <span data-fr="Organisation du travail" data-en="Work organisation">Organisation du travail</span>
-      <span class="cat-count" id="count-organisation">0</span>
+    <button class="cat-btn" data-cat="equipes_roles">
+      <i class="ti ti-users" aria-hidden="true"></i>
+      <span data-fr="Équipes & communication" data-en="Teams & communication">Équipes & communication</span>
+      <span class="cat-count" id="count-equipes_roles">0</span>
+    </button>
+    <button class="cat-btn" data-cat="fichiers_outils">
+      <i class="ti ti-folder" aria-hidden="true"></i>
+      <span data-fr="Fichiers & outils" data-en="Files & tools">Fichiers & outils</span>
+      <span class="cat-count" id="count-fichiers_outils">0</span>
+    </button>
+    <button class="cat-btn" data-cat="regles_droits">
+      <i class="ti ti-shield-lock" aria-hidden="true"></i>
+      <span data-fr="Règles & droits" data-en="Rules & rights">Règles & droits</span>
+      <span class="cat-count" id="count-regles_droits">0</span>
+    </button>
+    <button class="cat-btn" data-cat="competences_perso">
+      <i class="ti ti-heart" aria-hidden="true"></i>
+      <span data-fr="Compétences personnelles" data-en="Personal skills">Compétences personnelles</span>
+      <span class="cat-count" id="count-competences_perso">0</span>
     </button>
   </nav>
 
