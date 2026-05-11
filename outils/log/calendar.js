@@ -119,12 +119,20 @@ function renderAll() {
 }
 
 // Populate the sidebar date inputs from calData, or leave blank if missing.
+// Highlights the dates card if either date is absent.
 function populateDateInputs() {
   const ctx = calData?.context || {};
   const si = document.getElementById("cal-start-date-input");
   const ei = document.getElementById("cal-end-date-input");
   if (si) si.value = ctx.start_date || "";
   if (ei) ei.value = ctx.scheduled_end_date || "";
+
+  // Highlight the dates card if something is missing
+  const datesCard = document.getElementById("cal-dates-card");
+  if (datesCard) {
+    const missing = !ctx.start_date || !ctx.scheduled_end_date;
+    datesCard.classList.toggle("card--accent", missing);
+  }
 }
 
 // Called when either date input changes — save and re-render.
@@ -144,12 +152,28 @@ function renderGrid() {
 
   // Guard: both dates required — show a hint if end date is missing
   if (!ctx.start_date || !ctx.scheduled_end_date) {
+    const missingStart = !ctx.start_date;
+    const targetId     = missingStart ? "cal-start-date-input" : "cal-end-date-input";
+    const lang         = getCurrentLang();
+    const isFr         = lang === "fr-CA";
+    const label        = missingStart
+      ? (isFr ? "date de début" : "start date")
+      : (isFr ? "date de fin"   : "end date");
     document.getElementById("cal-grid").innerHTML =
-      `<p style="color:var(--text-muted);padding:var(--sp-4)" data-i18n="cal.missing_dates">${
-        getCurrentLang() === "fr-CA"
-          ? "Les dates de début et de fin de stage sont nécessaires pour afficher le calendrier. Va dans <a href=\"index.html\">Configuration</a> pour les ajouter."
-          : "Start and end dates are required to display the calendar. Go to <a href=\"index.html\">Setup</a> to add them."
-      }</p>`;
+      `<p style="color:var(--text-muted);padding:var(--sp-4);font-size:1.3rem">
+        ${isFr
+          ? `La <strong>${label}</strong> est nécessaire. Renseigne-la dans le panneau à droite.`
+          : `The <strong>${label}</strong> is required. Fill it in the panel on the right.`}
+      </p>`;
+    // Highlight the relevant date input
+    setTimeout(() => {
+      const el = document.getElementById(targetId);
+      if (!el) return;
+      el.focus();
+      el.style.outline = "2px solid var(--accent)";
+      el.style.outlineOffset = "2px";
+      setTimeout(() => { el.style.outline = ""; el.style.outlineOffset = ""; }, 2000);
+    }, 100);
     return;
   }
 
