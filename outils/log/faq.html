@@ -243,6 +243,19 @@ button i, button .ico { pointer-events: none; }
   top: 65px;
   height: calc(100vh - 65px);
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-hover) transparent;
+}
+
+.sidebar::after {
+  content: '';
+  position: sticky;
+  bottom: 0;
+  display: block;
+  height: 32px;
+  margin-top: -32px;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none;
 }
 
 .sidebar-label {
@@ -262,10 +275,10 @@ button i, button .ico { pointer-events: none; }
   text-align: left;
   background: none;
   border: none;
-  padding: 7px 10px;
+  padding: 5px 10px;
   border-radius: var(--radius);
   font-family: 'Modern Gothic', sans-serif;
-  font-size: 13.5px;
+  font-size: 13px;
   color: var(--text-muted);
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
@@ -663,6 +676,11 @@ footer {
       <i class="ti ti-users" aria-hidden="true"></i>
       <span data-fr="Équipes & rôles" data-en="Teams & roles">Équipes & rôles</span>
       <span class="cat-count" id="count-equipe">0</span>
+    </button>
+    <button class="cat-btn" data-cat="chefequipe">
+      <i class="ti ti-crown" aria-hidden="true"></i>
+      <span data-fr="Rôle de chef·fe d'équipe" data-en="Team lead role">Rôle de chef·fe d'équipe</span>
+      <span class="cat-count" id="count-chefequipe">0</span>
     </button>
     <button class="cat-btn" data-cat="taches">
       <i class="ti ti-subtask" aria-hidden="true"></i>
