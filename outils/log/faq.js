@@ -132,26 +132,16 @@ function render() {
   const cats = ['avant_stage','pendant_stage','outil_journal','evaluation','projets_methodes','chef_equipe','equipes_roles','fichiers_outils','regles_droits','competences_perso'];
 
   const catLabels = {
-    avant:         { fr: 'Avant le début du stage', en: 'Before the internship starts' },
-    demarrage:     { fr: 'Journée de départ', en: 'Start date' },
-    demarrage_projet: { fr: 'Démarrage de projet', en: 'Project kickoff' },
-    semaine1:      { fr: 'Première semaine', en: 'First week' },
-    outil:         { fr: 'Outil de journal de stage', en: 'Internship log tool' },
-    espaces:       { fr: 'Espaces de travail', en: 'Workspace' },
-    communication: { fr: 'Règles de communication', en: 'Communication rules' },
-    equipe:        { fr: 'Équipes & rôles', en: 'Teams & roles' },
-    chefequipe:    { fr: 'Rôle de chef·fe d\'équipe', en: 'Team lead role' },
-    taches:        { fr: 'Tâches & planification dans un projet', en: 'Tasks & project planning' },
-    'outil-log':   { fr: 'Dans l\'outil — fonctionnement détaillé', en: 'In the tool — detailed how-to' },
-    fichiers:      { fr: 'Fichiers, documents & contrôle de version', en: 'Files, documents & version control' },
-    ip:            { fr: 'Propriété intellectuelle & licences', en: 'Intellectual property & licences' },
-    conduite:      { fr: 'Conduite professionnelle', en: 'Professional conduct' },
-    multiprojet:   { fr: 'Travailler sur plusieurs projets', en: 'Working on multiple projects' },
-    modalite:      { fr: 'Modalités de travail', en: 'Work modality' },
-    notation:      { fr: 'Évaluation & notation', en: 'Grading' },
-    productivite:  { fr: 'Productivité personnelle', en: 'Personal productivity' },
-    interpersonnel:{ fr: 'Relations interpersonnelles', en: 'Interpersonal skills' },
-    organisation:  { fr: 'Organisation du travail', en: 'Work organisation' }
+    avant_stage:      { fr: 'Avant le stage', en: 'Before the internship' },
+    pendant_stage:    { fr: 'Pendant le stage', en: 'During the internship' },
+    outil_journal:    { fr: 'Outil de journal', en: 'Log tool' },
+    evaluation:       { fr: '\u00c9valuation', en: 'Grading' },
+    projets_methodes: { fr: 'Projets & m\u00e9thodes', en: 'Projects & methods' },
+    chef_equipe:      { fr: "Chef\u00b7fe d'\u00e9quipe", en: 'Team lead' },
+    equipes_roles:    { fr: '\u00c9quipes & communication', en: 'Teams & communication' },
+    fichiers_outils:  { fr: 'Fichiers & outils', en: 'Files & tools' },
+    regles_droits:    { fr: 'R\u00e8gles & droits', en: 'Rules & rights' },
+    competences_perso:{ fr: 'Comp\u00e9tences personnelles', en: 'Personal skills' }
   };
 
   let totalVisible = 0;
