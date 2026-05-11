@@ -169,39 +169,70 @@ function loadFiles(fileList) {
       setStatus("Aucun fichier valide trouvé.", "error"); return;
     }
     if (!valid.length && configFiles.length) {
-      // Only configs uploaded — merge context into existing rows and rebuild
-      Object.entries(configByUUID).forEach(([uid, ctx]) => {
-        const existing = students.findIndex(s => s.uuid === uid);
-        if (existing < 0) {
-          console.warn(`[LCI Hub] Config for UUID ${uid} — no matching student row loaded yet. Load student files first.`);
+      // Only configs uploaded — update existing rows OR create new stub rows
+      configFiles.forEach(({ data: cfg, name }) => {
+        const uid = cfg.meta?.student_uuid || cfg.profile?.student_id;
+        if (!uid) {
+          console.warn(`[LCI Hub] Config "${name}" → cannot create student row: no UUID.`);
           return;
         }
+        const existing = students.findIndex(s => s.uuid === uid);
 
-        // Preserve existing file type counts before rebuilding
-        const prevCounts = students[existing].file_type_counts || {};
+        if (existing >= 0) {
+          // Update existing row context
+          const prevCounts = students[existing].file_type_counts || {};
+          const ctx = cfg.context || {};
+          const mergedData = {
+            ...students[existing].raw,
+            context: {
+              ...students[existing].raw.context,
+              start_date:          ctx.start_date          || students[existing].raw.context?.start_date,
+              scheduled_end_date:  ctx.scheduled_end_date  || students[existing].raw.context?.scheduled_end_date,
+              planned_absences:    ctx.planned_absences    ?? students[existing].raw.context?.planned_absences    ?? [],
+              work_days:           ctx.work_days           ?? students[existing].raw.context?.work_days           ?? [1,2,3,4,5],
+              work_hours:          ctx.work_hours          ?? students[existing].raw.context?.work_hours,
+              work_hours_by_day:   ctx.work_hours_by_day   ?? students[existing].raw.context?.work_hours_by_day   ?? {},
+              work_hours_date_overrides: ctx.work_hours_date_overrides ?? students[existing].raw.context?.work_hours_date_overrides ?? {},
+              calendar_week_start: ctx.calendar_week_start ?? students[existing].raw.context?.calendar_week_start ?? 1,
+            },
+          };
+          students[existing] = buildRow(mergedData);
+          students[existing].file_type_counts = { ...prevCounts, config: (prevCounts.config || 0) + 1 };
+          console.info(`[LCI Hub] Config "${name}" → updated existing row for ${cfg.profile?.full_name || uid}`);
 
-        // Rebuild row with overlaid config context
-        // .raw holds the original data object — we need to deep-merge context
-        const mergedData = {
-          ...students[existing].raw,
-          context: {
-            ...students[existing].raw.context,
-            planned_absences:    ctx.planned_absences    ?? students[existing].raw.context?.planned_absences    ?? [],
-            work_days:           ctx.work_days           ?? students[existing].raw.context?.work_days           ?? [1,2,3,4,5],
-            work_hours:          ctx.work_hours          ?? students[existing].raw.context?.work_hours,
-            work_hours_by_day:   ctx.work_hours_by_day   ?? students[existing].raw.context?.work_hours_by_day   ?? {},
-            work_hours_date_overrides: ctx.work_hours_date_overrides ?? students[existing].raw.context?.work_hours_date_overrides ?? {},
-            calendar_week_start: ctx.calendar_week_start ?? students[existing].raw.context?.calendar_week_start ?? 1,
-          },
-        };
-        students[existing] = buildRow(mergedData);
-        students[existing].file_type_counts = {
-          ...prevCounts,
-          config: (prevCounts.config || 0) + 1,
-        };
+        } else {
+          // No matching row — bootstrap a stub from this config (zero logs)
+          if (!cfg.profile?.full_name) {
+            console.warn(`[LCI Hub] Config "${name}" → cannot create student row: missing profile.full_name.`);
+            return;
+          }
+          const stub = {
+            meta:           { ...cfg.meta, student_uuid: uid },
+            profile:        cfg.profile  || {},
+            pathway:        cfg.pathway  || "company",
+            context:        cfg.context  || {},
+            people:         cfg.people   || [],
+            projects:       cfg.projects || [],
+            activity_types: cfg.activity_types || [],
+            tools:          cfg.tools    || [],
+            logs:           [],
+            reflection:     null,
+            todos:          [],
+          };
+          const row = buildRow(stub);
+          row.file_type_counts = { daily: 0, weekly: 0, full: 0, reflection: 0, config: 1 };
+          students.push(row);
+          console.info(`[LCI Hub] Config "${name}" → created stub row for ${cfg.profile.full_name} (no logs yet)`);
+        }
       });
+
       const nC = configFiles.length;
-      setStatus(`${nC} fichier${nC > 1 ? "s" : ""} de configuration traité${nC > 1 ? "s" : ""}.`);
+      const nS = students.length;
+      setStatus(`${nC} fichier${nC > 1 ? "s" : ""} de configuration — ${nS} étudiant·e${nS > 1 ? "·s" : ""} au total.`);
+      document.getElementById("btn-csv").style.display   = "";
+      document.getElementById("btn-clear").style.display = "";
+      document.getElementById("hub-dashboard").style.display = "block";
+      document.getElementById("hub-upload-strip")?.classList.add("hub-upload-strip--loaded");
       populateFilterOptions();
       applyFilters();
       return;
@@ -278,6 +309,32 @@ function loadFiles(fileList) {
         students[existing] = r;
       } else {
         students.push(r);
+      }
+    });
+
+    // Stub rows for config-only students not covered by any log file
+    configFiles.forEach(({ data: cfg, name }) => {
+      const uid = cfg.meta?.student_uuid || cfg.profile?.student_id;
+      if (!uid || !cfg.profile?.full_name) return;
+      const alreadyIn = students.some(s => s.uuid === uid);
+      if (!alreadyIn) {
+        const stub = {
+          meta:           { ...cfg.meta, student_uuid: uid },
+          profile:        cfg.profile  || {},
+          pathway:        cfg.pathway  || "company",
+          context:        cfg.context  || {},
+          people:         cfg.people   || [],
+          projects:       cfg.projects || [],
+          activity_types: cfg.activity_types || [],
+          tools:          cfg.tools    || [],
+          logs:           [],
+          reflection:     null,
+          todos:          [],
+        };
+        const row = buildRow(stub);
+        row.file_type_counts = { daily: 0, weekly: 0, full: 0, reflection: 0, config: 1 };
+        students.push(row);
+        console.info(`[LCI Hub] Config "${name}" → stub row for ${cfg.profile.full_name} (no logs yet)`);
       }
     });
 
