@@ -337,6 +337,7 @@ button i, button .ico { pointer-events: none; }
   margin-bottom: 8px;
   overflow: hidden;
   transition: border-color 0.2s;
+  position: relative;
 }
 
 .faq-item:hover { border-color: var(--border-hover); }
@@ -481,18 +482,19 @@ button i, button .ico { pointer-events: none; }
 .share-btn.copied { color: var(--accent); }
 
 .q-share-btn {
-  background: none;
-  border: none;
+  position: absolute;
+  top: 12px;
+  right: 38px;
   color: var(--text-muted);
   cursor: pointer;
   padding: 2px 4px;
   font-size: 11px;
   opacity: 1;
   transition: color 0.15s;
-  flex-shrink: 0;
   line-height: 1;
-  margin-left: 6px;
   border-radius: var(--radius);
+  z-index: 1;
+  user-select: none;
 }
 .q-share-btn:hover { color: var(--accent); }
 .q-share-btn.copied { color: var(--accent); }

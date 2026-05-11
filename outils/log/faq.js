@@ -113,7 +113,7 @@ function render() {
   const container = document.getElementById('faq-sections');
   const noResults = document.getElementById('no-results');
   const resultCount = document.getElementById('result-count');
-  const cats = ['avant', 'demarrage', 'semaine1', 'modalite', 'notation', 'outil', 'espaces', 'communication', 'equipe', 'taches', 'outil-log', 'fichiers', 'ip', 'conduite', 'multiprojet', 'productivite', 'interpersonnel', 'organisation'];
+  const cats = ['avant', 'demarrage', 'semaine1', 'modalite', 'notation', 'outil', 'espaces', 'communication', 'equipe', 'chefequipe', 'taches', 'outil-log', 'fichiers', 'ip', 'conduite', 'multiprojet', 'productivite', 'interpersonnel', 'organisation'];
 
   const catLabels = {
     avant:         { fr: 'Avant le début du stage', en: 'Before the internship starts' },
@@ -123,6 +123,7 @@ function render() {
     espaces:       { fr: 'Espaces de travail', en: 'Workspace' },
     communication: { fr: 'Règles de communication', en: 'Communication rules' },
     equipe:        { fr: 'Équipes & rôles', en: 'Teams & roles' },
+    chefequipe:    { fr: 'Rôle de chef·fe d\'équipe', en: 'Team lead role' },
     taches:        { fr: 'Tâches & planification dans un projet', en: 'Tasks & project planning' },
     'outil-log':   { fr: 'Dans l\'outil — fonctionnement détaillé', en: 'In the tool — detailed how-to' },
     fichiers:      { fr: 'Fichiers, documents & contrôle de version', en: 'Files, documents & version control' },
@@ -209,10 +210,10 @@ function renderItem(id, content, lang) {
   return `<div class="faq-item" id="${id}">
     <button class="faq-q" aria-expanded="false">
       ${langTag}
-      <span>${content.q}</span>
-      <button class="q-share-btn" data-id="${id}" title="${currentLang === 'en' ? 'Copy link to this question' : 'Copier le lien vers cette question'}" aria-label="${currentLang === 'en' ? 'Copy link' : 'Copier le lien'}" tabindex="0">&#x1F517;</button>
+      <span class="faq-q-text">${content.q}</span>
       <i class="ti ti-chevron-down faq-chevron" aria-hidden="true"></i>
     </button>
+    <span class="q-share-btn" data-id="${id}" role="button" tabindex="0" title="${currentLang === 'en' ? 'Copy link to this question' : 'Copier le lien vers cette question'}" aria-label="${currentLang === 'en' ? 'Copy link' : 'Copier le lien'}">&#x1F517;</span>
     <div class="faq-a" role="region">${content.a}</div>
   </div>`;
 }
@@ -297,7 +298,7 @@ function initApp() {
   // Called after FAQ data is loaded — handles deep links
   if (location.hash) {
     const hash = location.hash.slice(1);
-    const validCats = ['avant','demarrage','semaine1','modalite','notation','outil','espaces','communication','equipe','taches','outil-log','fichiers','ip','conduite','multiprojet','productivite','interpersonnel','organisation'];
+    const validCats = ['avant','demarrage','semaine1','modalite','notation','outil','espaces','communication','equipe','chefequipe','taches','outil-log','fichiers','ip','conduite','multiprojet','productivite','interpersonnel','organisation'];
     if (validCats.includes(hash)) {
       filterCat(hash);
       setTimeout(() => {
