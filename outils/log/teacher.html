@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light" data-page-title-key="nav.title.teacher">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <meta name="upload-form-url" content="https://lcieducation-my.sharepoint.com/:f:/g/personal/elisa_schaeffer_collegelasalle_com/IgDuTArLyqXOSYc0rdHnAhTOAf2HQnWL01dYrthgl8k5RNk?e=mXO69B">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Reuse hub layout vars ─────────────────────────── */
+    .hub-upload-strip {
+      display:flex;gap:var(--sp-4);
+      padding:var(--sp-4) var(--sp-5);
+      background:var(--bg-card);border-radius:var(--r-xl);
+      box-shadow:var(--shadow-sm);margin-bottom:var(--sp-5);
+      flex-direction:column;align-items:stretch;
+    }
+    .hub-upload-strip--loaded {
+      flex-direction:row;align-items:center;
+    }
+    .hub-upload-strip--loaded #teacher-drop-inline {
+      min-height:unset !important;padding:var(--sp-2) var(--sp-4) !important;
+      flex-direction:row !important;gap:var(--sp-3) !important;
+      min-width:18rem;width:auto !important;margin-top:0 !important;
+    }
+    .hub-upload-strip--loaded #teacher-drop-inline div:not(:first-child) { display:none; }
+    .hub-table-outer {
+      background:var(--bg-card);border-radius:var(--r-xl);
+      box-shadow:var(--shadow-sm);overflow:hidden;
+    }
+    .hub-table-scroll { overflow-x:auto;-webkit-overflow-scrolling:touch; }
+    #teacher-table {
+      width:100%;border-collapse:collapse;font-size:1.4rem;min-width:72rem;
+    }
+    #teacher-table th {
+      background:var(--bg-subtle);
+      padding:var(--sp-3) var(--sp-4);
+      font-size:1.1rem;font-weight:600;text-transform:uppercase;
+      letter-spacing:0.06em;color:var(--text-subtle);
+      border-bottom:1px solid var(--border);
+      white-space:nowrap;
+    }
+    #teacher-table td {
+      padding:var(--sp-3) var(--sp-4);
+      border-bottom:1px solid var(--border);
+      vertical-align:middle;white-space:nowrap;
+    }
+    #teacher-table tbody tr:last-child td { border-bottom:none; }
+    #teacher-table tbody tr.data-row { cursor:pointer; }
+    #teacher-table tbody tr.data-row:hover td { background:var(--bg-subtle); }
+    .track-pill {
+      display:inline-block;padding:0.2rem var(--sp-2);border-radius:var(--r-pill);
+      font-size:1.15rem;font-weight:600;letter-spacing:0.03em;
+    }
+    .track-green  { background:rgba(126,200,80,.18);color:#3a6e00; }
+    .track-amber  { background:rgba(230,184,48,.2); color:#8a5c00; }
+    .track-red    { background:rgba(255,107,112,.18);color:#a00; }
+    .track-none   { background:var(--bg-subtle);color:var(--text-subtle); }
+    [data-theme="dark"] .track-green { color:#8ab840; }
+    [data-theme="dark"] .track-amber { color:#e6b830; }
+    [data-theme="dark"] .track-red   { color:#ff6b70; }
+    /* ── Visibility badge ──────────────────────────────── */
+    .vis-matched  { color:var(--success);font-size:1.2rem; }
+    .vis-blank    { color:var(--text-muted);font-size:1.2rem; }
+    .vis-hidden   { color:var(--danger);font-size:1.2rem; }
+    /* ── Identity screen ───────────────────────────────── */
+    #teacher-identity-screen {
+      max-width:52rem;margin:0 auto;padding:var(--sp-10) 0;
+    }
+    @media print {
+      .no-print { display:none !important; }
+      @page { size:A4 landscape;margin:1cm; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <header class="site-header">
+    <div class="container container--wide">
+      <div class="header-inner">
+        <div class="site-title" data-i18n="nav.title.teacher">Tableau — enseignant·e</div>
+        <div class="header-actions">
+          <button class="btn btn--ghost btn--sm lang-toggle-btn" data-lang-target="fr-CA">FR</button>
+          <button class="btn btn--ghost btn--sm lang-toggle-btn" data-lang-target="en-CA">EN</button>
+          <button class="btn btn--ghost btn--sm theme-toggle-btn" aria-label="Toggle theme"
+            style="padding:var(--sp-2);line-height:0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content" style="padding-bottom:var(--sp-12)">
+    <div class="container container--wide">
+
+      <!-- ── Identity screen (shown until teacher name is set) ── -->
+      <div id="teacher-identity-screen">
+
+        <div style="max-width:72rem;margin:0 auto;padding:var(--sp-8) 0">
+
+          <h1 style="font-size:3rem;font-weight:700;margin-bottom:var(--sp-2)"
+            data-i18n="teacher.identity_title">Tableau de suivi — Enseignant·e</h1>
+          <p style="font-size:1.6rem;color:var(--text-muted);margin-bottom:var(--sp-8)"
+            data-i18n="teacher.identity_subtitle">
+            Suis la progression de tes étudiant·e·s en stage sans rien avoir à installer.
+          </p>
+
+          <!-- How it works -->
+          <div style="background:var(--bg-card);border-radius:var(--r-xl);
+                      padding:var(--sp-6);box-shadow:var(--shadow-sm);margin-bottom:var(--sp-5)">
+            <div style="font-size:1.1rem;font-weight:700;text-transform:uppercase;
+                        letter-spacing:.08em;color:var(--text-subtle);margin-bottom:var(--sp-4)"
+              data-i18n="teacher.how_it_works">Comment ça marche</div>
+
+            <div style="display:flex;flex-direction:column;gap:var(--sp-5)">
+
+              <!-- Step 1 -->
+              <div style="display:flex;gap:var(--sp-4);align-items:flex-start">
+                <div style="flex-shrink:0;width:3.2rem;height:3.2rem;border-radius:50%;
+                            background:var(--accent);color:#fff;font-weight:700;font-size:1.5rem;
+                            display:flex;align-items:center;justify-content:center">1</div>
+                <div>
+                  <div style="font-size:1.5rem;font-weight:600;margin-bottom:var(--sp-1)"
+                    data-i18n="teacher.step1_title">Les étudiant·e·s exportent leurs journaux</div>
+                  <p style="font-size:1.4rem;color:var(--text-muted);margin:0"
+                    data-i18n="teacher.step1_body">
+                    Depuis leur journal de stage, chaque étudiant·e exporte un fichier JSON quotidien
+                    et le dépose dans le dossier OneDrive partagé du cours.
+                    Les fichiers de configuration (horaire, absences planifiées) y sont aussi.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Step 2 -->
+              <div style="display:flex;gap:var(--sp-4);align-items:flex-start">
+                <div style="flex-shrink:0;width:3.2rem;height:3.2rem;border-radius:50%;
+                            background:var(--accent);color:#fff;font-weight:700;font-size:1.5rem;
+                            display:flex;align-items:center;justify-content:center">2</div>
+                <div>
+                  <div style="font-size:1.5rem;font-weight:600;margin-bottom:var(--sp-1)"
+                    data-i18n="teacher.step2_title">Tu télécharges tous les fichiers d'un coup</div>
+                  <p style="font-size:1.4rem;color:var(--text-muted);margin:0 0 var(--sp-3) 0"
+                    data-i18n="teacher.step2_body">
+                    Ouvre le dossier OneDrive ci-dessous, sélectionne tous les fichiers
+                    (Ctrl+A ou ⌘A), télécharge-les.
+                    <strong>Pas besoin de trier</strong> — cette page identifie automatiquement
+                    les étudiant·e·s qui t'ont assigné·e comme superviseur·e.
+                  </p>
+                  <a href="https://lcieducation-my.sharepoint.com/:f:/g/personal/elisa_schaeffer_collegelasalle_com/IgDuTArLyqXOSYc0rdHnAhTOAf2HQnWL01dYrthgl8k5RNk?e=mXO69B"
+                    target="_blank" rel="noopener"
+                    class="btn btn--primary"
+                    style="font-size:1.4rem;display:inline-flex;align-items:center;gap:var(--sp-2)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7 10 12 15 17 10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    <span data-i18n="teacher.onedrive_btn">Ouvrir le dossier OneDrive</span>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Step 3 -->
+              <div style="display:flex;gap:var(--sp-4);align-items:flex-start">
+                <div style="flex-shrink:0;width:3.2rem;height:3.2rem;border-radius:50%;
+                            background:var(--accent);color:#fff;font-weight:700;font-size:1.5rem;
+                            display:flex;align-items:center;justify-content:center">3</div>
+                <div>
+                  <div style="font-size:1.5rem;font-weight:600;margin-bottom:var(--sp-1)"
+                    data-i18n="teacher.step3_title">Tu dépose les fichiers ici</div>
+                  <p style="font-size:1.4rem;color:var(--text-muted);margin:0"
+                    data-i18n="teacher.step3_body">
+                    Glisse-dépose tous les fichiers téléchargés dans la zone de dépôt qui apparaîtra
+                    après avoir entré ton nom. Tu verras uniquement tes étudiant·e·s,
+                    avec leur progression, leurs heures et les éventuelles absences.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Name problem hint -->
+          <div style="background:rgba(var(--accent-rgb,0,88,124),.07);border:1.5px solid rgba(var(--accent-rgb,0,88,124),.18);
+                      border-radius:var(--r-lg);padding:var(--sp-4);margin-bottom:var(--sp-6)">
+            <div style="display:flex;gap:var(--sp-3);align-items:flex-start">
+              <span style="font-size:1.6rem;flex-shrink:0">💡</span>
+              <div style="font-size:1.35rem;color:var(--text-muted)">
+                <strong data-i18n="teacher.name_match_note_bold">Correspondance par nom :</strong>
+                <span data-i18n="teacher.name_match_note">
+                  le tableau compare ton nom avec le champ
+                  « Enseignant·e responsable » que chaque étudiant·e a rempli lors de la configuration.
+                  Si un·e étudiant·e n'apparaît pas, c'est probablement parce que
+                  son nom ne correspond pas exactement — la page t'indiquera lequel corriger.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Name input -->
+          <div style="background:var(--bg-card);border-radius:var(--r-xl);
+                      padding:var(--sp-6);box-shadow:var(--shadow-sm)">
+            <div style="font-size:1.1rem;font-weight:700;text-transform:uppercase;
+                        letter-spacing:.08em;color:var(--text-subtle);margin-bottom:var(--sp-4)"
+              data-i18n="teacher.your_name_section">Ton nom</div>
+            <p style="font-size:1.4rem;color:var(--text-muted);margin-bottom:var(--sp-3)"
+              data-i18n="teacher.name_input_hint">
+              Entre ton nom exactement comme tu t'attends à ce que les étudiant·e·s l'aient écrit —
+              la comparaison ignore les majuscules et les accents.
+            </p>
+            <div style="display:flex;gap:var(--sp-3);align-items:flex-end;flex-wrap:wrap">
+              <div class="form-group" style="margin:0;flex:1;min-width:22rem">
+                <label style="font-size:1.2rem;color:var(--text-muted)"
+                  data-i18n="field.teacher"></label>
+                <input type="text" id="teacher-name-input"
+                  style="width:100%;margin-top:var(--sp-2)"
+                  data-i18n-placeholder="teacher.name_placeholder"
+                  onkeydown="if(event.key==='Enter') confirmTeacherName()">
+              </div>
+              <button class="btn btn--primary" onclick="confirmTeacherName()"
+                data-i18n="teacher.start_btn">Continuer →</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── Main dashboard (hidden until identity set) ──────── -->
+      <div id="teacher-dashboard-wrap" style="display:none">
+
+        <!-- Upload strip -->
+        <div class="hub-upload-strip no-print" id="teacher-upload-strip">
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
+              <div style="font-size:1.6rem;font-weight:600" id="teacher-greeting"></div>
+              <button class="btn btn--ghost btn--sm" onclick="changeTeacherName()"
+                data-i18n="teacher.change_name" style="font-size:1.2rem">Changer de nom</button>
+            </div>
+            <div id="teacher-status-text" style="font-size:1.3rem;color:var(--text-subtle);margin-top:var(--sp-1)"
+              data-i18n="teacher.drop_hint">
+              Dépose les fichiers JSON des étudiant·e·s ici.
+            </div>
+          </div>
+          <div id="teacher-drop-inline"
+            style="border:2px dashed var(--border);border-radius:var(--r-lg);
+                   padding:var(--sp-8) var(--sp-6);text-align:center;cursor:pointer;
+                   min-height:14rem;display:flex;flex-direction:column;
+                   align-items:center;justify-content:center;gap:var(--sp-3);
+                   width:100%;margin-top:var(--sp-4);
+                   transition:border-color var(--dur-fast),background var(--dur-fast)"
+            onclick="document.getElementById('file-input-teacher').click()"
+            ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+            ondragleave="this.style.borderColor=''"
+            ondrop="event.preventDefault();this.style.borderColor='';loadTeacherFiles(event.dataTransfer.files)">
+            <div style="font-size:3.2rem">📂</div>
+            <div style="font-size:1.6rem;font-weight:600;color:var(--text-muted)"
+              data-i18n="hub.drop_files">Déposer les fichiers JSON ici</div>
+            <div style="font-size:1.3rem;color:var(--text-subtle)"
+              data-i18n="hub.drop_types">Quotidiens · Hebdomadaires · Complets</div>
+            <div style="font-size:1.2rem;color:var(--text-subtle)"
+              data-i18n="hub.drop_click">ou cliquer pour sélectionner</div>
+          </div>
+          <input type="file" id="file-input-teacher" accept=".json" multiple style="display:none"
+            onchange="loadTeacherFiles(this.files)">
+          <div class="flex gap-2" style="flex-shrink:0">
+            <button class="btn btn--ghost btn--sm" onclick="exportTeacherView()" id="btn-teacher-export"
+              style="display:none" data-i18n="teacher.export_btn">⬇ Exporter vue</button>
+            <button class="btn btn--ghost btn--sm" onclick="clearTeacherData()" id="btn-teacher-clear"
+              style="display:none" data-i18n="teacher.clear_btn">✕ Vider</button>
+          </div>
+        </div>
+
+        <!-- Dashboard content -->
+        <div id="teacher-dashboard" style="display:none">
+
+          <!-- Filter bar -->
+          <div class="hub-filter-bar no-print" style="display:flex;flex-wrap:wrap;gap:var(--sp-3);
+              align-items:flex-end;background:var(--bg-card);border-radius:var(--r-xl);
+              padding:var(--sp-4) var(--sp-5);box-shadow:var(--shadow-sm);margin-bottom:var(--sp-4)">
+            <div>
+              <span class="hub-filter-label" data-i18n="hub.filter_search"></span>
+              <input type="text" id="teacher-search" placeholder="…"
+                style="font-size:1.3rem;padding:var(--sp-1) var(--sp-3);
+                       border:1.5px solid var(--border);border-radius:var(--r-md);
+                       background:var(--bg-input);color:var(--text);height:3.4rem;min-width:18rem"
+                oninput="applyTeacherFilters()">
+            </div>
+            <label style="display:flex;align-items:center;gap:var(--sp-2);font-size:1.3rem;cursor:pointer">
+              <input type="checkbox" id="teacher-show-hidden" onchange="applyTeacherFilters()">
+              <span data-i18n="teacher.show_hidden">Afficher les étudiant·e·s masqué·e·s</span>
+            </label>
+          </div>
+
+          <!-- AWOL section -->
+          <div id="teacher-awol-section" style="display:none;margin-bottom:var(--sp-5)">
+            <div style="background:rgba(255,107,112,.1);border:1.5px solid var(--danger);
+                        border-radius:var(--r-xl);padding:var(--sp-5)">
+              <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4)">
+                <span style="font-size:2rem">🚨</span>
+                <div>
+                  <div style="font-size:1.6rem;font-weight:600;color:var(--danger)"
+                    id="teacher-awol-title" data-i18n="hub.awol_title">Étudiant·e·s sans nouvelles</div>
+                  <div style="font-size:1.3rem;color:var(--text-muted)" id="teacher-awol-subtitle"></div>
+                </div>
+              </div>
+              <div id="teacher-awol-list"></div>
+            </div>
+          </div>
+
+          <!-- Student table -->
+          <div class="hub-table-outer">
+            <div class="hub-table-scroll">
+              <table id="teacher-table">
+                <thead>
+                  <tr>
+                    <th data-i18n="hub.col_name">Nom</th>
+                    <th data-i18n="hub.col_program">Programme</th>
+                    <th data-i18n="hub.col_hours">Heures</th>
+                    <th data-i18n="hub.col_track">Progression</th>
+                    <th data-i18n="hub.col_last_log">Dernier journal</th>
+                    <th data-i18n="hub.col_supervisor">Superviseur·e</th>
+                    <th style="text-align:center" data-i18n="teacher.col_status">Statut</th>
+                  </tr>
+                </thead>
+                <tbody id="teacher-tbody"></tbody>
+              </table>
+            </div>
+            <div id="teacher-empty" class="hub-empty" style="display:none"
+              data-i18n="hub.no_students">Aucun·e étudiant·e à afficher.</div>
+          </div>
+
+        </div><!-- /teacher-dashboard -->
+      </div><!-- /teacher-dashboard-wrap -->
+
+    </div>
+  </main>
+</div>
+
+<script src="lang.js?v=20260513"></script>
+<script src="app.js?v=20260513"></script>
+<script src="courses.js?v=20260513"></script>
+<script src="teacher.js?v=20260513"></script>
+</body>
+</html>
