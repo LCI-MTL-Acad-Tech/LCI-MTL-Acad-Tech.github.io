@@ -61,15 +61,47 @@ function loadCalFile(file) {
   r.onload = e => {
     try {
       const d = JSON.parse(e.target.result);
-      if (!d.context?.start_date) {
+
+      // Must at minimum have a context block to be useful
+      if (!d.context) {
+        console.error("[LCI Calendar] File rejected — no 'context' block found.", d);
         alert(t("error.no_files") || "Fichier non reconnu — assure-toi d'utiliser un fichier JSON de stage valide.");
         return;
       }
-      // Config files have no logs — that's fine, renderAll handles it
-      calData = d;
+
+      // Migrate schema in place
+      migrateData(d);
+
+      // Merge with existing localStorage data so persistAndRefresh works.
+      // If the file has the same UUID as what's stored, deep-merge (file wins for context,
+      // localStorage wins for logs already saved). If no match, just use the file.
+      const existing = loadData();
+      const fileUUID  = d.meta?.student_uuid;
+      const existUUID = existing?.meta?.student_uuid;
+
+      if (existing && fileUUID && fileUUID === existUUID) {
+        // Same student — merge logs (union, deduplicated by log_id) and overlay context
+        const existingLogIds = new Set((existing.logs || []).map(l => l.log_id));
+        const newLogs = (d.logs || []).filter(l => !existingLogIds.has(l.log_id));
+        d.logs = [...(existing.logs || []), ...newLogs];
+        d.context = { ...existing.context, ...d.context }; // file context wins for dates etc.
+        console.info(`[LCI Calendar] Merged file into existing data — ${newLogs.length} new log(s) added.`);
+      }
+
+      // Persist so modal saves (absences, hours, modality) survive page reload
+      if (d.profile?.full_name || d.meta?.student_uuid) {
+        saveData(d);
+        console.info("[LCI Calendar] File saved to localStorage.");
+      }
+
+      calData      = loadData() || d; // re-read so migrateData ran on the stored copy
       calDownloads = getDownloads();
       showCalendar();
-    } catch { alert("Erreur de lecture du fichier JSON."); }
+
+    } catch (err) {
+      console.error("[LCI Calendar] Failed to read JSON file:", err);
+      alert("Erreur de lecture du fichier JSON.");
+    }
   };
   r.readAsText(file);
 }
