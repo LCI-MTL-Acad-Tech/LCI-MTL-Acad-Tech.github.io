@@ -69,6 +69,10 @@ function prefillFromCache() {
 
   if (data && data.context) {
     const ctx = data.context;
+    // Internship dates and hours target
+    if (ctx.start_date)          setVal("ctx-start-date",   ctx.start_date);
+    if (ctx.scheduled_end_date)  setVal("ctx-end-date",     ctx.scheduled_end_date);
+    if (ctx.total_hours_target)  setVal("ctx-total-hours",  ctx.total_hours_target);
     // Work hours — uniform or variable
     if (ctx.work_hours) {
       setVal("ctx-work-hours-h", ctx.work_hours.h);
@@ -91,9 +95,33 @@ function prefillFromCache() {
     // Wrap-up day and calendar week start
     if (ctx.week_end_day !== undefined) setVal("ctx-week-end-day", ctx.week_end_day);
     if (ctx.calendar_week_start !== undefined) setVal("ctx-cal-week-start", ctx.calendar_week_start);
+
+    // Company / org fields (company pathway) — stored under ctx.company
+    const co = ctx.company || {};
+    if (co.organization_name) setVal("ctx-org-name",  co.organization_name);
+    if (co.industry)          setVal("ctx-industry",   co.industry);
+    if (co.city)              setVal("ctx-city",        co.city);
+    if (co.country)           setVal("ctx-country",     co.country);
+    if (ctx.supervisor_name)  setVal("ctx-sup-name",   ctx.supervisor_name);
+    if (ctx.supervisor_role)  setVal("ctx-sup-role",   ctx.supervisor_role);
+    if (ctx.situation_before) setVal("ctx-situation-before", ctx.situation_before);
+
+    // Teacher custom field
+    if (ctx.teacher_custom_field?.label) {
+      setVal("ctx-teacher-field-label",       ctx.teacher_custom_field.label);
+      setVal("ctx-teacher-field-placeholder", ctx.teacher_custom_field.placeholder || "");
+    }
   }
 
-  if (cache.known_orgs?.length) {
+  // Hub pathway: restore project blocks
+  if (data?.projects?.length) {
+    const list = document.getElementById("ctx-projects-list");
+    if (list && !list.children.length) { // don't double-add
+      data.projects.forEach(p => addProjectBlock(p));
+    }
+  }
+
+  if (cache?.known_orgs?.length) {
     setupAutocomplete(document.getElementById("ctx-org-name"), cache.known_orgs);
   }
 }
@@ -302,6 +330,14 @@ function saveProfileAndNext() {
 
   goToScreen("screen-context");
   renderSteps("setup-steps-2", 1);
+
+  // If this is an edit, persist profile changes immediately.
+  const existingForProfile = loadData();
+  if (existingForProfile && existingForProfile.meta?.student_uuid) {
+    existingForProfile.profile  = { ...existingForProfile.profile,  ...setupData.profile };
+    existingForProfile.pathway  = currentPathway;
+    saveData(existingForProfile);
+  }
 }
 
 // ── Project blocks (hub pathway) ─────────────────────────────
@@ -437,6 +473,14 @@ function saveContextAndNext() {
 
   goToScreen("screen-expectations");
   renderSteps("setup-steps-3", 2);
+
+  // If this is an edit (data already exists), persist the context change immediately
+  // so navigating away doesn't lose it — no need to reach finishSetup.
+  const existing = loadData();
+  if (existing && existing.meta?.student_uuid) {
+    existing.context = { ...existing.context, ...setupData.context };
+    saveData(existing);
+  }
 }
 
 // ── Skills and tools tags ────────────────────────────────────
@@ -697,8 +741,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const data = loadData();
   if (data && data.profile?.full_name) {
     document.getElementById("welcome-options-new").classList.add("hidden");
+    document.getElementById("welcome-options-import").classList.add("hidden");
     const cont = document.getElementById("welcome-options-continue");
     cont.classList.remove("hidden");
+    document.getElementById("welcome-options-edit-config")?.classList.remove("hidden");
     document.getElementById("reset-link-row")?.classList.remove("hidden");
     document.getElementById("export-config-row")?.classList.remove("hidden");
     const lang = getCurrentLang();
@@ -706,5 +752,9 @@ document.addEventListener("DOMContentLoaded", () => {
       lang === "fr-CA"
         ? `${data.profile.full_name} — ${data.pathway === "hub" ? "Hub d'innovation" : data.context?.company?.organization_name || "Stage"}`
         : `${data.profile.full_name} — ${data.pathway === "hub" ? "Innovation hub" : data.context?.company?.organization_name || "Internship"}`;
+
+    // Prefill all form fields immediately — editing shortcuts bypass pathway selection
+    if (data.pathway) currentPathway = data.pathway;
+    prefillFromCache();
   }
 });
