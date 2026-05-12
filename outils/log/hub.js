@@ -26,6 +26,9 @@ let activeTeacher   = "";
 let activeIntegrity = false; // filter: show only students with integrity issues
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Only run hub-specific init when on the actual hub page
+  if (!document.getElementById("hub-drop-inline")) return;
+
   initPage();
   setupHubDrop();
 
