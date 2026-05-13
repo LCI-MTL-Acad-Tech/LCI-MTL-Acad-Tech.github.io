@@ -756,5 +756,19 @@ document.addEventListener("DOMContentLoaded", () => {
     // Prefill all form fields immediately — editing shortcuts bypass pathway selection
     if (data.pathway) currentPathway = data.pathway;
     prefillFromCache();
+
+    // Show feedback if this page was reloaded after a config import
+    if (sessionStorage.getItem("config_imported") === "1") {
+      sessionStorage.removeItem("config_imported");
+      const lang = getCurrentLang();
+      const msg = lang === "fr-CA"
+        ? "✓ Configuration chargée — vérifie les champs ci-dessous et enregistre si nécessaire."
+        : "✓ Configuration loaded — review the fields below and save if needed.";
+      const banner = document.createElement("div");
+      banner.style.cssText = "background:rgba(91,128,0,.1);border:1.5px solid var(--success);border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4);margin-bottom:var(--sp-4);font-size:1.4rem;color:var(--success)";
+      banner.textContent = msg;
+      document.getElementById("welcome-options-edit-config")?.after(banner);
+      setTimeout(() => banner.remove(), 8000);
+    }
   }
 });

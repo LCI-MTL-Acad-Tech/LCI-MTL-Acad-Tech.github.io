@@ -54,6 +54,24 @@ function showCalendar() {
   renderAll();
 }
 
+function _showCalFileHint(mode) {
+  document.getElementById("cal-file-hint")?.remove();
+  const lang = getCurrentLang();
+  const isFr = lang === "fr-CA";
+  const msg = mode === "merged"
+    ? (isFr ? "✓ Données fusionnées avec celles déjà enregistrées. Tes modifications du calendrier sont préservées."
+             : "✓ Data merged with existing records. Your calendar edits are preserved.")
+    : (isFr ? "✓ Fichier chargé et enregistré. Les modifications que tu feras ici seront conservées."
+             : "✓ File loaded and saved. Any changes you make here will be kept.");
+  const div = document.createElement("div");
+  div.id = "cal-file-hint";
+  div.style.cssText = "margin-bottom:var(--sp-3);font-size:1.3rem;color:var(--success);";
+  div.textContent = msg;
+  const grid = document.getElementById("cal-main");
+  if (grid) grid.prepend(div);
+  setTimeout(() => div.remove(), 6000);
+}
+
 // ── File upload fallback ──────────────────────────────────────
 function loadCalFile(file) {
   if (!file) return;
@@ -62,45 +80,74 @@ function loadCalFile(file) {
     try {
       const d = JSON.parse(e.target.result);
 
+      // Run migration first — recovers missing blocks, remaps old fields
+      migrateData(d);
+
       // Must at minimum have a context block to be useful
       if (!d.context) {
-        console.error("[LCI Calendar] File rejected — no 'context' block found.", d);
-        alert(t("error.no_files") || "Fichier non reconnu — assure-toi d'utiliser un fichier JSON de stage valide.");
+        console.error("[LCI Calendar] File rejected — no 'context' block after migration.", d);
+        const lang = getCurrentLang();
+        alert(lang === "fr-CA"
+          ? "Fichier non reconnu. Utilise un fichier JSON de journal de stage ou de configuration."
+          : "File not recognized. Use an internship log or configuration JSON file.");
         return;
       }
 
-      // Migrate schema in place
-      migrateData(d);
-
-      // Merge with existing localStorage data so persistAndRefresh works.
-      // If the file has the same UUID as what's stored, deep-merge (file wins for context,
-      // localStorage wins for logs already saved). If no match, just use the file.
-      const existing = loadData();
+      const existing  = loadData();
       const fileUUID  = d.meta?.student_uuid;
       const existUUID = existing?.meta?.student_uuid;
+      const sameStudent = existing && fileUUID && fileUUID === existUUID;
 
-      if (existing && fileUUID && fileUUID === existUUID) {
-        // Same student — merge logs (union, deduplicated by log_id) and overlay context
+      let toSave;
+
+      if (sameStudent) {
+        // Same student — merge carefully:
+        // - Logs: union by log_id (existing logs kept, new ones from file added)
+        // - Context: existing wins for calendar-specific edits (absences, modality,
+        //   date overrides), file wins for profile data (dates, schedule)
         const existingLogIds = new Set((existing.logs || []).map(l => l.log_id));
         const newLogs = (d.logs || []).filter(l => !existingLogIds.has(l.log_id));
-        d.logs = [...(existing.logs || []), ...newLogs];
-        d.context = { ...existing.context, ...d.context }; // file context wins for dates etc.
-        console.info(`[LCI Calendar] Merged file into existing data — ${newLogs.length} new log(s) added.`);
+        const mergedContext = {
+          ...d.context,                    // file: dates, schedule, course
+          // existing wins for calendar-only fields the student may have edited in-browser
+          planned_absences:         existing.context?.planned_absences         ?? d.context.planned_absences,
+          planned_modalities:       existing.context?.planned_modalities       ?? d.context.planned_modalities,
+          work_hours_date_overrides: existing.context?.work_hours_date_overrides ?? d.context.work_hours_date_overrides,
+        };
+        toSave = {
+          ...existing,
+          context: mergedContext,
+          logs: [...(existing.logs || []), ...newLogs],
+        };
+        console.info(`[LCI Calendar] Same student — merged ${newLogs.length} new log(s), kept existing calendar edits.`);
+      } else {
+        // Different student or no existing data — use file as-is
+        toSave = d;
+        if (existing?.meta?.student_uuid) {
+          console.warn("[LCI Calendar] UUID mismatch — overwriting existing data with file.", { existing: existUUID, file: fileUUID });
+        }
       }
 
-      // Persist so modal saves (absences, hours, modality) survive page reload
-      if (d.profile?.full_name || d.meta?.student_uuid) {
-        saveData(d);
-        console.info("[LCI Calendar] File saved to localStorage.");
+      // Persist so modal saves survive reload
+      if (toSave.profile?.full_name || toSave.meta?.student_uuid) {
+        saveData(toSave);
+        console.info("[LCI Calendar] Saved to localStorage.");
       }
 
-      calData      = loadData() || d; // re-read so migrateData ran on the stored copy
+      calData      = loadData() || toSave;
       calDownloads = getDownloads();
+
+      // Brief success hint at the top of the page
+      _showCalFileHint(sameStudent ? "merged" : "loaded");
+
       showCalendar();
 
     } catch (err) {
       console.error("[LCI Calendar] Failed to read JSON file:", err);
-      alert("Erreur de lecture du fichier JSON.");
+      const lang = getCurrentLang();
+      alert(lang === "fr-CA"
+        ? "Erreur de lecture du fichier JSON. Vérifie qu'il s'agit d'un fichier valide."
+        : "Error reading the JSON file. Make sure it is a valid file.");
     }
   };
   r.readAsText(file);

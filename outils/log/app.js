@@ -81,10 +81,57 @@ function loadData() {
 
 // ── Data migration ────────────────────────────────────────────
 // Upgrades localStorage data from older schema versions in-place.
+// Also runs a recovery pass to reconstruct missing blocks from partial data.
 function migrateData(data) {
   if (!data) return;
 
-  // v1 → v2: sys-work renamed to sys-programming; activity.undocumented → activity.other
+  // ── Recovery pass: reconstruct missing top-level blocks ───
+  // Ensures downstream code never crashes on missing keys.
+
+  // meta block
+  if (!data.meta) data.meta = {};
+  if (!data.meta.student_uuid) data.meta.student_uuid = generateUUID();
+
+  // profile block
+  if (!data.profile) {
+    data.profile = {};
+    console.warn("[LCI Migration] Missing 'profile' block — created empty. Student name will need to be filled in.");
+  }
+
+  // context block — try to recover from flat legacy fields
+  if (!data.context) {
+    data.context = {};
+    // Recover flat v0 fields sometimes stored at root level
+    if (data.start_date)         data.context.start_date         = data.start_date;
+    if (data.scheduled_end_date) data.context.scheduled_end_date = data.scheduled_end_date;
+    if (data.work_days)          data.context.work_days          = data.work_days;
+    if (data.hours_per_day)      data.context.hours_per_day      = data.hours_per_day;
+    if (data.organization_name)  data.context.organization_name  = data.organization_name;
+    if (Object.keys(data.context).length) {
+      console.info("[LCI Migration] Recovered context from root-level fields:", data.context);
+    } else {
+      console.warn("[LCI Migration] Missing 'context' block — created empty. Dates will need to be filled in.");
+    }
+  }
+
+  // logs array
+  if (!Array.isArray(data.logs)) {
+    // Try to recover from legacy formats where logs was an object keyed by date
+    if (data.logs && typeof data.logs === "object") {
+      data.logs = Object.values(data.logs);
+      console.info("[LCI Migration] Converted logs object to array:", data.logs.length, "entries");
+    } else {
+      data.logs = [];
+    }
+  }
+
+  // Ensure arrays exist
+  if (!Array.isArray(data.activity_types)) data.activity_types = [];
+  if (!Array.isArray(data.people))         data.people         = [];
+  if (!Array.isArray(data.projects))       data.projects       = [];
+  if (!Array.isArray(data.tools))          data.tools          = [];
+
+  // ── v1 → v2: activity type remapping ─────────────────────
   const typeRemap = {
     "sys-work": "sys-programming",
   };
@@ -426,11 +473,21 @@ function importConfig(file) {
   reader.onload = e => {
     try {
       const cfg = JSON.parse(e.target.result);
+
+      // Run migration to recover any old schema fields
+      migrateData(cfg);
+
       if (cfg.meta?.type !== "config" && !cfg.profile?.full_name) {
-        alert(t("error.not_config") || "Fichier de configuration non valide.");
+        const issues = diagnoseFile(cfg);
+        const lang = getCurrentLang();
+        const isFr = lang === "fr-CA";
+        const hints = issues.map(i => (isFr ? i.hint_fr : i.hint_en)).join("\n• ");
+        alert((isFr ? "Fichier non reconnu.\n\n" : "File not recognized.\n\n") + (hints ? "• " + hints : ""));
         return;
       }
-      // Load existing data (if any) and overlay config fields
+
+      // Load existing data (if any) and overlay config fields.
+      // Logs from existing data are always preserved.
       const existing = loadData() || {};
       const merged = {
         ...existing,
@@ -440,24 +497,36 @@ function importConfig(file) {
           schema_version: cfg.meta?.schema_version || "1.2",
           last_modified:  new Date().toISOString(),
         },
-        profile:        cfg.profile,
+        profile:        cfg.profile        || existing.profile,
         pathway:        cfg.pathway        || existing.pathway,
-        context:        cfg.context        || existing.context,
+        context:        { ...(existing.context || {}), ...(cfg.context || {}) }, // cfg wins for dates/schedule
         people:         cfg.people         || existing.people         || [],
         projects:       cfg.projects       || existing.projects       || [],
         activity_types: cfg.activity_types || existing.activity_types || [],
         tools:          cfg.tools          || existing.tools          || [],
-        logs:           existing.logs      || [],  // keep existing logs
+        logs:           existing.logs      || [],  // always keep existing logs
         reflection:     existing.reflection|| null,
         todos:          existing.todos     || [],
       };
       saveData(merged);
       updateCache(merged);
-      // Signal success and redirect to log
-      sessionStorage.setItem("config_imported", "1");
-      window.location.href = "log.html";
-    } catch {
-      alert(t("error.not_config") || "Erreur lors de la lecture du fichier.");
+
+      // Stay on the setup page so the student can review and edit the loaded config.
+      // Reload so prefillFromCache picks up the new data.
+      // Only redirect to log.html on a completely fresh first import (no existing logs).
+      const isFirstImport = !existing.profile?.full_name && !existing.logs?.length;
+      if (isFirstImport) {
+        sessionStorage.setItem("config_imported", "1");
+        window.location.href = "log.html";
+      } else {
+        window.location.reload();
+      }
+    } catch (err) {
+      console.error("[LCI Import] Failed to read config file:", err);
+      const lang = getCurrentLang();
+      alert(lang === "fr-CA"
+        ? "Erreur de lecture du fichier. Vérifie qu'il s'agit d'un fichier JSON valide."
+        : "Could not read the file. Make sure it is a valid JSON file.");
     }
   };
   reader.readAsText(file);
@@ -563,6 +632,69 @@ function stampDownload(type) {
 // ── Work hours helpers ────────────────────────────────────────
 // work_hours is stored as { h: 7, m: 30 }.
 // Returns total minutes.
+// ── File diagnostics ─────────────────────────────────────────
+// Returns an array of { severity: "error"|"warning"|"info", key, hint_fr, hint_en }
+// describing problems found in a parsed JSON file, with actionable fix hints.
+function diagnoseFile(data) {
+  const issues = [];
+  if (!data || typeof data !== "object") {
+    issues.push({ severity: "error", hint_fr: "Le fichier n'est pas un JSON valide.", hint_en: "The file is not valid JSON." });
+    return issues;
+  }
+
+  // Profile issues
+  if (!data.profile?.full_name) {
+    issues.push({ severity: "error",
+      hint_fr: "Nom de l'étudiant·e manquant — retourne dans Configuration > Profil pour le compléter.",
+      hint_en: "Student name missing — go to Setup > Profile to fill it in." });
+  }
+  if (!data.profile?.student_id) {
+    issues.push({ severity: "warning",
+      hint_fr: "Numéro étudiant·e manquant — Configuration > Profil.",
+      hint_en: "Student ID missing — Setup > Profile." });
+  }
+
+  // Context issues
+  if (!data.context) {
+    issues.push({ severity: "error",
+      hint_fr: "Bloc 'context' introuvable — ce fichier est très ancien ou corrompu. Refais la configuration.",
+      hint_en: "Missing 'context' block — this file is very old or corrupted. Redo the setup." });
+  } else {
+    if (!data.context.start_date) {
+      issues.push({ severity: "error",
+        hint_fr: "Date de début de stage manquante — Configuration > Horaire, ou directement dans le calendrier.",
+        hint_en: "Internship start date missing — Setup > Schedule, or edit directly in the calendar." });
+    }
+    if (!data.context.scheduled_end_date) {
+      issues.push({ severity: "warning",
+        hint_fr: "Date de fin de stage manquante — le calendrier ne peut pas s'afficher sans elle.",
+        hint_en: "End date missing — the calendar cannot display without it." });
+    }
+    if (!data.context.internship_course_code || data.context.internship_course_code === "generic") {
+      issues.push({ severity: "info",
+        hint_fr: "Cours de stage non sélectionné — les compétences ne seront pas filtrées par programme.",
+        hint_en: "Internship course not selected — competencies won't be filtered by program." });
+    }
+  }
+
+  // Meta / UUID
+  if (!data.meta?.student_uuid) {
+    issues.push({ severity: "warning",
+      hint_fr: "UUID étudiant·e absent — les fichiers ne pourront pas être fusionnés automatiquement.",
+      hint_en: "Student UUID missing — files cannot be auto-merged." });
+  }
+
+  // Schema version
+  const schemaVer = data.meta?.schema_version;
+  if (schemaVer && !schemaVer.startsWith("1.5")) {
+    issues.push({ severity: "info",
+      hint_fr: `Schéma ancien (${schemaVer}) — migration automatique appliquée.`,
+      hint_en: `Old schema (${schemaVer}) — automatic migration applied.` });
+  }
+
+  return issues;
+}
+
 function workHoursToMinutes(wh) {
   if (!wh) return 450; // 7h30 default
   return (wh.h || 0) * 60 + (wh.m || 0);
@@ -1238,7 +1370,10 @@ function sidebarLoadFiles(fileList) {
     const r = new FileReader();
     r.onload = e => {
       try { res({ name: f.name, data: JSON.parse(e.target.result) }); }
-      catch { res(null); }
+      catch (err) {
+        console.error(`[LCI Journal] Failed to parse JSON: "${f.name}"`, err);
+        res(null);
+      }
     };
     r.readAsText(f);
   }));
@@ -1250,6 +1385,9 @@ function sidebarLoadFiles(fileList) {
       return;
     }
 
+    // Run migration on every file immediately after parsing
+    valid.forEach(p => migrateData(p.data));
+
     const isFr  = getCurrentLang() === "fr-CA";
     const counts = { config: 0, log: 0, merged: 0, milestones: 0, error: 0 };
 
@@ -1259,14 +1397,20 @@ function sidebarLoadFiles(fileList) {
     const logFiles       = valid.filter(p => !["config","milestones"].includes(p.data.meta?.type));
 
     // ── Process milestone files ───────────────────────────────
-    milestoneFiles.forEach(({ data: mf }) => {
-      if (!Array.isArray(mf.projects)) { counts.error++; return; }
+    milestoneFiles.forEach(({ name, data: mf }) => {
+      if (!Array.isArray(mf.projects)) {
+        console.error(`[LCI Journal] Milestone file "${name}": missing or invalid "projects" array.`, mf);
+        counts.error++; return;
+      }
       const existing = loadMilestones(); // { [project_id]: { exported_at, … } }
       const fileExportedAt = mf.meta?.exported_at || new Date().toISOString();
       const exportedBy     = mf.meta?.exported_by  || "";
       const fileTitle      = mf.title || "";
       mf.projects.forEach(project => {
-        if (!project.id || !Array.isArray(project.milestones)) return;
+        if (!project.id || !Array.isArray(project.milestones)) {
+          console.warn(`[LCI Journal] Milestone file "${name}": project skipped — missing "id" or "milestones".`, project);
+          return;
+        }
         const current = existing[project.id];
         // Replace only if this file is newer than what we have for this project
         if (!current || fileExportedAt >= current.exported_at) {
@@ -1277,6 +1421,8 @@ function sidebarLoadFiles(fileList) {
             project,
           };
           counts.milestones++;
+        } else {
+          console.info(`[LCI Journal] Milestone file "${name}": project "${project.id}" skipped — existing version is newer (${current.exported_at} ≥ ${fileExportedAt}).`);
         }
       });
       saveMilestones(existing);
@@ -1288,12 +1434,13 @@ function sidebarLoadFiles(fileList) {
 
       if (logFiles.length === 1 && !existing) {
         // First load — no existing data — just save directly
-        const d = logFiles[0].data;
+        const { name, data: d } = logFiles[0];
         if (d.context?.start_date && d.profile?.full_name) {
           saveData(d);
           updateCache(d);
           counts.log++;
         } else {
+          console.error(`[LCI Journal] Log file "${name}": missing "context.start_date" or "profile.full_name".`, d);
           counts.error++;
         }
       } else if (logFiles.length >= 1 && existing) {
@@ -1305,6 +1452,7 @@ function sidebarLoadFiles(fileList) {
           updateCache(merged.data);
           counts.merged = logFiles.length;
         } else {
+          console.error(`[LCI Journal] Merge failed.`, merged.errors, merged.warnings);
           counts.error++;
         }
       } else if (logFiles.length > 1 && !existing) {
@@ -1315,14 +1463,18 @@ function sidebarLoadFiles(fileList) {
           updateCache(merged.data);
           counts.merged = logFiles.length;
         } else {
+          console.error(`[LCI Journal] Multi-file merge failed.`, merged.errors, merged.warnings);
           counts.error++;
         }
       }
     }
 
     // ── Process config files ──────────────────────────────────
-    configs.forEach(({ data: cfg }) => {
-      if (!cfg.context?.start_date) { counts.error++; return; }
+    configs.forEach(({ name, data: cfg }) => {
+      if (!cfg.context?.start_date) {
+        console.error(`[LCI Journal] Config file "${name}": missing "context.start_date". Cannot process.`, cfg.context);
+        counts.error++; return;
+      }
 
       const existing = loadData();
       if (existing) {
@@ -1407,10 +1559,34 @@ function sidebarLoadFiles(fileList) {
 
     const statusType = counts.error && !total ? "err" : total ? "ok" : "err";
     const verb = isFr ? "chargé·s" : "loaded";
-    _sidebarSetStatus(
-      parts.length ? `✓ ${parts.join(" + ")} ${verb}.` : (isFr ? "Aucun fichier valide." : "No valid files."),
-      statusType
-    );
+
+    // Build diagnostic hints for files that had issues
+    const diagLines = [];
+    parsed.forEach(p => {
+      if (!p?.data) {
+        diagLines.push(`<div style="margin-top:var(--sp-2);font-size:1.2rem;color:var(--danger)">
+          ⚠ ${isFr ? "Fichier illisible (JSON invalide)." : "Unreadable file (invalid JSON)."}
+        </div>`);
+        return;
+      }
+      const issues = diagnoseFile(p.data);
+      const serious = issues.filter(i => i.severity === "error" || i.severity === "warning");
+      if (serious.length) {
+        const name = p.name || "fichier";
+        diagLines.push(`<div style="margin-top:var(--sp-2)">
+          <div style="font-size:1.2rem;font-weight:600;color:var(--text-muted)">${escHtml(name)}</div>
+          ${serious.map(i => `<div style="font-size:1.2rem;color:${i.severity === "error" ? "var(--danger)" : "var(--warning,#b87800)"}">
+            ${i.severity === "error" ? "✗" : "⚠"} ${escHtml(isFr ? i.hint_fr : i.hint_en)}
+          </div>`).join("")}
+        </div>`);
+      }
+    });
+
+    const mainMsg = parts.length
+      ? `✓ ${parts.join(" + ")} ${verb}.`
+      : (isFr ? "Aucun fichier valide." : "No valid files.");
+
+    _sidebarSetStatus(mainMsg + diagLines.join(""), statusType);
 
     _sidebarRefreshWho();
 
