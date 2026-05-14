@@ -860,7 +860,9 @@ function renderMilestonesPanel() {
   container.innerHTML = rows + `
     <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap;margin-top:var(--sp-3)">
       <button class="btn btn--ghost btn--sm" onclick="exportMilestones()"
-        data-i18n="cal.milestones_export">${isFr ? "Exporter" : "Export"}</button>
+        data-i18n="cal.milestones_export">${isFr ? "Exporter JSON" : "Export JSON"}</button>
+      <button class="btn btn--ghost btn--sm" onclick="exportMilestonesIcal()"
+        data-i18n="cal.milestones_export_ical">${isFr ? "Exporter .ics" : "Export .ics"}</button>
       <button class="btn btn--ghost btn--sm" style="color:var(--danger)" onclick="clearMilestones()"
         data-i18n="cal.milestones_clear">${isFr ? "Effacer tout" : "Clear all"}</button>
     </div>`;
@@ -923,7 +925,100 @@ function exportMilestones() {
     },
     projects: Object.values(calMilestones).map(e => e.project),
   };
-  downloadJSON(payload, `${isFr ? "jalons" : "milestones"}_${new Date().toISOString().slice(0,10)}.json`);
+  downloadJSON(payload, `${isFr ? "jalons" : "milestones"}_${localDateISO()}.json`);
+}
+
+// Export all visible milestone projects as an iCal (.ics) file.
+function exportMilestonesIcal() {
+  const lang  = getCurrentLang();
+  const isFr  = lang === "fr-CA";
+  const stamp = new Date().toISOString().replace(/[-:.]/g, "").slice(0, 15) + "Z";
+
+  function icsDate(iso)    { return iso.replace(/-/g, ""); }
+  function icsDateEnd(iso) { return icsDate(isoDate(addDays(parseDate(iso), 1))); }
+  function fold(line) {
+    if (line.length <= 75) return line;
+    let out = "", pos = 0;
+    while (pos < line.length) {
+      const max = out.length ? 74 : 75;
+      out += (out.length ? "\r\n " : "") + line.slice(pos, pos + max);
+      pos += max;
+    }
+    return out;
+  }
+  function esc(s) {
+    return (s || "").replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\n/g,"\\n");
+  }
+
+  const events = [];
+
+  Object.values(calMilestones).forEach(({ project }) => {
+    if (hiddenProjects.has(project.id)) return;
+    const emoji = project.emoji || "🚩";
+    (project.milestones || []).forEach((m, i) => {
+      if (!m.date) return;
+      const lines = [
+        "BEGIN:VEVENT",
+        fold(`UID:milestone-${project.id}-${i}@lci-journal`),
+        `DTSTAMP:${stamp}`,
+        `DTSTART;VALUE=DATE:${icsDate(m.date)}`,
+        `DTEND;VALUE=DATE:${icsDateEnd(m.date)}`,
+        fold(`SUMMARY:${esc(emoji + " " + m.title + " — " + project.name)}`),
+        ...(m.description ? [fold(`DESCRIPTION:${esc(m.description)}`)] : []),
+        fold(`CATEGORIES:${esc(isFr ? "Jalon" : "Milestone")}`),
+        "END:VEVENT",
+      ];
+      events.push(lines.join("\r\n"));
+    });
+  });
+
+  if (!events.length) {
+    alert(isFr ? "Aucun jalon visible à exporter." : "No visible milestones to export.");
+    return;
+  }
+
+  // Build one VEVENT per project as a summary event spanning all its milestones
+  Object.values(calMilestones).forEach(({ project }) => {
+    if (hiddenProjects.has(project.id)) return;
+    const dates = (project.milestones || []).map(m => m.date).filter(Boolean).sort();
+    if (dates.length < 2) return; // single milestone already covered above
+    const emoji = project.emoji || "🚩";
+    const lines = [
+      "BEGIN:VEVENT",
+      fold(`UID:project-span-${project.id}@lci-journal`),
+      `DTSTAMP:${stamp}`,
+      `DTSTART;VALUE=DATE:${icsDate(dates[0])}`,
+      `DTEND;VALUE=DATE:${icsDateEnd(dates[dates.length - 1])}`,
+      fold(`SUMMARY:${esc(emoji + " " + project.name + (isFr ? " (période)" : " (span)"))}`),
+      fold(`CATEGORIES:${esc(isFr ? "Projet jalons" : "Milestone project")}`),
+      "END:VEVENT",
+    ];
+    events.push(lines.join("\r\n"));
+  });
+
+  const calNames = Object.values(calMilestones)
+    .filter(e => !hiddenProjects.has(e.project.id))
+    .map(e => e.project.emoji + " " + e.project.name)
+    .join(", ");
+
+  const cal = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//LCI Internship Journal//FR",
+    fold(`X-WR-CALNAME:${esc(isFr ? `Jalons — ${calNames}` : `Milestones — ${calNames}`)}`),
+    "X-WR-TIMEZONE:America/Toronto",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    ...events,
+    "END:VCALENDAR",
+  ].join("\r\n");
+
+  const blob = new Blob([cal], { type: "text/calendar;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `jalons_${localDateISO()}.ics`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 3000);
 }
 
 // Remove all milestone projects from localStorage and re-render.
@@ -935,6 +1030,124 @@ function clearMilestones() {
   saveMilestones({});
   renderGrid();
   renderMilestonesPanel();
+}
+
+// ── iCal export ───────────────────────────────────────────────
+function exportIcal() {
+  if (!calData) return;
+  const ctx   = calData.context || {};
+  const lang  = getCurrentLang();
+  const isFr  = lang === "fr-CA";
+  const name  = calData.profile?.full_name || (isFr ? "Étudiant·e" : "Student");
+  const org   = ctx.company?.organization_name || ctx.organization_name || "";
+  const stamp = new Date().toISOString().replace(/[-:.]/g, "").slice(0, 15) + "Z";
+  const uid_base = calData.meta?.student_uuid || generateUUID();
+
+  function icsDate(iso) { return iso.replace(/-/g, ""); }
+  function icsDateEnd(iso) {
+    const d = parseDate(iso);
+    return icsDate(isoDate(addDays(d, 1)));
+  }
+  function fold(line) {
+    if (line.length <= 75) return line;
+    let out = "", pos = 0;
+    while (pos < line.length) {
+      const max = out.length ? 74 : 75;
+      out += (out.length ? "\r\n " : "") + line.slice(pos, pos + max);
+      pos += max;
+    }
+    return out;
+  }
+  function esc(s) {
+    return (s || "").replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\n/g,"\\n");
+  }
+  function vevent(uid, dtstart, dtend, summary, description, categories) {
+    const lines = [
+      "BEGIN:VEVENT",
+      fold(`UID:${uid}@lci-journal`),
+      `DTSTAMP:${stamp}`,
+      `DTSTART;VALUE=DATE:${icsDate(dtstart)}`,
+      `DTEND;VALUE=DATE:${icsDateEnd(dtend)}`,
+      fold(`SUMMARY:${esc(summary)}`),
+    ];
+    if (description) lines.push(fold(`DESCRIPTION:${esc(description)}`));
+    if (categories)  lines.push(fold(`CATEGORIES:${esc(categories)}`));
+    lines.push("END:VEVENT");
+    return lines.join("\r\n");
+  }
+
+  const events = [];
+
+  // 1. Main internship period
+  if (ctx.start_date && ctx.scheduled_end_date) {
+    const desc = [
+      isFr ? `Étudiant·e : ${name}` : `Student: ${name}`,
+      org ? (isFr ? `Organisme : ${org}` : `Organization: ${org}`) : "",
+      ctx.internship_course_code ? (isFr ? `Cours : ${ctx.internship_course_code}` : `Course: ${ctx.internship_course_code}`) : "",
+      ctx.total_hours_target ? (isFr ? `Objectif : ${ctx.total_hours_target}h` : `Target: ${ctx.total_hours_target}h`) : "",
+    ].filter(Boolean).join("\n");
+    events.push(vevent(
+      `internship-${uid_base}`,
+      ctx.start_date, ctx.scheduled_end_date,
+      isFr ? `Stage${org ? " — " + org : ""}` : `Internship${org ? " — " + org : ""}`,
+      desc, isFr ? "Stage" : "Internship"
+    ));
+  }
+
+  // 2. Planned absences
+  (ctx.planned_absences || []).forEach((abs, i) => {
+    if (!abs.date) return;
+    events.push(vevent(
+      `absence-${uid_base}-${i}`, abs.date, abs.date,
+      isFr ? `Absence${abs.reason ? " — " + abs.reason : ""}` : `Absence${abs.reason ? " — " + abs.reason : ""}`,
+      abs.reason || "", isFr ? "Absence" : "Absence"
+    ));
+  });
+
+  // 3. Milestones (visible projects only)
+  Object.values(calMilestones).forEach(({ project }) => {
+    if (hiddenProjects.has(project.id)) return;
+    const emoji = project.emoji || "🚩";
+    (project.milestones || []).forEach((m, i) => {
+      if (!m.date) return;
+      events.push(vevent(
+        `milestone-${project.id}-${i}`, m.date, m.date,
+        `${emoji} ${m.title} — ${project.name}`,
+        m.description || "", isFr ? "Jalon" : "Milestone"
+      ));
+    });
+  });
+
+  // 4. Days with logged work
+  (calData.logs || []).forEach(log => {
+    if (!log.date || !log.task_total_minutes) return;
+    const hrs = (log.task_total_minutes / 60).toFixed(1);
+    events.push(vevent(
+      `log-${log.log_id || uid_base + log.date}`, log.date, log.date,
+      isFr ? `Journal — ${hrs}h` : `Log — ${hrs}h`,
+      (log.tasks || []).map(t => t.description).filter(Boolean).join("; "),
+      isFr ? "Journal" : "Log"
+    ));
+  });
+
+  const cal = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//LCI Internship Journal//FR",
+    fold(`X-WR-CALNAME:${esc(isFr ? `Journal de stage — ${name}` : `Internship log — ${name}`)}`),
+    "X-WR-TIMEZONE:America/Toronto",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    ...events,
+    "END:VCALENDAR",
+  ].join("\r\n");
+
+  const blob = new Blob([cal], { type: "text/calendar;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `${calData.profile?.student_id || slugify(name) || "stage"}_calendrier_stage.ics`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 3000);
 }
 
 // ── Persist & refresh ─────────────────────────────────────────

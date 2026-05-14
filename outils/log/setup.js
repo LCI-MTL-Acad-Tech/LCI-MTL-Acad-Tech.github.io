@@ -51,6 +51,17 @@ function prefillFromCache() {
   const cache = loadCache();
   const data  = loadData();
 
+  // Seed setupData from existing — so saving from any edit screen doesn't lose fields
+  // that weren't touched in this session.
+  if (data) {
+    setupData.profile  = { ...(data.profile  || {}) };
+    setupData.context  = { ...(data.context  || {}) };
+    setupData.projects = (data.projects || []).map(p => ({ ...p }));
+    setupData.skills   = data.context?.skills_to_develop  ? [...data.context.skills_to_develop]  : [];
+    setupData.tools_known  = data.context?.tools_known    ? [...data.context.tools_known]    : [];
+    setupData.tools_to_learn = data.context?.tools_to_learn ? [...data.context.tools_to_learn] : [];
+  }
+
   if (data && data.profile) {
     setVal("profile-name", data.profile.full_name);
     setVal("profile-student-id", data.profile.student_id);
@@ -118,6 +129,19 @@ function prefillFromCache() {
     const list = document.getElementById("ctx-projects-list");
     if (list && !list.children.length) { // don't double-add
       data.projects.forEach(p => addProjectBlock(p));
+    }
+  }
+
+  // Show the correct context section for the pathway
+  const companyFields = document.getElementById("ctx-company-fields");
+  const hubFields     = document.getElementById("ctx-hub-fields");
+  if (companyFields && hubFields) {
+    if (currentPathway === "hub") {
+      companyFields.classList.add("hidden");
+      hubFields.classList.remove("hidden");
+    } else {
+      companyFields.classList.remove("hidden");
+      hubFields.classList.add("hidden");
     }
   }
 

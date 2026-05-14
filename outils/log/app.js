@@ -9,6 +9,15 @@ const SETTINGS = {
   SCHEMA_VERSION: "1.4",
 };
 
+// ── Date helpers ──────────────────────────────────────────────
+// Returns today's date as YYYY-MM-DD in the user's LOCAL timezone.
+// Never use new Date().toISOString().slice(0,10) for "today" — that's UTC
+// and shows tomorrow's date for students in negative UTC offsets after ~7pm.
+function localDateISO(d) {
+  const dt = d || new Date();
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`;
+}
+
 // ── Default activity types ───────────────────────────────────
 const DEFAULT_ACTIVITY_TYPES = [
   // Work-type categories — cross-disciplinary
@@ -336,7 +345,7 @@ function createNewInternship(profile, pathway, context) {
 
 // ── Daily log helpers ────────────────────────────────────────
 function getTodayLogId(data, date) {
-  const target = date || new Date().toISOString().slice(0, 10);
+  const target = date || localDateISO();
   return data.logs.find(l => l.date === target) || null;
 }
 
@@ -622,7 +631,7 @@ function saveDownloads(obj) {
 // Stamps a download event for today's date.
 // type: "d" | "w" | "f"
 function stampDownload(type) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateISO();
   const dl = getDownloads();
   if (!dl[today]) dl[today] = [];
   if (!dl[today].includes(type)) dl[today].push(type);
@@ -842,7 +851,7 @@ function mergeInternshipFiles(files) {
 // ── People / Project / Tool helpers ─────────────────────────
 function addPerson(data, person) {
   person.person_id = person.person_id || generateUUID();
-  person.added_date = new Date().toISOString().slice(0, 10);
+  person.added_date = localDateISO();
   data.people.push(person);
   saveData(data);
   return person;
@@ -850,7 +859,7 @@ function addPerson(data, person) {
 
 function addProject(data, project) {
   project.project_id = project.project_id || generateUUID();
-  project.added_date = new Date().toISOString().slice(0, 10);
+  project.added_date = localDateISO();
   project.status = project.status || "active";
   data.projects.push(project);
   saveData(data);
@@ -859,7 +868,7 @@ function addProject(data, project) {
 
 function addTool(data, tool) {
   tool.tool_id = tool.tool_id || generateUUID();
-  tool.added_date = new Date().toISOString().slice(0, 10);
+  tool.added_date = localDateISO();
   data.tools.push(tool);
   saveData(data);
   return tool;
@@ -868,7 +877,7 @@ function addTool(data, tool) {
 function addActivityType(data, type) {
   type.type_id = type.type_id || generateUUID();
   type.system = false;
-  type.added_date = new Date().toISOString().slice(0, 10);
+  type.added_date = localDateISO();
   data.activity_types.push(type);
   saveData(data);
   return type;
@@ -1150,7 +1159,7 @@ function shouldShowUploadReminder(type) {
 // Snooze the reminder for 30 days.
 function snoozeUploadReminder(type) {
   const r = getUploadReminders();
-  r[type] = new Date().toISOString().slice(0, 10);
+  r[type] = localDateISO();
   saveUploadReminders(r);
 }
 
@@ -1623,7 +1632,7 @@ function sidebarOpenForData() {
 //
 // Call as: getEffectiveToday(logData)  or  getEffectiveToday(calData)  etc.
 function getEffectiveToday(data) {
-  const realToday = new Date().toISOString().slice(0, 10);
+  const realToday = localDateISO();
   const logs = data?.logs;
   if (!logs?.length) return realToday;
   const lastLog = [...logs].sort((a, b) => b.date.localeCompare(a.date))[0]?.date;

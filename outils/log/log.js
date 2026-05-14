@@ -96,7 +96,7 @@ function renderHeader() {
   document.getElementById("log-date-display").textContent = dateStr;
 
   // Show "Today" button when current log is not real today
-  const realToday = new Date().toISOString().slice(0, 10);
+  const realToday = localDateISO();
   const todayBtn  = document.getElementById("go-to-today-btn");
   if (todayBtn) todayBtn.style.display = currentLog.date !== realToday ? "" : "none";
 
@@ -513,7 +513,7 @@ function switchToDate(dateStr) {
 // Used when a student is on a machine with the wrong date/time setting.
 // Clamps to internship bounds so we never create a log outside the period.
 function goToRealToday() {
-  let realToday = new Date().toISOString().slice(0, 10);
+  let realToday = localDateISO();
   const start = logData?.context?.start_date;
   const end   = logData?.context?.scheduled_end_date;
   if (start && realToday < start) realToday = start;
@@ -712,7 +712,7 @@ function addTodo() {
     todo_id: generateUUID(),
     description: desc.trim(),
     project_id: null,
-    created_date: new Date().toISOString().slice(0, 10),
+    created_date: localDateISO(),
     due_date: null,
     completed: false,
     completed_date: null,
@@ -728,7 +728,7 @@ function toggleTodo(todoId) {
   if (!todo) return;
   todo.completed = !todo.completed;
   if (todo.completed) {
-    todo.completed_date = new Date().toISOString().slice(0, 10);
+    todo.completed_date = localDateISO();
     todo.log_id_completed = currentLog.log_id;
     if (!currentLog.todos_completed_today.includes(todoId)) {
       currentLog.todos_completed_today.push(todoId);
@@ -887,7 +887,7 @@ function updateProjectStatus(projectId, status) {
   if (!project) return;
   project.status = status;
   if (status === "completed" || status === "cancelled") {
-    project.project_end_date = new Date().toISOString().slice(0, 10);
+    project.project_end_date = localDateISO();
   }
   saveData(logData);
   renderProjectsSidebar();
@@ -1003,7 +1003,7 @@ function saveNewProject() {
   addProject(logData, {
     project_name: name,
     client_name: document.getElementById("new-proj-client").value.trim(),
-    student_joined_date: document.getElementById("new-proj-joined").value || new Date().toISOString().slice(0, 10),
+    student_joined_date: document.getElementById("new-proj-joined").value || localDateISO(),
     project_start_date: null,
     client_person_id: null,
   });

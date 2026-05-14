@@ -242,9 +242,52 @@
 
       <!-- No data: upload fallback -->
       <div id="cal-no-data" class="hidden">
-        <div class="alert alert--info" style="margin-bottom:var(--sp-4)">
-          <span>📂</span>
-          <span data-i18n="cal.no_data"></span>
+        <div style="max-width:58rem;margin:var(--sp-8) auto 0">
+          <h2 style="font-size:2.4rem;font-weight:700;margin-bottom:var(--sp-2)"
+            data-i18n="cal.no_data_title">Calendrier de stage</h2>
+          <p style="font-size:1.5rem;color:var(--text-muted);margin-bottom:var(--sp-6)"
+            data-i18n="cal.no_data_subtitle">Charge tes données pour afficher le calendrier.</p>
+
+          <div style="display:flex;flex-direction:column;gap:var(--sp-4)">
+
+            <!-- Option 1: data in localStorage -->
+            <div class="card" style="border-left:4px solid var(--accent)">
+              <div style="display:flex;gap:var(--sp-3);align-items:flex-start;flex-wrap:wrap">
+                <div style="flex:1;min-width:20rem">
+                  <div style="font-size:1.5rem;font-weight:600;margin-bottom:var(--sp-1)"
+                    data-i18n="cal.no_data_option1_title">Tu as déjà configuré ton journal sur cet appareil</div>
+                  <p style="font-size:1.4rem;color:var(--text-muted);margin:0"
+                    data-i18n="cal.no_data_option1_body">
+                    Si tu es sur le même appareil que tu as utilisé pour la configuration, tes données sont déjà disponibles — ouvre simplement le panneau latéral pour les charger.
+                  </p>
+                </div>
+                <button class="btn btn--primary" onclick="sidebarOpenForData()"
+                  data-i18n="cal.no_data_open_sidebar">Ouvrir le panneau 📂</button>
+              </div>
+            </div>
+
+            <!-- Option 2: load JSON file -->
+            <div class="card" style="border-left:4px solid var(--border)">
+              <div style="display:flex;gap:var(--sp-3);align-items:flex-start;flex-wrap:wrap">
+                <div style="flex:1;min-width:20rem">
+                  <div style="font-size:1.5rem;font-weight:600;margin-bottom:var(--sp-1)"
+                    data-i18n="cal.no_data_option2_title">Tu arrives d'un autre appareil ou tu as un fichier JSON</div>
+                  <p style="font-size:1.4rem;color:var(--text-muted);margin:0"
+                    data-i18n="cal.no_data_option2_body">
+                    Glisse un fichier JSON de configuration ou de journal dans le panneau latéral.
+                    Ce peut être le fichier exporté depuis la page Configuration,
+                    ou n'importe quel journal quotidien — le calendrier se construira à partir des données disponibles.
+                  </p>
+                </div>
+                <label style="cursor:pointer;flex-shrink:0">
+                  <input type="file" accept=".json" style="display:none"
+                    onchange="if(this.files[0]){loadCalFile(this.files[0])}">
+                  <span class="btn btn--ghost" data-i18n="cal.no_data_load_file">Choisir un fichier</span>
+                </label>
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
 
@@ -254,6 +297,8 @@
                     flex-wrap:wrap;gap:var(--sp-3);margin-bottom:var(--sp-5)">
           <h2 data-i18n="cal.title">Calendrier de stage</h2>
           <div style="display:flex;gap:var(--sp-3);align-items:center;flex-wrap:wrap">
+            <button class="btn btn--ghost btn--sm" onclick="exportIcal()"
+              data-i18n="cal.export_ical">📅 Exporter .ics</button>
             <span style="font-size:1.3rem;color:var(--text-muted)" data-i18n="cal.click_to_toggle"></span>
           </div>
         </div>
@@ -482,7 +527,7 @@
     <div class="file-sidebar__inner">
       <div>
         <div class="file-sidebar__head" data-i18n="sidebar.title">Charger des fichiers</div>
-        <div class="file-sidebar__sub" data-i18n="sidebar.hint">Dépose ici tes journaux, bilans, configs ou rapports JSON.</div>
+        <div class="file-sidebar__sub" data-i18n="sidebar.hint_calendar">Dépose ici un fichier JSON de configuration ou un journal quotidien pour afficher ton calendrier.</div>
       </div>
       <div id="sidebar-who" class="file-sidebar__who" style="display:none"></div>
       <div class="file-sidebar__dropzone" role="button" tabindex="0"
