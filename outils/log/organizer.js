@@ -24,7 +24,7 @@ function renderSubtitle() {
   const isFr = getCurrentLang() === "fr-CA";
   const n = orgData.logs?.length || 0;
   el.textContent = isFr
-    ? `${orgData.profile.full_name} · ${n} journal${n !== 1 ? "x" : ""}`
+    ? `${orgData.profile.full_name} · ${n} ${n !== 1 ? "journaux" : "journal"}`
     : `${orgData.profile.full_name} · ${n} log${n !== 1 ? "s" : ""}`;
 }
 
