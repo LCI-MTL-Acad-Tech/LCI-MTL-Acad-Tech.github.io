@@ -495,16 +495,24 @@ function saveContextAndNext() {
     setupData.projects = collectProjects();
   }
 
-  goToScreen("screen-expectations");
-  renderSteps("setup-steps-3", 2);
-
-  // If this is an edit (data already exists), persist the context change immediately
-  // so navigating away doesn't lose it — no need to reach finishSetup.
+  // If this is an edit (data already exists), persist immediately and return to welcome.
   const existing = loadData();
   if (existing && existing.meta?.student_uuid) {
     existing.context = { ...existing.context, ...setupData.context };
     saveData(existing);
+    // Go back to the welcome screen rather than pushing through the full setup flow
+    goToScreen("screen-welcome");
+    const isFr = getCurrentLang() === "fr-CA";
+    const flash = document.createElement("div");
+    flash.style.cssText = "background:rgba(91,128,0,.1);border:1.5px solid var(--success);border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4);margin-bottom:var(--sp-4);font-size:1.4rem;color:var(--success)";
+    flash.textContent = isFr ? "✓ Configuration mise à jour." : "✓ Configuration updated.";
+    document.getElementById("welcome-options-edit-config")?.after(flash);
+    setTimeout(() => flash.remove(), 5000);
+    return;
   }
+
+  goToScreen("screen-expectations");
+  renderSteps("setup-steps-3", 2);
 }
 
 // ── Skills and tools tags ────────────────────────────────────
@@ -780,6 +788,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Prefill all form fields immediately — editing shortcuts bypass pathway selection
     if (data.pathway) currentPathway = data.pathway;
     prefillFromCache();
+
+    // Change "Suivant" to "Enregistrer" on screen-context since edits return to welcome
+    const ctxNextBtn = document.querySelector("#screen-context .btn--primary[onclick='saveContextAndNext()']");
+    if (ctxNextBtn) {
+      const isFr = getCurrentLang() === "fr-CA";
+      ctxNextBtn.textContent = isFr ? "✓ Enregistrer" : "✓ Save";
+    }
 
     // Show feedback if this page was reloaded after a config import
     if (sessionStorage.getItem("config_imported") === "1") {
