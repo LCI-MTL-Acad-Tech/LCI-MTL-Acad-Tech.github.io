@@ -355,25 +355,13 @@ function saveProfileAndNext() {
   goToScreen("screen-context");
   renderSteps("setup-steps-2", 1);
 
-  // Persist profile immediately whether editing or in full setup flow
+  // Persist profile immediately in all cases (first setup or edit).
+  // screen-context will handle the return-to-welcome / continue-to-expectations decision.
   const existingForProfile = loadData();
   if (existingForProfile && existingForProfile.meta?.student_uuid) {
     existingForProfile.profile = { ...existingForProfile.profile, ...setupData.profile };
     existingForProfile.pathway = currentPathway;
     saveData(existingForProfile);
-
-    // Only return to welcome if the student came via the edit-profile shortcut button,
-    // NOT if they are progressing through the normal setup flow (screen-onboard → screen-profile → screen-context).
-    if (sessionStorage.getItem("setup_edit_profile") === "1") {
-      sessionStorage.removeItem("setup_edit_profile");
-      const isFr = getCurrentLang() === "fr-CA";
-      goToScreen("screen-welcome");
-      const flash = document.createElement("div");
-      flash.style.cssText = "background:rgba(91,128,0,.1);border:1.5px solid var(--success);border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4);margin-bottom:var(--sp-4);font-size:1.4rem;color:var(--success)";
-      flash.textContent = isFr ? "✓ Profil mis à jour." : "✓ Profile updated.";
-      document.getElementById("welcome-options-edit-config")?.after(flash);
-      setTimeout(() => flash.remove(), 5000);
-    }
   }
 }
 
