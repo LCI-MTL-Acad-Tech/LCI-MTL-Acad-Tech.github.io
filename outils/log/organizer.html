@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Organisateur de fichiers</title>
+  <meta name="upload-form-url" content="https://lcieducation-my.sharepoint.com/:f:/g/personal/elisa_schaeffer_collegelasalle_com/IgDuTArLyqXOSYc0rdHnAhTOAf2HQnWL01dYrthgl8k5RNk?e=mXO69B">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .org-table { width:100%;border-collapse:collapse;font-size:1.35rem; }
+    .org-table th {
+      background:var(--bg-subtle);padding:var(--sp-2) var(--sp-4);
+      font-size:1.1rem;font-weight:600;text-transform:uppercase;
+      letter-spacing:.06em;color:var(--text-subtle);
+      border-bottom:1px solid var(--border);white-space:nowrap;text-align:left;
+    }
+    .org-table td {
+      padding:var(--sp-2) var(--sp-4);border-bottom:1px solid var(--border);
+      vertical-align:middle;
+    }
+    .org-table tr.org-row:hover td { background:var(--bg-subtle);cursor:pointer; }
+    .org-table tr.org-row.is-expanded td { background:var(--bg-subtle); }
+    .org-table tr.org-detail td { padding:0; }
+    .org-detail-inner {
+      padding:var(--sp-4) var(--sp-5);
+      border-bottom:2px solid var(--accent);
+      background:var(--bg-card);
+    }
+    .org-date-input {
+      font-size:1.4rem;border:1.5px solid var(--border);
+      border-radius:var(--r-md);padding:var(--sp-1) var(--sp-2);
+      background:var(--bg-input);color:var(--text);
+    }
+    .badge-late    { background:rgba(230,120,30,.15);color:#b85000;padding:2px 7px;border-radius:var(--r-pill);font-size:1.15rem; }
+    .badge-future  { background:rgba(80,130,220,.15);color:#1a5cb5;padding:2px 7px;border-radius:var(--r-pill);font-size:1.15rem; }
+    .badge-dup     { background:rgba(200,30,30,.15);color:var(--danger);padding:2px 7px;border-radius:var(--r-pill);font-size:1.15rem; }
+    .badge-ok      { background:rgba(91,128,0,.12);color:var(--success);padding:2px 7px;border-radius:var(--r-pill);font-size:1.15rem; }
+    .org-field     { display:flex;flex-direction:column;gap:4px;margin-bottom:var(--sp-3); }
+    .org-section-label {
+      font-size:1.2rem;font-weight:700;text-transform:uppercase;
+      letter-spacing:.06em;color:var(--text-subtle);margin-bottom:var(--sp-3);
+    }
+    .org-field label { font-size:1.2rem;color:var(--text-muted);font-weight:600; }
+    .org-field textarea, .org-field input[type="text"] {
+      font-size:1.3rem;border:1.5px solid var(--border);border-radius:var(--r-md);
+      padding:var(--sp-2);background:var(--bg-input);color:var(--text);
+      font-family:inherit;resize:vertical;width:100%;
+    }
+    .org-stars { font-size:1.6rem;cursor:pointer;letter-spacing:2px; }
+    .scroll-x { overflow-x:auto;-webkit-overflow-scrolling:touch; }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <header class="site-header">
+    <div class="container container--wide">
+      <div class="header-inner">
+        <nav class="main-nav" style="display:flex;align-items:center;gap:var(--sp-4);flex-wrap:wrap">
+          <a href="index.html" class="nav-link" data-i18n="nav.setup">Configuration</a>
+          <a href="log.html"   class="nav-link" data-i18n="nav.log">Journal</a>
+          <a href="weekly.html" class="nav-link" data-i18n="nav.weekly">Bilan</a>
+          <a href="report.html" class="nav-link" data-i18n="nav.report">Rapport</a>
+          <a href="calendar.html" class="nav-link" data-i18n="nav.calendar">Calendrier</a>
+          <a href="organizer.html" class="nav-link active" data-i18n="nav.organizer">Organisateur</a>
+        </nav>
+        <div class="header-actions">
+          <button class="btn btn--ghost btn--sm lang-toggle-btn" data-lang-target="fr-CA">FR</button>
+          <button class="btn btn--ghost btn--sm lang-toggle-btn" data-lang-target="en-CA">EN</button>
+          <button class="btn btn--ghost btn--sm theme-toggle-btn" aria-label="Toggle theme"
+            style="padding:var(--sp-2);line-height:0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content" style="padding-bottom:var(--sp-12)">
+    <div class="container container--wide">
+
+      <!-- No data state -->
+      <div id="org-no-data" class="hidden" style="max-width:52rem;padding:var(--sp-10) 0">
+        <h1 style="font-size:2.4rem;font-weight:700;margin-bottom:var(--sp-3)"
+          data-i18n="org.title">Organisateur de fichiers</h1>
+        <div class="alert alert--info">
+          <span>📂</span>
+          <span data-i18n="org.no_data">Aucune donnée trouvée. Configure ton journal d'abord.</span>
+        </div>
+        <a href="index.html" class="btn btn--primary mt-4" data-i18n="org.go_setup" style="margin-top:var(--sp-4);display:inline-block">Aller à la configuration →</a>
+      </div>
+
+      <!-- Main view -->
+      <div id="org-main" class="hidden">
+
+        <div style="display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:var(--sp-3);margin-bottom:var(--sp-5)">
+          <div>
+            <h1 style="font-size:2.4rem;font-weight:700;margin-bottom:var(--sp-1)"
+              data-i18n="org.title">Organisateur de fichiers</h1>
+            <p id="org-subtitle" style="font-size:1.4rem;color:var(--text-muted)"></p>
+          </div>
+          <div style="display:flex;gap:var(--sp-3);flex-wrap:wrap;align-items:center">
+            <button class="btn btn--ghost btn--sm" onclick="exportAllJSON()"
+              data-i18n="org.export_all">⬇ Exporter tout (JSON)</button>
+            <div id="org-dup-banner" class="hidden"
+              style="background:rgba(200,30,30,.12);border:1.5px solid var(--danger);
+                     border-radius:var(--r-md);padding:var(--sp-2) var(--sp-4);
+                     font-size:1.3rem;color:var(--danger)">
+              ⚠ <span data-i18n="org.dup_warning">Dates en double détectées</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div style="display:flex;gap:var(--sp-3);align-items:center;flex-wrap:wrap;margin-bottom:var(--sp-4)">
+          <input type="text" id="org-search" placeholder="Filtrer par date ou description…"
+            data-i18n-placeholder="org.search_placeholder"
+            style="font-size:1.3rem;padding:var(--sp-1) var(--sp-3);
+                   border:1.5px solid var(--border);border-radius:var(--r-md);
+                   background:var(--bg-input);color:var(--text);min-width:22rem;height:3.4rem"
+            oninput="renderOrgTable()">
+          <label style="font-size:1.3rem;display:flex;align-items:center;gap:var(--sp-2);cursor:pointer">
+            <input type="checkbox" id="org-show-dups" onchange="renderOrgTable()">
+            <span data-i18n="org.show_dups_only">Doublons seulement</span>
+          </label>
+        </div>
+
+        <!-- Table -->
+        <div class="card" style="padding:0;overflow:hidden">
+          <div class="scroll-x">
+            <table class="org-table">
+              <thead>
+                <tr>
+                  <th data-i18n="org.col_date">Date</th>
+                  <th data-i18n="org.col_created">Créé le</th>
+                  <th data-i18n="org.col_saved">Modifié le</th>
+                  <th data-i18n="org.col_tasks">Tâches</th>
+                  <th data-i18n="org.col_hours">Heures</th>
+                  <th data-i18n="org.col_status">Statut</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="org-tbody"></tbody>
+            </table>
+          </div>
+          <div id="org-empty" class="hidden"
+            style="padding:var(--sp-6);text-align:center;color:var(--text-muted);font-size:1.4rem"
+            data-i18n="org.empty">Aucun journal à afficher.</div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Confirm delete modal -->
+<div id="org-delete-modal" class="reset-modal-overlay hidden" onclick="if(event.target===this)closeDeleteModal()">
+  <div class="reset-modal-card" style="max-width:42rem">
+    <p style="font-size:1.5rem;font-weight:600;margin-bottom:var(--sp-3)"
+      data-i18n="org.delete_confirm">Supprimer ce journal ?</p>
+    <p id="org-delete-desc" style="font-size:1.4rem;color:var(--text-muted);margin-bottom:var(--sp-5)"></p>
+    <div style="display:flex;gap:var(--sp-3);justify-content:flex-end">
+      <button class="btn btn--ghost" onclick="closeDeleteModal()" data-i18n="action.cancel">Annuler</button>
+      <button class="btn btn--danger" onclick="confirmDelete()" data-i18n="org.delete_btn">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<script src="lang.js?v=20260515"></script>
+<script src="app.js?v=20260515"></script>
+<script src="courses.js?v=20260515"></script>
+<script src="organizer.js?v=20260515"></script>
+</body>
+</html>
