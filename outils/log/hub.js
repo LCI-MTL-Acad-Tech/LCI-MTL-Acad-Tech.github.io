@@ -1669,8 +1669,11 @@ function buildDetailHTML(s) {
 
   return `
     <div style="margin-bottom:var(--sp-3);display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center">
-      <span style="font-size:1.2rem;color:var(--text-subtle)">Fichiers chargés :</span>
+      <span style="font-size:1.2rem;color:var(--text-subtle)">${lang === "fr-CA" ? "Fichiers chargés :" : "Loaded files:"}</span>
       ${fileTypeBadges || '<span style="font-size:1.2rem;color:var(--text-subtle)">—</span>'}
+      <button class="btn btn--ghost btn--sm" style="margin-left:var(--sp-2);font-size:1.2rem"
+        onclick="openFileListModal('${escHtml(s.uuid)}')"
+        >${lang === "fr-CA" ? "📋 Voir les journaux" : "📋 View logs"}</button>
     </div>
     ${buildIntegritySection(s, lang)}
     <div style="display:grid;grid-template-columns:1fr 1fr 22rem;gap:var(--sp-6)">
@@ -1861,6 +1864,113 @@ function moodSparklineLarge(points) {
       stroke-linejoin="round" stroke-linecap="round"/>
     ${dots}
   </svg>`;
+}
+
+// ── File list modal ────────────────────────────────────────────
+let _fileModalUUID = null;
+
+function openFileListModal(uuid) {
+  const s    = students.find(r => r.uuid === uuid);
+  if (!s) return;
+  _fileModalUUID = uuid;
+
+  const lang = getCurrentLang();
+  const isFr = lang === "fr-CA";
+  const logs = (s.raw.logs || []).slice().sort((a, b) => b.date.localeCompare(a.date));
+
+  document.getElementById("hub-file-modal-title").textContent =
+    `${escHtml(s.name)} — ${isFr ? "Journaux" : "Logs"} (${logs.length})`;
+
+  const exportBtn = document.getElementById("hub-file-modal-export");
+  if (exportBtn) {
+    exportBtn.style.display = "";
+    exportBtn.textContent = isFr ? "⬇ Exporter JSON complet" : "⬇ Export full JSON";
+  }
+
+  if (!logs.length) {
+    document.getElementById("hub-file-modal-body").innerHTML =
+      `<p style="color:var(--text-muted);font-size:1.4rem">
+        ${isFr ? "Aucun journal chargé pour cet·te étudiant·e." : "No logs loaded for this student."}
+      </p>`;
+    document.getElementById("hub-file-modal").classList.remove("hidden");
+    return;
+  }
+
+  // Build table
+  const rows = logs.map(log => {
+    const hrs     = log.task_total_minutes   ? (log.task_total_minutes / 60).toFixed(1) + "h"   : "";
+    const total   = log.day_duration_minutes ? (log.day_duration_minutes / 60).toFixed(1) + "h" : "";
+    const created = log.created_at ? log.created_at.slice(0, 16).replace("T", " ") : "—";
+    const saved   = log.saved_at   ? log.saved_at.slice(0, 16).replace("T", " ")   : "—";
+    const taskCount = (log.tasks || []).length;
+
+    const flags = [];
+    if (log.future_filing) flags.push(`<span style="color:#1a5cb5;font-size:1.2rem">${isFr ? "futur" : "future"}</span>`);
+    if (log.late_filing)   flags.push(`<span style="color:#b85000;font-size:1.2rem">${isFr ? "tardif" : "late"}</span>`);
+    if (log.revision > 0)  flags.push(`<span style="color:var(--text-subtle);font-size:1.2rem">r${log.revision}</span>`);
+
+    // Task summary on hover via title
+    const taskSummary = (log.tasks || [])
+      .slice(0, 5).map(t => t.description).filter(Boolean).join(" · ");
+    const moreCount = taskCount > 5 ? ` +${taskCount - 5}` : "";
+
+    return `
+      <tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:var(--sp-2) var(--sp-3);font-weight:600;white-space:nowrap">${log.date}</td>
+        <td style="padding:var(--sp-2) var(--sp-3);font-size:1.2rem;color:var(--text-muted);white-space:nowrap">${created}</td>
+        <td style="padding:var(--sp-2) var(--sp-3);font-size:1.2rem;color:var(--text-muted);white-space:nowrap">${saved}</td>
+        <td style="padding:var(--sp-2) var(--sp-3);font-size:1.3rem" title="${escHtml(taskSummary + moreCount)}">${taskCount} ${isFr ? "tâche" : "task"}${taskCount !== 1 ? "s" : ""}</td>
+        <td style="padding:var(--sp-2) var(--sp-3);font-size:1.3rem">${total || hrs}${total && hrs && total !== hrs ? ` <span style="font-size:1.1rem;color:var(--text-subtle)">(${hrs} tâches)</span>` : ""}</td>
+        <td style="padding:var(--sp-2) var(--sp-3)">${flags.join(" ")}</td>
+        <td style="padding:var(--sp-2) var(--sp-3)">
+          <button class="btn btn--ghost btn--sm" style="font-size:1.2rem;padding:2px 8px"
+            onclick="exportSingleLogJSON('${uuid}','${log.log_id}')"
+            title="${isFr ? "Exporter ce journal" : "Export this log"}">⬇</button>
+        </td>
+      </tr>`;
+  }).join("");
+
+  document.getElementById("hub-file-modal-body").innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:1.35rem">
+      <thead>
+        <tr style="background:var(--bg-subtle);font-size:1.1rem;text-transform:uppercase;
+                   letter-spacing:.06em;color:var(--text-subtle)">
+          <th style="padding:var(--sp-2) var(--sp-3);text-align:left;white-space:nowrap">${isFr ? "Date" : "Date"}</th>
+          <th style="padding:var(--sp-2) var(--sp-3);text-align:left;white-space:nowrap">${isFr ? "Créé le" : "Created"}</th>
+          <th style="padding:var(--sp-2) var(--sp-3);text-align:left;white-space:nowrap">${isFr ? "Modifié le" : "Modified"}</th>
+          <th style="padding:var(--sp-2) var(--sp-3);text-align:left">${isFr ? "Tâches" : "Tasks"}</th>
+          <th style="padding:var(--sp-2) var(--sp-3);text-align:left">${isFr ? "Heures" : "Hours"}</th>
+          <th style="padding:var(--sp-2) var(--sp-3);text-align:left">${isFr ? "Drapeaux" : "Flags"}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+
+  document.getElementById("hub-file-modal").classList.remove("hidden");
+}
+
+function closeFileListModal() {
+  _fileModalUUID = null;
+  document.getElementById("hub-file-modal").classList.add("hidden");
+}
+
+function exportStudentJSON() {
+  const s = students.find(r => r.uuid === _fileModalUUID);
+  if (!s) return;
+  const slug = s.raw.profile?.student_id || slugify(s.name) || "student";
+  downloadJSON(s.raw, `${slug}_export_complet_${localDateISO()}.json`);
+}
+
+function exportSingleLogJSON(uuid, logId) {
+  const s = students.find(r => r.uuid === uuid);
+  if (!s) return;
+  const log = (s.raw.logs || []).find(l => l.log_id === logId);
+  if (!log) return;
+  const payload = { ...s.raw, logs: [log],
+    meta: { ...s.raw.meta, exported_at: new Date().toISOString() } };
+  const slug = s.raw.profile?.student_id || slugify(s.name) || "student";
+  downloadJSON(payload, `${slug}_${log.date}.json`);
 }
 
 // ── CSV export ────────────────────────────────────────────────

@@ -411,6 +411,29 @@
 
 </div>
 
+<!-- ── File list modal ──────────────────────────────────────── -->
+<div id="hub-file-modal" class="reset-modal-overlay hidden"
+  onclick="if(event.target===this)closeFileListModal()">
+  <div class="reset-modal-card" style="max-width:72rem;width:95%;max-height:80vh;
+    display:flex;flex-direction:column;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;
+                margin-bottom:var(--sp-4);flex-shrink:0">
+      <h3 id="hub-file-modal-title" style="font-size:1.8rem;font-weight:700"></h3>
+      <button onclick="closeFileListModal()"
+        style="background:none;border:none;cursor:pointer;font-size:2rem;
+               color:var(--text-muted);line-height:1;padding:0">×</button>
+    </div>
+    <div id="hub-file-modal-body"
+      style="overflow-y:auto;flex:1;min-height:0"></div>
+    <div style="flex-shrink:0;margin-top:var(--sp-4);display:flex;
+                justify-content:flex-end;gap:var(--sp-3)">
+      <button id="hub-file-modal-export" class="btn btn--ghost btn--sm"
+        onclick="exportStudentJSON()" style="display:none"></button>
+      <button class="btn btn--ghost" onclick="closeFileListModal()">Fermer</button>
+    </div>
+  </div>
+</div>
+
 <script src="lang.js?v=20260421"></script>
 <script src="app.js?v=20260421"></script>
 <script src="courses.js?v=20260421"></script>
