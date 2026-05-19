@@ -361,6 +361,18 @@ function saveProfileAndNext() {
     existingForProfile.profile  = { ...existingForProfile.profile,  ...setupData.profile };
     existingForProfile.pathway  = currentPathway;
     saveData(existingForProfile);
+
+    // If coming from the edit-profile shortcut (not a full setup flow),
+    // go back to welcome immediately rather than making the student also save context.
+    // We detect this by checking whether screen-context was already pre-filled
+    // (i.e. existing data was there before this session).
+    const isFr = getCurrentLang() === "fr-CA";
+    goToScreen("screen-welcome");
+    const flash = document.createElement("div");
+    flash.style.cssText = "background:rgba(91,128,0,.1);border:1.5px solid var(--success);border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4);margin-bottom:var(--sp-4);font-size:1.4rem;color:var(--success)";
+    flash.textContent = isFr ? "✓ Profil mis à jour." : "✓ Profile updated.";
+    document.getElementById("welcome-options-edit-config")?.after(flash);
+    setTimeout(() => flash.remove(), 5000);
   }
 }
 
@@ -468,16 +480,10 @@ function saveContextAndNext() {
     work_days:            workDays.length ? workDays : [1,2,3,4,5],
     work_hours:           { h: workH, m: workM },
     work_hours_by_day:    workHoursByDay,
-    work_hours_date_overrides: {},
     work_start_time:      startTime,
     lunch_minutes:        lunchMins,
     total_hours_target:   parseFloat(document.getElementById("ctx-total-hours").value) || null,
-    planned_absences:     [],
-    skills_to_develop:    [],
-    apprehensions:        "",
-    personal_success_definition: "",
-    // Course code resolved in saveProfileAndNext
-    internship_course_code: setupData._selectedCourseCode || "generic",
+    internship_course_code: setupData._selectedCourseCode || setupData.context?.internship_course_code || "generic",
   };
 
   if (currentPathway === "company") {
@@ -498,9 +504,28 @@ function saveContextAndNext() {
   // If this is an edit (data already exists), persist immediately and return to welcome.
   const existing = loadData();
   if (existing && existing.meta?.student_uuid) {
-    existing.context = { ...existing.context, ...setupData.context };
+    // Merge only the fields we actually edited here — preserve everything else
+    // (planned_absences, planned_modalities, work_hours_date_overrides, skills, etc.)
+    existing.context = {
+      ...existing.context,       // keep all existing fields
+      ...setupData.context,      // overlay only what screen-context manages
+      // Explicitly preserve calendar-managed fields that are NOT on this screen
+      planned_absences:          existing.context?.planned_absences          ?? [],
+      planned_modalities:        existing.context?.planned_modalities        ?? [],
+      work_hours_date_overrides: existing.context?.work_hours_date_overrides ?? {},
+      // Preserve skills / expectations managed on screen-expectations
+      skills_to_develop:         existing.context?.skills_to_develop         ?? [],
+      apprehensions:             existing.context?.apprehensions             ?? "",
+      personal_success_definition: existing.context?.personal_success_definition ?? "",
+      tools_known:               existing.context?.tools_known               ?? [],
+      tools_to_learn:            existing.context?.tools_to_learn            ?? [],
+      teacher_custom_field:      existing.context?.teacher_custom_field      ?? null,
+    };
+    // Also preserve projects for hub pathway
+    if (currentPathway === "hub" && setupData.projects?.length) {
+      existing.projects = setupData.projects;
+    }
     saveData(existing);
-    // Go back to the welcome screen rather than pushing through the full setup flow
     goToScreen("screen-welcome");
     const isFr = getCurrentLang() === "fr-CA";
     const flash = document.createElement("div");
