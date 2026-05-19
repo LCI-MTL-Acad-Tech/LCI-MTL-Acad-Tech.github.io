@@ -7,16 +7,41 @@ let pendingDelete = null;
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   initPage();
+  initFileSidebar();
   applyLanguage(getCurrentLang());
   orgData = loadData();
+  _renderOrgState();
+});
+
+// Called by app.js after the global file sidebar processes files
+function onSidebarLoad() {
+  orgData = loadData();
+  _renderOrgState();
+}
+
+// Called by the inline drop zone in the no-data area
+function loadOrgFiles(fileList) {
+  const statusEl = document.getElementById("org-load-status");
+  if (statusEl) {
+    const isFr = getCurrentLang() === "fr-CA";
+    statusEl.style.color = "var(--text-muted)";
+    statusEl.textContent = isFr ? "⏳ Chargement…" : "⏳ Loading…";
+  }
+  // Delegate to the global sidebar loader — it handles merge, migrate, persist
+  sidebarLoadFiles(fileList);
+}
+
+function _renderOrgState() {
   if (!orgData?.profile?.full_name) {
     document.getElementById("org-no-data").classList.remove("hidden");
+    document.getElementById("org-main").classList.add("hidden");
     return;
   }
+  document.getElementById("org-no-data").classList.add("hidden");
   document.getElementById("org-main").classList.remove("hidden");
   renderSubtitle();
   renderOrgTable();
-});
+}
 
 function renderSubtitle() {
   const el = document.getElementById("org-subtitle");

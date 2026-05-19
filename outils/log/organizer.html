@@ -51,7 +51,7 @@
     .scroll-x { overflow-x:auto;-webkit-overflow-scrolling:touch; }
   </style>
 </head>
-<body>
+<body class="has-file-sidebar">
 <div class="page-wrap">
 
   <header class="site-header">
@@ -83,15 +83,43 @@
   <main class="main-content" style="padding-bottom:var(--sp-12)">
     <div class="container container--wide">
 
-      <!-- No data state -->
-      <div id="org-no-data" class="hidden" style="max-width:52rem;padding:var(--sp-10) 0">
-        <h1 style="font-size:2.4rem;font-weight:700;margin-bottom:var(--sp-3)"
+      <!-- Load area — shown when no data in localStorage -->
+      <div id="org-no-data" class="hidden" style="max-width:64rem;padding:var(--sp-8) 0">
+        <h1 style="font-size:2.4rem;font-weight:700;margin-bottom:var(--sp-2)"
           data-i18n="org.title">Organisateur de fichiers</h1>
-        <div class="alert alert--info">
-          <span>📂</span>
-          <span data-i18n="org.no_data">Aucune donnée trouvée. Configure ton journal d'abord.</span>
+        <p style="font-size:1.5rem;color:var(--text-muted);margin-bottom:var(--sp-6)"
+          data-i18n="org.no_data_subtitle">Charge tes fichiers pour voir et corriger tes journaux.</p>
+
+        <div style="display:flex;flex-direction:column;gap:var(--sp-4)">
+
+          <!-- Drop zone -->
+          <div id="org-drop-zone"
+            style="border:2px dashed var(--border);border-radius:var(--r-xl);
+                   padding:var(--sp-8) var(--sp-6);text-align:center;cursor:pointer;
+                   transition:border-color var(--dur-fast),background var(--dur-fast)"
+            onclick="document.getElementById('org-file-input').click()"
+            ondragover="event.preventDefault();this.style.borderColor='var(--accent)';this.style.background='var(--tag-bg)'"
+            ondragleave="this.style.borderColor='';this.style.background=''"
+            ondrop="event.preventDefault();this.style.borderColor='';this.style.background='';loadOrgFiles(event.dataTransfer.files)">
+            <div style="font-size:3rem;margin-bottom:var(--sp-3)">📂</div>
+            <div style="font-size:1.6rem;font-weight:600;margin-bottom:var(--sp-2)"
+              data-i18n="org.drop_title">Déposer les fichiers JSON ici</div>
+            <div style="font-size:1.3rem;color:var(--text-muted)"
+              data-i18n="org.drop_hint">Journaux quotidiens · Bilans · Fichiers de configuration</div>
+            <div style="font-size:1.2rem;color:var(--text-subtle);margin-top:var(--sp-2)"
+              data-i18n="org.drop_click">ou cliquer pour sélectionner</div>
+          </div>
+          <input type="file" id="org-file-input" accept=".json" multiple style="display:none"
+            onchange="loadOrgFiles(this.files)">
+
+          <div id="org-load-status" style="font-size:1.3rem;min-height:2rem"></div>
+
+          <!-- Or go to setup -->
+          <div style="display:flex;align-items:center;gap:var(--sp-4);flex-wrap:wrap">
+            <span style="font-size:1.3rem;color:var(--text-muted)" data-i18n="org.or_setup">Pas encore de fichiers ?</span>
+            <a href="index.html" class="btn btn--ghost btn--sm" data-i18n="org.go_setup">Aller à la configuration →</a>
+          </div>
         </div>
-        <a href="index.html" class="btn btn--primary mt-4" data-i18n="org.go_setup" style="margin-top:var(--sp-4);display:inline-block">Aller à la configuration →</a>
       </div>
 
       <!-- Main view -->
@@ -170,9 +198,32 @@
   </div>
 </div>
 
-<script src="lang.js?v=20260515"></script>
-<script src="app.js?v=20260515"></script>
-<script src="courses.js?v=20260515"></script>
-<script src="organizer.js?v=20260515"></script>
+<script src="lang.js?v=20260516"></script>
+<script src="app.js?v=20260516"></script>
+<script src="courses.js?v=20260516"></script>
+<script src="organizer.js?v=20260516"></script>
+
+  <aside id="file-sidebar" class="file-sidebar" aria-label="Chargeur de fichiers">
+    <div class="file-sidebar__tab" role="button" aria-label="Ouvrir/fermer">
+      <span class="sidebar-tab-icon">📂</span>
+      <span data-i18n="sidebar.tab_label">Charger</span>
+    </div>
+    <div class="file-sidebar__inner">
+      <div>
+        <div class="file-sidebar__head" data-i18n="sidebar.title">Charger des fichiers</div>
+        <div class="file-sidebar__sub" data-i18n="sidebar.hint">Dépose ici tes journaux, bilans, configs ou rapports JSON.</div>
+      </div>
+      <div id="sidebar-who" class="file-sidebar__who" style="display:none"></div>
+      <div class="file-sidebar__dropzone" role="button" tabindex="0"
+           aria-label="Zone de dépôt de fichiers"
+           onkeydown="if(event.key==='Enter'||event.key===' ')this.click()">
+        <div class="file-sidebar__dropzone-icon">⬆️</div>
+        <div class="file-sidebar__dropzone-label" data-i18n="sidebar.drop_label">Glisser-déposer ou cliquer</div>
+        <div class="file-sidebar__dropzone-hint" data-i18n="sidebar.drop_hint">Journaux · Config · Bilan · Rapport</div>
+      </div>
+      <input class="file-sidebar__input" type="file" accept=".json" multiple style="display:none">
+      <div id="sidebar-status" class="file-sidebar__status status-info"></div>
+    </div>
+  </aside>
 </body>
 </html>

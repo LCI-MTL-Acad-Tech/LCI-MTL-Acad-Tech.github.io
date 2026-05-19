@@ -48,6 +48,11 @@ const LANG = {
 
     // File organizer
     "org.title":             "Organisateur de fichiers",
+    "org.no_data_subtitle":  "Charge tes fichiers pour voir et corriger tes journaux.",
+    "org.drop_title":        "Déposer les fichiers JSON ici",
+    "org.drop_hint":         "Journaux quotidiens · Bilans · Fichiers de configuration",
+    "org.drop_click":        "ou cliquer pour sélectionner",
+    "org.or_setup":          "Pas encore de fichiers ?",
     "org.no_data":           "Aucune donnée trouvée. Configure ton journal d'abord.",
     "org.go_setup":          "Aller à la configuration →",
     "org.export_all":        "⬇ Exporter tout (JSON)",
@@ -680,6 +685,11 @@ const LANG = {
 
     // File organizer
     "org.title":             "File organizer",
+    "org.no_data_subtitle":  "Load your files to view and correct your logs.",
+    "org.drop_title":        "Drop JSON files here",
+    "org.drop_hint":         "Daily logs · Weekly reports · Configuration files",
+    "org.drop_click":        "or click to select",
+    "org.or_setup":          "No files yet?",
     "org.no_data":           "No data found. Set up your journal first.",
     "org.go_setup":          "Go to setup →",
     "org.export_all":        "⬇ Export all (JSON)",
