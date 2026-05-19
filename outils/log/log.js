@@ -58,6 +58,14 @@ document.addEventListener("DOMContentLoaded", () => {
   buildColorPicker();
   setupIdleTimer();
 
+  // If coming from the organizer with a specific log date to jump to
+  const jumpLogId = sessionStorage.getItem("org_jump_log_id");
+  if (jumpLogId) {
+    sessionStorage.removeItem("org_jump_log_id");
+    const jumpLog = logData.logs?.find(l => l.log_id === jumpLogId);
+    if (jumpLog) switchToDate(jumpLog.date);
+  }
+
   // Show download reminder after 5 minutes
   setTimeout(() => {
     if (!lastDownloaded) showDownloadBanner();

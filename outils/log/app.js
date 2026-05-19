@@ -6,7 +6,7 @@
 const SETTINGS = {
   GRAYZONE_THRESHOLD_PCT: 20,      // % of day that triggers undocumented prompt
   IDLE_REMINDER_MINUTES: 120,       // minutes before idle save reminder
-  SCHEMA_VERSION: "1.4",
+  SCHEMA_VERSION: "1.5",
 };
 
 // ── Date helpers ──────────────────────────────────────────────
@@ -249,7 +249,10 @@ function migrateData(data) {
 function loadReportData() {
   try {
     const raw = localStorage.getItem(LS.REPORT_DATA);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    migrateData(data);
+    return data;
   } catch { return null; }
 }
 
@@ -352,8 +355,8 @@ function getTodayLogId(data, date) {
 function createNewLog(date) {
   const now = new Date();
   const nowISO = now.toISOString();
-  const targetDate = date || nowISO.slice(0, 10);
-  const realDate   = nowISO.slice(0, 10);
+  const targetDate = date || localDateISO();   // use local date as default
+  const realDate   = localDateISO();            // always local today for late/future flags
   return {
     log_id: generateUUID(),
     date: targetDate,
@@ -430,7 +433,7 @@ function exportLogJSON(data, log) {
   if (!log.created_at) log.created_at = nowISO;
 
   // Recompute filing flags based on wall-clock date at export time
-  const realDate = nowISO.slice(0, 10);
+  const realDate = localDateISO();
   log.future_filing = log.date > realDate;
   // late_filing: keep true if already set, or set if date is in the past
   if (log.date < realDate) log.late_filing = true;

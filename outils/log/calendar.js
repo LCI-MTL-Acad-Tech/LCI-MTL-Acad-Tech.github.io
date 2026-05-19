@@ -860,9 +860,7 @@ function renderMilestonesPanel() {
   container.innerHTML = rows + `
     <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap;margin-top:var(--sp-3)">
       <button class="btn btn--ghost btn--sm" onclick="exportMilestones()"
-        data-i18n="cal.milestones_export">${isFr ? "Exporter JSON" : "Export JSON"}</button>
-      <button class="btn btn--ghost btn--sm" onclick="exportMilestonesIcal()"
-        data-i18n="cal.milestones_export_ical">${isFr ? "Exporter .ics" : "Export .ics"}</button>
+        data-i18n="cal.milestones_export">${isFr ? "Exporter" : "Export"}</button>
       <button class="btn btn--ghost btn--sm" style="color:var(--danger)" onclick="clearMilestones()"
         data-i18n="cal.milestones_clear">${isFr ? "Effacer tout" : "Clear all"}</button>
     </div>`;
@@ -925,100 +923,7 @@ function exportMilestones() {
     },
     projects: Object.values(calMilestones).map(e => e.project),
   };
-  downloadJSON(payload, `${isFr ? "jalons" : "milestones"}_${localDateISO()}.json`);
-}
-
-// Export all visible milestone projects as an iCal (.ics) file.
-function exportMilestonesIcal() {
-  const lang  = getCurrentLang();
-  const isFr  = lang === "fr-CA";
-  const stamp = new Date().toISOString().replace(/[-:.]/g, "").slice(0, 15) + "Z";
-
-  function icsDate(iso)    { return iso.replace(/-/g, ""); }
-  function icsDateEnd(iso) { return icsDate(isoDate(addDays(parseDate(iso), 1))); }
-  function fold(line) {
-    if (line.length <= 75) return line;
-    let out = "", pos = 0;
-    while (pos < line.length) {
-      const max = out.length ? 74 : 75;
-      out += (out.length ? "\r\n " : "") + line.slice(pos, pos + max);
-      pos += max;
-    }
-    return out;
-  }
-  function esc(s) {
-    return (s || "").replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\n/g,"\\n");
-  }
-
-  const events = [];
-
-  Object.values(calMilestones).forEach(({ project }) => {
-    if (hiddenProjects.has(project.id)) return;
-    const emoji = project.emoji || "🚩";
-    (project.milestones || []).forEach((m, i) => {
-      if (!m.date) return;
-      const lines = [
-        "BEGIN:VEVENT",
-        fold(`UID:milestone-${project.id}-${i}@lci-journal`),
-        `DTSTAMP:${stamp}`,
-        `DTSTART;VALUE=DATE:${icsDate(m.date)}`,
-        `DTEND;VALUE=DATE:${icsDateEnd(m.date)}`,
-        fold(`SUMMARY:${esc(emoji + " " + m.title + " — " + project.name)}`),
-        ...(m.description ? [fold(`DESCRIPTION:${esc(m.description)}`)] : []),
-        fold(`CATEGORIES:${esc(isFr ? "Jalon" : "Milestone")}`),
-        "END:VEVENT",
-      ];
-      events.push(lines.join("\r\n"));
-    });
-  });
-
-  if (!events.length) {
-    alert(isFr ? "Aucun jalon visible à exporter." : "No visible milestones to export.");
-    return;
-  }
-
-  // Build one VEVENT per project as a summary event spanning all its milestones
-  Object.values(calMilestones).forEach(({ project }) => {
-    if (hiddenProjects.has(project.id)) return;
-    const dates = (project.milestones || []).map(m => m.date).filter(Boolean).sort();
-    if (dates.length < 2) return; // single milestone already covered above
-    const emoji = project.emoji || "🚩";
-    const lines = [
-      "BEGIN:VEVENT",
-      fold(`UID:project-span-${project.id}@lci-journal`),
-      `DTSTAMP:${stamp}`,
-      `DTSTART;VALUE=DATE:${icsDate(dates[0])}`,
-      `DTEND;VALUE=DATE:${icsDateEnd(dates[dates.length - 1])}`,
-      fold(`SUMMARY:${esc(emoji + " " + project.name + (isFr ? " (période)" : " (span)"))}`),
-      fold(`CATEGORIES:${esc(isFr ? "Projet jalons" : "Milestone project")}`),
-      "END:VEVENT",
-    ];
-    events.push(lines.join("\r\n"));
-  });
-
-  const calNames = Object.values(calMilestones)
-    .filter(e => !hiddenProjects.has(e.project.id))
-    .map(e => e.project.emoji + " " + e.project.name)
-    .join(", ");
-
-  const cal = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//LCI Internship Journal//FR",
-    fold(`X-WR-CALNAME:${esc(isFr ? `Jalons — ${calNames}` : `Milestones — ${calNames}`)}`),
-    "X-WR-TIMEZONE:America/Toronto",
-    "CALSCALE:GREGORIAN",
-    "METHOD:PUBLISH",
-    ...events,
-    "END:VCALENDAR",
-  ].join("\r\n");
-
-  const blob = new Blob([cal], { type: "text/calendar;charset=utf-8" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = `jalons_${localDateISO()}.ics`;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  downloadJSON(payload, `${isFr ? "jalons" : "milestones"}_${new Date().toISOString().slice(0,10)}.json`);
 }
 
 // Remove all milestone projects from localStorage and re-render.
