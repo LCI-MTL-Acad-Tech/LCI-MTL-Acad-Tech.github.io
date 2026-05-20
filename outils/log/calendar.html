@@ -349,9 +349,38 @@
                 </div>
                 <div class="form-group mb-4">
                   <label style="font-size:1.2rem;color:var(--text-muted)" data-i18n="cal.milestones_project_emoji"></label>
-                  <input type="text" id="ms-project-emoji" style="width:6rem;margin-top:var(--sp-1);font-size:1.8rem;text-align:center"
-                    maxlength="4" placeholder="🚩">
-                  <div class="form-hint" data-i18n="cal.milestones_emoji_hint"></div>
+                  <div style="display:flex;align-items:center;gap:var(--sp-3);margin-top:var(--sp-1);position:relative">
+                    <button type="button" id="ms-emoji-trigger"
+                      onclick="toggleEmojiPicker()"
+                      style="font-size:2rem;width:4.4rem;height:4.4rem;border:1.5px solid var(--border);
+                             border-radius:var(--r-md);background:var(--bg-input);cursor:pointer;
+                             display:flex;align-items:center;justify-content:center;
+                             transition:border-color var(--dur-fast)"
+                      title="">🚩</button>
+                    <input type="hidden" id="ms-project-emoji" value="🚩">
+                    <span style="font-size:1.3rem;color:var(--text-muted)" data-i18n="cal.milestones_emoji_btn_hint"></span>
+                    <!-- Picker panel -->
+                    <div id="emoji-picker-panel"
+                      style="display:none;position:absolute;top:calc(100% + 4px);left:0;
+                             background:var(--bg-card);border:1.5px solid var(--border);
+                             border-radius:var(--r-xl);box-shadow:var(--shadow-md);
+                             width:32rem;max-height:28rem;z-index:500;
+                             display:none;flex-direction:column;overflow:hidden">
+                      <div style="padding:var(--sp-2) var(--sp-3);border-bottom:1px solid var(--border)">
+                        <input type="text" id="emoji-search"
+                          oninput="filterEmojis(this.value)"
+                          style="width:100%;font-size:1.3rem;padding:var(--sp-1) var(--sp-2);
+                                 border:1.5px solid var(--border);border-radius:var(--r-md);
+                                 background:var(--bg-input);color:var(--text)"
+                          data-i18n-placeholder="cal.emoji_search_placeholder"
+                          placeholder="Rechercher…">
+                      </div>
+                      <div id="emoji-grid"
+                        style="padding:var(--sp-2);overflow-y:auto;flex:1;
+                               display:flex;flex-wrap:wrap;gap:2px;align-content:flex-start">
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div style="font-size:1.2rem;font-weight:600;color:var(--text-muted);margin-bottom:var(--sp-2)"

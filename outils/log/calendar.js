@@ -727,7 +727,10 @@ function openMilestoneEditor(projectId) {
   const existing = projectId ? calMilestones[projectId] : null;
   const proj = existing?.project;
   document.getElementById("ms-project-name").value  = proj?.name  || "";
-  document.getElementById("ms-project-emoji").value = proj?.emoji || "";
+  const emojiVal = proj?.emoji || "🚩";
+  document.getElementById("ms-project-emoji").value = emojiVal;
+  const trigger = document.getElementById("ms-emoji-trigger");
+  if (trigger) trigger.textContent = emojiVal;
 
   // Render milestone rows
   const rows = document.getElementById("ms-rows");
@@ -937,7 +940,221 @@ function clearMilestones() {
   renderMilestonesPanel();
 }
 
-// ── iCal export ───────────────────────────────────────────────
+// ── Emoji picker ──────────────────────────────────────────────
+const EMOJI_LIST = [
+  // Flags & markers
+  {e:"🚩",k:"drapeau flag marker red"},
+  {e:"📌",k:"pin epingle carte map"},
+  {e:"📍",k:"pin location lieu"},
+  {e:"🏁",k:"finish line arrivée chequered"},
+  {e:"🎯",k:"cible target bullseye objectif"},
+  {e:"⭐",k:"étoile star important"},
+  {e:"🌟",k:"étoile star glowing"},
+  {e:"✅",k:"check done terminé validé"},
+  {e:"☑️",k:"check done box"},
+  {e:"❌",k:"x cross annulé cancelled"},
+  {e:"⚠️",k:"attention warning alerte"},
+  {e:"💡",k:"idée idea ampoule bulb"},
+  {e:"🔔",k:"cloche bell notification rappel"},
+  {e:"🔑",k:"clé key important accès"},
+  {e:"🔒",k:"cadenas lock sécurité"},
+  {e:"🔓",k:"cadenas unlock déverrouillé"},
+  // Progress & work
+  {e:"🚀",k:"fusée rocket lancement launch départ"},
+  {e:"🛠️",k:"outils tools travaux work"},
+  {e:"⚙️",k:"engrenage gear settings configuration"},
+  {e:"🔧",k:"clé wrench réparation fix"},
+  {e:"🔨",k:"marteau hammer construction build"},
+  {e:"💻",k:"ordinateur computer laptop"},
+  {e:"📱",k:"téléphone phone mobile"},
+  {e:"🖥️",k:"écran screen desktop monitor"},
+  {e:"📊",k:"graphique graph stats données data"},
+  {e:"📈",k:"hausse trend up croissance growth"},
+  {e:"📉",k:"baisse trend down décroissance"},
+  {e:"📋",k:"liste list presse-papier clipboard"},
+  {e:"📝",k:"notes memo crayon pencil"},
+  {e:"📄",k:"document file page"},
+  {e:"📁",k:"dossier folder fichier"},
+  {e:"📂",k:"dossier folder ouvert open"},
+  {e:"🗂️",k:"classeur fichiers tabs index"},
+  {e:"📦",k:"boîte box paquet package livraison"},
+  {e:"📬",k:"courrier mail envoi send"},
+  {e:"📨",k:"courriel email entrant inbox"},
+  {e:"🗓️",k:"calendrier calendar date agenda"},
+  {e:"📅",k:"calendrier calendar date"},
+  {e:"⏰",k:"alarme alarm réveil clock heure time"},
+  {e:"⏱️",k:"chronomètre timer stopwatch"},
+  {e:"⌛",k:"sablier hourglass temps time attente"},
+  {e:"🕐",k:"heure time clock une one"},
+  // People & collaboration
+  {e:"👤",k:"personne person profil profile"},
+  {e:"👥",k:"personnes people groupe group équipe"},
+  {e:"🤝",k:"poignée handshake accord deal partenariat"},
+  {e:"👋",k:"bonjour hello salut wave"},
+  {e:"✋",k:"stop main hand"},
+  {e:"👍",k:"pouce bien good ok super thumbs up"},
+  {e:"🙌",k:"applaudissement clap bravo félicitations"},
+  {e:"💬",k:"message chat discussion commentaire"},
+  {e:"💭",k:"pensée thought idée reflexion"},
+  {e:"🗣️",k:"parole speech parler talk présentation"},
+  {e:"🎤",k:"micro microphone présentation"},
+  {e:"📣",k:"megaphone annonce announce"},
+  // Education & learning
+  {e:"📚",k:"livres books étude study formation"},
+  {e:"📖",k:"livre book lecture reading"},
+  {e:"🎓",k:"diplôme graduation remise cap school"},
+  {e:"🏫",k:"école school université"},
+  {e:"✏️",k:"crayon pencil écriture écrire write"},
+  {e:"📏",k:"règle ruler mesure"},
+  {e:"🔬",k:"microscope science recherche research lab"},
+  {e:"🔭",k:"télescope telescope exploration"},
+  {e:"🧪",k:"tube test lab science chimie"},
+  {e:"🧠",k:"cerveau brain intelligence cognitif"},
+  {e:"💡",k:"idée idea ampoule lightbulb innovation"},
+  // Nature & environment
+  {e:"🌱",k:"plante plant croissance growth germination"},
+  {e:"🌿",k:"plante herb feuille leaf"},
+  {e:"🌳",k:"arbre tree nature"},
+  {e:"🌍",k:"monde world earth global environnement"},
+  {e:"☀️",k:"soleil sun ensoleillé beau temps"},
+  {e:"🌤️",k:"nuage cloud ensoleillé sun"},
+  {e:"⛅",k:"nuageux cloudy"},
+  {e:"🌧️",k:"pluie rain"},
+  {e:"❄️",k:"neige snow hiver winter froid cold"},
+  {e:"🔥",k:"feu fire urgent chaud hot"},
+  {e:"💧",k:"eau water goutte drop"},
+  {e:"⚡",k:"éclair lightning énergie energy rapide fast"},
+  // Food (hospitality)
+  {e:"🍽️",k:"assiette plate repas meal restaurant"},
+  {e:"🍴",k:"fourchette couteau fork knife restaurant"},
+  {e:"🥂",k:"champagne toast célébration celebration"},
+  {e:"🍷",k:"vin wine restaurant sommelier"},
+  {e:"☕",k:"café coffee thé tea"},
+  {e:"🍕",k:"pizza restaurant"},
+  {e:"🍔",k:"burger restaurant"},
+  {e:"🥗",k:"salade salad restaurant"},
+  {e:"🧁",k:"cupcake gâteau cake pâtisserie"},
+  {e:"🍰",k:"gâteau cake anniversaire birthday"},
+  {e:"🎂",k:"gâteau birthday anniversaire"},
+  // Events & celebration
+  {e:"🎉",k:"fête party celebration confetti"},
+  {e:"🎊",k:"confetti fête party"},
+  {e:"🏆",k:"trophée trophy victoire win prix award"},
+  {e:"🥇",k:"médaille medal or gold premier first"},
+  {e:"🎖️",k:"médaille medal distinction"},
+  {e:"🎗️",k:"ruban ribbon sensibilisation awareness"},
+  {e:"🎁",k:"cadeau gift présent"},
+  {e:"🎈",k:"ballon balloon fête"},
+  {e:"🎀",k:"nœud bow ruban ribbon"},
+  // Transport & places
+  {e:"🚗",k:"voiture car transport"},
+  {e:"🚌",k:"bus autobus transport"},
+  {e:"✈️",k:"avion airplane vol flight voyage"},
+  {e:"🏠",k:"maison house home domicile"},
+  {e:"🏢",k:"bureau office immeuble building entreprise"},
+  {e:"🏥",k:"hôpital hospital santé health"},
+  {e:"🏪",k:"magasin store boutique shop"},
+  {e:"🏨",k:"hôtel hotel hébergement"},
+  // Design & art
+  {e:"🎨",k:"art peinture design couleur palette"},
+  {e:"✒️",k:"stylo pen signature design"},
+  {e:"🖊️",k:"stylo pen écriture"},
+  {e:"📐",k:"équerre triangle règle géométrie"},
+  {e:"🖌️",k:"pinceau brush peinture art"},
+  {e:"🖼️",k:"tableau painting art galerie"},
+  // Tech
+  {e:"📡",k:"antenne satellite réseau network"},
+  {e:"🔌",k:"prise plug connection électricité"},
+  {e:"🖨️",k:"imprimante printer"},
+  {e:"💾",k:"disquette floppy sauvegarde save"},
+  {e:"💿",k:"cd dvd disque disc"},
+  {e:"🖱️",k:"souris mouse computer"},
+  {e:"⌨️",k:"clavier keyboard computer"},
+  {e:"📟",k:"pager beeper"},
+  {e:"📠",k:"fax télécopieur"},
+  // Symbols & misc
+  {e:"💯",k:"cent percent parfait perfect"},
+  {e:"💫",k:"étoile filante star dizzy"},
+  {e:"✨",k:"sparkles éclat brillant"},
+  {e:"🔷",k:"bleu blue diamant diamond"},
+  {e:"🔶",k:"orange diamant diamond"},
+  {e:"🟢",k:"vert green rond circle"},
+  {e:"🔴",k:"rouge red rond circle"},
+  {e:"🟡",k:"jaune yellow rond circle"},
+  {e:"🟣",k:"violet purple rond circle"},
+  {e:"⚫",k:"noir black rond circle"},
+  {e:"⚪",k:"blanc white rond circle"},
+  {e:"🔺",k:"triangle rouge red up"},
+  {e:"🔻",k:"triangle rouge red down"},
+  {e:"➡️",k:"flèche arrow droite right"},
+  {e:"⬆️",k:"flèche arrow haut up"},
+  {e:"⬇️",k:"flèche arrow bas down"},
+  {e:"🔄",k:"refresh cycle boucle loop"},
+  {e:"♻️",k:"recycle recyclage"},
+  {e:"🆕",k:"nouveau new"},
+  {e:"🆙",k:"up mise à jour update"},
+  {e:"🔀",k:"shuffle aléatoire random mélange"},
+];
+
+let _emojiPickerOpen = false;
+
+function toggleEmojiPicker() {
+  const panel = document.getElementById("emoji-picker-panel");
+  const search = document.getElementById("emoji-search");
+  if (!panel) return;
+  _emojiPickerOpen = !_emojiPickerOpen;
+  panel.style.display = _emojiPickerOpen ? "flex" : "none";
+  if (_emojiPickerOpen) {
+    renderEmojiGrid(EMOJI_LIST);
+    if (search) { search.value = ""; search.focus(); }
+  }
+}
+
+function closeEmojiPicker() {
+  _emojiPickerOpen = false;
+  const panel = document.getElementById("emoji-picker-panel");
+  if (panel) panel.style.display = "none";
+}
+
+function filterEmojis(query) {
+  const q = query.toLowerCase().trim();
+  const list = q ? EMOJI_LIST.filter(e => e.k.includes(q)) : EMOJI_LIST;
+  renderEmojiGrid(list);
+}
+
+function renderEmojiGrid(list) {
+  const grid = document.getElementById("emoji-grid");
+  if (!grid) return;
+  if (!list.length) {
+    grid.innerHTML = `<div style="width:100%;text-align:center;color:var(--text-muted);
+      font-size:1.3rem;padding:var(--sp-4)">${getCurrentLang() === "fr-CA" ? "Aucun résultat" : "No results"}</div>`;
+    return;
+  }
+  grid.innerHTML = list.map(({e, k}) =>
+    `<button type="button" title="${k.split(" ")[0]}"
+      onclick="selectEmoji('${e}')"
+      style="font-size:1.8rem;width:3.2rem;height:3.2rem;border:none;
+             background:none;cursor:pointer;border-radius:var(--r-md);
+             display:flex;align-items:center;justify-content:center;
+             transition:background var(--dur-fast)"
+      onmouseover="this.style.background='var(--bg-subtle)'"
+      onmouseout="this.style.background='none'">${e}</button>`
+  ).join("");
+}
+
+function selectEmoji(emoji) {
+  document.getElementById("ms-project-emoji").value = emoji;
+  const trigger = document.getElementById("ms-emoji-trigger");
+  if (trigger) trigger.textContent = emoji;
+  closeEmojiPicker();
+}
+
+// Close picker when clicking outside
+document.addEventListener("click", e => {
+  if (_emojiPickerOpen && !e.target.closest("#ms-emoji-trigger") && !e.target.closest("#emoji-picker-panel")) {
+    closeEmojiPicker();
+  }
+});
 function exportIcal() {
   if (!calData) return;
   const ctx   = calData.context || {};
