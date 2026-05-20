@@ -785,19 +785,31 @@ document.addEventListener("DOMContentLoaded", () => {
   buildProgramDropdown();
 
   const data = loadData();
-  if (data && data.profile?.full_name) {
+  // Show edit options if we have ANY data — even incomplete (missing name or dates).
+  // Students need to be able to edit their way to a valid config.
+  if (data && (data.profile?.full_name || data.meta?.student_uuid || data.context)) {
     document.getElementById("welcome-options-new").classList.add("hidden");
     document.getElementById("welcome-options-import").classList.add("hidden");
-    const cont = document.getElementById("welcome-options-continue");
-    cont.classList.remove("hidden");
+
+    // Only show the "continue to log" card if the profile is actually complete enough
+    if (data.profile?.full_name) {
+      const cont = document.getElementById("welcome-options-continue");
+      cont?.classList.remove("hidden");
+    }
+
     document.getElementById("welcome-options-edit-config")?.classList.remove("hidden");
     document.getElementById("reset-link-row")?.classList.remove("hidden");
     document.getElementById("export-config-row")?.classList.remove("hidden");
+
     const lang = getCurrentLang();
-    document.getElementById("welcome-continue-name").textContent =
-      lang === "fr-CA"
-        ? `${data.profile.full_name} — ${data.pathway === "hub" ? "Hub d'innovation" : data.context?.company?.organization_name || "Stage"}`
-        : `${data.profile.full_name} — ${data.pathway === "hub" ? "Innovation hub" : data.context?.company?.organization_name || "Internship"}`;
+    const nameEl = document.getElementById("welcome-continue-name");
+    if (nameEl) {
+      nameEl.textContent = data.profile?.full_name
+        ? (lang === "fr-CA"
+          ? `${data.profile.full_name} — ${data.pathway === "hub" ? "Hub d'innovation" : data.context?.company?.organization_name || "Stage"}`
+          : `${data.profile.full_name} — ${data.pathway === "hub" ? "Innovation hub" : data.context?.company?.organization_name || "Internship"}`)
+        : (lang === "fr-CA" ? "Profil incomplet — complète ta configuration" : "Incomplete profile — complete your setup");
+    }
 
     // Prefill all form fields immediately — editing shortcuts bypass pathway selection
     if (data.pathway) currentPathway = data.pathway;

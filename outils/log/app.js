@@ -489,7 +489,14 @@ function importConfig(file) {
       // Run migration to recover any old schema fields
       migrateData(cfg);
 
-      if (cfg.meta?.type !== "config" && !cfg.profile?.full_name) {
+      // Accept if it's explicitly typed as config, OR has a profile/context block we can work with.
+      // We do NOT require full_name or dates — the whole point is to let the student fill those in.
+      const looksLikeConfig = cfg.meta?.type === "config"
+        || cfg.profile
+        || cfg.context
+        || cfg.meta?.student_uuid;
+
+      if (!looksLikeConfig) {
         const issues = diagnoseFile(cfg);
         const lang = getCurrentLang();
         const isFr = lang === "fr-CA";
@@ -526,11 +533,14 @@ function importConfig(file) {
       // Stay on the setup page so the student can review and edit the loaded config.
       // Reload so prefillFromCache picks up the new data.
       // Only redirect to log.html on a completely fresh first import (no existing logs).
-      const isFirstImport = !existing.profile?.full_name && !existing.logs?.length;
-      if (isFirstImport) {
+      const isFirstImport    = !existing.profile?.full_name && !existing.logs?.length;
+      const isCompleteConfig = merged.profile?.full_name && merged.context?.start_date && merged.context?.scheduled_end_date;
+      if (isFirstImport && isCompleteConfig) {
         sessionStorage.setItem("config_imported", "1");
         window.location.href = "log.html";
       } else {
+        // Stay on setup page — either re-importing over existing data,
+        // or config is incomplete and student needs to fill in missing fields.
         window.location.reload();
       }
     } catch (err) {
