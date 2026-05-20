@@ -798,15 +798,18 @@ function renderCurrentView() {
   const courseWrap = document.getElementById("hub-course-section");
   const calWrap    = document.getElementById("hub-cal-section");
 
+  const mgWrap    = document.getElementById("hub-monthgrid-section");
   if (tableWrap)  tableWrap.style.display  = hubView === "students"   ? "" : "none";
   if (compWrap)   compWrap.style.display   = hubView === "competency" ? "" : "none";
   if (courseWrap) courseWrap.style.display = hubView === "course"     ? "" : "none";
   if (calWrap)    calWrap.style.display    = hubView === "calendar"   ? "" : "none";
+  if (mgWrap)     mgWrap.style.display     = hubView === "monthgrid"  ? "" : "none";
 
   if (hubView === "students")   renderTable();
   if (hubView === "competency") renderCompetencyView();
   if (hubView === "course")     renderCourseView();
   if (hubView === "calendar")   renderCalendarView();
+  if (hubView === "monthgrid")  renderMonthGridView();
 }
 
 // ── Stat tiles ────────────────────────────────────────────────
@@ -1994,6 +1997,207 @@ function exportCSV() {
   a.download = `hub_stage_${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+// ── Hub monthly grid view ─────────────────────────────────────
+// Regular week-grid calendar (Mon→Sun rows), covering the cohort date range.
+// Each cell shows: attendance heat (green intensity), onsite/remote bar, milestones.
+function renderMonthGridView() {
+  const container = document.getElementById("hub-monthgrid-section");
+  if (!container) return;
+  const isFr   = getCurrentLang() === "fr-CA";
+  const cohort  = filtered;
+
+  if (!cohort.length) {
+    container.innerHTML = `<p class="text-muted" style="padding:var(--sp-6)">
+      ${isFr ? "Aucun étudiant·e visible." : "No students visible."}</p>`;
+    return;
+  }
+
+  // ── Date range ─────────────────────────────────────────────
+  const allStarts = cohort.map(s => s.raw.context?.start_date).filter(Boolean).sort();
+  const allEnds   = cohort.map(s => s.raw.context?.scheduled_end_date).filter(Boolean).sort();
+  const today     = localDateISO();
+  const rangeStart = allStarts[0]                || today;
+  const rangeEnd   = allEnds[allEnds.length - 1] || today;
+
+  function addDays(iso, n) {
+    const d = new Date(iso + "T12:00:00"); d.setDate(d.getDate() + n);
+    return d.toISOString().slice(0, 10);
+  }
+  function dowOf(iso) { return new Date(iso + "T12:00:00").getDay(); }
+  function dayNumOf(iso) { return new Date(iso + "T12:00:00").getDate(); }
+
+  // Expand grid to full Mon–Sun weeks
+  let gridStart = rangeStart;
+  while (dowOf(gridStart) !== 1) gridStart = addDays(gridStart, -1);
+  let gridEnd = rangeEnd;
+  while (dowOf(gridEnd) !== 0) gridEnd = addDays(gridEnd, 1);
+
+  const allDays = [];
+  let cur = gridStart;
+  while (cur <= gridEnd) { allDays.push(cur); cur = addDays(cur, 1); }
+
+  // ── Per-day helpers ────────────────────────────────────────
+  function isWorkDay(s, d) {
+    const ctx = s.raw.context || {};
+    const wd  = ctx.work_days || [1,2,3,4,5];
+    const abs = (ctx.planned_absences || []).map(a => a.date);
+    const dow = dowOf(d);
+    if (!wd.includes(dow)) return false;
+    if (abs.includes(d)) return false;
+    if (ctx.start_date && d < ctx.start_date) return false;
+    if (ctx.scheduled_end_date && d > ctx.scheduled_end_date) return false;
+    return true;
+  }
+
+  const logMap = {};
+  cohort.forEach(s => { logMap[s.uuid] = {}; (s.raw.logs || []).forEach(l => { logMap[s.uuid][l.date] = l; }); });
+
+  const planMap = {};
+  cohort.forEach(s => { planMap[s.uuid] = {}; (s.raw.context?.planned_modalities || []).forEach(m => { planMap[s.uuid][m.date] = m.modality; }); });
+
+  const milestonesByDate = {};
+  try {
+    Object.values(loadMilestones()).forEach(({ project }) => {
+      const emoji = project.emoji || "\uD83D\uDEA9";
+      (project.milestones || []).forEach(m => {
+        if (!m.date) return;
+        if (!milestonesByDate[m.date]) milestonesByDate[m.date] = [];
+        milestonesByDate[m.date].push({ emoji, title: m.title, projectName: project.name });
+      });
+    });
+  } catch (e) {}
+
+  function getStats(d) {
+    const working   = cohort.filter(s => isWorkDay(s, d));
+    const n         = working.length;
+    const submitted = working.filter(s => logMap[s.uuid]?.[d]).length;
+    const onsite    = working.filter(s => planMap[s.uuid]?.[d] === "onsite").length;
+    const remote    = working.filter(s => planMap[s.uuid]?.[d] === "remote").length;
+    const hybrid    = working.filter(s => planMap[s.uuid]?.[d] === "hybrid").length;
+    return { n, submitted, onsite, remote, hybrid };
+  }
+
+  // ── Cell renderer ──────────────────────────────────────────
+  function renderCell(d) {
+    const inRange = d >= rangeStart && d <= rangeEnd;
+    const isToday = d === today;
+    const isPast  = d < today;
+    const isWE    = dowOf(d) === 0 || dowOf(d) === 6;
+    const ms      = milestonesByDate[d] || [];
+    const st      = getStats(d);
+    const dn      = dayNumOf(d);
+
+    let bgStyle;
+    if (!inRange) {
+      bgStyle = "background:var(--bg-subtle);";
+    } else if (st.n === 0) {
+      bgStyle = isWE ? "background:var(--bg-subtle);" : "background:var(--bg-card);";
+    } else {
+      const ratio = isPast ? st.submitted / st.n : 0;
+      const alpha = isPast ? (0.1 + ratio * 0.5) : 0.08;
+      bgStyle = `background:rgba(91,128,0,${alpha.toFixed(2)});`;
+    }
+
+    const borderStyle = isToday ? "outline:2px solid var(--accent);outline-offset:-2px;" : "";
+
+    const barHTML = (st.onsite + st.remote + st.hybrid > 0 && inRange) ? (() => {
+      const pOn  = Math.round(st.onsite  / st.n * 100);
+      const pRem = Math.round(st.remote  / st.n * 100);
+      const pHyb = Math.round(st.hybrid  / st.n * 100);
+      return `<div style="position:absolute;bottom:0;left:0;width:100%;height:4px;display:flex;overflow:hidden">
+        <div style="width:${pOn}%;background:#3B6D11"></div>
+        <div style="width:${pRem}%;background:#185FA5"></div>
+        <div style="width:${pHyb}%;background:#BA7517"></div>
+      </div>`;
+    })() : "";
+
+    const msEmojis = ms.map(m => m.emoji).join("");
+    const msTip    = ms.map(m => `${m.emoji} ${m.title} — ${m.projectName}`).join("\n");
+    const msHTML   = ms.length ? `<div style="font-size:1.1rem;line-height:1.2;letter-spacing:-1px">${msEmojis}</div>` : "";
+
+    const statsHTML = inRange && st.n > 0
+      ? `<div style="font-size:1.1rem;color:var(--text-muted);margin-top:2px">
+           ${isPast ? `${st.submitted}/${st.n}` : `${st.n}`}
+         </div>`
+      : "";
+
+    const dateLabel = dn === 1
+      ? `<span style="font-size:1.05rem;color:var(--accent);font-weight:700">${
+          new Date(d + "T12:00:00").toLocaleDateString(isFr ? "fr-CA" : "en-CA", { month:"short" })} 1</span>`
+      : `<span style="font-size:1.3rem;font-weight:${isToday ? 700 : isWE ? 400 : 500};
+                      color:${isToday ? "var(--accent)" : isWE ? "var(--text-muted)" : "var(--text)"}">${dn}</span>`;
+
+    const tip = [
+      new Date(d + "T12:00:00").toLocaleDateString(isFr ? "fr-CA" : "en-CA", { day:"numeric", month:"long", year:"numeric" }),
+      inRange && st.n > 0 ? `${isFr ? "En stage" : "Interning"}: ${st.n}` : "",
+      isPast && inRange && st.n > 0 ? `${isFr ? "Soumis" : "Submitted"}: ${st.submitted}` : "",
+      st.onsite ? `${isFr ? "Présentiel" : "Onsite"}: ${st.onsite}` : "",
+      st.remote ? `${isFr ? "Télétravail" : "Remote"}: ${st.remote}` : "",
+      st.hybrid ? `${isFr ? "Mixte" : "Hybrid"}: ${st.hybrid}` : "",
+      msTip,
+    ].filter(Boolean).join("\n");
+
+    return `
+      <td title="${escHtml(tip)}" style="width:14.28%;vertical-align:top;padding:0">
+        <div style="min-height:7rem;padding:var(--sp-2);border:0.5px solid var(--border);
+                    margin:-0.5px 0 0 -0.5px;position:relative;${bgStyle}${borderStyle}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            ${dateLabel}${msHTML}
+          </div>
+          ${statsHTML}
+          ${barHTML}
+        </div>
+      </td>`;
+  }
+
+  // ── Assemble ───────────────────────────────────────────────
+  const DOW_FR = ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
+  const DOW_EN = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  const dowLabels = isFr ? DOW_FR : DOW_EN;
+
+  const weeks = [];
+  for (let i = 0; i < allDays.length; i += 7) weeks.push(allDays.slice(i, i+7));
+
+  const gridHTML = weeks.map(week =>
+    `<tr>${week.map(d => renderCell(d)).join("")}</tr>`
+  ).join("");
+
+  container.innerHTML = `
+    <div style="display:flex;flex-wrap:wrap;gap:var(--sp-3) var(--sp-5);
+                margin-bottom:var(--sp-4);font-size:1.2rem;align-items:center">
+      <div style="display:flex;align-items:center;gap:var(--sp-2)">
+        <div style="width:2.8rem;height:1.4rem;background:linear-gradient(to right,rgba(91,128,0,0.08),rgba(91,128,0,0.55));border-radius:3px"></div>
+        ${isFr ? "Intensité = taux de soumission" : "Intensity = submission rate"}
+      </div>
+      <div style="display:flex;align-items:center;gap:var(--sp-2)">
+        <div style="width:2.4rem;height:4px;display:flex;border-radius:2px;overflow:hidden">
+          <div style="flex:1;background:#3B6D11"></div>
+          <div style="flex:1;background:#185FA5"></div>
+          <div style="flex:1;background:#BA7517"></div>
+        </div>
+        ${isFr ? "Présentiel / télétravail / mixte" : "Onsite / remote / hybrid"}
+      </div>
+      <div style="display:flex;align-items:center;gap:var(--sp-2)">
+        <span style="font-weight:600;color:var(--text-muted)">2/5</span>
+        ${isFr ? "Soumis / en stage" : "Submitted / interning"}
+      </div>
+      <div style="display:flex;align-items:center;gap:var(--sp-2)">
+        <span>🚩</span>${isFr ? "Jalons de projet" : "Project milestones"}
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed">
+        <thead>
+          <tr>${dowLabels.map(l =>
+            `<th style="text-align:center;font-size:1.2rem;font-weight:600;
+                        color:var(--text-subtle);padding:var(--sp-2) 0">${l}</th>`
+          ).join("")}</tr>
+        </thead>
+        <tbody>${gridHTML}</tbody>
+      </table>
+    </div>`;
 }
 
 // ── Hub calendar view ─────────────────────────────────────────
