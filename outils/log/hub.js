@@ -241,12 +241,60 @@ function loadFiles(fileList) {
       return;
     }
 
+    // ── Content-based deduplication ───────────────────────────
+    // Windows adds (1), (2) etc. when re-downloading a file. We deduplicate by
+    // content: within the same UUID, if one file's log_ids are a subset of
+    // another's (and the other is newer by meta.last_modified), discard the older.
+    const deduped = (() => {
+      const byUID = {};
+      valid.forEach(p => {
+        const uid = p.data.meta?.student_uuid || p.data.profile?.student_id || p.name;
+        (byUID[uid] = byUID[uid] || []).push(p);
+      });
+
+      const result = [];
+      Object.entries(byUID).forEach(([uid, group]) => {
+        if (group.length === 1) { result.push(group[0]); return; }
+
+        // Sort newest-first by last_modified
+        group.sort((a, b) => {
+          const ta = a.data.meta?.last_modified || a.data.meta?.exported_at || "";
+          const tb = b.data.meta?.last_modified || b.data.meta?.exported_at || "";
+          return tb.localeCompare(ta);
+        });
+
+        const logIdSets = group.map(p => new Set((p.data.logs || []).map(l => l.log_id)));
+        const keep = new Set(group.map((_, i) => i));
+        for (let i = 0; i < group.length; i++) {
+          if (!keep.has(i)) continue;
+          for (let j = i + 1; j < group.length; j++) {
+            if (!keep.has(j)) continue;
+            // j is older; if its log_ids are all in i, it's a pure snapshot of i
+            if ([...logIdSets[j]].every(id => logIdSets[i].has(id))) {
+              console.info(`[LCI Hub] Deduped "${group[j].name}" — older snapshot of "${group[i].name}" (same UUID, log_ids are a subset)`);
+              keep.delete(j);
+            }
+          }
+        }
+        keep.forEach(i => result.push(group[i]));
+      });
+      return result;
+    })();
+
+    const dedupedCount = valid.length - deduped.length;
+    if (dedupedCount > 0) {
+      console.info(`[LCI Hub] Removed ${dedupedCount} duplicate snapshot file(s) based on content.`);
+    }
+
     // Group log files by UUID
     const byUUID     = {};
     const typesByUUID = {};
 
-    valid.forEach(({ data: d, type }) => {
-      const uid = d.meta?.student_uuid || d.profile?.student_id || Math.random().toString();
+    deduped.forEach(({ data: d, type }) => {
+      const rawUid = d.meta?.student_uuid || d.profile?.student_id || Math.random().toString();
+      // Normalise IDs that look like student numbers (all digits, 5-9 chars) to
+      // strip a leading "20" so "2012345" and "12345" group together.
+      const uid = /^\d{7,9}$/.test(rawUid) ? normId(rawUid) : rawUid;
       (byUUID[uid] = byUUID[uid] || []).push(d);
       const c = (typesByUUID[uid] = typesByUUID[uid] || { daily:0, weekly:0, full:0, reflection:0, config:0 });
       if (type in c) c[type]++;
@@ -760,6 +808,7 @@ function applyFilters() {
     `${filtered.length} / ${students.length} étudiant·e·s`;
 
   renderStats();
+  renderDupStudentBanner();
   renderAWOL();
   renderHoursChart();
   renderProgramPie();
@@ -813,6 +862,190 @@ function renderCurrentView() {
 }
 
 // ── Stat tiles ────────────────────────────────────────────────
+// ── Probable duplicate student detection ──────────────────────
+
+// Normalise a string for fuzzy comparison: lowercase, strip accents + punctuation,
+// collapse whitespace.
+function normStr(s) {
+  return (s || "")
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9 ]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Levenshtein distance (capped at maxDist for performance).
+function levenshtein(a, b, maxDist = 3) {
+  if (Math.abs(a.length - b.length) > maxDist) return maxDist + 1;
+  const m = a.length, n = b.length;
+  let prev = Array.from({ length: n + 1 }, (_, i) => i);
+  for (let i = 1; i <= m; i++) {
+    const curr = [i];
+    for (let j = 1; j <= n; j++) {
+      curr[j] = a[i-1] === b[j-1]
+        ? prev[j-1]
+        : 1 + Math.min(prev[j-1], prev[j], curr[j-1]);
+    }
+    prev = curr;
+  }
+  return prev[n];
+}
+
+// Normalise a student ID to digits only, and strip a leading "20" prefix so
+// that "2012345" and "12345" compare equal.
+function normId(id) {
+  let digits = (id || "").replace(/\D/g, "");
+  // Strip leading "20" only when it would leave a plausible 5-7 digit ID,
+  // i.e. the total length is 7-9 digits (20 + 5-7 core digits).
+  if (digits.startsWith("20") && digits.length >= 7 && digits.length <= 9) {
+    digits = digits.slice(2);
+  }
+  return digits;
+}
+
+// Find pairs of student rows that are likely the same person.
+// Returns array of { a, b, reason } where a/b are row indices in `students`.
+function findProbableDuplicates() {
+  const pairs = [];
+  for (let i = 0; i < students.length; i++) {
+    for (let j = i + 1; j < students.length; j++) {
+      const si = students[i], sj = students[j];
+      const ni = normStr(si.name), nj = normStr(sj.name);
+      const ii = normId(si.raw?.profile?.student_id);
+      const ij = normId(sj.raw?.profile?.student_id);
+
+      // 1. Same student ID (numeric match)
+      if (ii && ij && ii === ij) {
+        pairs.push({ i, j, reason: "same_id" }); continue;
+      }
+
+      // 2. Student IDs differ by exactly 1 character (transposition or typo)
+      if (ii && ij && ii.length === ij.length && levenshtein(ii, ij, 1) === 1) {
+        pairs.push({ i, j, reason: "id_typo" }); continue;
+      }
+
+      // 3. Names are identical after normalisation
+      if (ni && nj && ni === nj) {
+        pairs.push({ i, j, reason: "same_name" }); continue;
+      }
+
+      // 4. Names differ by ≤ 2 characters AND same cohort/program
+      if (ni && nj && levenshtein(ni, nj, 2) <= 2) {
+        const pi = si.raw?.profile?.program || si.program;
+        const pj = sj.raw?.profile?.program || sj.program;
+        if (pi && pj && pi === pj) {
+          pairs.push({ i, j, reason: "name_typo" }); continue;
+        }
+      }
+    }
+  }
+  return pairs;
+}
+
+function renderDupStudentBanner() {
+  const banner = document.getElementById("hub-dup-student-banner");
+  if (!banner) return;
+  const pairs = findProbableDuplicates();
+  if (!pairs.length) { banner.style.display = "none"; return; }
+
+  const isFr = getCurrentLang() === "fr-CA";
+
+  const rows = pairs.map(({ i, j, reason }) => {
+    const si = students[i], sj = students[j];
+    const reasonLabel = {
+      same_id:   isFr ? "Même numéro étudiant·e"          : "Same student ID",
+      id_typo:   isFr ? "Numéro étudiant·e presque identique (faute probable)" : "Student ID nearly identical (likely typo)",
+      same_name: isFr ? "Même nom (après normalisation)"   : "Same name (after normalisation)",
+      name_typo: isFr ? "Nom très similaire + même programme (faute probable)" : "Very similar name + same program (likely typo)",
+    }[reason] || reason;
+
+    return `
+      <div style="display:flex;align-items:center;justify-content:space-between;
+                  flex-wrap:wrap;gap:var(--sp-3);padding:var(--sp-3) 0;
+                  border-bottom:1px solid rgba(184,120,23,.2)">
+        <div style="font-size:1.3rem">
+          <strong>${escHtml(si.name)}</strong>
+          <span style="color:var(--text-muted);margin:0 var(--sp-2)">↔</span>
+          <strong>${escHtml(sj.name)}</strong>
+          <span style="font-size:1.2rem;color:var(--text-muted);margin-left:var(--sp-3)">${reasonLabel}</span>
+          <div style="font-size:1.1rem;color:var(--text-subtle);margin-top:2px">
+            ID: ${escHtml(si.raw?.profile?.student_id || "—")} / ${escHtml(sj.raw?.profile?.student_id || "—")}
+            · ${isFr ? "Journaux" : "Logs"}: ${si.log_count} / ${sj.log_count}
+          </div>
+        </div>
+        <button class="btn btn--ghost btn--sm"
+          onclick="mergeStudents('${si.uuid}','${sj.uuid}')"
+          style="color:var(--accent)">
+          ${isFr ? "⇌ Fusionner" : "⇌ Merge"}
+        </button>
+      </div>`;
+  }).join("");
+
+  banner.style.display = "";
+  banner.innerHTML = `
+    <div style="background:rgba(184,120,23,.1);border:1.5px solid #b87800;
+                border-radius:var(--r-xl);padding:var(--sp-4) var(--sp-5)">
+      <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-3)">
+        <span style="font-size:1.8rem">⚠</span>
+        <div style="font-size:1.5rem;font-weight:600;color:#8a5c00">
+          ${isFr
+            ? `${pairs.length} doublon${pairs.length > 1 ? "s" : ""} probable${pairs.length > 1 ? "s" : ""} détecté${pairs.length > 1 ? "s" : ""}`
+            : `${pairs.length} probable duplicate${pairs.length > 1 ? "s" : ""} detected`}
+        </div>
+      </div>
+      <p style="font-size:1.3rem;color:#8a5c00;margin-bottom:var(--sp-3)">
+        ${isFr
+          ? "Ces paires d'étudiant·e·s semblent être la même personne. Vérifie et fusionne si c'est le cas — les journaux seront combinés et la ligne en double supprimée."
+          : "These student pairs appear to be the same person. Verify and merge if so — logs will be combined and the duplicate row removed."}
+      </p>
+      ${rows}
+    </div>`;
+}
+
+function mergeStudents(uuidA, uuidB) {
+  const isFr = getCurrentLang() === "fr-CA";
+  const si = students.find(s => s.uuid === uuidA);
+  const sj = students.find(s => s.uuid === uuidB);
+  if (!si || !sj) return;
+
+  // Confirm
+  const msg = isFr
+    ? `Fusionner "${si.name}" et "${sj.name}" ?\n\nTous les journaux seront combinés sous le premier profil (${si.log_count} + ${sj.log_count} journaux). Cette opération ne peut pas être annulée dans cette session.`
+    : `Merge "${si.name}" and "${sj.name}"?\n\nAll logs will be combined under the first profile (${si.log_count} + ${sj.log_count} logs). This cannot be undone in this session.`;
+  if (!confirm(msg)) return;
+
+  // Pick the row with more logs as the base; the other donates its logs
+  const [base, donor] = si.log_count >= sj.log_count ? [si, sj] : [sj, si];
+
+  // Merge donor logs into base (deduplicate by log_id, revision wins)
+  const logMap = new Map();
+  [...(base.raw.logs || []), ...(donor.raw.logs || [])].forEach(l => {
+    const existing = logMap.get(l.log_id);
+    if (!existing || l.revision > existing.revision) logMap.set(l.log_id, l);
+  });
+  base.raw.logs = [...logMap.values()].sort((a, b) => a.date.localeCompare(b.date));
+
+  // Rebuild base row with merged logs
+  const rebuilt = buildRow(base.raw);
+  rebuilt.file_type_counts = {
+    daily:      (base.file_type_counts?.daily      || 0) + (donor.file_type_counts?.daily      || 0),
+    weekly:     (base.file_type_counts?.weekly     || 0) + (donor.file_type_counts?.weekly     || 0),
+    full:       (base.file_type_counts?.full       || 0) + (donor.file_type_counts?.full       || 0),
+    reflection: (base.file_type_counts?.reflection || 0) + (donor.file_type_counts?.reflection || 0),
+    config:     (base.file_type_counts?.config     || 0) + (donor.file_type_counts?.config     || 0),
+  };
+
+  // Remove both, re-insert merged
+  students = students.filter(s => s.uuid !== base.uuid && s.uuid !== donor.uuid);
+  students.push(rebuilt);
+
+  console.info(`[LCI Hub] Merged "${donor.name}" (${donor.uuid}) into "${base.name}" (${base.uuid}) — ${base.raw.logs.length} logs total`);
+
+  applyFilters();
+  renderDupStudentBanner();
+}
+
 function renderStats() {
   const f = filtered;
   const total      = f.length;
