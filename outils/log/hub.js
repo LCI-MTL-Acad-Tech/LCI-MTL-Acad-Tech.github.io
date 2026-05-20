@@ -2016,10 +2016,25 @@ function renderMonthGridView() {
 
   // ── Date range ─────────────────────────────────────────────
   const allStarts = cohort.map(s => s.raw.context?.start_date).filter(Boolean).sort();
-  const allEnds   = cohort.map(s => s.raw.context?.scheduled_end_date).filter(Boolean).sort();
+  const allEnds   = cohort.map(s => s.raw.context?.scheduled_end_date).filter(s => !!s && s.match(/^\d{4}-\d{2}-\d{2}$/)).sort();
   const today     = localDateISO();
   const rangeStart = allStarts[0]                || today;
-  const rangeEnd   = allEnds[allEnds.length - 1] || today;
+  const rangeEnd   = allEnds.length ? allEnds[allEnds.length - 1] : (allStarts[allStarts.length - 1] || today);
+
+  // ── Console diagnostics ────────────────────────────────────
+  console.group("[LCI Hub] Vue mensuelle — date range sources");
+  cohort.forEach(s => {
+    const ctx  = s.raw.context || {};
+    const name = s.name || s.uuid;
+    const file = s.raw.meta?.student_uuid || "?";
+    console.info(`  ${name} (${file})`,
+      `start_date: ${ctx.start_date || "MISSING"}`,
+      `· scheduled_end_date: ${ctx.scheduled_end_date || "MISSING"}`
+    );
+  });
+  console.info(`→ rangeStart: ${rangeStart}  rangeEnd: ${rangeEnd}`,
+    `(${Math.round((new Date(rangeEnd) - new Date(rangeStart)) / 86400000)} days)`);
+  console.groupEnd();
 
   function addDays(iso, n) {
     const d = new Date(iso + "T12:00:00"); d.setDate(d.getDate() + n);
@@ -2123,10 +2138,10 @@ function renderMonthGridView() {
          </div>`
       : "";
 
-    const dateLabel = dn === 1
-      ? `<span style="font-size:1.05rem;color:var(--accent);font-weight:700">${
-          new Date(d + "T12:00:00").toLocaleDateString(isFr ? "fr-CA" : "en-CA", { month:"short" })} 1</span>`
-      : `<span style="font-size:1.3rem;font-weight:${isToday ? 700 : isWE ? 400 : 500};
+    const monthAbbr = new Date(d + "T12:00:00").toLocaleDateString(
+      isFr ? "fr-CA" : "en-CA", { month: "short" });
+
+    const dateLabel = `<span style="font-size:1.3rem;font-weight:${isToday ? 700 : isWE ? 400 : 500};
                       color:${isToday ? "var(--accent)" : isWE ? "var(--text-muted)" : "var(--text)"}">${dn}</span>`;
 
     const tip = [
@@ -2148,6 +2163,11 @@ function renderMonthGridView() {
           </div>
           ${statsHTML}
           ${barHTML}
+          <div style="position:absolute;bottom:var(--sp-1);right:var(--sp-2);
+                      font-size:1rem;color:var(--text-subtle);font-weight:400;
+                      ${dn === 1 ? "color:var(--accent);font-weight:600;" : ""}">
+            ${monthAbbr}
+          </div>
         </div>
       </td>`;
   }
@@ -2221,10 +2241,10 @@ function renderCalendarView() {
   // Use the intersection of all students' internship periods if they overlap,
   // otherwise fall back to the union clamped to a reasonable window.
   const allStarts = cohort.map(s => s.raw.context?.start_date).filter(Boolean).sort();
-  const allEnds   = cohort.map(s => s.raw.context?.scheduled_end_date).filter(Boolean).sort();
+  const allEnds   = cohort.map(s => s.raw.context?.scheduled_end_date).filter(s => !!s && s.match(/^\d{4}-\d{2}-\d{2}$/)).sort();
 
   // Default to today ± 30 days if no dates defined
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateISO();
   const rangeStart = allStarts[0]             || today;
   const rangeEnd   = allEnds[allEnds.length - 1] || today;
 
