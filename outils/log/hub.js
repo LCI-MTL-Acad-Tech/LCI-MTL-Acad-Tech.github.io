@@ -2179,10 +2179,26 @@ function renderCalendarView() {
   // ── Cell size — shrink when many days ────────────────────
   const cellW = days.length > 60 ? 14 : days.length > 30 ? 18 : 24;
 
+  // ── Load milestones ───────────────────────────────────────
+  // Build a lookup: date → array of { emoji, title, projectName }
+  const milestonesByDate = {};
+  try {
+    const ms = loadMilestones(); // { [project_id]: { project } }
+    Object.values(ms).forEach(({ project }) => {
+      const emoji = project.emoji || "🚩";
+      (project.milestones || []).forEach(m => {
+        if (!m.date) return;
+        if (!milestonesByDate[m.date]) milestonesByDate[m.date] = [];
+        milestonesByDate[m.date].push({ emoji, title: m.title, projectName: project.name });
+      });
+    });
+  } catch (e) { /* milestones not available */ }
+
   // ── Build HTML ────────────────────────────────────────────
-  const CELL = (bg, title) =>
+  const CELL = (bg, title, content = "") =>
     `<td title="${escHtml(title)}" style="width:${cellW}px;min-width:${cellW}px;
-      height:${cellW}px;padding:0;${bg}border-radius:3px"></td>`;
+      height:${cellW}px;padding:0;${bg}border-radius:3px;text-align:center;
+      font-size:${cellW > 16 ? "10px" : "8px"};line-height:${cellW}px;overflow:hidden">${content}</td>`;
 
   const thead_month = `<tr>
     <th style="min-width:14rem;text-align:left;position:sticky;left:0;
@@ -2196,6 +2212,23 @@ function renderCalendarView() {
       </th>`
     ).join("")}
   </tr>`;
+
+  // Milestone row — one emoji per day that has milestone(s)
+  const hasMilestones = Object.keys(milestonesByDate).length > 0;
+  const thead_milestones = hasMilestones ? `<tr>
+    <td style="position:sticky;left:0;background:var(--bg-card);z-index:2;
+               font-size:1.1rem;color:var(--text-subtle);padding:0 var(--sp-2);
+               white-space:nowrap">${isFr ? "Jalons" : "Milestones"}</td>
+    ${days.map(d => {
+      const ms = milestonesByDate[d];
+      if (!ms?.length) return `<td style="width:${cellW}px;min-width:${cellW}px;height:${cellW}px;padding:0"></td>`;
+      const tip = ms.map(m => `${m.emoji} ${m.title} — ${m.projectName}`).join("\n");
+      const display = ms.length === 1 ? ms[0].emoji : ms.map(m => m.emoji).join("");
+      return `<td title="${escHtml(tip)}" style="width:${cellW}px;min-width:${cellW}px;
+        height:${cellW}px;padding:0;text-align:center;font-size:${cellW > 16 ? "12px" : "9px"};
+        line-height:${cellW}px">${display}</td>`;
+    }).join("")}
+  </tr>` : "";
 
   const thead_days = `<tr>
     <th style="position:sticky;left:0;background:var(--bg-card);z-index:2"></th>
@@ -2227,6 +2260,47 @@ function renderCalendarView() {
     }).join("")}
   </tr>`;
 
+  // Global summary row — heat-map fill by # students working + stacked modality bar
+  const thead_summary = `<tr style="background:var(--bg-subtle)">
+    <td style="position:sticky;left:0;background:var(--bg-subtle);z-index:2;
+               font-size:1.1rem;font-weight:600;color:var(--text-subtle);
+               padding:0 var(--sp-2);white-space:nowrap">
+      ${isFr ? "Cohort" : "Cohort"}
+    </td>
+    ${days.map((d, i) => {
+      const stat = dayStats[i];
+      if (!stat.planned) {
+        return `<td style="width:${cellW}px;min-width:${cellW}px;height:${cellW}px;
+          padding:0;background:var(--bg-subtle)"></td>`;
+      }
+      const ratio = stat.planned > 0 ? stat.submitted / stat.planned : 0;
+      // Heat: green shades by attendance density
+      const alpha = 0.12 + ratio * 0.55;
+      const bg = `rgba(91,128,0,${alpha.toFixed(2)})`;
+      // Modality split: stacked mini-bar inside the cell
+      const totalPlan = stat.planOnsite + stat.planRemote + stat.planHybrid;
+      const pctOn  = totalPlan ? Math.round(stat.planOnsite  / stat.planned * 100) : 0;
+      const pctRem = totalPlan ? Math.round(stat.planRemote  / stat.planned * 100) : 0;
+      const tip = [
+        `${d}`,
+        `${isFr ? "Travaillent" : "Working"}: ${stat.planned}`,
+        `${isFr ? "Soumis" : "Submitted"}: ${stat.submitted}`,
+        stat.planOnsite  ? `${isFr ? "Présentiel" : "Onsite"}: ${stat.planOnsite}`  : "",
+        stat.planRemote  ? `${isFr ? "Télétravail" : "Remote"}: ${stat.planRemote}` : "",
+        stat.planHybrid  ? `${isFr ? "Mixte"       : "Hybrid"}: ${stat.planHybrid}` : "",
+      ].filter(Boolean).join("\n");
+      return `<td title="${escHtml(tip)}" style="width:${cellW}px;min-width:${cellW}px;
+        height:${cellW}px;padding:0;background:${bg};border-radius:3px;
+        position:relative;overflow:hidden">
+        ${totalPlan ? `
+          <div style="position:absolute;bottom:0;left:0;width:100%;height:3px;display:flex">
+            <div style="width:${pctOn}%;background:#3B6D11;height:100%"></div>
+            <div style="width:${pctRem}%;background:#185FA5;height:100%"></div>
+          </div>` : ""}
+      </td>`;
+    }).join("")}
+  </tr>`;
+
   const tbody = cohort.map(s => {
     const cells = days.map(d => CELL(cellStyle(s, d), cellTitle(s, d))).join("");
     // Submitted count for this student
@@ -2254,13 +2328,18 @@ function renderCalendarView() {
     { bg: "background:var(--bg-card);border:1.5px solid var(--border);border-top:3px solid var(--accent)", label: isFr ? "Prévu : présentiel (non soumis)" : "Planned: onsite (no log yet)" },
     { bg: "background:var(--bg-card);border:1.5px solid var(--border);border-top:3px solid var(--color-blue-400,#5ba8c4)", label: isFr ? "Prévu : télétravail (non soumis)" : "Planned: remote (no log yet)" },
     { bg: "background:var(--bg-subtle)",                label: isFr ? "Hors horaire" : "Not scheduled" },
+    { bg: "background:rgba(91,128,0,0.55)",             label: isFr ? "Ligne cohort — vert foncé = tous présents" : "Cohort row — dark green = full attendance" },
+    { custom: `<div style="height:14px;width:24px;background:rgba(91,128,0,0.3);border-radius:2px;position:relative"><div style="position:absolute;bottom:0;left:0;width:100%;height:3px;display:flex"><div style="width:50%;background:#3B6D11"></div><div style="width:30%;background:#185FA5"></div></div></div>`, label: isFr ? "Barre du bas : vert=présentiel, bleu=télétravail" : "Bottom bar: green=onsite, blue=remote" },
+    { custom: `<span style="font-size:14px">🚩</span>`, label: isFr ? "Jalon de projet" : "Project milestone" },
   ];
   const legend = `
     <div style="display:flex;flex-wrap:wrap;gap:var(--sp-3) var(--sp-5);
                 margin-bottom:var(--sp-4);align-items:center">
       ${legendItems.map(item =>
         `<div style="display:flex;align-items:center;gap:var(--sp-2);font-size:1.2rem">
-          <div style="width:1.4rem;height:1.4rem;border-radius:3px;flex-shrink:0;${item.bg}"></div>
+          ${item.custom
+            ? item.custom
+            : `<div style="width:1.4rem;height:1.4rem;border-radius:3px;flex-shrink:0;${item.bg}"></div>`}
           ${escHtml(item.label)}
         </div>`
       ).join("")}
@@ -2303,7 +2382,7 @@ function renderCalendarView() {
       ${truncNotice}
       <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
         <table style="border-collapse:separate;border-spacing:2px;table-layout:fixed">
-          <thead>${thead_month}${thead_days}</thead>
+          <thead>${thead_month}${thead_milestones}${thead_days}${thead_summary}</thead>
           <tbody>${tbody}</tbody>
         </table>
       </div>
