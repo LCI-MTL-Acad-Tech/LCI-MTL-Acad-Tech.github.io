@@ -2015,23 +2015,37 @@ function renderMonthGridView() {
   }
 
   // ── Date range ─────────────────────────────────────────────
-  const allStarts = cohort.map(s => s.raw.context?.start_date).filter(Boolean).sort();
-  const allEnds   = cohort.map(s => s.raw.context?.scheduled_end_date).filter(s => !!s && s.match(/^\d{4}-\d{2}-\d{2}$/)).sort();
-  const today     = localDateISO();
+  const today      = localDateISO();
+  const sixMonthsAgo    = localDateISO(new Date(new Date().setMonth(new Date().getMonth() - 6)));
+  const sixMonthsAhead  = localDateISO(new Date(new Date().setMonth(new Date().getMonth() + 6)));
+
+  function inSafetyWindow(iso) {
+    return iso && iso.match(/^\d{4}-\d{2}-\d{2}$/) && iso >= sixMonthsAgo && iso <= sixMonthsAhead;
+  }
+
+  const allStarts = cohort.map(s => s.raw.context?.start_date).filter(inSafetyWindow).sort();
+  const allEnds   = cohort.map(s => s.raw.context?.scheduled_end_date).filter(inSafetyWindow).sort();
+
   const rangeStart = allStarts[0]                || today;
   const rangeEnd   = allEnds.length ? allEnds[allEnds.length - 1] : (allStarts[allStarts.length - 1] || today);
-
-  // ── Console diagnostics ────────────────────────────────────
   console.group("[LCI Hub] Vue mensuelle — date range sources");
+  console.info(`Safety window: ${sixMonthsAgo} → ${sixMonthsAhead}`);
+  let anomalies = 0;
   cohort.forEach(s => {
     const ctx  = s.raw.context || {};
-    const name = s.name || s.uuid;
-    const file = s.raw.meta?.student_uuid || "?";
-    console.info(`  ${name} (${file})`,
-      `start_date: ${ctx.start_date || "MISSING"}`,
-      `· scheduled_end_date: ${ctx.scheduled_end_date || "MISSING"}`
-    );
+    const rawStart = ctx.start_date;
+    const rawEnd   = ctx.scheduled_end_date;
+    const startOk  = inSafetyWindow(rawStart);
+    const endOk    = inSafetyWindow(rawEnd);
+    if (!startOk || !endOk) {
+      anomalies++;
+      console.warn(`  ${s.name}`,
+        !startOk ? `start_date: ${rawStart || "MISSING"} ⚠ IGNORED` : "",
+        !endOk   ? `scheduled_end_date: ${rawEnd || "MISSING"} ⚠ IGNORED` : ""
+      );
+    }
   });
+  if (!anomalies) console.info("  All dates within window — no anomalies.");
   console.info(`→ rangeStart: ${rangeStart}  rangeEnd: ${rangeEnd}`,
     `(${Math.round((new Date(rangeEnd) - new Date(rangeStart)) / 86400000)} days)`);
   console.groupEnd();
@@ -2240,11 +2254,15 @@ function renderCalendarView() {
   // ── Determine date range ──────────────────────────────────
   // Use the intersection of all students' internship periods if they overlap,
   // otherwise fall back to the union clamped to a reasonable window.
-  const allStarts = cohort.map(s => s.raw.context?.start_date).filter(Boolean).sort();
-  const allEnds   = cohort.map(s => s.raw.context?.scheduled_end_date).filter(s => !!s && s.match(/^\d{4}-\d{2}-\d{2}$/)).sort();
+  const today = localDateISO();
+  const _sixAgo   = localDateISO(new Date(new Date().setMonth(new Date().getMonth() - 6)));
+  const _sixAhead = localDateISO(new Date(new Date().setMonth(new Date().getMonth() + 6)));
+  const _safe = iso => iso && iso.match(/^\d{4}-\d{2}-\d{2}$/) && iso >= _sixAgo && iso <= _sixAhead;
+
+  const allStarts = cohort.map(s => s.raw.context?.start_date).filter(_safe).sort();
+  const allEnds   = cohort.map(s => s.raw.context?.scheduled_end_date).filter(_safe).sort();
 
   // Default to today ± 30 days if no dates defined
-  const today = localDateISO();
   const rangeStart = allStarts[0]             || today;
   const rangeEnd   = allEnds[allEnds.length - 1] || today;
 
