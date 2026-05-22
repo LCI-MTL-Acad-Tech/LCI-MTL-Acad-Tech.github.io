@@ -72,7 +72,7 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
 
 body {
   font-family: 'Modern Gothic', system-ui, -apple-system, sans-serif;
@@ -342,9 +342,11 @@ button i, button .ico { pointer-events: none; }
   border-radius: 10px;
 }
 
-.faq-section { margin-bottom: 40px; }
+.faq-section {
+  scroll-margin-top: 80px; margin-bottom: 40px; }
 
 .faq-item {
+  scroll-margin-top: 80px;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   margin-bottom: 8px;
