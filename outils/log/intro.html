@@ -79,23 +79,27 @@
     /* ── Steps ────────────────────────────────── */
     .steps { display: flex; flex-direction: column; gap: var(--sp-3); }
     .step  {
-      display: grid;
-      grid-template-columns: 3.2rem 1fr;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
       gap: var(--sp-4);
-      padding: var(--sp-4) var(--sp-5);
+      padding: var(--sp-4);
       border: 1.5px solid var(--border); border-radius: var(--r-lg);
       background: var(--bg-card);
+      box-sizing: border-box;
+      width: 100%;
     }
     .step-num {
-      width: 3.2rem; height: 3.2rem;
+      width: 3.2rem; height: 3.2rem; min-width: 3.2rem;
       border-radius: 50%; background: var(--accent); color: #fff;
       font-size: 1.5rem; font-weight: 700;
       display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; margin-top: 0.1rem;
+      flex-shrink: 0; margin-top: 0.2rem;
     }
     .step-num.faq-num {
       background: var(--bg-subtle); color: var(--text-muted);
     }
+    .step-content { flex: 1; min-width: 0; }
     .step-title { font-size: 1.5rem; font-weight: 700; margin-bottom: var(--sp-1); }
     .step-body  { font-size: 1.4rem; color: var(--text-muted); line-height: 1.55; }
     .step-body p { margin-bottom: var(--sp-2); }
@@ -319,7 +323,7 @@
 
               <div class="step">
                 <div class="step-num">1</div>
-                <div>
+                <div class="step-content">
                   <div class="step-title">
                     <span class="fr">Remplir le formulaire d'inscription</span>
                     <span class="en">Fill in the registration form</span>
@@ -337,7 +341,7 @@
 
               <div class="step">
                 <div class="step-num">2</div>
-                <div>
+                <div class="step-content">
                   <div class="step-title">
                     <span class="fr">Remplir le formulaire RH</span>
                     <span class="en">Fill in the HR form</span>
@@ -355,7 +359,7 @@
 
               <div class="step">
                 <div class="step-num">3</div>
-                <div>
+                <div class="step-content">
                   <div class="step-title">
                     <span class="fr">Remplir et soumettre le document C</span>
                     <span class="en">Complete and submit document C</span>
@@ -373,7 +377,7 @@
 
               <div class="step">
                 <div class="step-num">4</div>
-                <div>
+                <div class="step-content">
                   <div class="step-title">
                     <span class="fr">Discuter de tes projets avec l'administration du hub</span>
                     <span class="en">Discuss your projects with the hub administration</span>
@@ -387,7 +391,7 @@
 
               <div class="step">
                 <div class="step-num">5</div>
-                <div>
+                <div class="step-content">
                   <div class="step-title">
                     <span class="fr">Configurer ton journal de stage</span>
                     <span class="en">Set up your internship journal</span>
@@ -405,7 +409,7 @@
 
               <div class="step">
                 <div class="step-num faq-num">?</div>
-                <div>
+                <div class="step-content">
                   <div class="step-title">
                     <span class="fr">Des doutes ?</span>
                     <span class="en">Any doubts?</span>
@@ -485,21 +489,21 @@
             <div class="steps">
               <div class="step">
                 <div class="step-num">1</div>
-                <div>
+                <div class="step-content">
                   <div class="step-title"><span class="fr">Configure ton profil</span><span class="en">Set up your profile</span></div>
                   <div class="step-body"><p class="fr">Entre ton nom, numéro étudiant, programme, les dates de ton stage et les infos de ton milieu. Les dates et la durée totale sont indiquées dans le <strong>document B</strong>. Environ 5 minutes.</p><p class="en">Enter your name, student number, program, internship dates, and workplace info. Dates and total duration are in <strong>document B</strong>. About 5 minutes.</p></div>
                 </div>
               </div>
               <div class="step">
                 <div class="step-num">2</div>
-                <div>
+                <div class="step-content">
                   <div class="step-title"><span class="fr">Documente chaque jour</span><span class="en">Log each day</span></div>
                   <div class="step-body"><p class="fr">Ouvre le journal quotidien, décris tes tâches et ton temps. Exporte le fichier JSON et dépose-le dans le dossier partagé OneDrive de ton cours.</p><p class="en">Open the daily log, describe your tasks and time. Export the JSON file and drop it in your course's shared OneDrive folder.</p></div>
                 </div>
               </div>
               <div class="step">
                 <div class="step-num">3</div>
-                <div>
+                <div class="step-content">
                   <div class="step-title"><span class="fr">L'administration du hub suit ta progression</span><span class="en">The hub administration follows your progress</span></div>
                   <div class="step-body"><p class="fr">Le tableau de bord lit automatiquement les fichiers que tu déposes et affiche ton avancement, tes heures et tes compétences couvertes — tu peux toi-même consulter ton rapport de progression à tout moment. L'administration du hub y a aussi accès, et ton·ta enseignant·e superviseur·e peut également y accéder s'il ou elle le souhaite.</p><p class="en">The dashboard automatically reads the files you drop and shows your progress, hours, and covered competencies — you can view your own progress report at any time. The hub administration also has access, and your supervising teacher can as well if they wish.</p></div>
                 </div>
