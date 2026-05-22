@@ -235,15 +235,7 @@ img { max-width: 100%; }
   font-weight: 500;
   color: var(--text-on-dark);
   letter-spacing: -0.02em;
-}
-.site-title span {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--color-red-500);
-  margin-left: var(--sp-2);
-  vertical-align: middle;
+  white-space: nowrap;
 }
 .header-actions {
   display: flex;
