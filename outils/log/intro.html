@@ -30,9 +30,9 @@
     .intro-hero .btn--hero:hover { background:var(--color-cream-500); }
 
     /* ── Section spacing ──────────────────────── */
-    .intro-sec { padding: var(--sp-10) var(--sp-6); }
+    .intro-sec { padding: var(--sp-10) var(--sp-6); width: 100%; box-sizing: border-box; }
     .intro-sec + .intro-sec { border-top: 1px solid var(--border); }
-    .intro-sec-inner { max-width: 80rem; margin: 0 auto; }
+    .intro-sec-inner { max-width: 80rem; margin: 0 auto; width: 100%; }
     .intro-label {
       font-size: 1.1rem; font-weight: 700; letter-spacing: .1em;
       text-transform: uppercase; color: var(--accent);
@@ -52,6 +52,8 @@
       box-shadow: var(--shadow-sm);
       margin-bottom: var(--sp-5);
       overflow: hidden;
+      width: 100%;
+      box-sizing: border-box;
     }
     .audience-block summary {
       list-style: none; cursor: pointer; user-select: none;
@@ -198,10 +200,6 @@
         <span class="fr">Documente ton stage jour après jour, suis tes heures et tes compétences, et partage ta progression avec l'équipe pédagogique.</span>
         <span class="en">Document your internship day by day, track your hours and competencies, and share your progress with the teaching team.</span>
       </p>
-      <a href="index.html" class="btn btn--hero">
-        <span class="fr">Commencer →</span>
-        <span class="en">Get started →</span>
-      </a>
     </div>
 
     <!-- ── Audience sections ──────────────────────────────── -->
@@ -217,35 +215,15 @@
           <span class="en">Two situations, different steps</span>
         </h2>
 
-        <!-- ── Hub students ── -->
-        <details class="audience-block hub-block">
-          <summary>
-            <div>
-              <div class="audience-eyebrow">
-                <span class="fr">Étudiant·e·s rejoignant le hub — stage en organisation partenaire non trouvé</span>
-                <span class="en">Students joining the hub — no company internship found yet</span>
-              </div>
-              <div class="audience-title">
-                <span class="fr">S'inscrire au stage pôle INNOVATION hub</span>
-                <span class="en">Joining the INNOVATION hub internship program</span>
-              </div>
-              <div class="audience-sub">
-                <span class="fr">Démarches supplémentaires obligatoires, en plus de l'utilisation du journal.</span>
-                <span class="en">Additional required steps, on top of using the journal.</span>
-              </div>
-            </div>
-            <span class="arrow">▼</span>
-          </summary>
-          <div class="block-body">
-
-            <!-- Documents -->
+        <!-- ── Documents prerequisite ── -->
+        <div style="margin-bottom:var(--sp-5)">
             <h3 style="font-size:1.6rem;font-weight:700;margin-bottom:var(--sp-2)">
               <span class="fr">Les documents de stage</span>
               <span class="en">Internship documents</span>
             </h3>
             <p style="font-size:1.4rem;color:var(--text-muted);margin-bottom:var(--sp-4);line-height:1.6">
-              <span class="fr">Tu recevras ces documents de l'administration. Lis leurs rôles avant de commencer les démarches.</span>
-              <span class="en">You will receive these documents from the administration. Read their roles before starting the steps.</span>
+              <span class="fr">Tu recevras ces quatre documents de l'administration avant ou pendant la session. Tous les étudiant·e·s les reçoivent — qu'ils ou elles fassent leur stage en entreprise ou au hub. Tu dois avoir reçu les documents A, B et C avant d'entreprendre les démarches ci-dessous.</span>
+              <span class="en">You will receive these four documents from the administration before or during the session. All students receive them — whether interning at a company or at the hub. You must have received documents A, B, and C before starting the steps below.</span>
             </p>
 
             <div style="margin-bottom:var(--sp-6)">
@@ -313,6 +291,29 @@
                 </div>
               </details>
             </div>
+        </div>
+
+        <!-- ── Hub students ── -->
+        <details class="audience-block hub-block">
+          <summary>
+            <div>
+              <div class="audience-eyebrow">
+                <span class="fr">Étudiant·e·s inscrit·e·s à un cours de stage — rejoignant le hub (stage en organisation partenaire non trouvé)</span>
+                <span class="en">Students enrolled in an internship course — joining the hub (no company internship found yet)</span>
+              </div>
+              <div class="audience-title">
+                <span class="fr">S'inscrire au stage pôle INNOVATION hub</span>
+                <span class="en">Joining the INNOVATION hub internship program</span>
+              </div>
+              <div class="audience-sub">
+                <span class="fr">Tu dois être inscrit·e à un cours de stage <strong>et</strong> avoir reçu les documents A, B et C de l'administration avant de commencer ces démarches. Si tu n'as pas encore reçu ces documents, tu n'es pas encore éligible.</span>
+                <span class="en">You must be enrolled in an internship course <strong>and</strong> have received documents A, B, and C from the administration before starting these steps. If you have not yet received these documents, you are not yet eligible.</span>
+              </div>
+            </div>
+            <span class="arrow">▼</span>
+          </summary>
+          <div class="block-body">
+
 
             <!-- Hub steps -->
             <h3 style="font-size:1.6rem;font-weight:700;margin-bottom:var(--sp-3)">
