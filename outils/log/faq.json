@@ -1197,5 +1197,181 @@
       "q": "How do you develop a proactive attitude instead of waiting for instructions?",
       "a": "<p>One of the most visible differences between an intern who stands out and one who goes unnoticed is rarely technical skill — it is attitude in the face of the unknown. Waiting to be told exactly what to do at each step is a school mindset. Professional environments reward those who move forward.</p>\n\n<p><strong>What \"proactive\" actually means</strong></p>\n<ul>\n  <li><strong>When you receive a task, start by exploring.</strong> Before asking how to do it, spend thirty minutes searching on your own. Read the documentation. Try something. See how far you get. The question you ask after that effort will be infinitely more precise — and the answer, infinitely more useful.</li>\n  <li><strong>When you are stuck, formulate the blocker.</strong> \"I do not know what to do\" is not a blocker — it is an absence of reflection. \"I tried X and Y, I get Z, and I do not understand why\" is a real and articulable blocker. It deserves an answer.</li>\n  <li><strong>When you finish a task, look for the next one.</strong> In an active project, there is almost always something useful to do. Look at the plan, the task board, the Discord thread — offer to take something on rather than waiting to be assigned.</li>\n  <li><strong>When you are unsure whether you are allowed to do something, ask — but propose first.</strong> \"I was thinking of taking on X, does that work?\" is much more useful than \"What should I do now?\"</li>\n</ul>\n\n<p><strong>Exploration as a working method</strong></p>\n<p>Faced with an unknown tool, a new technology, or a domain you do not master:</p>\n<ul>\n  <li>Allow yourself not to understand everything from the start — that is normal and expected</li>\n  <li>Launch the tool, create an empty project, click on things. Direct manipulation teaches faster than passive reading</li>\n  <li>Note what you discover — including errors. An error you resolved yourself is knowledge you will not lose</li>\n  <li>Dare to produce something imperfect. A shaky prototype that exists is worth more than an imaginary masterpiece that has not been started yet</li>\n</ul>\n\n<p><strong>What this attitude changes for the team</strong></p>\n<p>When every team member moves forward autonomously, the team lead can focus on coordination rather than managing task by task. The whole team moves faster. And you gain real skills — not just the habit of following instructions.</p>\n\n<div class=\"note\">You do not need permission to learn. You do not need permission to try. You do not need permission to propose. What needs validation is what you deliver — not how you explore.</div>"
     }
+  },
+  {
+    "cat": "pendant_stage",
+    "fr": {
+      "q": "Mon enseignant·e superviseur·e veut me rencontrer. Est-ce que c'est grave ?",
+      "a": "<p>Non, c'est tout à fait normal. Les enseignant·e·s superviseur·es font des points réguliers avec chaque stagiaire pour voir ce sur quoi tu travailles — ce n'est pas un signal d'alarme.</p><p>Prépare-toi à :</p><ul><li>Parler de tes projets et de ton équipe</li><li>Montrer les recherches que tu as effectuées</li><li>Présenter les tâches documentées dans tes journaux</li></ul><div class=\"note\">L'enseignant·e superviseur·e a accès à tes journaux JSON via son propre tableau de bord. Une partie de ta note de stage dépend de ce qu'il ou elle y voit — c'est une raison supplémentaire de documenter ton travail sérieusement et régulièrement.</div>"
+    },
+    "en": {
+      "q": "My supervising teacher wants to meet with me. Is that a problem?",
+      "a": "<p>Not at all — this is completely normal. Supervising teachers check in with every intern to see what you are working on. It is not a warning sign.</p><p>Come prepared to:</p><ul><li>Talk about your projects and your team</li><li>Show the research you have done</li><li>Walk through the tasks documented in your logs</li></ul><div class=\"note\">Your supervising teacher has access to your JSON logs through their own dashboard. Part of your internship grade depends on what they see there — another good reason to document your work seriously and consistently.</div>"
+    }
+  },
+  {
+    "cat": "pendant_stage",
+    "fr": {
+      "q": "Ma date de fin de stage peut-elle changer ?",
+      "a": "<p>La date de fin officielle ne change pas — elle est fixée dans ton document B et dans l'entente (document D). Ce qui peut changer, c'est le rythme auquel tu accumules tes heures.</p><p>Si tu complètes tes heures requises avant la date de fin officielle, tu dois tout de même rester disponible et actif·ve jusqu'à cette date. Ajuste ton rythme de travail en conséquence plutôt que de ralentir trop tôt.</p><div class=\"note\">Si tu prévois terminer tes heures bien avant la date officielle, discutes-en avec l'administration du hub à l'avance.</div>"
+    },
+    "en": {
+      "q": "Can my internship end date change?",
+      "a": "<p>The official end date does not change — it is set in your document B and in the agreement (document D). What can change is the pace at which you accumulate your hours.</p><p>If you complete your required hours before the official end date, you are still expected to remain available and active until that date. Adjust your work pace accordingly rather than stopping too early.</p><div class=\"note\">If you expect to finish your hours well before the official end date, discuss it with the hub administration in advance.</div>"
+    }
+  },
+  {
+    "cat": "pendant_stage",
+    "fr": {
+      "q": "Est-ce que travailler plus d'heures que le minimum requis améliore ma note ?",
+      "a": "<p>Non. Dépasser le nombre d'heures requis n'a aucun impact sur ta note — ce n'est ni attendu ni récompensé.</p><p>Ce qui compte, c'est la qualité de ton travail, la régularité de ta documentation, et ta contribution à tes équipes pendant la durée officielle de ton stage.</p>"
+    },
+    "en": {
+      "q": "Does working more hours than required improve my grade?",
+      "a": "<p>No. Working beyond the required number of hours has no impact on your grade — it is neither expected nor rewarded.</p><p>What matters is the quality of your work, the consistency of your documentation, and your contribution to your teams over the official duration of your internship.</p>"
+    }
+  },
+  {
+    "cat": "pendant_stage",
+    "fr": {
+      "q": "Je me retrouve à attendre — une réponse du client, un coéquipier, un accès. Qu'est-ce que je fais ?",
+      "a": "<p>Attendre n'est pas du travail. Si tu te retrouves bloqué·e, passe à autre chose :</p><ul><li>Avance sur une autre tâche de ce projet</li><li>Contribue à un autre de tes projets</li><li>Prépare les prochaines étapes : spécifications, cas de test, documentation, recherche</li><li>Consulte la documentation du projet pour mieux comprendre le domaine</li></ul><div class=\"note\">Dans un vrai contexte professionnel, signaler un blocage et rester actif·ve en parallèle est une compétence valorisée. Note ce que tu as fait pendant l'attente dans ton journal.</div>"
+    },
+    "en": {
+      "q": "I find myself waiting — for a client reply, a teammate, an access. What do I do?",
+      "a": "<p>Waiting is not work. If you are blocked, move on to something else:</p><ul><li>Advance on another task within the same project</li><li>Contribute to one of your other projects</li><li>Prepare upcoming steps: specs, test cases, documentation, research</li><li>Read the project documentation to deepen your understanding of the domain</li></ul><div class=\"note\">In a real professional context, flagging a blocker and staying productive in parallel is a valued skill. Log what you did during the wait in your journal.</div>"
+    }
+  },
+  {
+    "cat": "pendant_stage",
+    "fr": {
+      "q": "Je n'arrive pas à avancer sur un projet parce que les tâches ne me conviennent pas ou ne sont pas claires. Que faire ?",
+      "a": "<p>Ne te retire pas d'un projet parce que quelque chose n'est pas clair — c'est précisément le moment de poser des questions et de faire des propositions concrètes.</p><p>Dans la vie professionnelle, les entretiens d'embauche demandent souvent : <em>« Décris une situation où tu as dû surmonter une difficulté. »</em> Abandonner un projet difficile n'est pas une réponse valorisante.</p><p>Exemples de propositions concrètes :</p><ul><li>« Je propose de modéliser l'environnement 3D de la scène décrite dans le chapitre 2 — qui veut me rejoindre ? »</li><li>« Je peux prendre en charge la documentation de l'API pendant qu'on attend la réponse du client. »</li></ul><div class=\"note\">Si la nature de tes tâches change considérablement par rapport à ce qui était prévu dans ton document D, discutes-en avec l'administration du hub avant de procéder.</div>"
+    },
+    "en": {
+      "q": "I am struggling to move forward on a project because the tasks are unclear or don't feel like a fit. What should I do?",
+      "a": "<p>Do not withdraw from a project because something is unclear — that is exactly when to ask questions and make concrete proposals.</p><p>Job interviews often ask: <em>\"Describe a situation where you had to overcome a difficulty.\"</em> Walking away from a hard project is not a strong answer.</p><p>Examples of concrete proposals:</p><ul><li>\"I suggest we model the 3D environment of the scene described in chapter 2 — who wants to join me?\"</li><li>\"I can take on the API documentation while we wait for the client's response.\"</li></ul><div class=\"note\">If the nature of your tasks changes significantly from what was planned in your document D, discuss it with the hub administration before proceeding.</div>"
+    }
+  },
+  {
+    "cat": "equipes_roles",
+    "fr": {
+      "q": "Personne ne réagit quand je publie quelque chose dans le canal du projet. Que faire ?",
+      "a": "<p>Les déclarations générales obtiennent rarement une réaction. Les questions concrètes et spécifiques, oui.</p><p>Au lieu de :</p><ul><li>« Est-ce que quelqu'un a lu le document ? »</li><li>« Est-ce que quelqu'un peut m'aider ? »</li></ul><p>Essaie plutôt :</p><ul><li>« Je propose de modéliser X — qui veut se joindre à moi pour Y ? »</li><li>« J'ai terminé Z. La prochaine étape serait W. Quelqu'un peut la prendre en charge d'ici vendredi ? »</li></ul><p>Si personne ne s'oppose à ta proposition, procède comme tu l'as suggéré et documente ta décision dans le plan épinglé sur Discord.</p>"
+    },
+    "en": {
+      "q": "Nobody reacts when I post something in the project channel. What should I do?",
+      "a": "<p>General statements rarely get a reaction. Concrete, specific questions do.</p><p>Instead of:</p><ul><li>\"Did anyone read the document?\"</li><li>\"Can anyone help me?\"</li></ul><p>Try:</p><ul><li>\"I suggest we model X — who wants to join me on Y?\"</li><li>\"I finished Z. The next step would be W. Can someone take it on by Friday?\"</li></ul><p>If nobody objects to your proposal, proceed as suggested and document your decision in the plan pinned on Discord.</p>"
+    }
+  },
+  {
+    "cat": "equipes_roles",
+    "fr": {
+      "q": "Qui doit contacter le client ?",
+      "a": "<p>La liaison client·e, et seulement elle. Ce rôle est assigné par l'administration du hub.</p><p>Tout le monde qui envoie des messages au client ou le tague directement crée de la confusion et donne une image désorganisée de l'équipe. Si tu as une question pour le client, transmets-la à la liaison — c'est son rôle de faire le pont.</p>"
+    },
+    "en": {
+      "q": "Who should contact the client?",
+      "a": "<p>The client liaison, and only them. This role is assigned by the hub administration.</p><p>Everyone messaging the client directly or tagging them creates confusion and presents the team as disorganized. If you have a question for the client, pass it to the liaison — bridging that communication is their role.</p>"
+    }
+  },
+  {
+    "cat": "equipes_roles",
+    "fr": {
+      "q": "Est-ce qu'on doit être sur Discord ET sur Teams ? On peut pas tout mettre sur Teams ?",
+      "a": "<p>Les deux sont attendus, et ils ont des rôles distincts :</p><ul><li><strong>Discord</strong> — coordination de projet, fils d'équipe, questions opérationnelles du hub</li><li><strong>Teams</strong> — questions sur les notes, communications avec l'enseignant·e superviseur·e, sujets personnels ou confidentiels</li></ul><p>Quand tu travailles à distance, reste connecté·e sur les deux afin que tes coéquipier·es puissent voir ton statut (disponible, occupé·e, absent·e). Même quand tu es en présentiel, tes coéquipier·es à distance dépendent de ces indicateurs de présence.</p><p>Si ton équipe utilise principalement Teams, désignez quand même quelqu'un pour surveiller Discord à tour de rôle — des nouveaux membres peuvent arriver et ne voir que Discord.</p><div class=\"note\">Maîtriser les deux outils, c'est une ligne de plus sur ton CV. Les gens qui ne travaillent qu'avec les outils qu'ils connaissent déjà ont tendance à avoir les profils les plus faibles.</div>"
+    },
+    "en": {
+      "q": "Do we have to be on both Discord and Teams? Can't we just use Teams?",
+      "a": "<p>Both are expected, and they serve different roles:</p><ul><li><strong>Discord</strong> — project coordination, team threads, hub operational questions</li><li><strong>Teams</strong> — grading questions, communications with your supervising teacher, personal or confidential matters</li></ul><p>When working remotely, stay connected on both so your teammates can see your status (available, busy, away). Even when you are onsite, your remote teammates rely on those presence indicators.</p><p>If your team mainly uses Teams, take turns monitoring Discord anyway — new members may join and only see Discord.</p><div class=\"note\">Being proficient in both tools is a line on your CV. People who only use tools they already know tend to have the weakest profiles.</div>"
+    }
+  },
+  {
+    "cat": "chef_equipe",
+    "fr": {
+      "q": "Qu'est-ce qu'un jalon et pourquoi en avons-nous besoin ?",
+      "a": "<p>Un jalon, c'est un livrable clé avec une date : <em>« Schéma de base de données — 30 mai »</em>, <em>« Présentation finale — 15 août »</em>. Sans échéances, les projets avancent rarement.</p><p>Comment les définir :</p><ol><li>Réunissez l'équipe pour vous entendre sur les livrables (le <em>quoi</em>) et les dates (le <em>quand</em>)</li><li>Choisissez l'émoji qui représentera votre équipe sur le calendrier</li><li>Un·e membre désigné·e crée le fichier JSON de jalons dans l'outil de journal</li><li>Déposez le JSON sur OneDrive et signalez-le à l'administration du hub</li></ol><p>Le JSON n'a pas besoin d'être tenu parfaitement à jour — les grandes étapes suffisent. Après la première semaine, la mise à jour prend environ 5 minutes.</p><div class=\"note\">C'est la seule façon pour l'administration du hub de voir l'avancement de toutes les équipes en un coup d'œil, sans avoir à naviguer dans chacun de vos outils de gestion.</div>"
+    },
+    "en": {
+      "q": "What is a milestone and why do we need them?",
+      "a": "<p>A milestone is a key deliverable with a date: <em>\"Database schema — May 30\"</em>, <em>\"Final presentation — August 15\"</em>. Without deadlines, projects rarely move forward.</p><p>How to set them:</p><ol><li>Meet as a team to agree on deliverables (the <em>what</em>) and dates (the <em>when</em>)</li><li>Pick an emoji to represent your team on the calendar</li><li>A designated team member creates the milestone JSON file in the log tool</li><li>Upload the JSON to OneDrive and notify the hub administration</li></ol><p>The JSON does not need to be perfectly up to date — major steps are enough. After the first week, updating it takes about 5 minutes.</p><div class=\"note\">This is the only way for the hub administration to see all teams' progress at a glance, without navigating through each team's separate project management tool.</div>"
+    }
+  },
+  {
+    "cat": "chef_equipe",
+    "fr": {
+      "q": "Le client veut modifier la portée du projet en cours de stage. Comment gérer ça ?",
+      "a": "<p>Un changement de portée en cours de route est courant dans le monde réel. L'équipe — via la liaison — a le droit de négocier ou de refuser si le changement est déraisonnable.</p><p>Comment procéder :</p><ol><li>La liaison informe l'équipe de la demande</li><li>L'équipe évalue l'impact : est-ce faisable avec le temps restant ? Cela dépasse-t-il les compétences disponibles ?</li><li>La liaison répond au client avec une position claire :<ul><li><strong>Acceptable :</strong> « Nous pouvons intégrer X si nous repoussons Y au [date]. »</li><li><strong>Refus partiel :</strong> « Nous pouvons faire X mais pas Y dans les délais actuels. »</li><li><strong>Refus complet :</strong> « Ce changement dépasse la portée convenue et le temps disponible. Nous livrerons ce qui était prévu. »</li></ul></li></ol><p>Documentez la décision dans le plan épinglé sur Discord et informez l'administration du hub si le changement est majeur.</p><div class=\"warn\">Accepter silencieusement une demande déraisonnable, puis ne pas la livrer, est pire qu'un refus poli et documenté.</div>"
+    },
+    "en": {
+      "q": "The client wants to change the project scope mid-internship. How do we handle that?",
+      "a": "<p>Mid-project scope changes are common in the real world. The team — through the liaison — has the right to negotiate or decline if the change is unreasonable.</p><p>How to proceed:</p><ol><li>The liaison informs the team of the request</li><li>The team assesses the impact: is it feasible in the time remaining? Does it exceed available skills?</li><li>The liaison responds to the client with a clear position:<ul><li><strong>Acceptable:</strong> \"We can include X if we push Y to [date].\"</li><li><strong>Partial refusal:</strong> \"We can do X but not Y within the current timeline.\"</li><li><strong>Full refusal:</strong> \"This change exceeds the agreed scope and available time. We will deliver what was originally planned.\"</li></ul></li></ol><p>Document the decision in the plan pinned on Discord and inform the hub administration if the change is significant.</p><div class=\"warn\">Silently accepting an unreasonable request and then failing to deliver is worse than a polite, documented refusal.</div>"
+    }
+  },
+  {
+    "cat": "chef_equipe",
+    "fr": {
+      "q": "Quel est mon style de leadership ? Pourquoi c'est important ?",
+      "a": "<p>Si tu mentionnes une expérience en leadership dans un entretien d'embauche, la question suivante est presque inévitable : <em>« Quel est ton style de leadership ? »</em></p><p>Prends le temps d'analyser comment tu travailles : est-ce que tu consultes avant de décider ? Est-ce que tu délègues facilement ? Est-ce que tu mènes par l'exemple ou par la structure ?</p><p>Pour t'aider à mettre des mots dessus : <a href=\"https://www.ivey.uwo.ca/executive-education/insights/2020/01/13-common-leadership-styles/\" target=\"_blank\">13 styles de leadership courants — Ivey Business School ↗</a></p><div class=\"note\">Il n'y a pas de mauvais style de leadership — mais ne pas savoir lequel tu as, c'est une faiblesse dans un entretien.</div>"
+    },
+    "en": {
+      "q": "What is my leadership style and why does it matter?",
+      "a": "<p>If you mention leadership experience in a job interview, the follow-up question is almost inevitable: <em>\"What is your leadership style?\"</em></p><p>Take the time to analyze how you work: do you consult before deciding? Do you delegate easily? Do you lead by example or by structure?</p><p>To help you put words to it: <a href=\"https://www.ivey.uwo.ca/executive-education/insights/2020/01/13-common-leadership-styles/\" target=\"_blank\">13 common leadership styles — Ivey Business School ↗</a></p><div class=\"note\">There is no wrong leadership style — but not knowing which one you have is a weakness in an interview.</div>"
+    }
+  },
+  {
+    "cat": "chef_equipe",
+    "fr": {
+      "q": "Un·e membre de l'équipe est absent·e ou silencieux·se depuis plusieurs jours. Que faire ?",
+      "a": "<p>En tant que chef·fe d'équipe, c'est ta responsabilité de remarquer les absences et d'agir :</p><ol><li>Envoie un message privé sur Discord ou Teams pour prendre des nouvelles — au moins une fois par semaine</li><li>Si tu n'obtiens pas de réponse après quelques jours, informe l'administration du hub</li><li>En attendant, redistribue les tâches si le travail de cette personne bloque l'équipe</li></ol><div class=\"note\">Ne laisse pas une absence non signalée bloquer toute l'équipe en silence. Deux minutes de communication évitent beaucoup de retard.</div>"
+    },
+    "en": {
+      "q": "A team member has been absent or silent for several days. What should I do?",
+      "a": "<p>As team lead, noticing absences and acting on them is your responsibility:</p><ol><li>Send a private message on Discord or Teams to check in — at least once a week</li><li>If you get no response after a few days, inform the hub administration</li><li>In the meantime, redistribute tasks if their work is blocking the team</li></ol><div class=\"note\">Do not let an unannounced absence silently block the whole team. Two minutes of communication prevents a lot of delay.</div>"
+    }
+  },
+  {
+    "cat": "competences_perso",
+    "fr": {
+      "q": "Comment mettre mon stage sur LinkedIn ?",
+      "a": "<p>Voici les étapes :</p><ol><li>Clique sur ta photo de profil, puis sur l'icône crayon pour modifier ton profil</li><li>Dans la section <strong>Expérience</strong>, ajoute un nouveau poste :<ul><li><strong>Nom de l'entreprise :</strong> exactement comme indiqué sur ton document D — ne modifie pas le nom, ne choisis pas quelque chose de similaire</li><li><strong>Titre du poste :</strong> Stagiaire / Intern</li><li><strong>Dates :</strong> selon ton document B</li></ul></li><li>Dans la section <strong>Compétences</strong>, ajoute les outils et compétences pertinents à ton stage (langages, outils, méthodes)</li><li>Partage ton URL LinkedIn sur le canal de ton projet pour que tes coéquipier·es puissent se connecter avec toi</li></ol><p><strong>Recommandations et endorsements :</strong></p><ul><li>Quand tu sais qu'un·e coéquipier·e maîtrise une compétence, va l'endorser pour celle-ci dans sa section Compétences</li><li>Tu peux aussi lui écrire une Recommandation — un court texte décrivant son travail et ses qualités</li><li>La meilleure façon d'obtenir une recommandation, c'est d'en écrire une en premier</li><li>Remercie toujours quelqu'un qui t'endorse ou te recommande</li></ul><div class=\"note\">Tu peux aussi te connecter avec l'administration du hub si tu le souhaites.</div>"
+    },
+    "en": {
+      "q": "How do I add my internship to LinkedIn?",
+      "a": "<p>Here are the steps:</p><ol><li>Click on your profile photo, then the pencil icon to edit your profile</li><li>In the <strong>Experience</strong> section, add a new position:<ul><li><strong>Company name:</strong> exactly as it appears on your document D — do not modify it, do not pick something similar</li><li><strong>Job title:</strong> Intern</li><li><strong>Dates:</strong> as per your document B</li></ul></li><li>In the <strong>Skills</strong> section, add tools and competencies relevant to your internship (languages, tools, methods)</li><li>Share your LinkedIn URL on your project channel so your teammates can connect with you</li></ol><p><strong>Recommendations and endorsements:</strong></p><ul><li>When you know a teammate is good at something, go endorse them for that skill in their Skills section</li><li>You can also write them a Recommendation — a short text describing their work and qualities</li><li>The best way to get a recommendation is to write one first</li><li>Always thank someone who endorses or recommends you</li></ul><div class=\"note\">You can also connect with the hub administration if you wish.</div>"
+    }
+  },
+  {
+    "cat": "competences_perso",
+    "fr": {
+      "q": "Qu'est-ce que je mets sur mon CV concernant mon stage au hub ?",
+      "a": "<p><strong>Expérience professionnelle :</strong></p><ul><li>Nom de l'entreprise : exactement comme sur ton document D</li><li>Titre : Stagiaire / Intern</li><li>Durée : selon ton document B</li></ul><p><strong>Compétences :</strong> liste les outils, langages et méthodes que tu as réellement utilisés — Discord, MS Teams, GitHub, les langages de programmation, les outils de design, etc.</p><p><strong>Si tu as été chef·fe d'équipe ou liaison client·e :</strong> mentionne-le explicitement et prépare-toi à parler de ton style de leadership.</p><p><strong>Dans un entretien :</strong> tu peux décrire les projets sur lesquels tu as travaillé, les défis rencontrés et comment tu les as résolus, et les compétences développées — sans divulguer d'informations confidentielles sur les client·es.</p>"
+    },
+    "en": {
+      "q": "What do I put on my CV about my hub internship?",
+      "a": "<p><strong>Work experience:</strong></p><ul><li>Company name: exactly as on your document D</li><li>Title: Intern</li><li>Duration: as per your document B</li></ul><p><strong>Skills:</strong> list the tools, languages, and methods you actually used — Discord, MS Teams, GitHub, programming languages, design tools, etc.</p><p><strong>If you were a team lead or client liaison:</strong> mention it explicitly and be ready to discuss your leadership style.</p><p><strong>In an interview:</strong> you can describe the projects you worked on, challenges you faced and how you resolved them, and skills you developed — without disclosing confidential client information.</p>"
+    }
+  },
+  {
+    "cat": "competences_perso",
+    "fr": {
+      "q": "Il y a un conflit dans mon équipe ou je me sens mal traité·e. Que faire ?",
+      "a": "<p>Les conflits font partie du travail en équipe. Voici comment les aborder :</p><p><strong>Étape 1 — Essaie d'abord de régler le problème directement</strong></p><ul><li>Parle à la personne concernée en privé, avec calme et sans accusation</li><li>Décris la situation de ton point de vue : <em>« Quand X se passe, ça m'affecte parce que Y. »</em></li><li>Propose un changement concret : <em>« Je préférerais qu'on fasse Z à la place. »</em></li></ul><p><strong>Étape 2 — Si ça ne fonctionne pas, implique le chef·fe d'équipe</strong></p><ul><li>Informe ton chef·fe d'équipe de la situation</li><li>Le chef·fe d'équipe peut faire office de médiateur·rice neutre</li></ul><p><strong>Étape 3 — Si le conflit persiste ou s'il y a du harcèlement</strong></p><ul><li>Envoie un message privé à l'administration du hub sur MS Teams</li><li>Documente les incidents : dates, ce qui s'est passé, ce qui a été dit</li></ul><div class=\"warn\">Le harcèlement, l'intimidation ou tout comportement discriminatoire ne sont jamais acceptables — peu importe le contexte ou la hiérarchie dans l'équipe. Signale-le sans attendre.</div><div class=\"note\">Ces conversations n'ont pas leur place sur Discord. Les canaux de projet sont des espaces professionnels visibles par tou·tes.</div>"
+    },
+    "en": {
+      "q": "There is a conflict in my team or I feel I am being mistreated. What should I do?",
+      "a": "<p>Conflicts are part of teamwork. Here is how to approach them:</p><p><strong>Step 1 — Try to resolve it directly first</strong></p><ul><li>Talk to the person privately, calmly, and without accusations</li><li>Describe the situation from your perspective: <em>\"When X happens, it affects me because Y.\"</em></li><li>Propose a concrete change: <em>\"I would prefer we do Z instead.\"</em></li></ul><p><strong>Step 2 — If that does not work, involve the team lead</strong></p><ul><li>Let your team lead know about the situation</li><li>The team lead can act as a neutral mediator</li></ul><p><strong>Step 3 — If the conflict continues or there is harassment</strong></p><ul><li>Send a private message to the hub administration on MS Teams</li><li>Document incidents: dates, what happened, what was said</li></ul><div class=\"warn\">Harassment, bullying, or any discriminatory behaviour is never acceptable — regardless of context or team hierarchy. Report it without delay.</div><div class=\"note\">These conversations do not belong on Discord. Project channels are professional spaces visible to everyone.</div>"
+    }
+  },
+  {
+    "cat": "pendant_stage",
+    "fr": {
+      "q": "Que voit l'administration du hub ? Que ne voit-elle pas ?",
+      "a": "<p><strong>L'administration du hub peut voir :</strong></p><ul><li>Tes journaux JSON déposés sur OneDrive</li><li>Les canaux Discord publics des projets</li><li>Les canaux et groupes Teams auxquels elle participe</li></ul><p><strong>L'administration du hub ne peut pas voir :</strong></p><ul><li>Tes conversations privées (Discord ou Teams)</li><li>Les groupes ou discussions Teams auxquels elle n'appartient pas</li></ul><p>Si tu ne documentes pas ton travail et ne partages pas ta progression de manière visible, l'administration du hub ne peut pas confirmer que tu travailles — et devra en informer ton enseignant·e superviseur·e, ce qui peut affecter ta note.</p><div class=\"warn\">Tu ne réussiras pas un stage simplement en t'inscrivant. Il faut réellement faire le travail et le documenter.</div>"
+    },
+    "en": {
+      "q": "What does the hub administration see? What do they not see?",
+      "a": "<p><strong>The hub administration can see:</strong></p><ul><li>Your JSON logs uploaded to OneDrive</li><li>Public Discord project channels</li><li>Teams channels and groups they are part of</li></ul><p><strong>The hub administration cannot see:</strong></p><ul><li>Your private conversations (Discord or Teams)</li><li>Teams groups or chats they are not part of</li></ul><p>If you do not document your work and share your progress visibly, the hub administration cannot confirm you are working — and will have to inform your supervising teacher, which may affect your grade.</p><div class=\"warn\">You will not pass an internship just for having signed up. You actually have to do the work and document it.</div>"
+    }
   }
 ]
