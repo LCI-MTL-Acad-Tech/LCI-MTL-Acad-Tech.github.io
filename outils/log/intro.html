@@ -12,6 +12,7 @@
     /* ── Hide/show by html[lang] — no JS needed ── */
     html[lang="fr"] .en  { display: none !important; }
     html[lang="en"] .fr  { display: none !important; }
+    body { overflow-x: hidden; }
 
     /* ── Hero ─────────────────────────────────── */
     .intro-hero {
@@ -166,7 +167,6 @@
   </style>
 </head>
 <body>
-<div class="page-wrap">
 
   <!-- ── Header ──────────────────────────────────────────── -->
   <header class="site-header">
@@ -541,8 +541,8 @@
     <!-- ── FAQ link ──────────────────────────────────────── -->
     <section class="intro-sec" style="background:var(--bg-subtle);text-align:center">
       <h2 class="intro-h2" style="margin-bottom:var(--sp-3)">
-        <span class="fr">❓ Des questions ?</span>
-        <span class="en">❓ Questions?</span>
+        <span class="fr">Des questions ?</span>
+        <span class="en">Questions?</span>
       </h2>
       <p style="font-size:1.5rem;color:var(--text-muted);max-width:52rem;margin:0 auto var(--sp-6);line-height:1.6">
         <span class="fr">La foire aux questions couvre les sujets les plus fréquents : outil de journal, avant le stage, pendant le stage, projets, évaluation et plus.</span>
@@ -556,7 +556,6 @@
     </section>
 
   </main>
-</div>
 
 <script src="lang.js?v=20260522"></script>
 <script src="app.js?v=20260522"></script>
