@@ -77,18 +77,21 @@
     .audience-block.hub-block { border-left: 4px solid var(--accent); }
 
     /* ── Steps ────────────────────────────────── */
-    .steps { display: flex; flex-direction: column; gap: var(--sp-4); }
+    .steps { display: flex; flex-direction: column; gap: var(--sp-3); }
     .step  {
-      display: flex; gap: var(--sp-4); align-items: flex-start;
+      display: grid;
+      grid-template-columns: 3.2rem 1fr;
+      gap: var(--sp-4);
       padding: var(--sp-4) var(--sp-5);
       border: 1.5px solid var(--border); border-radius: var(--r-lg);
       background: var(--bg-card);
     }
     .step-num {
-      flex-shrink: 0; width: 3.2rem; height: 3.2rem;
+      width: 3.2rem; height: 3.2rem;
       border-radius: 50%; background: var(--accent); color: #fff;
       font-size: 1.5rem; font-weight: 700;
       display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 0.1rem;
     }
     .step-num.faq-num {
       background: var(--bg-subtle); color: var(--text-muted);
