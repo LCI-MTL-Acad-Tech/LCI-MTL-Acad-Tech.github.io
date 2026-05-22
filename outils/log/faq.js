@@ -125,6 +125,16 @@ function matchesSearch(item, query) {
   return words.every(word => haystack.includes(word));
 }
 
+function slugify(str) {
+  // Produce a short stable slug from a question string — used as a persistent link anchor.
+  return (str || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48);
+}
+
 function render() {
   const container = document.getElementById('faq-sections');
   const noResults = document.getElementById('no-results');
@@ -164,8 +174,9 @@ function render() {
         <button class="share-btn" data-cat="${cat}" title="${currentLang === 'en' ? 'Copy link to this section' : 'Copier le lien vers cette section'}" aria-label="${currentLang === 'en' ? 'Copy link' : 'Copier le lien'}">&#x1F517;</button>
       </div>`;
 
-    items.forEach((item, idx) => {
-      const id = `faq-${cat}-${idx}`;
+    items.forEach((item) => {
+      // Stable ID based on category + FR question slug — survives re-renders and filters
+      const id = `faq-${cat}-${slugify(item.fr.q)}`;
       if (currentLang === 'both') {
         html += renderItem(id + '-fr', item.fr, 'fr');
         html += renderItem(id + '-en', item.en, 'en');

@@ -237,7 +237,7 @@ button i, button .ico { pointer-events: none; }
 }
 
 .sidebar {
-  padding: 28px 16px 28px 32px;
+  padding: 28px 16px 48px 32px;
   border-right: 1px solid var(--border);
   position: sticky;
   top: 65px;
@@ -256,6 +256,9 @@ button i, button .ico { pointer-events: none; }
   margin-top: -32px;
   background: linear-gradient(to bottom, transparent, var(--bg));
   pointer-events: none;
+  opacity: var(--fade-opacity, 0);
+  transition: opacity 0.2s;
+}
 }
 
 .sidebar-label {
@@ -721,5 +724,21 @@ footer {
 </footer>
 
 <script src="faq.js"></script>
+<script>
+// Show the sidebar fade only when there is more content to scroll to
+(function() {
+  const sidebar = document.querySelector('.sidebar');
+  if (!sidebar) return;
+  function updateFade() {
+    const atBottom = sidebar.scrollHeight - sidebar.scrollTop <= sidebar.clientHeight + 4;
+    sidebar.style.setProperty('--fade-opacity', atBottom ? '0' : '1');
+  }
+  sidebar.addEventListener('scroll', updateFade, { passive: true });
+  // Also update after render (category list height may change)
+  const observer = new MutationObserver(updateFade);
+  observer.observe(sidebar, { childList: true, subtree: true });
+  updateFade();
+})();
+</script>
 </body>
 </html>
