@@ -30,7 +30,7 @@
     .intro-hero .btn--hero:hover { background:var(--color-cream-500); }
 
     /* ── Section spacing ──────────────────────── */
-    .intro-sec { padding: var(--sp-10) var(--sp-6); width: 100%; box-sizing: border-box; }
+    .intro-sec { padding: var(--sp-10) var(--sp-6); width: 100%; box-sizing: border-box; overflow-x: hidden; }
     .intro-sec + .intro-sec { border-top: 1px solid var(--border); }
     .intro-sec-inner { max-width: 80rem; margin: 0 auto; width: 100%; }
     .intro-label {
@@ -75,6 +75,7 @@
     .audience-block[open] .arrow { transform: rotate(180deg); }
     .audience-block .block-body {
       padding: var(--sp-5); border-top: 1px solid var(--border);
+      overflow: hidden; min-width: 0; box-sizing: border-box;
     }
     .audience-block.hub-block { border-left: 4px solid var(--accent); }
 
@@ -236,8 +237,8 @@
                   <span class="arrow">▼</span>
                 </summary>
                 <div class="doc-body">
-                  <p class="fr">Reçu par MIO (Omnivox) <strong>avant le début de la session</strong>. Contient les règles, attentes, procédures et la <strong>date limite de soumission du document C</strong>. Lis-le attentivement dès réception.</p>
-                  <p class="en">Received by MIO (Omnivox) <strong>before the start of the session</strong>. Contains rules, expectations, procedures, and the <strong>document C submission deadline</strong>. Read it carefully upon receipt.</p>
+                  <p class="fr">Reçu par MIO (Omnivox) <strong>avant le début de la session</strong>. Contient les règles, attentes, procédures et la <strong>date limite de soumission du document C</strong>. Lis-le attentivement dès réception et <strong>télécharge-le</strong> pour le garder à portée de main.</p>
+                  <p class="en">Received by MIO (Omnivox) <strong>before the start of the session</strong>. Contains rules, expectations, procedures, and the <strong>document C submission deadline</strong>. Read it carefully upon receipt and <strong>download it</strong> to keep it handy.</p>
                 </div>
               </details>
 
@@ -250,8 +251,8 @@
                   <span class="arrow">▼</span>
                 </summary>
                 <div class="doc-body">
-                  <p class="fr">Reçu par MIO (Omnivox) en même temps que le document A. <strong>La page 2 indique le nom du programme, les dates de début et de fin, et le nombre total d'heures</strong> — tu en auras besoin pour configurer ton journal et pour la discussion avec l'administration du hub.</p>
-                  <p class="en">Received by MIO (Omnivox) at the same time as document A. <strong>Page 2 shows the program name, start and end dates, and total hours</strong> — you will need this to set up your journal and for the discussion with the hub administration.</p>
+                  <p class="fr">Reçu par MIO (Omnivox) en même temps que le document A. <strong>La page 2 indique le nom du programme, les dates de début et de fin, et le nombre total d'heures</strong> — tu en auras besoin pour configurer ton journal et pour la discussion avec l'administration du hub. <strong>Télécharge-le dès réception.</strong></p>
+                  <p class="en">Received by MIO (Omnivox) at the same time as document A. <strong>Page 2 shows the program name, start and end dates, and total hours</strong> — you will need this to set up your journal and for the discussion with the hub administration. <strong>Download it as soon as you receive it.</strong></p>
                 </div>
               </details>
 
@@ -264,8 +265,8 @@
                   <span class="arrow">▼</span>
                 </summary>
                 <div class="doc-body">
-                  <p class="fr">Reçu par <strong>courriel personnel</strong> quelques semaines après le début de la session. À compléter et soumettre via <strong>Adobe Sign</strong> avant la date limite du document A. <a href="https://lcieducation-my.sharepoint.com/:w:/g/personal/elisa_schaeffer_collegelasalle_com/IQBINWvaq7OzR4mw3pMQZ4qvAdJ9LR3t9Rtk4N1FfMjOc6A?e=hxQaZt" target="_blank" rel="noopener">Instructions ici ↗</a></p>
-                  <p class="en">Received by <strong>personal email</strong> a few weeks after the start of the session. Must be completed and submitted via <strong>Adobe Sign</strong> before the deadline in document A. <a href="https://lcieducation-my.sharepoint.com/:w:/g/personal/elisa_schaeffer_collegelasalle_com/IQBINWvaq7OzR4mw3pMQZ4qvAdJ9LR3t9Rtk4N1FfMjOc6A?e=hxQaZt" target="_blank" rel="noopener">Instructions here ↗</a></p>
+                  <p class="fr">Reçu par <strong>courriel personnel</strong> quelques semaines après le début de la session. À compléter et soumettre via <strong>Adobe Sign</strong> avant la date limite du document A. <strong>Télécharge-le une fois signé par toutes les parties.</strong> <a href="https://lcieducation-my.sharepoint.com/:w:/g/personal/elisa_schaeffer_collegelasalle_com/IQBINWvaq7OzR4mw3pMQZ4qvAdJ9LR3t9Rtk4N1FfMjOc6A?e=hxQaZt" target="_blank" rel="noopener">Instructions ici ↗</a></p>
+                  <p class="en">Received by <strong>personal email</strong> a few weeks after the start of the session. Must be completed and submitted via <strong>Adobe Sign</strong> before the deadline in document A. <strong>Download it once all parties have signed.</strong> <a href="https://lcieducation-my.sharepoint.com/:w:/g/personal/elisa_schaeffer_collegelasalle_com/IQBINWvaq7OzR4mw3pMQZ4qvAdJ9LR3t9Rtk4N1FfMjOc6A?e=hxQaZt" target="_blank" rel="noopener">Instructions here ↗</a></p>
                 </div>
               </details>
 
@@ -273,16 +274,16 @@
                 <summary>
                   <span><span class="doc-letter">D —</span>
                     <span class="fr">Contrat de stage (préparé par l'administration)</span>
-                    <span class="en">Internship contract (prepared by the administration)</span>
+                    <span class="en">Internship agreement (prepared by the administration)</span>
                   </span>
                   <span class="arrow">▼</span>
                 </summary>
                 <div class="doc-body">
-                  <p class="fr">Préparé après ta soumission du document C, puis envoyé par <strong>Adobe Sign</strong> pour signature par l'organisation partenaire, l'étudiant·e et le Collège LaSalle (Service emploi).</p>
-                  <p class="en">Prepared after you submit document C, then sent via <strong>Adobe Sign</strong> for signature by the partner organization, the student, and Collège LaSalle (Employment Services).</p>
+                  <p class="fr">Préparé par l'administration après ta soumission du document C. Il sera envoyé à l'adresse courriel que tu as indiquée dans le document C pour signature via <strong>Adobe Sign</strong> par l'organisation partenaire, toi-même et le Collège LaSalle (Service emploi). <strong>Télécharge-le une fois signé par toutes les parties.</strong></p>
+                  <p class="en">Prepared by the administration after you submit document C. It will be sent to the email address you provided in document C for signature via <strong>Adobe Sign</strong> by the partner organization, yourself, and Collège LaSalle (Employment Services). <strong>Download it once all parties have signed.</strong></p>
                   <div class="alert-warn">
-                    <span class="fr">⏱ <strong>Délais à prévoir :</strong> au moins <strong>2 jours ouvrables</strong> pour la préparation du contrat après ta soumission du document C, puis au moins <strong>2 jours ouvrables supplémentaires</strong> pour la collecte de toutes les signatures. Ni l'administration ni l'équipe enseignante ne traitent les demandes en soirée, les fins de semaine ou les jours fériés.</span>
-                    <span class="en">⏱ <strong>Allow time:</strong> at least <strong>2 business days</strong> to prepare the contract after you submit document C, then at least <strong>2 more business days</strong> for all signatures. Neither the hub administration process requests in the evenings, on weekends, or on holidays.</span>
+                    <span class="fr">⏱ <strong>Délais à prévoir :</strong> au moins <strong>2 jours ouvrables</strong> pour la préparation de l'entente après ta soumission du document C, puis au moins <strong>2 jours ouvrables supplémentaires</strong> pour la collecte de toutes les signatures. Ni l'administration ni l'équipe enseignante ne traitent les demandes en soirée, les fins de semaine ou les jours fériés.</span>
+                    <span class="en">⏱ <strong>Allow time:</strong> at least <strong>2 business days</strong> to prepare the agreement after you submit document C, then at least <strong>2 more business days</strong> for all signatures. Neither the hub administration process requests in the evenings, on weekends, or on holidays.</span>
                   </div>
                   <div class="alert-danger">
                     <span class="fr">⚠ Vise à avoir le document D finalisé <strong>avant la date de début de ton stage</strong> pour éviter toute complication avec la validation de ton stage.</span>
@@ -293,13 +294,18 @@
             </div>
         </div>
 
+        <div class="note-optional" style="margin-bottom:var(--sp-5)">
+          <span class="fr">📁 <strong>Bonne pratique :</strong> crée un dossier dédié à ton stage (par exemple <code>Stage-2026/</code>) et garde-y une copie de tous ces documents. À l'intérieur, crée un sous-dossier <code>journaux/</code> où tu déposeras systématiquement chaque fichier JSON exporté depuis l'outil — un par jour travaillé et un par semaine. Cela te permet de recharger facilement tes données dans l'outil, de vérifier d'un coup d'œil qu'aucune journée ou semaine ne manque, et de conserver une preuve complète de ton stage. Tu pourrais en avoir besoin plus tard — dans un dossier d'immigration, lors d'entretiens d'embauche, ou pour toute démarche professionnelle future.</span>
+          <span class="en">📁 <strong>Good practice:</strong> create a dedicated folder for your internship (e.g. <code>Internship-2026/</code>) and keep a copy of all these documents in it. Inside, create a <code>logs/</code> subfolder where you systematically save every JSON file exported from the tool — one per work day and one per work week. This makes it easy to reload your data into the tool, to check at a glance that no day or week is missing, and to keep a complete record of your internship. You may need it later — for an immigration file, during job interviews, or any future professional process where you need to prove work experience.</span>
+        </div>
+
         <!-- ── Hub students ── -->
         <details class="audience-block hub-block">
           <summary>
             <div>
               <div class="audience-eyebrow">
                 <span class="fr">Étudiant·e·s inscrit·e·s à un cours de stage — rejoignant le hub (stage en organisation partenaire non trouvé)</span>
-                <span class="en">Students enrolled in an internship course — joining the hub (no company internship found yet)</span>
+                <span class="en">Students enrolled in an internship course — joining the hub (no company internship found)</span>
               </div>
               <div class="audience-title">
                 <span class="fr">S'inscrire au stage pôle INNOVATION hub</span>
@@ -384,8 +390,8 @@
                     <span class="en">Wait for document D to be finalized</span>
                   </div>
                   <div class="step-body">
-                    <p class="fr">L'administration prépare le contrat de stage (document D) après ta soumission du document C. Il sera envoyé à l'adresse courriel que tu as indiquée dans le document C. Tu devras le signer via <strong>Adobe Sign</strong>, ainsi que l'organisation partenaire et le Collège LaSalle. Vise à avoir le document D finalisé <strong>avant ta date de début de stage</strong>.</p>
-                    <p class="en">The administration prepares the internship contract (document D) after you submit document C. It will be sent to the email address you provided in document C. You will need to sign it via <strong>Adobe Sign</strong>, along with the partner organization and Collège LaSalle. Aim to have document D finalized <strong>before your internship start date</strong>.</p>
+                    <p class="fr">L'administration prépare l'entente de stage (document D) après ta soumission du document C. Il sera envoyé à l'adresse courriel que tu as indiquée dans le document C. Tu devras le signer via <strong>Adobe Sign</strong>, ainsi que l'organisation partenaire et le Collège LaSalle. Vise à avoir le document D finalisé <strong>avant ta date de début de stage</strong>.</p>
+                    <p class="en">The administration prepares the internship agreement (document D) after you submit document C. It will be sent to the email address you provided in document C. You will need to sign it via <strong>Adobe Sign</strong>, along with the partner organization and Collège LaSalle. Aim to have document D finalized <strong>before your internship start date</strong>.</p>
                   </div>
                 </div>
               </div>
