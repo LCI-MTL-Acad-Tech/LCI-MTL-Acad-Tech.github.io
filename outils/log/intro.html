@@ -53,8 +53,9 @@
       margin-bottom: var(--sp-5);
       width: 100%;
       max-width: 100%;
+      min-width: 0;
       box-sizing: border-box;
-      contain: layout;
+      overflow: hidden;
     }
     .audience-block summary {
       list-style: none; cursor: pointer; user-select: none;
@@ -300,6 +301,9 @@
           <span class="en">📁 <strong>Good practice:</strong> create a dedicated folder for your internship (e.g. <code>Internship-2026/</code>) and keep a copy of all these documents in it. Inside, create a <code>logs/</code> subfolder where you systematically save every JSON file exported from the tool — one per work day and one per work week. This makes it easy to reload your data into the tool, to check at a glance that no day or week is missing, and to keep a complete record of your internship. You may need it later — for an immigration file, during job interviews, or any future professional process where you need to prove work experience.</span>
         </div>
 
+        <!-- ── Audience blocks ── -->
+        <div style="display:flex;flex-direction:column;gap:0;width:100%;min-width:0;overflow:hidden">
+
         <!-- ── Hub students ── -->
         <details class="audience-block hub-block">
           <summary>
@@ -528,6 +532,8 @@
             </div>
           </div>
         </details>
+
+        </div><!-- /audience blocks -->
 
       </div>
     </section>
