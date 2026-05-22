@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Journal de stage LCI — Introduction</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Hero ──────────────────────────────────────────────── */
+    .intro-hero {
+      background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 60%, #07181E) 100%);
+      color: #fff;
+      padding: var(--sp-12) var(--sp-6);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .intro-hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 70% 30%, rgba(255,255,255,.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .intro-hero-eyebrow {
+      font-size: 1.2rem; font-weight: 600; letter-spacing: .12em;
+      text-transform: uppercase; opacity: .75; margin-bottom: var(--sp-3);
+    }
+    .intro-hero-title {
+      font-size: clamp(2.8rem, 5vw, 5rem);
+      font-weight: 700; line-height: 1.1;
+      letter-spacing: -.03em; margin-bottom: var(--sp-4);
+    }
+    .intro-hero-sub {
+      font-size: clamp(1.5rem, 2.5vw, 1.9rem);
+      opacity: .88; max-width: 60rem; margin: 0 auto var(--sp-8);
+      line-height: 1.5;
+    }
+    /* ── Section ───────────────────────────────────────────── */
+    .intro-section { padding: var(--sp-10) var(--sp-6); }
+    .intro-section + .intro-section { border-top: 1px solid var(--border); }
+    .intro-section-inner { max-width: 80rem; margin: 0 auto; }
+    .intro-label {
+      font-size: 1.1rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: var(--sp-2);
+    }
+    .intro-h2 {
+      font-size: clamp(2.2rem, 3.5vw, 3.2rem);
+      font-weight: 700; letter-spacing: -.02em;
+      line-height: 1.15; margin-bottom: var(--sp-5);
+    }
+    /* ── Steps ─────────────────────────────────────────────── */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+      gap: var(--sp-5);
+    }
+    .step-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: var(--sp-5) var(--sp-5) var(--sp-5) var(--sp-4);
+      position: relative;
+    }
+    .step-number {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 3.2rem; height: 3.2rem; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      font-size: 1.5rem; font-weight: 700;
+      margin-bottom: var(--sp-3); flex-shrink: 0;
+    }
+    .step-title { font-size: 1.6rem; font-weight: 600; margin-bottom: var(--sp-2); }
+    .step-body  { font-size: 1.4rem; color: var(--text-muted); line-height: 1.55; }
+    /* ── Feature list ───────────────────────────────────────── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
+      gap: var(--sp-4);
+    }
+    .feature-item {
+      display: flex; gap: var(--sp-3); align-items: flex-start;
+    }
+    .feature-icon {
+      font-size: 2rem; flex-shrink: 0;
+      margin-top: 2px; line-height: 1;
+    }
+    .feature-title { font-size: 1.5rem; font-weight: 600; margin-bottom: 4px; }
+    .feature-desc  { font-size: 1.35rem; color: var(--text-muted); line-height: 1.5; }
+    /* ── FAQ ────────────────────────────────────────────────── */
+    .faq-item { border-bottom: 1px solid var(--border); padding: var(--sp-4) 0; }
+    .faq-q { font-size: 1.5rem; font-weight: 600; margin-bottom: var(--sp-2); }
+    .faq-a { font-size: 1.4rem; color: var(--text-muted); line-height: 1.55; }
+    /* ── CTA strip ──────────────────────────────────────────── */
+    .intro-cta-strip {
+      background: var(--bg-subtle);
+      padding: var(--sp-10) var(--sp-6);
+      text-align: center;
+    }
+    /* ── Lang toggle bar at top ─────────────────────────────── */
+    .intro-topbar {
+      display: flex; justify-content: flex-end; align-items: center;
+      gap: var(--sp-2); padding: var(--sp-3) var(--sp-5);
+      background: var(--bg-card); border-bottom: 1px solid var(--border);
+    }
+    /* ── Hide/show by lang ──────────────────────────────────── */
+    [data-lang="fr"] .en-only { display: none !important; }
+    [data-lang="en"] .fr-only { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- ── Top bar ──────────────────────────────────────────────── -->
+<div class="intro-topbar">
+  <button class="btn btn--ghost btn--sm lang-toggle-btn" data-lang-target="fr-CA">FR</button>
+  <button class="btn btn--ghost btn--sm lang-toggle-btn" data-lang-target="en-CA">EN</button>
+  <button class="btn btn--ghost btn--sm theme-toggle-btn"
+    style="padding:var(--sp-2);line-height:0" aria-label="Toggle theme">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
+    </svg>
+  </button>
+</div>
+
+<!-- ── Hero ─────────────────────────────────────────────────── -->
+<section class="intro-hero">
+  <div class="intro-hero-eyebrow">
+    <span class="fr-only">Collège LaSalle Montréal</span>
+    <span class="en-only">Collège LaSalle Montréal</span>
+  </div>
+  <h1 class="intro-hero-title">
+    <span class="fr-only">Journal de stage</span>
+    <span class="en-only">Internship Journal</span>
+  </h1>
+  <p class="intro-hero-sub">
+    <span class="fr-only">Documente ton stage jour après jour, suis tes heures et tes compétences, et partage ta progression avec ton·ta enseignant·e.</span>
+    <span class="en-only">Document your internship day by day, track your hours and competencies, and share your progress with your teacher.</span>
+  </p>
+  <a href="index.html" class="btn btn--primary"
+    style="font-size:1.6rem;padding:var(--sp-3) var(--sp-7);background:#fff;
+           color:var(--accent);border-color:#fff;display:inline-block">
+    <span class="fr-only">Commencer →</span>
+    <span class="en-only">Get started →</span>
+  </a>
+</section>
+
+<!-- ── Audience sections ──────────────────────────────────── -->
+<section class="intro-section">
+  <div class="intro-section-inner" style="max-width:72rem">
+
+    <div class="intro-label">
+      <span class="fr-only">Par où commencer</span>
+      <span class="en-only">Where to start</span>
+    </div>
+    <h2 class="intro-h2">
+      <span class="fr-only">Deux situations, des démarches différentes</span>
+      <span class="en-only">Two situations, different steps</span>
+    </h2>
+
+    <!-- ── Block 1: All students ── -->
+    <details class="card" style="padding:0;margin-bottom:var(--sp-4)" open>
+      <summary style="padding:var(--sp-5);cursor:pointer;list-style:none;
+                      display:flex;justify-content:space-between;align-items:center;
+                      user-select:none;gap:var(--sp-4)">
+        <div>
+          <div style="font-size:1.1rem;font-weight:700;letter-spacing:.1em;
+                      text-transform:uppercase;color:var(--accent);margin-bottom:var(--sp-1)">
+            <span class="fr-only">Tous les étudiant·e·s inscrit·e·s à un cours de stage</span>
+            <span class="en-only">All students enrolled in an internship course</span>
+          </div>
+          <div style="font-size:1.6rem;font-weight:700">
+            <span class="fr-only">Utiliser le journal de stage</span>
+            <span class="en-only">Using the internship journal</span>
+          </div>
+          <div style="font-size:1.35rem;color:var(--text-muted);margin-top:var(--sp-1)">
+            <span class="fr-only">Pour les étudiant·e·s en stage en entreprise ou au hub — optionnel sauf si ton·ta enseignant·e le demande.</span>
+            <span class="en-only">For students interning at a company or at the hub — optional unless your supervising teacher requires it.</span>
+          </div>
+        </div>
+        <span class="details-arrow" style="font-size:1.2rem;color:var(--text-muted);
+              flex-shrink:0;transition:transform .2s">▼</span>
+      </summary>
+      <div style="border-top:1px solid var(--border);padding:var(--sp-5)">
+        <div style="display:flex;flex-direction:column;gap:var(--sp-4)">
+
+          <!-- Feature grid -->
+          <div style="background:var(--bg-subtle);border-radius:var(--r-lg);
+                      padding:var(--sp-3) var(--sp-4);font-size:1.35rem;
+                      color:var(--text-muted);line-height:1.6;margin-bottom:var(--sp-2)">
+            <span class="fr-only">ℹ️ L'utilisation de ce journal est <strong>optionnelle</strong> pour les étudiant·e·s en stage en entreprise — tu peux l'adopter par choix personnel, ou parce que ton·ta enseignant·e superviseur·e t'en fait la demande explicite.</span>
+            <span class="en-only">ℹ️ Using this journal is <strong>optional</strong> for students interning at a company — you can adopt it by personal choice, or because your supervising teacher explicitly asks you to.</span>
+          </div>
+          <div class="feature-grid" style="margin-bottom:var(--sp-4)">
+            <div class="feature-item">
+              <div class="feature-icon">📝</div>
+              <div>
+                <div class="feature-title"><span class="fr-only">Journal quotidien</span><span class="en-only">Daily log</span></div>
+                <div class="feature-desc"><span class="fr-only">Décris tes tâches, tes heures et tes apprentissages chaque jour.</span><span class="en-only">Describe your tasks, hours, and learning each day.</span></div>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">📊</div>
+              <div>
+                <div class="feature-title"><span class="fr-only">Suivi des compétences</span><span class="en-only">Competency tracking</span></div>
+                <div class="feature-desc"><span class="fr-only">Lie tes tâches aux compétences ministérielles de ton programme.</span><span class="en-only">Link your tasks to the ministerial competencies of your program.</span></div>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">🗓️</div>
+              <div>
+                <div class="feature-title"><span class="fr-only">Calendrier et rapport</span><span class="en-only">Calendar and report</span></div>
+                <div class="feature-desc"><span class="fr-only">Visualise ta progression, tes absences et tes jalons de projet.</span><span class="en-only">Visualise your progress, absences, and project milestones.</span></div>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">📂</div>
+              <div>
+                <div class="feature-title"><span class="fr-only">Tes données, ton contrôle</span><span class="en-only">Your data, your control</span></div>
+                <div class="feature-desc"><span class="fr-only">Tout tourne dans ton navigateur. Exporte tes fichiers JSON quand tu veux.</span><span class="en-only">Everything runs in your browser. Export your JSON files whenever you want.</span></div>
+              </div>
+            </div>
+          </div>
+
+          <h3 style="font-size:1.6rem;font-weight:700;margin-bottom:var(--sp-3)">
+            <span class="fr-only">Comment commencer</span>
+            <span class="en-only">How to get started</span>
+          </h3>
+          <div class="steps-grid">
+            <div class="step-card">
+              <div class="step-number">1</div>
+              <div class="step-title"><span class="fr-only">Configure ton profil</span><span class="en-only">Set up your profile</span></div>
+              <div class="step-body"><span class="fr-only">Entre ton nom, numéro étudiant, programme, les dates de ton stage et les infos de ton milieu. Les dates et la durée totale sont indiquées dans le <strong>document B</strong>. Environ 5 minutes.</span><span class="en-only">Enter your name, student number, program, internship dates, and workplace info. Dates and total duration are in <strong>document B</strong>. About 5 minutes.</span></div>
+            </div>
+            <div class="step-card">
+              <div class="step-number">2</div>
+              <div class="step-title"><span class="fr-only">Documente chaque jour</span><span class="en-only">Log each day</span></div>
+              <div class="step-body"><span class="fr-only">Ouvre le journal quotidien, décris tes tâches et ton temps. Exporte le fichier JSON et dépose-le dans le dossier partagé OneDrive de ton cours.</span><span class="en-only">Open the daily log, describe your tasks and time. Export the JSON file and drop it in your course's shared OneDrive folder.</span></div>
+            </div>
+            <div class="step-card">
+              <div class="step-number">3</div>
+              <div class="step-title"><span class="fr-only">Ton·ta enseignant·e suit ta progression</span><span class="en-only">Your teacher follows your progress</span></div>
+              <div class="step-body"><span class="fr-only">Le tableau de bord enseignant·e lit automatiquement les fichiers que tu déposes et affiche ton avancement, tes heures et tes compétences couvertes.</span><span class="en-only">The teacher dashboard automatically reads the files you drop and shows your progress, hours, and covered competencies.</span></div>
+            </div>
+          </div>
+
+          <div style="margin-top:var(--sp-4)">
+            <a href="https://lci-mtl-acad-tech.github.io/outils/log/setup.html"
+              class="btn btn--primary" style="font-size:1.5rem;margin-right:var(--sp-3)">
+              <span class="fr-only">⚙ Configurer mon journal →</span>
+              <span class="en-only">⚙ Set up my journal →</span>
+            </a>
+            <a href="https://lci-mtl-acad-tech.github.io/outils/log/faq.html"
+              target="_blank" rel="noopener" class="btn btn--ghost">
+              <span class="fr-only">❓ FAQ</span>
+              <span class="en-only">❓ FAQ</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- ── Block 2: Hub students only ── -->
+    <details class="card" style="padding:0;border-left:4px solid var(--accent)">
+      <summary style="padding:var(--sp-5);cursor:pointer;list-style:none;
+                      display:flex;justify-content:space-between;align-items:center;
+                      user-select:none;gap:var(--sp-4)">
+        <div>
+          <div style="font-size:1.1rem;font-weight:700;letter-spacing:.1em;
+                      text-transform:uppercase;color:var(--accent);margin-bottom:var(--sp-1)">
+            <span class="fr-only">Étudiant·e·s qui rejoignent le hub — stage en organisation partenaire non trouvé</span>
+            <span class="en-only">Students joining the hub — no company internship found yet</span>
+          </div>
+          <div style="font-size:1.6rem;font-weight:700">
+            <span class="fr-only">S'inscrire au stage pôle INNOVATION hub</span>
+            <span class="en-only">Joining the INNOVATION hub internship program</span>
+          </div>
+          <div style="font-size:1.35rem;color:var(--text-muted);margin-top:var(--sp-1)">
+            <span class="fr-only">Démarches supplémentaires obligatoires, en plus de l'utilisation du journal.</span>
+            <span class="en-only">Additional required steps, on top of using the journal.</span>
+          </div>
+        </div>
+        <span class="details-arrow" style="font-size:1.2rem;color:var(--text-muted);
+              flex-shrink:0;transition:transform .2s">▼</span>
+      </summary>
+      <div style="border-top:1px solid var(--border);padding:var(--sp-5)">
+        <div style="display:flex;flex-direction:column;gap:var(--sp-4)">
+
+          <!-- Documents accordion -->
+          <h3 style="font-size:1.6rem;font-weight:700;margin-bottom:var(--sp-1)">
+            <span class="fr-only">Les documents de stage</span>
+            <span class="en-only">Internship documents</span>
+          </h3>
+          <p style="font-size:1.4rem;color:var(--text-muted);margin-bottom:var(--sp-3);line-height:1.6">
+            <span class="fr-only">Tu recevras ces documents de l'administration. Lis attentivement leurs rôles et leur chronologie avant de commencer les démarches.</span>
+            <span class="en-only">You will receive these documents from the administration. Read their roles and timeline carefully before starting the steps.</span>
+          </p>
+          <div style="display:flex;flex-direction:column;gap:var(--sp-2);margin-bottom:var(--sp-5)">
+
+            <details class="card" style="padding:0;background:var(--bg-subtle)">
+              <summary style="padding:var(--sp-3) var(--sp-4);cursor:pointer;list-style:none;
+                              display:flex;justify-content:space-between;align-items:center;user-select:none">
+                <span style="font-size:1.4rem;font-weight:600">
+                  <span style="color:var(--accent);margin-right:var(--sp-2)">A —</span>
+                  <span class="fr-only">Informations générales sur le stage (pour l'étudiant·e)</span>
+                  <span class="en-only">General internship information (for the student)</span>
+                </span>
+                <span class="details-arrow" style="font-size:1.1rem;color:var(--text-muted);transition:transform .2s">▼</span>
+              </summary>
+              <div style="padding:0 var(--sp-4) var(--sp-4);font-size:1.35rem;color:var(--text-muted);line-height:1.6;border-top:1px solid var(--border)"><br>
+                <span class="fr-only">Reçu par MIO (Omnivox) <strong>avant le début de la session</strong>. Contient les règles, attentes, procédures et la <strong>date limite de soumission du document C</strong>. Lis-le attentivement dès réception.</span>
+                <span class="en-only">Received by MIO (Omnivox) <strong>before the start of the session</strong>. Contains rules, expectations, procedures, and the <strong>document C submission deadline</strong>. Read it carefully upon receipt.</span>
+              </div>
+            </details>
+
+            <details class="card" style="padding:0;background:var(--bg-subtle)">
+              <summary style="padding:var(--sp-3) var(--sp-4);cursor:pointer;list-style:none;
+                              display:flex;justify-content:space-between;align-items:center;user-select:none">
+                <span style="font-size:1.4rem;font-weight:600">
+                  <span style="color:var(--accent);margin-right:var(--sp-2)">B —</span>
+                  <span class="fr-only">Informations générales sur le stage (pour l'organisation partenaire)</span>
+                  <span class="en-only">General internship information (for the partner organization)</span>
+                </span>
+                <span class="details-arrow" style="font-size:1.1rem;color:var(--text-muted);transition:transform .2s">▼</span>
+              </summary>
+              <div style="padding:0 var(--sp-4) var(--sp-4);font-size:1.35rem;color:var(--text-muted);line-height:1.6;border-top:1px solid var(--border)"><br>
+                <span class="fr-only">Reçu par MIO (Omnivox) en même temps que le document A. Destiné à l'organisation partenaire. <strong>La page 2 indique le nom du programme, les dates de début et de fin, et le nombre total d'heures</strong> — tu en auras besoin pour configurer ton journal et pour la discussion avec l'administration du hub.</span>
+                <span class="en-only">Received by MIO (Omnivox) at the same time as document A. Intended for the partner organization. <strong>Page 2 shows the program name, start and end dates, and total hours</strong> — you will need this to set up your journal and for the discussion with the hub administration.</span>
+              </div>
+            </details>
+
+            <details class="card" style="padding:0;background:var(--bg-subtle)">
+              <summary style="padding:var(--sp-3) var(--sp-4);cursor:pointer;list-style:none;
+                              display:flex;justify-content:space-between;align-items:center;user-select:none">
+                <span style="font-size:1.4rem;font-weight:600">
+                  <span style="color:var(--accent);margin-right:var(--sp-2)">C —</span>
+                  <span class="fr-only">Informations sur le milieu de stage (à compléter par l'étudiant·e)</span>
+                  <span class="en-only">Internship workplace information (to be completed by the student)</span>
+                </span>
+                <span class="details-arrow" style="font-size:1.1rem;color:var(--text-muted);transition:transform .2s">▼</span>
+              </summary>
+              <div style="padding:0 var(--sp-4) var(--sp-4);font-size:1.35rem;color:var(--text-muted);line-height:1.6;border-top:1px solid var(--border)"><br>
+                <span class="fr-only">Reçu par <strong>courriel personnel</strong> quelques semaines après le début de la session. À compléter et soumettre via <strong>Adobe Sign</strong> avant la date limite du document A. <a href="https://lcieducation-my.sharepoint.com/:w:/g/personal/elisa_schaeffer_collegelasalle_com/IQBINWvaq7OzR4mw3pMQZ4qvAdJ9LR3t9Rtk4N1FfMjOc6A?e=hxQaZt" target="_blank" rel="noopener">Instructions ici.</a></span>
+                <span class="en-only">Received by <strong>personal email</strong> a few weeks after the start of the session. Must be completed and submitted via <strong>Adobe Sign</strong> before the deadline in document A. <a href="https://lcieducation-my.sharepoint.com/:w:/g/personal/elisa_schaeffer_collegelasalle_com/IQBINWvaq7OzR4mw3pMQZ4qvAdJ9LR3t9Rtk4N1FfMjOc6A?e=hxQaZt" target="_blank" rel="noopener">Instructions here.</a></span>
+              </div>
+            </details>
+
+            <details class="card" style="padding:0;background:var(--bg-subtle)">
+              <summary style="padding:var(--sp-3) var(--sp-4);cursor:pointer;list-style:none;
+                              display:flex;justify-content:space-between;align-items:center;user-select:none">
+                <span style="font-size:1.4rem;font-weight:600">
+                  <span style="color:var(--accent);margin-right:var(--sp-2)">D —</span>
+                  <span class="fr-only">Contrat de stage (préparé par l'administration)</span>
+                  <span class="en-only">Internship contract (prepared by the administration)</span>
+                </span>
+                <span class="details-arrow" style="font-size:1.1rem;color:var(--text-muted);transition:transform .2s">▼</span>
+              </summary>
+              <div style="padding:0 var(--sp-4) var(--sp-4);font-size:1.35rem;color:var(--text-muted);line-height:1.6;border-top:1px solid var(--border)"><br>
+                <span class="fr-only">Préparé par l'administration après ta soumission du document C, puis envoyé par <strong>Adobe Sign</strong> pour signature par l'organisation partenaire, l'étudiant·e et le Collège LaSalle (Service emploi).</span>
+                <span class="en-only">Prepared by the administration after you submit document C, then sent via <strong>Adobe Sign</strong> for signature by the partner organization, the student, and Collège LaSalle (Employment Services).</span>
+                <br><br>
+                <div style="background:rgba(184,120,23,.1);border:1.5px solid #b87800;border-radius:var(--r-lg);
+                            padding:var(--sp-3) var(--sp-4);color:#7a4f00">
+                  <span class="fr-only">⏱ <strong>Délais à prévoir :</strong> au moins <strong>2 jours ouvrables</strong> pour la préparation du contrat après ta soumission du document C, puis au moins <strong>2 jours ouvrables supplémentaires</strong> pour la collecte de toutes les signatures. Ni l'administration ni l'équipe enseignante ne traitent les demandes en soirée, les fins de semaine ou les jours fériés.</span>
+                  <span class="en-only">⏱ <strong>Allow time:</strong> at least <strong>2 business days</strong> for the contract to be prepared after you submit document C, then at least <strong>2 more business days</strong> for all signatures to be collected. Neither the administration nor the teaching team process requests in the evenings, on weekends, or on holidays.</span>
+                </div>
+                <br>
+                <div style="background:rgba(255,107,112,.1);border:1.5px solid var(--danger);border-radius:var(--r-lg);
+                            padding:var(--sp-3) var(--sp-4);color:var(--danger)">
+                  <span class="fr-only">⚠ Vise à avoir le document D finalisé <strong>avant la date de début de ton stage</strong> pour éviter toute complication avec la validation de ton stage.</span>
+                  <span class="en-only">⚠ Aim to have document D finalized <strong>before your internship start date</strong> to avoid any complications with internship validation.</span>
+                </div>
+              </div>
+            </details>
+
+          </div>
+
+          <!-- Hub signup steps -->
+          <h3 style="font-size:1.6rem;font-weight:700;margin-bottom:var(--sp-3)">
+            <span class="fr-only">Étapes d'inscription au hub</span>
+            <span class="en-only">Hub registration steps</span>
+          </h3>
+          <div style="display:flex;flex-direction:column;gap:var(--sp-4)">
+
+            <div class="step-card" style="display:flex;gap:var(--sp-4);align-items:flex-start">
+              <div class="step-number" style="flex-shrink:0">1</div>
+              <div style="flex:1">
+                <div class="step-title"><span class="fr-only">Remplir le formulaire d'inscription</span><span class="en-only">Fill in the registration form</span></div>
+                <div class="step-body" style="margin-bottom:var(--sp-3)"><span class="fr-only">Obligatoire pour que l'équipe pédagogique puisse assurer le suivi de ton stage au hub.</span><span class="en-only">Required so the teaching team can follow your hub internship.</span></div>
+                <a href="https://forms.cloud.microsoft/r/EALWvR7eHv" target="_blank" rel="noopener" class="btn btn--primary btn--sm">
+                  <span class="fr-only">📋 Formulaire d'inscription — Stage pôle INNOVATION hub</span>
+                  <span class="en-only">📋 Registration form — Stage pôle INNOVATION hub</span>
+                </a>
+              </div>
+            </div>
+
+            <div class="step-card" style="display:flex;gap:var(--sp-4);align-items:flex-start">
+              <div class="step-number" style="flex-shrink:0">2</div>
+              <div style="flex:1">
+                <div class="step-title"><span class="fr-only">Remplir le formulaire RH</span><span class="en-only">Fill in the HR form</span></div>
+                <div class="step-body" style="margin-bottom:var(--sp-3)"><span class="fr-only">Requis pour le traitement administratif de ton stage.</span><span class="en-only">Required for the administrative processing of your internship.</span></div>
+                <a href="https://forms.cloud.microsoft/r/F3WY4PccAA" target="_blank" rel="noopener" class="btn btn--ghost btn--sm">
+                  <span class="fr-only">📋 Formulaire RH</span>
+                  <span class="en-only">📋 HR form</span>
+                </a>
+              </div>
+            </div>
+
+            <div class="step-card" style="display:flex;gap:var(--sp-4);align-items:flex-start">
+              <div class="step-number" style="flex-shrink:0">3</div>
+              <div style="flex:1">
+                <div class="step-title"><span class="fr-only">Remplir et soumettre le document C</span><span class="en-only">Complete and submit document C</span></div>
+                <div class="step-body" style="margin-bottom:var(--sp-3)"><span class="fr-only">À compléter via Adobe Sign avant la date limite indiquée dans le document A. Consulte les instructions si nécessaire.</span><span class="en-only">To be completed via Adobe Sign before the deadline shown in document A. See the instructions if needed.</span></div>
+                <a href="https://lcieducation-my.sharepoint.com/:w:/g/personal/elisa_schaeffer_collegelasalle_com/IQBINWvaq7OzR4mw3pMQZ4qvAdJ9LR3t9Rtk4N1FfMjOc6A?e=hxQaZt" target="_blank" rel="noopener" class="btn btn--ghost btn--sm">
+                  <span class="fr-only">📄 Instructions pour le document C</span>
+                  <span class="en-only">📄 Instructions for document C</span>
+                </a>
+              </div>
+            </div>
+
+            <div class="step-card" style="display:flex;gap:var(--sp-4);align-items:flex-start">
+              <div class="step-number" style="flex-shrink:0">4</div>
+              <div style="flex:1">
+                <div class="step-title"><span class="fr-only">Discuter de tes projets avec l'administration du hub</span><span class="en-only">Discuss your projects with the hub administration</span></div>
+                <div class="step-body"><span class="fr-only">Si tu n'as pas encore discuté de tes projets, envoie un <strong>seul</strong> message privé sur MS Teams contenant une capture d'écran de la <strong>page 2 de ton document B</strong> (nom du programme, dates du stage, nombre total d'heures), puis attends la réponse. Cela peut prendre plusieurs heures — ne relance pas avant la fin des heures de bureau.</span><span class="en-only">If you have not yet discussed your projects, send a <strong>single</strong> private message on MS Teams containing a screenshot of <strong>page 2 of your document B</strong> (program name, internship dates, total hours), then wait for a response. It may take several hours — do not follow up before the end of business hours.</span></div>
+              </div>
+            </div>
+
+            <div class="step-card" style="display:flex;gap:var(--sp-4);align-items:flex-start">
+              <div class="step-number" style="flex-shrink:0">5</div>
+              <div style="flex:1">
+                <div class="step-title"><span class="fr-only">Configurer ton journal de stage</span><span class="en-only">Set up your internship journal</span></div>
+                <div class="step-body" style="margin-bottom:var(--sp-3)"><span class="fr-only">Une fois que tu connais tes projets. Les dates et la durée totale sont indiquées dans le document B.</span><span class="en-only">Once you know your projects. Dates and total duration are in document B.</span></div>
+                <a href="https://lci-mtl-acad-tech.github.io/outils/log/setup.html" class="btn btn--primary btn--sm">
+                  <span class="fr-only">⚙ Configurer mon journal →</span>
+                  <span class="en-only">⚙ Set up my journal →</span>
+                </a>
+              </div>
+            </div>
+
+            <div class="step-card" style="display:flex;gap:var(--sp-4);align-items:flex-start">
+              <div class="step-number" style="flex-shrink:0;background:var(--bg-subtle);color:var(--text-muted)">?</div>
+              <div style="flex:1">
+                <div class="step-title"><span class="fr-only">Des doutes ?</span><span class="en-only">Any doubts?</span></div>
+                <div class="step-body" style="margin-bottom:var(--sp-3)"><span class="fr-only">Consulte la FAQ avant de contacter l'équipe pédagogique.</span><span class="en-only">Check the FAQ before contacting the teaching team.</span></div>
+                <a href="https://lci-mtl-acad-tech.github.io/outils/log/faq.html" target="_blank" rel="noopener" class="btn btn--ghost btn--sm">
+                  <span class="fr-only">❓ Consulter la FAQ</span>
+                  <span class="en-only">❓ View the FAQ</span>
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </details>
+
+  </div>
+</section>
+
+<!-- ── FAQ ───────────────────────────────────────────────────── -->
+<section class="intro-section" style="background:var(--bg-subtle)">
+  <div class="intro-section-inner" style="max-width:64rem">
+    <div class="intro-label">FAQ</div>
+    <h2 class="intro-h2">
+      <span class="fr-only">Questions fréquentes</span>
+      <span class="en-only">Frequently asked questions</span>
+    </h2>
+
+    <div class="faq-item">
+      <div class="faq-q">
+        <span class="fr-only">Est-ce que mes données sont envoyées quelque part ?</span>
+        <span class="en-only">Is my data sent anywhere?</span>
+      </div>
+      <div class="faq-a">
+        <span class="fr-only">Non. Tout reste dans ton navigateur (localStorage). Rien n'est envoyé à un serveur automatiquement. C'est toi qui choisis quand et où exporter tes fichiers.</span>
+        <span class="en-only">No. Everything stays in your browser (localStorage). Nothing is sent to a server automatically. You decide when and where to export your files.</span>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">
+        <span class="fr-only">Je change d'ordinateur — comment récupérer mes données ?</span>
+        <span class="en-only">I'm switching computers — how do I get my data back?</span>
+      </div>
+      <div class="faq-a">
+        <span class="fr-only">Exporte ta configuration et tes journaux depuis l'ancien appareil. Sur le nouvel appareil, ouvre la page Configuration et utilise le bouton « Importer sur cet appareil » pour recharger ton fichier JSON.</span>
+        <span class="en-only">Export your configuration and logs from the old device. On the new device, open the Setup page and use the "Import on this device" button to reload your JSON file.</span>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">
+        <span class="fr-only">Est-ce que ça marche sur téléphone ?</span>
+        <span class="en-only">Does it work on mobile?</span>
+      </div>
+      <div class="faq-a">
+        <span class="fr-only">Oui, l'interface est adaptée aux écrans mobiles. L'export de fichiers peut varier selon le navigateur mobile utilisé.</span>
+        <span class="en-only">Yes, the interface is adapted for mobile screens. File export behaviour may vary depending on your mobile browser.</span>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">
+        <span class="fr-only">J'ai fait une erreur dans ma configuration — je peux corriger ?</span>
+        <span class="en-only">I made a mistake in my setup — can I fix it?</span>
+      </div>
+      <div class="faq-a">
+        <span class="fr-only">Oui. Retourne sur la page Configuration à tout moment et utilise les boutons « Modifier le profil » ou « Dates et horaire » pour corriger ce que tu veux. Les modifications sont sauvegardées immédiatement.</span>
+        <span class="en-only">Yes. Go back to the Setup page at any time and use the "Edit profile" or "Dates and schedule" buttons to fix what you need. Changes are saved immediately.</span>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">
+        <span class="fr-only">Mon·ma enseignant·e ne me voit pas dans le tableau de bord — pourquoi ?</span>
+        <span class="en-only">My teacher doesn't see me in the dashboard — why?</span>
+      </div>
+      <div class="faq-a">
+        <span class="fr-only">Deux raisons possibles : tu n'as pas encore exporté de fichier JSON dans le dossier partagé, ou le nom de ton enseignant·e dans ta configuration ne correspond pas exactement à ce que ton·ta prof a entré dans son tableau. Vérifie l'orthographe dans ta page Configuration.</span>
+        <span class="en-only">Two possible reasons: you haven't exported a JSON file to the shared folder yet, or the teacher name in your setup doesn't exactly match what your teacher entered in their dashboard. Check the spelling on your Setup page.</span>
+      </div>
+    </div>
+
+    <div class="faq-item" style="border-bottom:none">
+      <div class="faq-q">
+        <span class="fr-only">Où est le dossier partagé pour déposer mes fichiers ?</span>
+        <span class="en-only">Where is the shared folder to drop my files?</span>
+      </div>
+      <div class="faq-a">
+        <span class="fr-only">Ton·ta enseignant·e t'a transmis le lien OneDrive. Si tu l'as perdu, demande-le-lui directement.</span>
+        <span class="en-only">Your teacher shared the OneDrive link with you. If you've lost it, ask them directly.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA strip ──────────────────────────────────────────────── -->
+
+  <h2 style="font-size:clamp(2rem,3vw,3rem);font-weight:700;letter-spacing:-.02em;margin-bottom:var(--sp-4)">
+    <span class="fr-only">Prêt·e à commencer ?</span>
+    <span class="en-only">Ready to start?</span>
+  </h2>
+  <p style="font-size:1.5rem;color:var(--text-muted);max-width:48rem;margin:0 auto var(--sp-6);line-height:1.5">
+    <span class="fr-only">La configuration prend environ 5 minutes. Ton premier journal quotidien peut être créé dans les 5 minutes qui suivent.</span>
+    <span class="en-only">Setup takes about 5 minutes. Your first daily log can be created in the 5 minutes after that.</span>
+  </p>
+  <a href="index.html" class="btn btn--primary"
+    style="font-size:1.6rem;padding:var(--sp-3) var(--sp-8);display:inline-block">
+    <span class="fr-only">Configurer mon journal →</span>
+    <span class="en-only">Set up my journal →</span>
+  </a>
+</div>
+
+<script src="lang.js?v=20260522"></script>
+<script src="app.js?v=20260522"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  initPage();
+
+  // Rotate arrows on all details elements
+  document.querySelectorAll("details").forEach(d => {
+    d.addEventListener("toggle", () => {
+      const arrow = d.querySelector(":scope > summary .details-arrow");
+      if (arrow) arrow.style.transform = d.open ? "rotate(180deg)" : "";
+    });
+    // Set initial state for any open by default
+    if (d.open) {
+      const arrow = d.querySelector(":scope > summary .details-arrow");
+      if (arrow) arrow.style.transform = "rotate(180deg)";
+    }
+  });
+
+  // Keep the data-lang attribute on <body> in sync with the active language
+  // so fr-only / en-only visibility works without lang.js rewrite.
+  function syncLangAttr() {
+    document.body.setAttribute("data-lang",
+      document.documentElement.lang?.startsWith("fr") ? "fr" : "en");
+  }
+  syncLangAttr();
+
+  // Re-sync when lang changes (MutationObserver on <html lang>)
+  new MutationObserver(syncLangAttr)
+    .observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
+});
+</script>
+</body>
+</html>
