@@ -313,7 +313,13 @@ function loadFiles(fileList) {
       if (grp.length === 1) {
         base = grp[0];
       } else {
-        const merged = mergeInternshipFiles(grp);
+        let merged;
+        try {
+          merged = mergeInternshipFiles(grp);
+        } catch (e) {
+          console.error(`[LCI Hub] mergeInternshipFiles threw for UUID ${uid} — using first file as fallback.`, e);
+          merged = { valid: false, errors: [e.message], warnings: [], data: grp[0] };
+        }
         if (merged.valid) {
           base = merged.data;
         } else {

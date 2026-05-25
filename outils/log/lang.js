@@ -574,6 +574,7 @@ const LANG = {
 
     // ── Validation & Errors ──────────────────────────────────
     "error.merge_uuid":       "Impossible de fusionner : les fichiers proviennent de comptes différents.",
+    "error.merge_no_main":    "Aucun fichier principal valide trouvé. Le fichier est peut-être corrompu ou vide.",
     "error.config_not_log":    "Ce fichier est une configuration, pas un journal. Utilise 'Changer d'ordinateur' sur la page de configuration.",
     "error.not_config":       "Ce fichier n'est pas un fichier de configuration valide.",
     "error.field_required":     "Ce champ est obligatoire.",
@@ -1263,6 +1264,7 @@ const LANG = {
     "setup.project_challenges":         "What challenges do you anticipate?",
     "setup.situation_before":           "What was the situation before you arrived? What problem or opportunity does this internship address?",
     "error.merge_uuid":       "These files belong to different students. Upload files for one student at a time.",
+    "error.merge_no_main":    "No valid main file found. The file may be corrupted or empty.",
     "error.config_not_log":   "This file is a configuration, not a log. Use \'Switch computer\' on the setup page.",
     "error.not_config":       "This file is not a valid configuration file.",
     "error.field_required":     "This field is required.",

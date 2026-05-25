@@ -793,6 +793,10 @@ function mergeInternshipFiles(files) {
   }
 
   // Use latest main file as base
+  if (!mainFiles.length) {
+    result.errors.push("error.merge_no_main");
+    return result;
+  }
   mainFiles.sort((a, b) => new Date(b.meta.last_modified) - new Date(a.meta.last_modified));
   const base = JSON.parse(JSON.stringify(mainFiles[0]));
 
