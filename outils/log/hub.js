@@ -593,9 +593,17 @@ function buildRow(data) {
     ? (() => {
         const totalMins   = sumExpectedMinutes(startDate, endDate);
         const elapsedMins = sumExpectedMinutes(startDate, yesterdayISO);
-        return totalMins > 0
-          ? +(totalTarget * (elapsedMins / totalMins)).toFixed(1)
-          : 0;
+        if (totalMins > 0) {
+          return +(totalTarget * (elapsedMins / totalMins)).toFixed(1);
+        }
+        // Fallback: schedule not configured — use linear interpolation over calendar days
+        if (startDate && endDate && endDate > startDate) {
+          const totalDays   = (new Date(endDate)      - new Date(startDate))   / 86400000;
+          const elapsedDays = (new Date(yesterdayISO) - new Date(startDate))   / 86400000;
+          const ratio       = Math.min(1, Math.max(0, elapsedDays / totalDays));
+          return +(totalTarget * ratio).toFixed(1);
+        }
+        return 0;
       })()
     : +(sumExpectedMinutes(startDate, yesterdayISO) / 60).toFixed(1);
 
@@ -1264,39 +1272,46 @@ function renderAWOL() {
   const lang = getCurrentLang();
   const isFr = lang === "fr-CA";
 
-  document.getElementById("awol-title").textContent = awol.length === 1
-    ? (isFr ? "1 étudiant·e absent·e sans journal (jours ouvrables)" : "1 student absent without a log (working days)")
-    : (isFr ? `${awol.length} étudiant·e·s absent·e·s sans journal (jours ouvrables)` : `${awol.length} students absent without a log (working days)`);
+  const groups = [
+    {
+      key: "awol",
+      students: awol.filter(s => s.working_days_absent >= AWOL_WORK_DAYS),
+      badge: "⛔ AWOL",
+      color: "var(--danger)",
+      border: "rgba(255,107,112,.3)",
+      label: isFr ? "AWOL — 4+ jours ouvrables sans journal" : "AWOL — 4+ working days without a log",
+    },
+    {
+      key: "late",
+      students: awol.filter(s => s.working_days_absent >= 3 && s.working_days_absent < AWOL_WORK_DAYS),
+      badge: isFr ? "⚠ En retard" : "⚠ Late",
+      color: "var(--warning)",
+      border: "rgba(230,184,48,.3)",
+      label: isFr ? "En retard — 3 jours ouvrables sans journal" : "Late — 3 working days without a log",
+    },
+    {
+      key: "mia",
+      students: awol.filter(s => s.working_days_absent >= MIA_WORK_DAYS && s.working_days_absent < 3),
+      badge: "⚠ MIA",
+      color: "var(--text-muted)",
+      border: "rgba(100,100,100,.2)",
+      label: isFr ? "MIA — 2 jours ouvrables sans journal" : "MIA — 2 working days without a log",
+    },
+  ].filter(g => g.students.length);
 
-  document.getElementById("awol-subtitle").textContent =
-    isFr ? "Jours = jours ouvrables prévus sans entrée de journal (congés planifiés exclus)."
-          : "Days = scheduled working days with no log entry (planned absences excluded).";
-
-  document.getElementById("awol-list").innerHTML = awol.map(s => {
+  function renderRow(s, color) {
     const wda = s.working_days_absent;
-    const severity = wda >= AWOL_WORK_DAYS ? "var(--danger)"
-      : wda >= 3                           ? "var(--warning)"
-      : "var(--text-muted)";
-    const badge = wda >= AWOL_WORK_DAYS
-      ? "⛔ AWOL"
-      : wda >= 3 ? "⚠ " + (isFr ? "En retard" : "Late")
-      :            "⚠ MIA";
-
-    // Show planned absences count if any — explains why fewer calendar days flagged
     const absenceCtx  = s.raw?.context?.planned_absences;
     const absenceNote = absenceCtx?.length
       ? `<span style="font-size:1.1rem;color:var(--text-subtle)">
            (${absenceCtx.length} ${isFr ? "congé·s planifié·s" : "planned absence·s"})
          </span>` : "";
-
     const lastPlan = s.last_plan
       ? `<span style="font-size:1.2rem;color:var(--text-subtle)"> · ${isFr ? "Planifié" : "Planned"} : ${escHtml(s.last_plan.text.slice(0, 60))}${s.last_plan.text.length > 60 ? "…" : ""}</span>`
       : "";
-
     return `
       <div style="display:flex;align-items:center;gap:var(--sp-4);
-                  padding:var(--sp-3) 0;border-bottom:1px solid rgba(255,107,112,.2)">
-        <span style="color:${severity};font-weight:700;width:6rem;flex-shrink:0">${badge}</span>
+                  padding:var(--sp-3) 0;border-bottom:1px solid ${color.replace(')', ',.2)').replace('var(', 'rgba(0,0,0,')}">
         <div style="flex:1;min-width:0">
           <button onclick="openStudentPanel('${escHtml(s.uuid)}')"
             style="background:none;border:none;cursor:pointer;font:inherit;font-size:1.4rem;
@@ -1308,7 +1323,7 @@ function renderAWOL() {
           ${absenceNote}${lastPlan}
         </div>
         <div style="text-align:right;flex-shrink:0">
-          <div style="color:${severity};font-weight:700;font-size:1.5rem">
+          <div style="color:${color};font-weight:700;font-size:1.5rem">
             ${wda} ${isFr ? "j. ouv." : "work day·s"}
           </div>
           <div style="color:var(--text-subtle);font-size:1.2rem">
@@ -1317,7 +1332,43 @@ function renderAWOL() {
         </div>
         ${s.email ? `<a href="mailto:${escHtml(s.email)}" class="btn btn--ghost btn--sm" style="flex-shrink:0">✉</a>` : ""}
       </div>`;
-  }).join("");
+  }
+
+  const subtitle = isFr
+    ? "Jours = jours ouvrables prévus sans entrée de journal (congés planifiés exclus)."
+    : "Days = scheduled working days with no log entry (planned absences excluded).";
+
+  document.getElementById("awol-title").textContent = awol.length === 1
+    ? (isFr ? "1 étudiant·e absent·e sans journal" : "1 student absent without a log")
+    : (isFr ? `${awol.length} étudiant·e·s absent·e·s sans journal` : `${awol.length} students absent without a log`);
+  document.getElementById("awol-subtitle").textContent = subtitle;
+
+  document.getElementById("awol-list").innerHTML = groups.map(g => `
+    <details style="margin-bottom:var(--sp-2)" ${g.key === "awol" ? "open" : ""}>
+      <summary style="list-style:none;cursor:pointer;user-select:none;
+                      display:flex;align-items:center;gap:var(--sp-3);
+                      padding:var(--sp-2) 0;font-size:1.4rem;font-weight:600;
+                      color:${g.color}">
+        <summary style="display:none"></summary>
+        <span style="min-width:3rem">${g.students.length}</span>
+        <span>${g.label}</span>
+        <span style="font-size:1.1rem;margin-left:auto;color:var(--text-muted)" class="awol-arrow">▼</span>
+      </summary>
+      <div style="padding-left:var(--sp-2)">
+        ${g.students.map(s => renderRow(s, g.color)).join("")}
+      </div>
+    </details>`
+  ).join("");
+
+  // Arrow rotation
+  document.querySelectorAll("#awol-list details").forEach(d => {
+    d.addEventListener("toggle", () => {
+      const arrow = d.querySelector(".awol-arrow");
+      if (arrow) arrow.style.transform = d.open ? "rotate(180deg)" : "";
+    });
+    const arrow = d.querySelector(".awol-arrow");
+    if (arrow && d.open) arrow.style.transform = "rotate(180deg)";
+  });
 }
 
 function copyAWOLEmails() {
@@ -1350,8 +1401,8 @@ function renderHoursChart() {
   });
 
   const isDark   = document.documentElement.getAttribute("data-theme") === "dark";
-  const barColors  = { green: "#3a6e00", amber: "#9a6c00", red: "#a00",    none: "var(--accent)" };
-  const darkColors = { green: "#8ab840", amber: "#e6b830", red: "#ff6b70", none: "var(--accent)" };
+  const barColors  = { green: "#3a6e00", amber: "#9a6c00", red: "#a00",    none: "#6b7280" };
+  const darkColors = { green: "#8ab840", amber: "#e6b830", red: "#ff6b70", none: "#9ca3af" };
   const cols = isDark ? darkColors : barColors;
 
   const maxH = Math.max(...sorted.map(s => Math.max(s.actual_hours, s.expected_hours, 1)));
@@ -2477,9 +2528,12 @@ function renderMonthGridView() {
       </div>`;
     })() : "";
 
-    const msEmojis = ms.map(m => m.emoji).join("");
-    const msTip    = ms.map(m => `${m.emoji} ${m.title} — ${m.projectName}`).join("\n");
-    const msHTML   = ms.length ? `<div style="font-size:1.1rem;line-height:1.2;letter-spacing:-1px">${msEmojis}</div>` : "";
+    const msHTML = ms.length
+      ? `<div style="font-size:1.1rem;line-height:1.2;letter-spacing:-1px">${
+          ms.map(m => `<span title="${escHtml(`${m.emoji} ${m.title} — ${m.projectName}`)}"
+            style="cursor:default">${m.emoji}</span>`).join("")
+        }</div>`
+      : "";
 
     const statsHTML = inRange && st.n > 0
       ? `<div style="font-size:1.1rem;color:var(--text-muted);margin-top:2px">
@@ -2500,7 +2554,6 @@ function renderMonthGridView() {
       st.onsite ? `${isFr ? "Présentiel" : "Onsite"}: ${st.onsite}` : "",
       st.remote ? `${isFr ? "Télétravail" : "Remote"}: ${st.remote}` : "",
       st.hybrid ? `${isFr ? "Mixte" : "Hybrid"}: ${st.hybrid}` : "",
-      msTip,
     ].filter(Boolean).join("\n");
 
     return `
