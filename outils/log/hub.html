@@ -207,7 +207,13 @@
         </div>
         <input type="file" id="file-input-hub" accept=".json" multiple style="display:none"
           onchange="loadFiles(this.files)">
-        <div class="flex gap-2">
+        <div class="flex gap-2" style="align-items:center;flex-wrap:wrap">
+          <label style="display:flex;align-items:center;gap:var(--sp-2);
+                        font-size:1.3rem;color:var(--text-muted);cursor:pointer;
+                        user-select:none;margin-right:var(--sp-3)">
+            <input type="checkbox" id="chk-replace-mode" style="width:1.4rem;height:1.4rem;cursor:pointer">
+            <span data-i18n="hub.replace_mode">Remplacer les données existantes</span>
+          </label>
           <button class="btn btn--ghost btn--sm" onclick="exportCSV()" id="btn-csv"
             style="display:none">⬇ CSV</button>
           <button class="btn btn--ghost btn--sm" onclick="clearAll()" id="btn-clear"

@@ -112,6 +112,14 @@ function loadFiles(fileList) {
   const files = Array.from(fileList).filter(f => f.name.endsWith(".json"));
   if (!files.length) return;
 
+  // Replace mode: clear all existing data before loading the new batch
+  if (document.getElementById("chk-replace-mode")?.checked) {
+    students = [];
+    filtered = [];
+    hubMilestones = {};
+    console.info("[LCI Hub] Replace mode — cleared existing data before loading new files.");
+  }
+
   const readers = files.map(f => new Promise(res => {
     const r = new FileReader();
     r.onload = e => {
