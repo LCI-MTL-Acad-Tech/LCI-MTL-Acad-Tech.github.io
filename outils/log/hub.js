@@ -3,6 +3,7 @@
 // All state lives in memory and is gone on refresh.
 
 let students = [];        // all built rows
+let hubMilestones = {};   // { [project_id]: { exported_at, project } } — loaded from uploaded milestone files
 // Pairs dismissed as "not the same person" — key is "uuidA|uuidB" (sorted)
 const dismissedDupPairs = new Set(
   JSON.parse(sessionStorage.getItem("hub_dismissed_dups") || "[]")
@@ -98,6 +99,7 @@ function detectFileType(d) {
   if (type === "reflection") return "reflection";
   if (type === "weekly")     return "weekly";
   if (type === "full")       return "full";
+  if (type === "milestones") return "milestones";
   if (!d.profile?.full_name) return "unknown";
   if (d.reflection && !d.logs?.length) return "reflection";
   if (d.logs?.length > 1)   return "weekly"; // merged multi-day
@@ -138,7 +140,20 @@ function loadFiles(fileList) {
       });
 
     // Separate config files from log/report files
-    const configFiles = enriched.filter(p => p.type === "config");
+    const configFiles    = enriched.filter(p => p.type === "config");
+    const milestoneFiles = enriched.filter(p => p.type === "milestones");
+
+    // Merge milestone files into the hub milestone store
+    if (milestoneFiles.length) {
+      milestoneFiles.forEach(p => {
+        (p.data.projects || []).forEach(project => {
+          if (!project?.id) return;
+          hubMilestones[project.id] = { exported_at: p.data.meta?.exported_at, project };
+        });
+        console.info(`[LCI Hub] Loaded milestones from "${p.name}" (${(p.data.projects||[]).length} project(s))`);
+      });
+    }
+
     const valid = enriched.filter(p => {
       if (p.type === "unknown") {
         console.warn(`[LCI Hub] "${p.name}" → type "unknown": no profile.full_name and no recognized meta.type.`, {
@@ -148,7 +163,8 @@ function loadFiles(fileList) {
         });
         return false;
       }
-      if (p.type === "config") return false; // handled separately
+      if (p.type === "config")     return false; // handled separately
+      if (p.type === "milestones") return false; // handled above
       if (!p.data.profile?.full_name) {
         console.warn(`[LCI Hub] "${p.name}" → skipped: missing profile.full_name.`, p.data.profile);
         return false;
@@ -2407,7 +2423,7 @@ function renderMonthGridView() {
 
   const milestonesByDate = {};
   try {
-    Object.values(loadMilestones()).forEach(({ project }) => {
+    Object.values(Object.keys(hubMilestones).length ? hubMilestones : loadMilestones()).forEach(({ project }) => {
       const emoji = project.emoji || "\uD83D\uDEA9";
       (project.milestones || []).forEach(m => {
         if (!m.date) return;
@@ -2744,7 +2760,7 @@ function renderCalendarView() {
   // Build a lookup: date → array of { emoji, title, projectName }
   const milestonesByDate = {};
   try {
-    const ms = loadMilestones(); // { [project_id]: { project } }
+    const ms = Object.keys(hubMilestones).length ? hubMilestones : loadMilestones(); // prefer uploaded milestone files
     Object.values(ms).forEach(({ project }) => {
       const emoji = project.emoji || "🚩";
       (project.milestones || []).forEach(m => {
