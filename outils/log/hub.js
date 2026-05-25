@@ -430,7 +430,10 @@ function loadFiles(fileList) {
       file_types: s.file_type_counts,
     })));
     if (nC)       console.info(`Config files applied: ${nC}`);
-    if (nUnknown) console.warn(`Files of unknown type (skipped): ${nUnknown}`);
+    if (nUnknown) {
+      const unknownNames = enriched.filter(p => p.type === "unknown").map(p => p.name);
+      console.warn(`[LCI Hub] ${nUnknown} file(s) of unknown type skipped:`, unknownNames);
+    }
     if (nFailed)  console.error(`Files that failed to parse: ${nFailed}`);
     console.groupEnd();
 
