@@ -3,6 +3,10 @@
 // All state lives in memory and is gone on refresh.
 
 let students = [];        // all built rows
+// Pairs dismissed as "not the same person" — key is "uuidA|uuidB" (sorted)
+const dismissedDupPairs = new Set(
+  JSON.parse(sessionStorage.getItem("hub_dismissed_dups") || "[]")
+);
 let filtered  = [];       // after filters
 let sortCol   = "track_pct";
 let sortDir   = 1;
@@ -246,9 +250,21 @@ function loadFiles(fileList) {
     // content: within the same UUID, if one file's log_ids are a subset of
     // another's (and the other is newer by meta.last_modified), discard the older.
     const deduped = (() => {
+      // Derive a stable group key for a parsed file.
+      // Priority: meta.student_uuid → student_id from profile → student ID parsed
+      // from filename (pattern: {digits}_{date}... or {digits}_weekly_...) → filename.
+      function groupKey(p) {
+        const raw = p.data.meta?.student_uuid || p.data.profile?.student_id;
+        if (raw) return normId(raw) || raw;
+        // Try to extract leading digits from filename (e.g. "202411884_2026-05-22_r1.json")
+        const m = p.name.match(/^(\d{5,10})[_\-]/);
+        if (m) return normId(m[1]) || m[1];
+        return p.name;
+      }
+
       const byUID = {};
       valid.forEach(p => {
-        const uid = p.data.meta?.student_uuid || p.data.profile?.student_id || p.name;
+        const uid = groupKey(p);
         (byUID[uid] = byUID[uid] || []).push(p);
       });
 
@@ -290,11 +306,16 @@ function loadFiles(fileList) {
     const byUUID     = {};
     const typesByUUID = {};
 
-    deduped.forEach(({ data: d, type }) => {
-      const rawUid = d.meta?.student_uuid || d.profile?.student_id || Math.random().toString();
-      // Normalise IDs that look like student numbers (all digits, 5-9 chars) to
-      // strip a leading "20" so "2012345" and "12345" group together.
-      const uid = /^\d{7,9}$/.test(rawUid) ? normId(rawUid) : rawUid;
+    deduped.forEach(({ data: d, type, name }) => {
+      const rawUid = d.meta?.student_uuid || d.profile?.student_id;
+      let uid;
+      if (rawUid) {
+        uid = /^\d{7,9}$/.test(rawUid) ? normId(rawUid) : rawUid;
+      } else {
+        // Fall back to student ID parsed from filename
+        const m = name.match(/^(\d{5,10})[_\-]/);
+        uid = m ? normId(m[1]) : name;
+      }
       (byUUID[uid] = byUUID[uid] || []).push(d);
       const c = (typesByUUID[uid] = typesByUUID[uid] || { daily:0, weekly:0, full:0, reflection:0, config:0 });
       if (type in c) c[type]++;
@@ -912,58 +933,103 @@ function normId(id) {
 
 // Find pairs of student rows that are likely the same person.
 // Returns array of { a, b, reason } where a/b are row indices in `students`.
+// Return sorted word-set of a normalised name string for order-independent comparison.
+function nameWords(normName) {
+  return normName.split(' ').filter(Boolean).sort();
+}
+// True if arrays contain the same elements.
+function arraysEqual(a, b) {
+  return a.length === b.length && a.every((v, i) => v === b[i]);
+}
+// True if a is a non-empty proper subset of b.
+function isSubset(a, b) {
+  if (!a.length || !b.length || a.length >= b.length) return false;
+  return a.every(w => b.includes(w));
+}
+
 function findProbableDuplicates() {
   const pairs = [];
   for (let i = 0; i < students.length; i++) {
     for (let j = i + 1; j < students.length; j++) {
       const si = students[i], sj = students[j];
       const ni = normStr(si.name), nj = normStr(sj.name);
+      const wi = nameWords(ni), wj = nameWords(nj);
       const ii = normId(si.raw?.profile?.student_id);
       const ij = normId(sj.raw?.profile?.student_id);
+      const idsMatch       = !!(ii && ij && ii === ij);
+      const namesExact     = !!(ni && nj && ni === nj);
+      const namesReordered = !!(ni && nj && wi.length > 0 && wj.length > 0 && arraysEqual(wi, wj) && !namesExact);
+      const namesSubset    = !!(ni && nj && (isSubset(wi, wj) || isSubset(wj, wi)));
 
-      // 1. Same student ID (numeric match)
-      if (ii && ij && ii === ij) {
-        pairs.push({ i, j, reason: "same_id" }); continue;
+      // AUTO-MERGE: IDs match + names same words in any order, or one name is subset of the other
+      if (idsMatch && (namesReordered || namesSubset)) {
+        pairs.push({ i, j, reason: "auto_name_order", autoMerge: true }); continue;
       }
 
-      // 2. Student IDs differ by exactly 1 character (transposition or typo)
-      if (ii && ij && ii.length === ij.length && levenshtein(ii, ij, 1) === 1) {
-        pairs.push({ i, j, reason: "id_typo" }); continue;
+      // FLAG for review: IDs match but names not clearly related
+      if (idsMatch) {
+        pairs.push({ i, j, reason: "same_id", autoMerge: false }); continue;
       }
 
-      // 3. Names are identical after normalisation
-      if (ni && nj && ni === nj) {
-        pairs.push({ i, j, reason: "same_name" }); continue;
+      // FLAG for review: names identical but IDs differ
+      if (namesExact) {
+        pairs.push({ i, j, reason: "same_name_diff_id", autoMerge: false }); continue;
       }
 
-      // 4. Names differ by ≤ 2 characters AND same cohort/program
-      if (ni && nj && levenshtein(ni, nj, 2) <= 2) {
-        const pi = si.raw?.profile?.program || si.program;
-        const pj = sj.raw?.profile?.program || sj.program;
-        if (pi && pj && pi === pj) {
-          pairs.push({ i, j, reason: "name_typo" }); continue;
-        }
-      }
+      // All other combinations (similar names + different IDs, ID typo + different names) — ignored
     }
   }
   return pairs;
 }
 
+function dupPairKey(uuidA, uuidB) {
+  return [uuidA, uuidB].sort().join("|");
+}
+
+function dismissDupPair(uuidA, uuidB) {
+  dismissedDupPairs.add(dupPairKey(uuidA, uuidB));
+  sessionStorage.setItem("hub_dismissed_dups", JSON.stringify([...dismissedDupPairs]));
+  renderDupStudentBanner();
+}
+
 function renderDupStudentBanner() {
   const banner = document.getElementById("hub-dup-student-banner");
   if (!banner) return;
-  const pairs = findProbableDuplicates();
-  if (!pairs.length) { banner.style.display = "none"; return; }
-
   const isFr = getCurrentLang() === "fr-CA";
+  const allPairs = findProbableDuplicates();
+
+  // Auto-merge silently before rendering
+  const autoMergePairs = allPairs.filter(p => p.autoMerge);
+  if (autoMergePairs.length) {
+    autoMergePairs.forEach(({ i, j }) => {
+      const si = students[i], sj = students[j];
+      if (!si || !sj) return;
+      const [base, donor] = si.log_count >= sj.log_count ? [si, sj] : [sj, si];
+      const logMap = new Map();
+      [...(base.raw.logs || []), ...(donor.raw.logs || [])].forEach(l => {
+        const ex = logMap.get(l.log_id);
+        if (!ex || l.revision > ex.revision) logMap.set(l.log_id, l);
+      });
+      base.raw.logs = [...logMap.values()].sort((a, b) => a.date.localeCompare(b.date));
+      const rebuilt = buildRow(base.raw);
+      students = students.filter(s => s.uuid !== base.uuid && s.uuid !== donor.uuid);
+      students.push(rebuilt);
+      console.info(`[LCI Hub] Auto-merged "${donor.name}" into "${base.name}" (same ID, name reorder/subset)`);
+    });
+    applyFilters(); // will re-run renderDupStudentBanner with fresh pairs
+    return;
+  }
+
+  const pairs = allPairs.filter(p => !p.autoMerge
+    && !dismissedDupPairs.has(dupPairKey(students[p.i]?.uuid, students[p.j]?.uuid))
+  );
+  if (!pairs.length) { banner.style.display = "none"; return; }
 
   const rows = pairs.map(({ i, j, reason }) => {
     const si = students[i], sj = students[j];
     const reasonLabel = {
-      same_id:   isFr ? "Même numéro étudiant·e"          : "Same student ID",
-      id_typo:   isFr ? "Numéro étudiant·e presque identique (faute probable)" : "Student ID nearly identical (likely typo)",
-      same_name: isFr ? "Même nom (après normalisation)"   : "Same name (after normalisation)",
-      name_typo: isFr ? "Nom très similaire + même programme (faute probable)" : "Very similar name + same program (likely typo)",
+      same_id:           isFr ? "Même numéro étudiant·e, noms différents"  : "Same student ID, different names",
+      same_name_diff_id: isFr ? "Nom identique, numéros différents"        : "Identical name, different student IDs",
     }[reason] || reason;
 
     return `
@@ -980,11 +1046,18 @@ function renderDupStudentBanner() {
             · ${isFr ? "Journaux" : "Logs"}: ${si.log_count} / ${sj.log_count}
           </div>
         </div>
-        <button class="btn btn--ghost btn--sm"
-          onclick="mergeStudents('${si.uuid}','${sj.uuid}')"
-          style="color:var(--accent)">
-          ${isFr ? "⇌ Fusionner" : "⇌ Merge"}
-        </button>
+        <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap">
+          <button class="btn btn--ghost btn--sm"
+            onclick="mergeStudents('${si.uuid}','${sj.uuid}')"
+            style="color:var(--accent)">
+            ${isFr ? "⇌ Fusionner" : "⇌ Merge"}
+          </button>
+          <button class="btn btn--ghost btn--sm"
+            onclick="dismissDupPair('${si.uuid}','${sj.uuid}')"
+            style="color:var(--text-muted)">
+            ${isFr ? "✗ Pas la même personne" : "✗ Not the same person"}
+          </button>
+        </div>
       </div>`;
   }).join("");
 
