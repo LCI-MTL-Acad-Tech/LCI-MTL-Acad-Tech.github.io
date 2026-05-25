@@ -279,15 +279,19 @@ function loadFiles(fileList) {
           return tb.localeCompare(ta);
         });
 
-        const logIdSets = group.map(p => new Set((p.data.logs || []).map(l => l.log_id)));
+        const logIdSets = group.map(p => {
+          const ids = (p.data.logs || []).map(l => l.log_id).sort().join(",");
+          return ids;
+        });
         const keep = new Set(group.map((_, i) => i));
         for (let i = 0; i < group.length; i++) {
           if (!keep.has(i)) continue;
           for (let j = i + 1; j < group.length; j++) {
             if (!keep.has(j)) continue;
-            // j is older; if its log_ids are all in i, it's a pure snapshot of i
-            if ([...logIdSets[j]].every(id => logIdSets[i].has(id))) {
-              console.info(`[LCI Hub] Deduped "${group[j].name}" — older snapshot of "${group[i].name}" (same UUID, log_ids are a subset)`);
+            // Only drop j if it has IDENTICAL log_ids to i (true Windows duplicate)
+            // i is newer (sorted newest-first), so j is the redundant copy
+            if (logIdSets[i] === logIdSets[j]) {
+              console.info(`[LCI Hub] Deduped "${group[j].name}" — identical log_ids to "${group[i].name}" (Windows duplicate)`);
               keep.delete(j);
             }
           }
