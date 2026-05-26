@@ -87,6 +87,8 @@ const LANG = {
     "action.confirm":         "Confirmer",
     "action.next":            "Suivant",
     "action.back":            "Retour",
+    "action.view_progress":   "Voir mon suivi de progression →",
+    "action.final_report":    "Générer mon rapport de fin de stage…",
     "action.open_log":        "Ouvrir le journal du jour",
     "action.new_todo":        "Nouvelle tâche",
 
@@ -729,7 +731,8 @@ const LANG = {
     "action.confirm":         "Confirm",
     "action.next":            "Next",
     "action.back":            "Back",
-    "action.open_log":        "Open today's log",
+    "action.view_progress":   "View my progress tracker →",
+    "action.final_report":    "Generate my end-of-internship report…",
     "action.new_todo":        "New task",
 
     // ── Global field labels ──────────────────────────────────

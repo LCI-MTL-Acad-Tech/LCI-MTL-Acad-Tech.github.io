@@ -171,6 +171,13 @@ function resolveConflict(logId, keep) {
 // ── Reflection phase ──────────────────────────────────────────
 function proceedToReflection() {
   if (!mergedData) return;
+  // Go straight to the progress dashboard — the reflection questionnaire
+  // is only for the final report and should not block everyday progress tracking.
+  generateDashboard();
+}
+
+function proceedToFinalReflection() {
+  if (!mergedData) return;
   // If reflection already present (pre-loaded or embedded), go straight to dashboard
   if (mergedData.reflection && Object.keys(mergedData.reflection).length > 0) {
     generateDashboard();

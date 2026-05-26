@@ -83,8 +83,12 @@
           <div id="upload-errors" class="hidden"></div>
           <div id="upload-conflicts" class="hidden"></div>
 
-          <button class="btn btn--primary btn--full btn--lg mt-6 hidden" id="proceed-btn"
-                  onclick="proceedToReflection()" data-i18n="action.next"></button>
+          <div class="hidden" id="proceed-btn" style="display:flex;flex-direction:column;gap:var(--sp-3);margin-top:var(--sp-6)">
+            <button class="btn btn--primary btn--full btn--lg"
+                    onclick="proceedToReflection()" data-i18n="action.view_progress"></button>
+            <button class="btn btn--ghost btn--full"
+                    onclick="proceedToFinalReflection()" data-i18n="action.final_report"></button>
+          </div>
         </div>
       </div>
 
