@@ -1303,6 +1303,33 @@ function initFileSidebar() {
   const dropzone = sidebar.querySelector(".file-sidebar__dropzone");
   const input    = sidebar.querySelector(".file-sidebar__input");
 
+  // Inject "clear local data" debug button after sidebar-status
+  const statusEl = document.getElementById("sidebar-status");
+  if (statusEl && !document.getElementById("sidebar-clear-btn")) {
+    const clearBtn = document.createElement("button");
+    clearBtn.id = "sidebar-clear-btn";
+    clearBtn.setAttribute("data-i18n", "sidebar.clear_data");
+    clearBtn.textContent = "🗑 Effacer les données locales";
+    clearBtn.style.cssText = [
+      "display:block", "width:100%", "margin-top:var(--sp-4)",
+      "background:none", "border:none", "cursor:pointer",
+      "font-family:inherit", "font-size:1.2rem",
+      "color:var(--text-subtle)", "text-decoration:underline",
+      "text-align:left", "padding:var(--sp-1) 0",
+    ].join(";");
+    clearBtn.onclick = () => {
+      const isFr = getCurrentLang() === "fr-CA";
+      const msg = isFr
+        ? "Effacer toutes les données locales (journaux, profil, cache) ?\n\nLe thème et la langue seront conservés."
+        : "Clear all local data (logs, profile, cache)?\n\nTheme and language will be kept.";
+      if (!confirm(msg)) return;
+      clearAllData(true);
+      window.location.reload();
+    };
+    statusEl.after(clearBtn);
+    applyLanguage(getCurrentLang(), false); // re-apply to pick up the new element
+  }
+
   // Toggle open/closed
   tab.addEventListener("click", () => {
     sidebar.classList.toggle("is-open");
@@ -1478,7 +1505,15 @@ function sidebarLoadFiles(fileList) {
           updateCache(merged.data);
           counts.merged = logFiles.length;
         } else {
+          const isFr = getCurrentLang() === "fr-CA";
+          const isUuidError = merged.errors.includes("error.merge_uuid");
+          const msg = isUuidError
+            ? (isFr
+                ? "⚠ Ce fichier appartient à un·e autre étudiant·e. Réinitialise l'outil avant de charger des fichiers d'une autre personne."
+                : "⚠ This file belongs to a different student. Reset the tool before loading files from someone else.")
+            : (isFr ? "⚠ Erreur lors de la fusion des fichiers." : "⚠ Error merging files.");
           console.error(`[LCI Journal] Merge failed.`, merged.errors, merged.warnings);
+          sidebarShowStatus(msg, "error");
           counts.error++;
         }
       } else if (logFiles.length > 1 && !existing) {

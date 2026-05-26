@@ -64,9 +64,24 @@
           <h2 data-i18n="report.upload_title" style="margin-bottom:var(--sp-3)"></h2>
           <p class="text-muted" data-i18n="report.upload_instructions" style="margin-bottom:var(--sp-4)"></p>
 
-          <div class="alert alert--info" style="margin-bottom:var(--sp-5)">
-            <span>📂</span>
-            <span data-i18n="sidebar.hint"></span>
+          <!-- Drop zone -->
+          <div id="report-drop-zone"
+            style="border:2px dashed var(--border);border-radius:var(--r-lg);
+                   padding:var(--sp-8) var(--sp-6);text-align:center;cursor:pointer;
+                   transition:border-color var(--dur-fast),background var(--dur-fast);
+                   margin-bottom:var(--sp-4)"
+            onclick="document.getElementById('report-file-input').click()"
+            ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+            ondragleave="this.style.borderColor=''"
+            ondrop="event.preventDefault();this.style.borderColor='';handleReportDrop(event.dataTransfer.files)">
+            <div style="font-size:2.8rem;margin-bottom:var(--sp-2)">📂</div>
+            <div style="font-size:1.5rem;font-weight:600;color:var(--text-muted);margin-bottom:var(--sp-2)"
+              data-i18n="report.drop_hint"></div>
+            <button class="btn btn--secondary btn--sm"
+              onclick="event.stopPropagation();document.getElementById('report-file-input').click()"
+              data-i18n="report.browse_btn"></button>
+            <input type="file" id="report-file-input" accept=".json" multiple style="display:none"
+              onchange="handleReportDrop(this.files)">
           </div>
 
           <div id="upload-files-list" class="upload-files-list hidden"></div>

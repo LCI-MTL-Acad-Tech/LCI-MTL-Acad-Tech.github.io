@@ -95,6 +95,20 @@ function renderFileList(fileInfos) {
   `).join("");
 }
 
+function handleReportDrop(fileList) {
+  const files = Array.from(fileList).filter(f => f.name.endsWith(".json"));
+  if (!files.length) return;
+  const readers = files.map(f => new Promise(res => {
+    const r = new FileReader();
+    r.onload = e => {
+      try { res({ data: JSON.parse(e.target.result), name: f.name, ok: true }); }
+      catch { res({ name: f.name, ok: false }); }
+    };
+    r.readAsText(f);
+  }));
+  Promise.all(readers).then(results => validateAndMerge(results));
+}
+
 function validateAndMerge(files) {
   const errEl = document.getElementById("upload-errors");
   const conflictEl = document.getElementById("upload-conflicts");
