@@ -42,8 +42,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (students.length) {
       populateFilterOptions();
       renderStats();
+      renderDupStudentBanner();
+      renderAWOL();
       renderHoursChart();
       renderProgramPie();
+      renderQuickFilters();
       renderCurrentView();
     }
   });
