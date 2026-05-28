@@ -348,7 +348,7 @@ function renderGrid() {
           .filter(m => m.date === ds)
           .forEach(m => {
             badges.push(`<span class="cal-badge cal-milestone-flag"
-              title="${escHtml(project.name + ': ' + m.title)}"
+              title="${escHtml((project.team ? project.team + ' · ' : '') + project.name + ': ' + m.title)}"
               style="cursor:pointer"
               onclick="event.stopPropagation();showMilestonePopup('${escHtml(project.id)}','${escHtml(m.id)}')">${emoji}</span>`);
           });
@@ -726,6 +726,7 @@ function openMilestoneEditor(projectId) {
   // Pre-fill if editing existing project
   const existing = projectId ? calMilestones[projectId] : null;
   const proj = existing?.project;
+  document.getElementById("ms-team-name").value  = proj?.team  || "";
   document.getElementById("ms-project-name").value  = proj?.name  || "";
   const emojiVal = proj?.emoji || "🚩";
   document.getElementById("ms-project-emoji").value = emojiVal;
@@ -786,9 +787,14 @@ function saveMilestoneEditor() {
   const lang = getCurrentLang();
   const isFr = lang === "fr-CA";
 
+  const team  = document.getElementById("ms-team-name").value.trim();
   const name  = document.getElementById("ms-project-name").value.trim();
   const emoji = document.getElementById("ms-project-emoji").value.trim() || "🚩";
 
+  if (!team && !name) {
+    document.getElementById("ms-team-name").focus();
+    return;
+  }
   if (!name) {
     document.getElementById("ms-project-name").focus();
     return;
@@ -817,7 +823,7 @@ function saveMilestoneEditor() {
     exported_at: now,
     exported_by: studentEmail,
     file_title:  "",
-    project: { id: projectId, name, emoji, milestones },
+    project: { id: projectId, name, team, emoji, milestones },
   };
   saveMilestones(calMilestones);
   closeMilestoneEditor();
@@ -851,7 +857,9 @@ function renderMilestonesPanel() {
         <label style="display:flex;align-items:center;gap:var(--sp-2);cursor:pointer;font-size:1.3rem;flex:1;min-width:0">
           <input type="checkbox" ${checked} onchange="toggleMilestoneProject('${pid}',this.checked)">
           <span style="font-size:1.5rem;line-height:1">${emoji}</span>
-          <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(project.name)}</span>
+          <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+            ${project.team ? `<span style="color:var(--text-muted);font-size:1.1rem">${escHtml(project.team)} · </span>` : ""}${escHtml(project.name)}
+          </span>
           <span style="color:var(--text-muted);font-size:1.2rem;flex-shrink:0">${count}</span>
         </label>
         <button class="btn btn--ghost btn--sm" style="flex-shrink:0;padding:2px 6px"
@@ -919,14 +927,46 @@ function showMilestonePopup(projectId, milestoneId) {
 function exportMilestones() {
   const lang = getCurrentLang();
   const isFr = lang === "fr-CA";
+
+  const projects = Object.values(calMilestones).map(e => e.project);
+
   const payload = {
     meta: {
       type: "milestones",
       exported_at: new Date().toISOString(),
     },
-    projects: Object.values(calMilestones).map(e => e.project),
+    projects,
   };
-  downloadJSON(payload, `${isFr ? "jalons" : "milestones"}_${new Date().toISOString().slice(0,10)}.json`);
+
+  // Build a descriptive filename:
+  // {studentID}_{team}-{project1}-{project2}_{date}.json
+  function slugify(s) {
+    return (s || "")
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 24);
+  }
+
+  const data      = loadData();
+  const studentId = data?.profile?.student_id || data?.meta?.student_uuid || "";
+  const idPart    = studentId ? slugify(studentId) : "";
+
+  // Collect unique team names and project names
+  const teams    = [...new Set(projects.map(p => slugify(p.team)).filter(Boolean))];
+  const projNames = projects.slice(0, 2).map(p => slugify(p.name)).filter(Boolean);
+  const teamPart  = teams.slice(0, 2).join("-");
+  const projPart  = projNames.join("-") || (isFr ? "jalons" : "milestones");
+
+  const now      = new Date();
+  const datePart = localDateISO() + "_" +
+    String(now.getHours()).padStart(2, "0") + "-" +
+    String(now.getMinutes()).padStart(2, "0");
+  const parts    = [idPart, teamPart, projPart, datePart].filter(Boolean);
+  const filename = parts.join("_") + ".json";
+
+  downloadJSON(payload, filename);
 }
 
 // Remove all milestone projects from localStorage and re-render.
@@ -1234,7 +1274,7 @@ function exportIcal() {
       if (!m.date) return;
       events.push(vevent(
         `milestone-${project.id}-${i}`, m.date, m.date,
-        `${emoji} ${m.title} — ${project.name}`,
+        `${emoji} ${m.title} — ${project.team ? project.team + ' · ' : ''}${project.name}`,
         m.description || "", isFr ? "Jalon" : "Milestone"
       ));
     });

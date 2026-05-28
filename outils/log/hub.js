@@ -29,6 +29,7 @@ function programColor(prog) {
 let activeProgram   = "";
 let activeTeacher   = "";
 let activeIntegrity = false; // filter: show only students with integrity issues
+let activeNoReport  = false; // filter: show only students missing final report
 
 document.addEventListener("DOMContentLoaded", () => {
   // Only run hub-specific init when on the actual hub page
@@ -465,7 +466,10 @@ function loadFiles(fileList) {
       const unknownNames = enriched.filter(p => p.type === "unknown").map(p => p.name);
       console.warn(`[LCI Hub] ${nUnknown} file(s) of unknown type skipped:`, unknownNames);
     }
-    if (nFailed)  console.error(`Files that failed to parse: ${nFailed}`);
+    if (nFailed) {
+      const failedNames = parsed.filter(p => !p?.data).map(p => p?.name || "unknown");
+      console.error(`[LCI Hub] ${nFailed} file(s) failed to parse (invalid JSON):`, failedNames);
+    }
     console.groupEnd();
 
     let statusMsg = `${nS} étudiant·e${nS > 1 ? "·s" : ""} chargé·e${nS > 1 ? "·s" : ""} — ${nF} fichier${nF > 1 ? "s" : ""} traité${nF > 1 ? "s" : ""}`;
@@ -860,6 +864,7 @@ function applyFilters() {
     if (track   && s.track_band !== track)      return false;
     if (course  && s.course_code !== course)    return false;
     if (activeIntegrity && s.integrity?.ok !== false) return false;
+    if (activeNoReport  && s.has_reflection)          return false;
     if (search  && !s.name.toLowerCase().includes(search)
                 && !s.student_id.toLowerCase().includes(search)) return false;
     return true;
@@ -885,7 +890,7 @@ function applyFilters() {
 }
 
 function clearFilters() {
-  activeProgram = ""; activeTeacher = ""; activeIntegrity = false;
+  activeProgram = ""; activeTeacher = ""; activeIntegrity = false; activeNoReport = false;
   ["filter-program","filter-teacher","filter-pathway","filter-track","filter-course"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = "";
@@ -1197,6 +1202,7 @@ function renderQuickFilters() {
   renderQuickFilterGroup("hub-qf-programs", "program",  activeProgram);
   renderQuickFilterGroup("hub-qf-teachers", "teacher",  activeTeacher);
   renderIntegrityFilter();
+  renderNoReportFilter();
 }
 
 function renderIntegrityFilter() {
@@ -1222,6 +1228,32 @@ function renderIntegrityFilter() {
 
 function toggleIntegrityFilter() {
   activeIntegrity = !activeIntegrity;
+  applyFilters();
+}
+
+function renderNoReportFilter() {
+  const el = document.getElementById("hub-qf-no-report");
+  if (!el) return;
+  const count = students.filter(s => !s.has_reflection).length;
+  if (!count) { el.innerHTML = ""; return; }
+  const lang = getCurrentLang();
+  const label = lang === "fr-CA"
+    ? `⬜ Sans rapport final (${count})`
+    : `⬜ No final report (${count})`;
+  el.innerHTML = `<button
+    onclick="toggleNoReportFilter()"
+    style="padding:var(--sp-1) var(--sp-3);border-radius:var(--r-pill);font-size:1.2rem;
+           font-family:inherit;cursor:pointer;
+           border:1.5px solid ${activeNoReport ? 'var(--accent)' : 'var(--border)'};
+           background:${activeNoReport ? 'var(--accent)' : 'var(--bg-card)'};
+           color:${activeNoReport ? 'white' : 'var(--text)'};
+           font-weight:${activeNoReport ? '600' : '400'};transition:all var(--dur-fast)">
+    ${label}
+  </button>`;
+}
+
+function toggleNoReportFilter() {
+  activeNoReport = !activeNoReport;
   applyFilters();
 }
 
@@ -2373,6 +2405,8 @@ function openFileListModal(uuid, filter = "all") {
     const typeLabel = isWeekly
       ? `<span style="color:var(--success);font-size:1.2rem;font-weight:600">📅 ${isFr ? "Hebdo" : "Weekly"}</span>`
       : `<span style="color:var(--text-subtle);font-size:1.2rem">📝</span>`;
+
+    const flags = [];
     if (log.future_filing) flags.push(`<span style="color:#1a5cb5;font-size:1.2rem">${isFr ? "futur" : "future"}</span>`);
     if (log.late_filing)   flags.push(`<span style="color:#b85000;font-size:1.2rem">${isFr ? "tardif" : "late"}</span>`);
     if (log.revision > 0)  flags.push(`<span style="color:var(--text-subtle);font-size:1.2rem">r${log.revision}</span>`);

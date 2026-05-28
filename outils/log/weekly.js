@@ -275,6 +275,23 @@ function buildWeekBody(logs, weekStart) {
     </div>`).join("");
   frag.appendChild(statRow);
 
+  // Warn about days with zero hours (missing task durations and clock times)
+  const zeroDays = logs.filter(l =>
+    (l.task_total_minutes || 0) === 0 && (l.day_duration_minutes || 0) === 0
+  );
+  if (zeroDays.length) {
+    const warn = document.createElement("div");
+    warn.style.cssText =
+      "font-size:1.3rem;color:var(--warning);margin-bottom:var(--sp-4);" +
+      "padding:var(--sp-2) var(--sp-3);background:rgba(230,184,48,.1);" +
+      "border-radius:var(--r-md);border-left:3px solid var(--warning)";
+    const dates = zeroDays.map(l => l.date).join(", ");
+    warn.textContent = "⚠ " + (zeroDays.length === 1
+      ? t("weekly.zero_hours_warn_one").replace("{date}", zeroDays[0].date)
+      : t("weekly.zero_hours_warn_many").replace("{n}", String(zeroDays.length)).replace("{dates}", dates));
+    frag.appendChild(warn);
+  }
+
   // Two-column: day bars + activity pie
   const topGrid = document.createElement("div");
   topGrid.style.cssText =
