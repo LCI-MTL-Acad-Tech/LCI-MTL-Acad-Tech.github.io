@@ -538,7 +538,8 @@ function downloadReflectionJSON() {
     reflection,
   };
   const studentId = mergedData.profile?.student_id || "stage";
-  const date = new Date().toISOString().slice(0, 10);
+  const now  = new Date();
+  const date = localDateISO() + "_" + String(now.getHours()).padStart(2,"0") + "-" + String(now.getMinutes()).padStart(2,"0");
   downloadJSON(payload, `${studentId}_reflexion_${date}.json`);
 
   // Show confirmation
@@ -560,7 +561,8 @@ function downloadFullJSON() {
   mergedData.meta.last_modified = new Date().toISOString();
   mergedData.meta.type          = "full";
   const studentId = mergedData.profile?.student_id || "stage";
-  const date      = new Date().toISOString().slice(0, 10);
+  const now  = new Date();
+  const date = localDateISO() + "_" + String(now.getHours()).padStart(2,"0") + "-" + String(now.getMinutes()).padStart(2,"0");
   downloadJSON(mergedData, `${studentId}_journal_complet_${date}.json`);
   stampDownload("f"); // record final report download for calendar view
   // Show upload reminder (respects snooze)
@@ -574,6 +576,23 @@ function downloadFullJSON() {
     setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 3000);
   }
 }
+function validateAndGenerateDashboard() {
+  const isFr = getCurrentLang() === "fr-CA";
+  const reality = document.getElementById("r-reality")?.value.trim();
+  if (!reality) {
+    const el = document.getElementById("r-reality");
+    el?.focus();
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    el?.style.setProperty("border-color", "var(--danger)");
+    setTimeout(() => el?.style.removeProperty("border-color"), 3000);
+    alert(isFr
+      ? "Merci de remplir au minimum le premier champ avant de continuer."
+      : "Please fill in at least the first field before continuing.");
+    return;
+  }
+  generateDashboard();
+}
+
 function generateDashboard() {
   mergedData.reflection = collectReflection();
   saveReportData(mergedData); // persist updated reflection

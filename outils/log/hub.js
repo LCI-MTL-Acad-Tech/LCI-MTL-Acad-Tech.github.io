@@ -1234,20 +1234,22 @@ function toggleIntegrityFilter() {
 function renderNoReportFilter() {
   const el = document.getElementById("hub-qf-no-report");
   if (!el) return;
+  const isFr  = getCurrentLang() === "fr-CA";
   const count = students.filter(s => !s.has_reflection).length;
-  if (!count) { el.innerHTML = ""; return; }
-  const lang = getCurrentLang();
-  const label = lang === "fr-CA"
-    ? `⬜ Sans rapport final (${count})`
+  const label = isFr
+    ? `⬜ ${isFr ? "Sans rapport final" : "No final report"} (${count})`
     : `⬜ No final report (${count})`;
   el.innerHTML = `<button
     onclick="toggleNoReportFilter()"
+    ${count === 0 ? "disabled" : ""}
     style="padding:var(--sp-1) var(--sp-3);border-radius:var(--r-pill);font-size:1.2rem;
-           font-family:inherit;cursor:pointer;
-           border:1.5px solid ${activeNoReport ? 'var(--accent)' : 'var(--border)'};
-           background:${activeNoReport ? 'var(--accent)' : 'var(--bg-card)'};
-           color:${activeNoReport ? 'white' : 'var(--text)'};
-           font-weight:${activeNoReport ? '600' : '400'};transition:all var(--dur-fast)">
+           font-family:inherit;cursor:${count === 0 ? "default" : "pointer"};
+           border:1.5px solid ${activeNoReport ? "var(--accent)" : "var(--border)"};
+           background:${activeNoReport ? "var(--accent)" : "var(--bg-card)"};
+           color:${activeNoReport ? "white" : count === 0 ? "var(--text-subtle)" : "var(--text)"};
+           font-weight:${activeNoReport ? "600" : "400"};
+           opacity:${count === 0 ? "0.5" : "1"};
+           transition:all var(--dur-fast)">
     ${label}
   </button>`;
 }
