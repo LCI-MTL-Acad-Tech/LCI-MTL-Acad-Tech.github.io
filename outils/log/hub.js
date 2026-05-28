@@ -1970,25 +1970,62 @@ function buildDetailHTML(s) {
   const courseLabel = (typeof getCourseLabel === "function" && s.course_code)
     ? getCourseLabel(s.course_code, lang) : (s.course_code || "—");
 
-  // File type counts badge row
-  // border and bg-tint use the accent colour; count and label use --text for contrast safety
-  const ftc = s.file_type_counts || {};
-  const fileTypeBadges = [
-    { key: "config",     label: "Config",     color: "var(--text-subtle)" },
-    { key: "daily",      label: "Quotidien",  color: "var(--accent)" },
-    { key: "weekly",     label: "Hebdo",      color: "var(--success)" },
-    { key: "full",       label: "Complet",    color: "#7341a0" },
-    { key: "reflection", label: "Réflexion",  color: "var(--comp-amber-bar,#b38a00)" },
-  ].filter(b => ftc[b.key] > 0).map(b =>
-    `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;
-                  border-radius:var(--r-sm);background:${b.color}2e;
-                  border:1px solid ${b.color};font-size:1.1rem">
-       <span style="color:var(--text);font-weight:700">${ftc[b.key]}</span>
-       <span style="color:var(--text-muted)">${b.label}</span>
-     </span>`
-  ).join(" ");
+  // ── Submission summary ────────────────────────────────────
+  const ftc        = s.file_type_counts || {};
+  const dailyLogs  = (s.raw.logs || []).filter(l => !l.weekly_wrap?.highlight);
+  const weeklyLogs = (s.raw.logs || []).filter(l =>  l.weekly_wrap?.highlight);
+  const hasRefl    = s.has_reflection;
 
-  // Work hours display
+  const submissionSummary = (() => {
+    const rows = [
+      {
+        icon: "\uD83D\uDCDD",
+        label: lang === "fr-CA" ? "Journaux quotidiens" : "Daily logs",
+        count: dailyLogs.length,
+        btn:   lang === "fr-CA" ? "Voir" : "View",
+        onclick: `openFileListModal('${escHtml(s.uuid)}','daily')`,
+        missing: false,
+      },
+      {
+        icon: "\uD83D\uDCC5",
+        label: lang === "fr-CA" ? "Bilans hebdomadaires" : "Weekly wraps",
+        count: weeklyLogs.length,
+        btn:   lang === "fr-CA" ? "Voir" : "View",
+        onclick: `openFileListModal('${escHtml(s.uuid)}','weekly')`,
+        missing: false,
+      },
+      {
+        icon: hasRefl ? "\u2705" : "\u2B1C",
+        label: lang === "fr-CA" ? "Rapport final" : "Final report",
+        count: hasRefl ? 1 : 0,
+        btn:   hasRefl ? (lang === "fr-CA" ? "Voir" : "View") : null,
+        onclick: `openFileListModal('${escHtml(s.uuid)}','reflection')`,
+        missing: !hasRefl,
+      },
+    ];
+    return `
+      <div style="display:flex;gap:var(--sp-3);flex-wrap:wrap;margin-bottom:var(--sp-4)">
+        ${rows.map(r => `
+          <div style="display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-2) var(--sp-4);
+                      background:var(--bg-subtle);border-radius:var(--r-lg);
+                      border:1.5px solid ${r.missing ? "var(--danger)" : "var(--border)"}">
+            <span style="font-size:1.6rem">${r.icon}</span>
+            <div>
+              <div style="font-size:1.1rem;color:var(--text-muted);text-transform:uppercase;
+                          letter-spacing:.06em">${r.label}</div>
+              <div style="font-size:1.8rem;font-weight:700;color:${r.missing ? "var(--danger)" : r.count > 0 ? "var(--text)" : "var(--text-subtle)"}">${r.count}</div>
+            </div>
+            ${r.btn ? `<button class="btn btn--ghost btn--sm" onclick="${r.onclick}"
+              style="font-size:1.2rem;margin-left:var(--sp-1)">${r.btn}</button>` : ""}
+          </div>`
+        ).join("")}
+        <button class="btn btn--ghost btn--sm" style="align-self:center;font-size:1.2rem"
+          onclick="openFileListModal('${escHtml(s.uuid)}','all')"
+          >${lang === "fr-CA" ? "\uD83D\uDCCB Tout voir" : "\uD83D\uDCCB View all"}</button>
+      </div>`;
+  })();
+
+    // Work hours display
   const wh    = ctx.work_hours;
   const byDay = ctx.work_hours_by_day;
   const hasVariableSchedule = byDay && Object.keys(byDay).length > 0;
@@ -2068,13 +2105,7 @@ function buildDetailHTML(s) {
     </div>` : "";
 
   return `
-    <div style="margin-bottom:var(--sp-3);display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center">
-      <span style="font-size:1.2rem;color:var(--text-subtle)">${lang === "fr-CA" ? "Fichiers chargés :" : "Loaded files:"}</span>
-      ${fileTypeBadges || '<span style="font-size:1.2rem;color:var(--text-subtle)">—</span>'}
-      <button class="btn btn--ghost btn--sm" style="margin-left:var(--sp-2);font-size:1.2rem"
-        onclick="openFileListModal('${escHtml(s.uuid)}')"
-        >${lang === "fr-CA" ? "📋 Voir les journaux" : "📋 View logs"}</button>
-    </div>
+    ${submissionSummary}
     ${buildIntegritySection(s, lang)}
     <div style="display:grid;grid-template-columns:1fr 1fr 22rem;gap:var(--sp-6)">
       <div>
@@ -2269,17 +2300,51 @@ function moodSparklineLarge(points) {
 // ── File list modal ────────────────────────────────────────────
 let _fileModalUUID = null;
 
-function openFileListModal(uuid) {
+function openFileListModal(uuid, filter = "all") {
   const s    = students.find(r => r.uuid === uuid);
   if (!s) return;
   _fileModalUUID = uuid;
 
   const lang = getCurrentLang();
   const isFr = lang === "fr-CA";
-  const logs = (s.raw.logs || []).slice().sort((a, b) => b.date.localeCompare(a.date));
+
+  // Reflection-only view
+  if (filter === "reflection") {
+    const refl = s.raw.reflection;
+    document.getElementById("hub-file-modal-title").textContent =
+      `${s.name} — ${isFr ? "Rapport final" : "Final report"}`;
+    const exportBtn = document.getElementById("hub-file-modal-export");
+    if (exportBtn) exportBtn.style.display = "none";
+    document.getElementById("hub-file-modal-body").innerHTML = refl && Object.keys(refl).length
+      ? `<div style="font-size:1.4rem;line-height:1.7">
+          ${Object.entries(refl).map(([k, v]) =>
+            `<div style="margin-bottom:var(--sp-4)">
+              <div style="font-weight:700;color:var(--text-subtle);font-size:1.2rem;
+                          text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--sp-1)">${escHtml(k)}</div>
+              <div>${escHtml(String(v || "—"))}</div>
+            </div>`
+          ).join("")}
+         </div>`
+      : `<p style="color:var(--danger);font-size:1.4rem">
+           ${isFr ? "Aucun rapport final soumis." : "No final report submitted."}
+         </p>`;
+    document.getElementById("hub-file-modal").classList.remove("hidden");
+    return;
+  }
+
+  // Log views (daily / weekly / all)
+  let logs = (s.raw.logs || []).slice().sort((a, b) => b.date.localeCompare(a.date));
+  if (filter === "daily")  logs = logs.filter(l => !l.weekly_wrap?.highlight);
+  if (filter === "weekly") logs = logs.filter(l =>  l.weekly_wrap?.highlight);
+
+  const filterLabel = filter === "weekly"
+    ? (isFr ? "Bilans hebdomadaires" : "Weekly wraps")
+    : filter === "daily"
+    ? (isFr ? "Journaux quotidiens" : "Daily logs")
+    : (isFr ? "Tous les journaux" : "All logs");
 
   document.getElementById("hub-file-modal-title").textContent =
-    `${escHtml(s.name)} — ${isFr ? "Journaux" : "Logs"} (${logs.length})`;
+    `${s.name} — ${filterLabel} (${logs.length})`;
 
   const exportBtn = document.getElementById("hub-file-modal-export");
   if (exportBtn) {
@@ -2304,7 +2369,10 @@ function openFileListModal(uuid) {
     const saved   = log.saved_at   ? log.saved_at.slice(0, 16).replace("T", " ")   : "—";
     const taskCount = (log.tasks || []).length;
 
-    const flags = [];
+    const isWeekly = !!(log.weekly_wrap?.highlight);
+    const typeLabel = isWeekly
+      ? `<span style="color:var(--success);font-size:1.2rem;font-weight:600">📅 ${isFr ? "Hebdo" : "Weekly"}</span>`
+      : `<span style="color:var(--text-subtle);font-size:1.2rem">📝</span>`;
     if (log.future_filing) flags.push(`<span style="color:#1a5cb5;font-size:1.2rem">${isFr ? "futur" : "future"}</span>`);
     if (log.late_filing)   flags.push(`<span style="color:#b85000;font-size:1.2rem">${isFr ? "tardif" : "late"}</span>`);
     if (log.revision > 0)  flags.push(`<span style="color:var(--text-subtle);font-size:1.2rem">r${log.revision}</span>`);
@@ -2316,6 +2384,7 @@ function openFileListModal(uuid) {
 
     return `
       <tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:var(--sp-2) var(--sp-3)">${typeLabel}</td>
         <td style="padding:var(--sp-2) var(--sp-3);font-weight:600;white-space:nowrap">${log.date}</td>
         <td style="padding:var(--sp-2) var(--sp-3);font-size:1.2rem;color:var(--text-muted);white-space:nowrap">${created}</td>
         <td style="padding:var(--sp-2) var(--sp-3);font-size:1.2rem;color:var(--text-muted);white-space:nowrap">${saved}</td>
@@ -2335,6 +2404,7 @@ function openFileListModal(uuid) {
       <thead>
         <tr style="background:var(--bg-subtle);font-size:1.1rem;text-transform:uppercase;
                    letter-spacing:.06em;color:var(--text-subtle)">
+          <th style="padding:var(--sp-2) var(--sp-3);text-align:left;white-space:nowrap">${isFr ? "Type" : "Type"}</th>
           <th style="padding:var(--sp-2) var(--sp-3);text-align:left;white-space:nowrap">${isFr ? "Date" : "Date"}</th>
           <th style="padding:var(--sp-2) var(--sp-3);text-align:left;white-space:nowrap">${isFr ? "Créé le" : "Created"}</th>
           <th style="padding:var(--sp-2) var(--sp-3);text-align:left;white-space:nowrap">${isFr ? "Modifié le" : "Modified"}</th>
