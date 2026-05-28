@@ -13,6 +13,8 @@ const LANG = {
     "nav.title.weekly":   "Bilan hebdomadaire",
     "nav.title.calendar": "Calendrier de stage",
     "nav.title.report":   "Rapport de stage",
+    "nav.title.final":    "Rapport final",
+    "final.upload_hint":  "Charge tes fichiers JSON pour accéder au formulaire de rapport final.",
     "nav.title.hub":      "Hub — Tableau de bord",
     "nav.title.teacher":  "Tableau — Enseignant·e",
     "nav.title.intro":    "Introduction",
@@ -51,6 +53,7 @@ const LANG = {
     "nav.organizer":          "Organisateur",
     "nav.weekly":             "Bilan hebdo",
     "nav.report":             "Suivi de progression",
+    "nav.final":              "Rapport final",
 
     // File organizer
     "org.title":             "Organisateur de fichiers",
@@ -668,6 +671,8 @@ const LANG = {
     "nav.title.weekly":   "Weekly Wrap-up",
     "nav.title.calendar": "Internship Calendar",
     "nav.title.report":   "Progress Report",
+    "nav.title.final":    "Final Report",
+    "final.upload_hint":  "Load your JSON files to access the final report form.",
     "nav.title.hub":      "Hub — Dashboard",
     "nav.title.teacher":  "Teacher dashboard",
     "nav.title.intro":    "Introduction",
@@ -706,6 +711,7 @@ const LANG = {
     "nav.organizer":          "Organizer",
     "nav.weekly":             "Weekly report",
     "nav.report":             "Progress tracker",
+    "nav.final":              "Final report",
 
     // File organizer
     "org.title":             "File organizer",

@@ -102,154 +102,7 @@
             <button class="btn btn--primary btn--full btn--lg"
                     onclick="proceedToReflection()" data-i18n="action.view_progress"></button>
             <button class="btn btn--ghost btn--full"
-                    onclick="proceedToFinalReflection()" data-i18n="action.final_report"></button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── PHASE 2: Reflection forms ──────────────────── -->
-      <div id="phase-reflection" class="hidden">
-        <h2 data-i18n="report.section_reflection" style="margin-bottom:var(--sp-6)"></h2>
-
-        <div class="card mb-4">
-          <div class="section-title" data-i18n="report.section_reflection"></div>
-
-          <div class="form-group">
-            <label data-i18n="report.reality_vs_expectation"></label>
-            <textarea id="r-reality" rows="4"></textarea>
-          </div>
-          <div class="form-group">
-            <label data-i18n="report.significant_work"></label>
-            <textarea id="r-significant" rows="3"></textarea>
-          </div>
-          <div class="form-group">
-            <label data-i18n="report.proud_moment"></label>
-            <textarea id="r-proud" rows="3"></textarea>
-          </div>
-          <div class="form-group">
-            <label data-i18n="report.failure_moment"></label>
-            <textarea id="r-failure" rows="3"></textarea>
-          </div>
-          <div class="form-group">
-            <label data-i18n="report.failure_lesson"></label>
-            <textarea id="r-failure-lesson" rows="2"></textarea>
-          </div>
-          <div class="form-group">
-            <label data-i18n="report.env_lesson"></label>
-            <textarea id="r-env" rows="3"></textarea>
-          </div>
-          <div class="form-group">
-            <label data-i18n="report.supervisor_rel"></label>
-            <textarea id="r-supervisor" rows="3"></textarea>
-          </div>
-          <div class="form-group">
-            <label data-i18n="report.advice"></label>
-            <textarea id="r-advice" rows="3"></textarea>
-          </div>
-          <div class="form-group">
-            <label data-i18n="report.would_do_differently"></label>
-            <textarea id="r-different" rows="3"></textarea>
-          </div>
-          <div class="form-group">
-            <label data-i18n="report.suggestions_school"></label>
-            <p class="form-hint" data-i18n="report.suggestions_school_q" style="margin-bottom:var(--sp-2)"></p>
-            <textarea id="r-suggestions-school" rows="4"></textarea>
-          </div>
-          <div class="form-group">
-            <label data-i18n="report.comments"></label>
-            <textarea id="r-comments" rows="2"></textarea>
-          </div>
-        </div>
-
-        <!-- Tools reflection -->
-        <div class="card mb-4">
-          <div class="section-title" data-i18n="report.tools_reflection_title"></div>
-          <div id="tools-reflection-list"></div>
-        </div>
-
-        <!-- Collaborator appreciation -->
-        <div class="card mb-4">
-          <div class="section-title" data-i18n="report.collab_title"></div>
-          <p class="text-muted" style="font-size:1.3rem;margin-bottom:var(--sp-4)" data-i18n="report.collab_note"></p>
-          <div id="collab-appreciation-list"></div>
-        </div>
-
-        <!-- Competencies -->
-        <div class="card mb-4">
-          <div class="section-title" data-i18n="report.competencies_title"></div>
-
-          <div class="accordion-item">
-            <button class="accordion-header" onclick="toggleAccordion(this)">
-              <span data-i18n="report.competencies_helpful"></span>
-              <span class="accordion-arrow">▼</span>
-            </button>
-            <div class="accordion-body">
-              <p class="text-muted" style="font-size:1.4rem;margin-bottom:var(--sp-4)" data-i18n="report.competencies_helpful_q"></p>
-              <div id="competencies-helpful-list"></div>
-              <button class="add-block-btn" onclick="addCompetencyBlock('helpful')">
-                + <span data-i18n="action.add"></span>
-              </button>
-            </div>
-          </div>
-
-          <div class="accordion-item">
-            <button class="accordion-header" onclick="toggleAccordion(this)">
-              <span data-i18n="report.competencies_gaps"></span>
-              <span class="accordion-arrow">▼</span>
-            </button>
-            <div class="accordion-body">
-              <p class="text-muted" style="font-size:1.4rem;margin-bottom:var(--sp-4)" data-i18n="report.competencies_gaps_q"></p>
-              <div id="competencies-gaps-list"></div>
-              <button class="add-block-btn" onclick="addCompetencyBlock('gaps')">
-                + <span data-i18n="action.add"></span>
-              </button>
-            </div>
-          </div>
-
-          <div class="accordion-item">
-            <button class="accordion-header" onclick="toggleAccordion(this)">
-              <span data-i18n="report.competencies_improve"></span>
-              <span class="accordion-arrow">▼</span>
-            </button>
-            <div class="accordion-body">
-              <p class="text-muted" style="font-size:1.4rem;margin-bottom:var(--sp-4)" data-i18n="report.competencies_improve_q"></p>
-              <div id="competencies-improve-list"></div>
-              <button class="add-block-btn" onclick="addCompetencyBlock('improve')">
-                + <span data-i18n="action.add"></span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Project outcomes (hub) -->
-        <div class="card mb-4 hidden" id="project-outcomes-card">
-          <div class="section-title" data-i18n="report.project_outcomes_title"></div>
-          <div id="project-outcomes-list"></div>
-        </div>
-
-        <!-- Future -->
-        <div class="card mb-4">
-          <div class="section-title" data-i18n="report.future_title"></div>
-          <div class="form-group">
-            <label data-i18n="report.future_direction"></label>
-            <textarea id="r-future-direction" rows="3"></textarea>
-          </div>
-          <div class="form-group">
-            <label data-i18n="report.future_next_steps"></label>
-            <textarea id="r-future-steps" rows="2"></textarea>
-          </div>
-          <div class="form-group">
-            <label data-i18n="report.future_skills"></label>
-            <textarea id="r-future-skills" rows="2"></textarea>
-          </div>
-        </div>
-
-        <div class="flex justify-between" style="flex-wrap:wrap;gap:var(--sp-3)">
-          <button class="btn btn--ghost" onclick="goToPhase('phase-upload')" data-i18n="action.back"></button>
-          <div class="flex gap-3" style="flex-wrap:wrap;">
-            <button class="btn btn--download" onclick="downloadFullJSON()" data-i18n="report.download_full_json"></button>
-            <button class="btn btn--secondary" onclick="downloadReflectionJSON()" data-i18n="report.download_reflection"></button>
-            <button class="btn btn--primary btn--lg" onclick="validateAndGenerateDashboard()" data-i18n="action.confirm"></button>
+                    onclick="window.location.href='final.html'" data-i18n="action.final_report"></button>
           </div>
         </div>
       </div>
@@ -411,6 +264,10 @@
       <a href="report.html" class="mobile-nav-item active">
       <span class="mobile-nav-icon">📊</span>
       <span data-i18n="nav.report">Rapport</span>
+    </a>
+    <a href="final.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">🎓</span>
+      <span data-i18n="nav.final">Bilan final</span>
     </a>
   </nav>
 
