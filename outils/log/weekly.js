@@ -190,7 +190,24 @@ function buildWeekSection(weekStart, logs, defaultOpen, collapsible, isCurrent =
     "display:flex;align-items:center;gap:var(--sp-4);padding:var(--sp-4) var(--sp-5);" +
     "cursor:pointer;user-select:none;";
   header.setAttribute("role", "button");
-  header.setAttribute("aria-expanded", defaultOpen ? "true" : "false");
+  // Retro-wrap button: completed weeks with no wrap yet
+  if (!isCurrent && !hasWrap) {
+    const retroBtn = document.createElement("button");
+    retroBtn.className = "btn btn--ghost btn--sm";
+    retroBtn.style.cssText = "font-size:1.2rem;margin-left:var(--sp-3);color:var(--warning)";
+    retroBtn.setAttribute("data-i18n", "weekly.add_retro_wrap");
+    retroBtn.textContent = t("weekly.add_retro_wrap") || "✏ Rédiger le bilan";
+    retroBtn.onclick = (e) => {
+      e.stopPropagation();
+      // Jump to the last log of this week to fill in the wrap
+      const lastLog = [...logs].sort((a, b) => b.date.localeCompare(a.date))[0];
+      if (!lastLog) return;
+      sessionStorage.setItem("weekly_jump_date", lastLog.date);
+      sessionStorage.setItem("weekly_show_wrap", "1");
+      window.location.href = "log.html";
+    };
+    header.appendChild(retroBtn);
+  }
 
   const weekLabel = `${t("weekly.week_label")} ${formatDate(weekStart + "T12:00:00")}`;
   const daysLabel = `${logs.length} ${logs.length > 1 ? (t("weekly.days") || "jours") : (t("weekly.day") || "jour")}`;

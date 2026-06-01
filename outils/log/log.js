@@ -66,6 +66,25 @@ document.addEventListener("DOMContentLoaded", () => {
     if (jumpLog) switchToDate(jumpLog.date);
   }
 
+  // If coming from the weekly view to fill in a retroactive wrap
+  const weeklyJumpDate = sessionStorage.getItem("weekly_jump_date");
+  const weeklyShowWrap = sessionStorage.getItem("weekly_show_wrap");
+  if (weeklyJumpDate) {
+    sessionStorage.removeItem("weekly_jump_date");
+    sessionStorage.removeItem("weekly_show_wrap");
+    switchToDate(weeklyJumpDate);
+    if (weeklyShowWrap) {
+      // Force-show wrap card and scroll to it after a short delay for render
+      setTimeout(() => {
+        const card = document.getElementById("log-weekly-section");
+        if (card) {
+          card.style.display = "block";
+          card.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 300);
+    }
+  }
+
   // Show download reminder after 5 minutes
   setTimeout(() => {
     if (!lastDownloaded) showDownloadBanner();
