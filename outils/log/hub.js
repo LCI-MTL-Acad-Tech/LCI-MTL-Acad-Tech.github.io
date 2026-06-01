@@ -2347,7 +2347,6 @@ function openFileListModal(uuid, filter = "all") {
     const refl = s.raw.reflection;
     document.getElementById("hub-file-modal-title").textContent =
       `${s.name} — ${isFr ? "Rapport final" : "Final report"}`;
-    const exportBtn = document.getElementById("hub-file-modal-export");
     if (exportBtn) exportBtn.style.display = "none";
     document.getElementById("hub-file-modal-body").innerHTML = refl && Object.keys(refl).length
       ? `<div style="font-size:1.4rem;line-height:1.7">
@@ -2380,7 +2379,6 @@ function openFileListModal(uuid, filter = "all") {
   document.getElementById("hub-file-modal-title").textContent =
     `${s.name} — ${filterLabel} (${logs.length})`;
 
-  const exportBtn = document.getElementById("hub-file-modal-export");
   if (exportBtn) {
     exportBtn.style.display = "";
     exportBtn.textContent = isFr ? "⬇ Exporter JSON complet" : "⬇ Export full JSON";
@@ -2429,8 +2427,8 @@ function openFileListModal(uuid, filter = "all") {
         <td style="padding:var(--sp-2) var(--sp-3)">${flags.join(" ")}</td>
         <td style="padding:var(--sp-2) var(--sp-3)">
           <button class="btn btn--ghost btn--sm" style="font-size:1.2rem;padding:2px 8px"
-            onclick="exportSingleLogJSON('${uuid}','${log.log_id}')"
-            title="${isFr ? "Exporter ce journal" : "Export this log"}">⬇</button>
+            onclick="previewLog('${uuid}','${log.log_id}')"
+            title="${isFr ? "Prévisualiser ce journal" : "Preview this log"}">👁</button>
         </td>
       </tr>`;
   }).join("");
@@ -2468,15 +2466,53 @@ function exportStudentJSON() {
   downloadJSON(s.raw, `${slug}_export_complet_${localDateISO()}.json`);
 }
 
-function exportSingleLogJSON(uuid, logId) {
+function previewLog(uuid, logId) {
   const s = students.find(r => r.uuid === uuid);
   if (!s) return;
   const log = (s.raw.logs || []).find(l => l.log_id === logId);
   if (!log) return;
-  const payload = { ...s.raw, logs: [log],
-    meta: { ...s.raw.meta, exported_at: new Date().toISOString() } };
-  const slug = s.raw.profile?.student_id || slugify(s.name) || "student";
-  downloadJSON(payload, `${slug}_${log.date}.json`);
+  const isFr = getCurrentLang() === "fr-CA";
+
+  const header = `
+    <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-5)">
+      <button class="btn btn--ghost btn--sm" onclick="openFileListModal('${uuid}','all')"
+        style="font-size:1.3rem">← ${isFr ? "Retour" : "Back"}</button>
+      <span style="font-size:1.4rem;font-weight:700">${log.date}${log.weekly_wrap?.highlight ? ` · <span style="color:var(--success)">${isFr ? "Bilan hebdo" : "Weekly wrap"}</span>` : ""}</span>
+    </div>`;
+
+  const tasks = (log.tasks || []).map(t => `
+    <div style="padding:var(--sp-3) 0;border-bottom:1px solid var(--border)">
+      <div style="font-size:1.4rem;font-weight:600;margin-bottom:var(--sp-1)">${escHtml(t.description || "—")}</div>
+      <div style="display:flex;gap:var(--sp-4);font-size:1.3rem;color:var(--text-muted)">
+        ${t.duration_minutes ? `<span>⏱ ${Math.floor(t.duration_minutes/60)}h${t.duration_minutes%60 ? (t.duration_minutes%60)+"m" : ""}</span>` : ""}
+        ${t.learning ? `<span>💡 ${escHtml(t.learning)}</span>` : ""}
+      </div>
+    </div>`).join("");
+
+  const sections = [
+    log.notes        && `<div><strong>${isFr ? "Notes" : "Notes"}</strong><p style="margin-top:var(--sp-2);color:var(--text-muted)">${escHtml(log.notes)}</p></div>`,
+    log.learning     && `<div><strong>${isFr ? "Apprentissages" : "Learning"}</strong><p style="margin-top:var(--sp-2);color:var(--text-muted)">${escHtml(log.learning)}</p></div>`,
+    log.weekly_wrap?.highlight && `<div><strong>${isFr ? "Bilan de la semaine" : "Weekly highlight"}</strong><p style="margin-top:var(--sp-2);color:var(--text-muted)">${escHtml(log.weekly_wrap.highlight)}</p></div>`,
+    log.weekly_wrap?.next_week && `<div><strong>${isFr ? "Semaine prochaine" : "Next week"}</strong><p style="margin-top:var(--sp-2);color:var(--text-muted)">${escHtml(log.weekly_wrap.next_week)}</p></div>`,
+  ].filter(Boolean).join("<hr style='border:none;border-top:1px solid var(--border);margin:var(--sp-4) 0'>");
+
+  const totalMins = log.task_total_minutes || log.day_duration_minutes || 0;
+  const statsBar = `
+    <div style="display:flex;gap:var(--sp-5);margin-bottom:var(--sp-4);
+                padding:var(--sp-3) var(--sp-4);background:var(--bg-subtle);border-radius:var(--r-lg);
+                font-size:1.3rem;flex-wrap:wrap">
+      <span>⏱ <strong>${Math.floor(totalMins/60)}h${totalMins%60 ? (totalMins%60)+"m" : ""}</strong></span>
+      <span>📝 <strong>${(log.tasks||[]).length}</strong> ${isFr ? "tâches" : "tasks"}</span>
+      ${log.day_rating ? `<span>😊 <strong>${log.day_rating}/5</strong></span>` : ""}
+      ${log.morning_energy ? `<span>⚡ <strong>${log.morning_energy}/5</strong> ${isFr ? "énergie" : "energy"}</span>` : ""}
+    </div>`;
+
+  document.getElementById("hub-file-modal-title").textContent =
+    `${s.name} — ${isFr ? "Journal" : "Log"} ${log.date}`;
+  document.getElementById("hub-file-modal-body").innerHTML = `
+    ${header}${statsBar}
+    <div style="margin-bottom:var(--sp-4)">${tasks || `<p style="color:var(--text-muted)">${isFr ? "Aucune tâche." : "No tasks."}</p>`}</div>
+    ${sections ? `<div style="display:flex;flex-direction:column;gap:var(--sp-4)">${sections}</div>` : ""}`;
 }
 
 // ── CSV export ────────────────────────────────────────────────
