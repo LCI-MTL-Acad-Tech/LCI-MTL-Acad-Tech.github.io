@@ -226,21 +226,18 @@ function buildWeekSection(weekStart, logs, defaultOpen, collapsible, isCurrent =
       transition:transform var(--dur-mod);transform:rotate(${defaultOpen ? "90deg" : "0deg"})"
       aria-hidden="true">›</span>`;
 
-  // Retro-wrap button: inserted into header after innerHTML is set (appendChild survives)
+  // Retro-wrap button: inserted into header after innerHTML is set
   if (!isCurrent && !hasWrap) {
     const retroBtn = document.createElement("button");
     retroBtn.className = "btn btn--ghost btn--sm no-print";
     retroBtn.style.cssText = "font-size:1.2rem;flex-shrink:0;color:var(--warning);margin-right:var(--sp-2)";
-    retroBtn.textContent = t("weekly.add_retro_wrap") || "✏ Rédiger le bilan manquant";
+    retroBtn.textContent = t("weekly.add_retro_wrap") || "✏ Bilan manquant";
     retroBtn.onclick = (e) => {
       e.stopPropagation();
-      const lastLog = [...logs].sort((a, b) => b.date.localeCompare(a.date))[0];
-      if (!lastLog) return;
-      sessionStorage.setItem("weekly_jump_date", lastLog.date);
-      sessionStorage.setItem("weekly_show_wrap", "1");
-      window.location.href = "log.html";
+      const existing = section.querySelector(".retro-wrap-form");
+      if (existing) { existing.remove(); return; }
+      openRetroWrapForm(section, weekStart, logs);
     };
-    // Insert before the print button (second-to-last child)
     const printBtn = header.querySelector("button");
     if (printBtn) header.insertBefore(retroBtn, printBtn);
     else header.appendChild(retroBtn);
@@ -504,6 +501,209 @@ function buildObstacleHTML(logs) {
         ? `<div style="font-size:1.3rem;color:var(--text-muted);margin-top:var(--sp-1)">
             → ${escHtml(l.obstacle_response)}</div>` : ""}
     </div>`).join("");
+}
+
+function openRetroWrapForm(section, weekStart, logs, existingWrap) {
+  const isFr = getCurrentLang() === "fr-CA";
+  const tcf  = weeklyData?.context?.teacher_custom_field;
+
+  // Competency fields for this student
+  let compFields = "";
+  if (typeof getStudentCompetencies === "function") {
+    const courseCode  = weeklyData?.context?.internship_course_code || "generic";
+    const programCode = weeklyData?.profile?.program || "";
+    const comps       = getStudentCompetencies(courseCode, programCode);
+    if (comps.length) {
+      compFields = `
+        <div class="form-group mb-4">
+          <label class="form-label" style="font-size:1.3rem;font-weight:600;margin-bottom:var(--sp-3)">
+            ${isFr ? "Réflexion sur les compétences" : "Competency reflection"}
+          </label>
+          ${comps.map(c => `
+            <div style="margin-bottom:var(--sp-3)">
+              <label class="form-label" style="font-size:1.2rem">
+                ${escHtml(c.code)} — ${escHtml(c.title[getCurrentLang()] || c.title["fr-CA"])}
+              </label>
+              <textarea class="retro-comp-ta" data-comp-code="${escHtml(c.code)}"
+                rows="2" style="width:100%;margin-top:var(--sp-1);resize:vertical"
+                placeholder="${isFr ? "Ta réflexion sur cette compétence…" : "Your reflection on this competency…"}"
+                >${escHtml(existingWrap?.competency_notes?.[c.code] || "")}</textarea>
+            </div>`).join("")}
+        </div>`;
+    }
+  }
+
+  const form = document.createElement("div");
+  form.className = "retro-wrap-form";
+  form.style.cssText =
+    "padding:var(--sp-5) var(--sp-5);border-top:2px solid var(--warning);" +
+    "background:rgba(230,184,48,.05)";
+
+  form.innerHTML = `
+    <div style="font-size:1.5rem;font-weight:700;margin-bottom:var(--sp-5);color:var(--warning)">
+      ✏ ${isFr ? "Bilan — semaine du " + weekStart : "Weekly wrap — week of " + weekStart}
+    </div>
+    <div class="form-group mb-4">
+      <label class="form-label" style="font-size:1.3rem">
+        ${isFr ? "Point fort de la semaine *" : "Highlight of the week *"}
+        <span style="font-size:1.1rem;color:var(--text-muted);font-weight:400">
+          ${isFr ? " — obligatoire" : " — required"}
+        </span>
+      </label>
+      <textarea id="retro-highlight-${weekStart}" rows="4"
+        style="width:100%;margin-top:var(--sp-2);resize:vertical"
+        placeholder="${isFr ? "Qu'est-ce qui s'est bien passé cette semaine ?" : "What went well this week?"}"
+        >${escHtml(existingWrap?.highlight || "")}</textarea>
+    </div>
+    <div class="form-group mb-4">
+      <label class="form-label" style="font-size:1.3rem">
+        ${isFr ? "Principal apprentissage" : "Main learning"}
+      </label>
+      <textarea id="retro-learning-${weekStart}" rows="3"
+        style="width:100%;margin-top:var(--sp-2);resize:vertical"
+        placeholder="${isFr ? "Qu'as-tu appris cette semaine ?" : "What did you learn this week?"}"
+        >${escHtml(existingWrap?.learning || "")}</textarea>
+    </div>
+    <div class="form-group mb-4">
+      <label class="form-label" style="font-size:1.3rem">
+        ${isFr ? "Ce que tu ferais différemment" : "What you'd do differently"}
+      </label>
+      <textarea id="retro-change-${weekStart}" rows="3"
+        style="width:100%;margin-top:var(--sp-2);resize:vertical"
+        placeholder="${isFr ? "Un ajustement pour la prochaine fois ?" : "One adjustment for next time?"}"
+        >${escHtml(existingWrap?.change || "")}</textarea>
+    </div>
+    ${tcf?.label ? `
+    <div class="form-group mb-4">
+      <label class="form-label" style="font-size:1.3rem">${escHtml(tcf.label)}</label>
+      <textarea id="retro-teacher-${weekStart}" rows="3"
+        style="width:100%;margin-top:var(--sp-2);resize:vertical"
+        placeholder="${escHtml(tcf.placeholder || "")}"
+        >${escHtml(existingWrap?.teacher_note || "")}</textarea>
+    </div>` : ""}
+    ${compFields}
+    <div style="display:flex;gap:var(--sp-3);flex-wrap:wrap;margin-top:var(--sp-2)">
+      <button class="btn btn--primary" id="retro-save-${weekStart}">
+        ${isFr ? "Enregistrer" : "Save"}
+      </button>
+      <button class="btn btn--ghost" onclick="this.closest('.retro-wrap-form').remove()">
+        ${isFr ? "Annuler" : "Cancel"}
+      </button>
+    </div>`;
+
+  section.appendChild(form);
+  form.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+  document.getElementById(`retro-save-${weekStart}`).onclick = () => {
+    const highlight    = document.getElementById(`retro-highlight-${weekStart}`)?.value.trim();
+    const learning     = document.getElementById(`retro-learning-${weekStart}`)?.value.trim();
+    const change       = document.getElementById(`retro-change-${weekStart}`)?.value.trim();
+    const teacher_note = document.getElementById(`retro-teacher-${weekStart}`)?.value.trim() || "";
+    if (!highlight) {
+      document.getElementById(`retro-highlight-${weekStart}`)?.focus();
+      alert(isFr ? "Le point fort est obligatoire." : "Highlight is required.");
+      return;
+    }
+    // Collect competency notes
+    const competency_notes = {};
+    form.querySelectorAll(".retro-comp-ta").forEach(ta => {
+      const val = ta.value.trim();
+      if (val) competency_notes[ta.dataset.compCode] = val;
+    });
+
+    // Write into the last log of this week
+    const weekLogs = (weeklyData.logs || []).filter(l => getWeekKey(l.date) === weekStart);
+    const target   = [...weekLogs].sort((a, b) => b.date.localeCompare(a.date))[0];
+    if (!target) {
+      alert(isFr ? "Aucun journal trouvé pour cette semaine." : "No log found for this week.");
+      return;
+    }
+    target.weekly_wrap = { highlight, learning, change, teacher_note,
+      ...(Object.keys(competency_notes).length ? { competency_notes } : {}) };
+    weeklyData.meta.last_modified = new Date().toISOString();
+    saveData(weeklyData);
+    saveReportData(weeklyData);
+    // No auto-download — student reviews answers first, downloads when satisfied
+
+    // Replace form with a read-only display + edit button
+    form.remove();
+    renderRetroWrapAnswers(section, weekStart, logs, target.weekly_wrap);
+  };
+}
+
+function renderRetroWrapAnswers(section, weekStart, logs, wrap) {
+  const isFr = getCurrentLang() === "fr-CA";
+  const tcf  = weeklyData?.context?.teacher_custom_field;
+
+  const fields = [
+    { label: isFr ? "Point fort" : "Highlight", value: wrap.highlight },
+    { label: isFr ? "Apprentissage" : "Learning", value: wrap.learning },
+    { label: isFr ? "À faire différemment" : "Do differently", value: wrap.change },
+    tcf?.label && wrap.teacher_note
+      ? { label: tcf.label, value: wrap.teacher_note }
+      : null,
+  ].filter(Boolean);
+
+  const compSection = wrap.competency_notes && typeof getStudentCompetencies === "function"
+    ? (() => {
+        const courseCode  = weeklyData?.context?.internship_course_code || "generic";
+        const programCode = weeklyData?.profile?.program || "";
+        const comps       = getStudentCompetencies(courseCode, programCode)
+          .filter(c => wrap.competency_notes[c.code]);
+        if (!comps.length) return "";
+        return `<div style="margin-top:var(--sp-4);padding-top:var(--sp-3);border-top:1px solid var(--border)">
+          <div style="font-size:1.2rem;font-weight:700;text-transform:uppercase;
+                      letter-spacing:.06em;color:var(--text-subtle);margin-bottom:var(--sp-3)">
+            ${isFr ? "Compétences" : "Competencies"}
+          </div>
+          ${comps.map(c => `
+            <div style="margin-bottom:var(--sp-3)">
+              <div style="font-size:1.2rem;font-weight:600;color:var(--text-muted)">
+                ${escHtml(c.code)} — ${escHtml(c.title[getCurrentLang()] || c.title["fr-CA"])}
+              </div>
+              <div style="font-size:1.4rem;margin-top:var(--sp-1)">${escHtml(wrap.competency_notes[c.code])}</div>
+            </div>`).join("")}
+        </div>`;
+      })()
+    : "";
+
+  const display = document.createElement("div");
+  display.className = "retro-wrap-form";
+  display.style.cssText =
+    "padding:var(--sp-5);border-top:2px solid var(--success);background:rgba(80,180,80,.05)";
+  display.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-4)">
+      <div style="font-size:1.4rem;font-weight:700;color:var(--success)">
+        ✓ ${isFr ? "Bilan enregistré — semaine du " + weekStart : "Wrap saved — week of " + weekStart}
+      </div>
+      <button class="btn btn--ghost btn--sm no-print"
+        onclick="this.closest('.retro-wrap-form').remove();openRetroWrapForm(this.closest('.weekly-section'),'${weekStart}',null,${JSON.stringify(wrap).replace(/"/g,'&quot;')})">
+        ✏ ${isFr ? "Modifier" : "Edit"}
+      </button>
+    </div>
+    ${fields.map(f => `
+      <div style="margin-bottom:var(--sp-4)">
+        <div style="font-size:1.1rem;font-weight:700;text-transform:uppercase;
+                    letter-spacing:.06em;color:var(--text-subtle);margin-bottom:var(--sp-1)">
+          ${escHtml(f.label)}
+        </div>
+        <div style="font-size:1.4rem;white-space:pre-wrap">${escHtml(f.value)}</div>
+      </div>`).join("")}
+    ${compSection}
+    <div style="margin-top:var(--sp-5);padding-top:var(--sp-4);border-top:1px solid var(--border);
+                display:flex;align-items:center;gap:var(--sp-4);flex-wrap:wrap">
+      <button class="btn btn--primary no-print" onclick="downloadWeeklyJSON()">
+        ⬇ ${isFr ? "Télécharger et déposer sur OneDrive" : "Download and upload to OneDrive"}
+      </button>
+      <span style="font-size:1.2rem;color:var(--text-muted)">
+        ${isFr
+          ? "Quand tu es satisfait·e de tes réponses, télécharge le fichier et dépose-le sur OneDrive."
+          : "When you are happy with your answers, download the file and upload it to OneDrive."}
+      </span>
+    </div>`;
+
+  section.appendChild(display);
+  display.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 function buildWrapHTML(logs) {
