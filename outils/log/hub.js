@@ -1220,19 +1220,21 @@ function mergeStudents(uuidA, uuidB) {
 function renderStats() {
   const f = filtered;
   const total      = f.length;
+  const finished   = f.filter(s => s.has_reflection).length;
+  const inProgress = total - finished;
   const onTrack    = f.filter(s => s.track_band === "green").length;
   const behind     = f.filter(s => s.track_band === "red").length;
   const avgH       = total ? (f.reduce((s, r) => s + r.actual_hours, 0) / total).toFixed(1) : "—";
-  const reflCount  = f.filter(s => s.has_reflection).length;
   const programs   = new Set(f.map(s => s.program?.slice(0,6))).size;
+  const isFr       = getCurrentLang() === "fr-CA";
 
   document.getElementById("hub-stats").innerHTML = [
-    { val: total,                     label: "Étudiant·e·s",    color: "var(--accent)" },
-    { val: onTrack + " / " + total,   label: "Dans les temps",  color: "#3a6e00" },
-    { val: behind  + " / " + total,   label: "En retard",       color: "#a00" },
-    { val: avgH + " h",               label: "Moy. heures",     color: "var(--accent)" },
-    { val: reflCount + " / " + total, label: "Réflexions",      color: "var(--accent)" },
-    { val: programs,                  label: "Programmes",       color: "var(--accent)" },
+    { val: inProgress + " / " + total,  label: isFr ? "En cours / Total"   : "In progress / Total", color: "var(--accent)" },
+    { val: finished,                     label: isFr ? "Terminé·e·s ✅"     : "Finished ✅",          color: "#1a6fa8" },
+    { val: onTrack + " / " + inProgress, label: isFr ? "Dans les temps"     : "On track",            color: "#3a6e00" },
+    { val: behind  + " / " + inProgress, label: isFr ? "En retard"          : "Behind",              color: "#a00" },
+    { val: avgH + " h",                  label: isFr ? "Moy. heures"        : "Avg. hours",          color: "var(--accent)" },
+    { val: programs,                     label: isFr ? "Programmes"         : "Programs",            color: "var(--accent)" },
   ].map(s => `
     <div class="hub-stat">
       <div class="hub-stat-val" style="color:${s.color}">${s.val}</div>
