@@ -843,6 +843,19 @@ function populateFilterOptions() {
         return `<option value="${escHtml(c)}" ${c===curC?"selected":""}>${escHtml(label)}</option>`;
       }).join("");
   }
+  const trackSel = document.getElementById("filter-track");
+  if (trackSel) {
+    const curTr = trackSel.value;
+    const isFr  = getCurrentLang() === "fr-CA";
+    trackSel.innerHTML = [
+      { v: "",         l: isFr ? "Tous"                          : "All"                        },
+      { v: "green",    l: isFr ? "Dans les temps (≥90%)"         : "On track (≥90%)"            },
+      { v: "amber",    l: isFr ? "Légèrement en retard (70-90%)" : "Slightly behind (70-90%)"   },
+      { v: "red",      l: isFr ? "En retard (<70%)"              : "Behind (<70%)"              },
+      { v: "none",     l: isFr ? "Non défini"                    : "Not scheduled"              },
+      { v: "finished", l: isFr ? "✅ Terminé (rapport final)"    : "✅ Finished (final report)" },
+    ].map(o => `<option value="${o.v}" ${o.v===curTr?"selected":""}>${o.l}</option>`).join("");
+  }
 }
 
 function applyFilters() {
@@ -861,7 +874,8 @@ function applyFilters() {
     if (prog    && s.program !== prog)          return false;
     if (teacher && s.teacher !== teacher)       return false;
     if (pathway && s.pathway !== pathway)       return false;
-    if (track   && s.track_band !== track)      return false;
+    if (track === "finished") { if (!s.has_reflection)   return false; }
+    else if (track)           { if (s.track_band !== track) return false; }
     if (course  && s.course_code !== course)    return false;
     if (activeIntegrity && s.integrity?.ok !== false) return false;
     if (activeNoReport  && s.has_reflection)          return false;
