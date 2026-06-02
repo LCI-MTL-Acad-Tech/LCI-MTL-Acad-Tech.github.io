@@ -361,66 +361,84 @@ function loadFiles(fileList) {
       c.config++;
     });
 
-    const newRows = Object.entries(byUUID).map(([uid, grp]) => {
-      let base;
-      if (grp.length === 1) {
-        base = grp[0];
-      } else {
-        let merged;
-        try {
-          merged = mergeInternshipFiles(grp);
-        } catch (e) {
-          console.error(`[LCI Hub] mergeInternshipFiles threw for UUID ${uid} — using first file as fallback.`, e);
-          merged = { valid: false, errors: [e.message], warnings: [], data: grp[0] };
-        }
-        if (merged.valid) {
-          base = merged.data;
-        } else {
-          console.error(`[LCI Hub] Merge failed for UUID ${uid} (${grp.length} files) — using first file as fallback.`,
-            { errors: merged.errors, warnings: merged.warnings });
+    // ── Batched row building ─────────────────────────────────
+    // Process students in small batches yielding to the browser between each
+    // to avoid freezing the UI on large uploads.
+    const uuidEntries = Object.entries(byUUID);
+    const BATCH = 10;
+    const isFrLoad = getCurrentLang() === "fr-CA";
+    setProgress(0);
+
+    function buildOneBatch(startIdx) {
+      const end = Math.min(startIdx + BATCH, uuidEntries.length);
+      for (let i = startIdx; i < end; i++) {
+        const [uid, grp] = uuidEntries[i];
+        let base;
+        if (grp.length === 1) {
           base = grp[0];
+        } else {
+          let merged;
+          try {
+            merged = mergeInternshipFiles(grp);
+          } catch (e) {
+            console.error(`[LCI Hub] mergeInternshipFiles threw for UUID ${uid} — using first file as fallback.`, e);
+            merged = { valid: false, errors: [e.message], warnings: [], data: grp[0] };
+          }
+          if (merged.valid) {
+            base = merged.data;
+          } else {
+            console.error(`[LCI Hub] Merge failed for UUID ${uid} (${grp.length} files) — using first file as fallback.`,
+              { errors: merged.errors, warnings: merged.warnings });
+            base = grp[0];
+          }
+        }
+
+        if (configByUUID[uid]) {
+          base = {
+            ...base,
+            context: {
+              ...base.context,
+              planned_absences:    configByUUID[uid].planned_absences    ?? base.context?.planned_absences    ?? [],
+              work_days:           configByUUID[uid].work_days           ?? base.context?.work_days           ?? [1,2,3,4,5],
+              work_hours:          configByUUID[uid].work_hours          ?? base.context?.work_hours,
+              work_hours_by_day:   configByUUID[uid].work_hours_by_day   ?? base.context?.work_hours_by_day   ?? {},
+              work_hours_date_overrides: configByUUID[uid].work_hours_date_overrides ?? base.context?.work_hours_date_overrides ?? {},
+              calendar_week_start: configByUUID[uid].calendar_week_start ?? base.context?.calendar_week_start ?? 1,
+            },
+          };
+        }
+
+        const row = buildRow(base);
+        row.file_type_counts = typesByUUID[uid] || { daily:0, weekly:0, full:0, reflection:0, config:0 };
+
+        const existing = students.findIndex(s => s.uuid === row.uuid);
+        if (existing >= 0) {
+          const prev = students[existing].file_type_counts || { daily:0, weekly:0, full:0, reflection:0, config:0 };
+          row.file_type_counts = {
+            daily:      prev.daily      + row.file_type_counts.daily,
+            weekly:     prev.weekly     + row.file_type_counts.weekly,
+            full:       prev.full       + row.file_type_counts.full,
+            reflection: prev.reflection + row.file_type_counts.reflection,
+            config:     prev.config     + row.file_type_counts.config,
+          };
+          students[existing] = row;
+        } else {
+          students.push(row);
         }
       }
 
-      // If a config file was uploaded for this student, overlay its context fields
-      // (planned_absences, work_days, work_hours take priority over what's in log files)
-      if (configByUUID[uid]) {
-        base = {
-          ...base,
-          context: {
-            ...base.context,
-            planned_absences:    configByUUID[uid].planned_absences    ?? base.context?.planned_absences    ?? [],
-            work_days:           configByUUID[uid].work_days           ?? base.context?.work_days           ?? [1,2,3,4,5],
-            work_hours:          configByUUID[uid].work_hours          ?? base.context?.work_hours,
-            work_hours_by_day:   configByUUID[uid].work_hours_by_day   ?? base.context?.work_hours_by_day   ?? {},
-            work_hours_date_overrides: configByUUID[uid].work_hours_date_overrides ?? base.context?.work_hours_date_overrides ?? {},
-            calendar_week_start: configByUUID[uid].calendar_week_start ?? base.context?.calendar_week_start ?? 1,
-          },
-        };
-      }
+      const pct = Math.round((end / uuidEntries.length) * 80); // 0-80% for rows
+      setProgress(pct);
+      setStatus((isFrLoad ? "Chargement… " : "Loading… ") + end + " / " + uuidEntries.length);
 
-      const row = buildRow(base);
-      row.file_type_counts = typesByUUID[uid] || { daily:0, weekly:0, full:0, reflection:0, config:0 };
-      return row;
-    });
-
-    // Deduplicate / update by UUID — merge file type counts on re-upload
-    newRows.forEach(r => {
-      const existing = students.findIndex(s => s.uuid === r.uuid);
-      if (existing >= 0) {
-        const prev = students[existing].file_type_counts || { daily:0, weekly:0, full:0, reflection:0, config:0 };
-        r.file_type_counts = {
-          daily:      prev.daily      + r.file_type_counts.daily,
-          weekly:     prev.weekly     + r.file_type_counts.weekly,
-          full:       prev.full       + r.file_type_counts.full,
-          reflection: prev.reflection + r.file_type_counts.reflection,
-          config:     prev.config     + r.file_type_counts.config,
-        };
-        students[existing] = r;
+      if (end < uuidEntries.length) {
+        setTimeout(() => buildOneBatch(end), 0);
       } else {
-        students.push(r);
+        finishLoading();
       }
-    });
+    }
+
+    function finishLoading() {
 
     // Stub rows for config-only students not covered by any log file
     configFiles.forEach(({ data: cfg, name }) => {
@@ -482,8 +500,13 @@ function loadFiles(fileList) {
     document.getElementById("hub-upload-strip")?.classList.add("hub-upload-strip--loaded");
 
     populateFilterOptions();
+    setProgress(90);
     applyFilters();
-  });
+    setProgress(null);
+    } // end finishLoading
+
+    buildOneBatch(0);
+  }); // end Promise.all
 }
 
 function clearAll() {
@@ -500,6 +523,14 @@ function setStatus(msg) {
   if (el) el.textContent = msg;
 }
 
+function setProgress(pct) {
+  const bar  = document.getElementById("hub-progress-bar");
+  const fill = document.getElementById("hub-progress-fill");
+  if (!bar || !fill) return;
+  if (pct === null) { bar.style.display = "none"; fill.style.width = "0%"; return; }
+  bar.style.display = "block";
+  fill.style.width  = Math.min(100, Math.max(0, pct)) + "%";
+}
 // ── Work-day helpers (hub-side) ───────────────────────────────
 // Count expected working days in [fromDate, toDate] inclusive,
 // respecting work_days schedule and excluding planned_absences.
