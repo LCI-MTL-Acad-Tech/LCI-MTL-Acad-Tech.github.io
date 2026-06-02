@@ -1461,8 +1461,9 @@ function renderHoursChart() {
   });
 
   const isDark   = document.documentElement.getAttribute("data-theme") === "dark";
-  const barColors  = { green: "#3a6e00", amber: "#9a6c00", red: "#a00",    none: "#6b7280" };
-  const darkColors = { green: "#8ab840", amber: "#e6b830", red: "#ff6b70", none: "#9ca3af" };
+  const isFr     = getCurrentLang() === "fr-CA";
+  const barColors  = { green: "#3a6e00", amber: "#9a6c00", red: "#a00", none: "#6b7280", finished: "#1a6fa8" };
+  const darkColors = { green: "#8ab840", amber: "#e6b830", red: "#ff6b70", none: "#9ca3af", finished: "#4db8ff" };
   const cols = isDark ? darkColors : barColors;
 
   const maxH = Math.max(...sorted.map(s => Math.max(s.actual_hours, s.expected_hours, 1)));
@@ -1486,7 +1487,7 @@ function renderHoursChart() {
     const expectH  = Math.max(s.expected_hours, 0.1);
     const actualPx = Math.max(Math.round((actualH / maxH) * chartH), 4);
     const expectPx = Math.max(Math.round((expectH / maxH) * chartH), 4);
-    const color    = cols[s.track_band] || cols.none;
+    const color    = s.has_reflection ? cols.finished : (cols[s.track_band] || cols.none);
     const initials = s.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
     const tip      = `${escHtml(s.name)}: ${s.actual_hours}h / ${s.expected_hours}h attendues`;
 
@@ -1514,14 +1515,15 @@ function renderHoursChart() {
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;width:100%;
                     justify-content:flex-end;height:${chartH}px;position:relative">
-          <div style="position:absolute;bottom:${expectPx}px;left:0;right:0;
-                      border-top:2px dashed rgba(100,100,100,.4);z-index:1"></div>
           <div style="width:100%;background:${color};height:${actualPx}px;
                       border-radius:3px 3px 0 0;position:relative;z-index:2;
                       transition:filter var(--dur-fast)"
                onmouseover="this.style.filter='brightness(1.2)'"
                onmouseout="this.style.filter=''">
             ${futureOverlay}
+            <div style="position:absolute;bottom:${expectPx - actualPx}px;left:-1px;right:-1px;
+                        border-top:2.5px solid rgba(40,40,40,.7);z-index:10;pointer-events:none"
+                 title="${s.expected_hours}h ${isFr ? 'attendues' : 'expected'}"></div>
           </div>
         </div>
         ${showInitials ? `<div style="font-size:${barW >= 20 ? 1 : 0.85}rem;color:var(--text-subtle);
