@@ -1305,6 +1305,7 @@ const CLUSTER_THRESHOLD_PCT = 0.20; // integrity: created_at span / internship s
 function getAWOLStudents() {
   return filtered.filter(s =>
     s.working_days_absent !== null && s.working_days_absent >= MIA_WORK_DAYS
+    && !s.has_reflection  // students who submitted their final report are done
   ).sort((a, b) => b.working_days_absent - a.working_days_absent);
 }
 
