@@ -892,7 +892,17 @@ function addTool(data, tool) {
 }
 
 function addActivityType(data, type) {
-  type.type_id = type.type_id || generateUUID();
+  if (!type.type_id) {
+    // Build a readable ID: usr-{label-slug}-{4 random hex chars}
+    const slug = (type.label || "custom")
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 24);
+    const suffix = Math.floor(Math.random() * 0x10000).toString(16).padStart(4, "0");
+    type.type_id = `usr-${slug}-${suffix}`;
+  }
   type.system = false;
   type.added_date = localDateISO();
   data.activity_types.push(type);

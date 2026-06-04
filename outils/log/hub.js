@@ -3,7 +3,29 @@
 // All state lives in memory and is gone on refresh.
 
 let students = [];        // all built rows
-let hubMilestones = {};   // { [project_id]: { exported_at, project } } — loaded from uploaded milestone files
+let hubMilestones = {};   // { [project_id]: { exported_at, project } }
+// UUIDs manually marked as finished by the hub admin
+const manuallyFinished = new Set(
+  JSON.parse(sessionStorage.getItem("hub_manually_finished") || "[]")
+);
+
+function isFinished(s) {
+  return s.has_reflection || manuallyFinished.has(s.uuid);
+}
+
+function toggleManualFinished(uuid) {
+  if (manuallyFinished.has(uuid)) manuallyFinished.delete(uuid);
+  else manuallyFinished.add(uuid);
+  sessionStorage.setItem("hub_manually_finished", JSON.stringify([...manuallyFinished]));
+  applyFilters();
+  // Re-open the detail row if it was open
+  const s = students.find(r => r.uuid === uuid);
+  if (s) {
+    const idx = filtered.findIndex(r => r.uuid === uuid);
+    if (idx >= 0) openStudentPanel(uuid);
+  }
+} // end toggleManualFinished
+
 // Pairs dismissed as "not the same person" — key is "uuidA|uuidB" (sorted)
 const dismissedDupPairs = new Set(
   JSON.parse(sessionStorage.getItem("hub_dismissed_dups") || "[]")
@@ -104,6 +126,7 @@ function detectFileType(d) {
   if (type === "weekly")     return "weekly";
   if (type === "full")       return "full";
   if (type === "milestones") return "milestones";
+  if (type === "hub_state")  return "hub_state";
   if (!d.profile?.full_name) return "unknown";
   if (d.reflection && !d.logs?.length) return "reflection";
   if (d.logs?.length > 1)   return "weekly"; // merged multi-day
@@ -154,6 +177,15 @@ function loadFiles(fileList) {
     // Separate config files from log/report files
     const configFiles    = enriched.filter(p => p.type === "config");
     const milestoneFiles = enriched.filter(p => p.type === "milestones");
+    const hubStateFiles  = enriched.filter(p => p.type === "hub_state");
+
+    // Restore hub state from any uploaded hub_state.json files
+    if (hubStateFiles.length) {
+      hubStateFiles.forEach(p => {
+        loadHubState(p.data);
+        console.info(`[LCI Hub] Restored hub state from "${p.name}"`);
+      });
+    }
 
     // Merge milestone files into the hub milestone store
     if (milestoneFiles.length) {
@@ -177,6 +209,7 @@ function loadFiles(fileList) {
       }
       if (p.type === "config")     return false; // handled separately
       if (p.type === "milestones") return false; // handled above
+      if (p.type === "hub_state")  return false; // handled above
       if (!p.data.profile?.full_name) {
         console.warn(`[LCI Hub] "${p.name}" → skipped: missing profile.full_name.`, p.data.profile);
         return false;
@@ -264,7 +297,8 @@ function loadFiles(fileList) {
       const nC = configFiles.length;
       const nS = students.length;
       setStatus(`${nC} fichier${nC > 1 ? "s" : ""} de configuration — ${nS} étudiant·e${nS > 1 ? "·s" : ""} au total.`);
-      document.getElementById("btn-csv").style.display   = "";
+      document.getElementById("btn-csv").style.display        = "";
+      document.getElementById("btn-export-hub").style.display = "";
       document.getElementById("btn-clear").style.display = "";
       document.getElementById("hub-dashboard").style.display = "block";
       document.getElementById("hub-upload-strip")?.classList.add("hub-upload-strip--loaded");
@@ -494,7 +528,8 @@ function loadFiles(fileList) {
     if (nC > 0) statusMsg += ` + ${nC} config`;
     setStatus(statusMsg + ".");
 
-    document.getElementById("btn-csv").style.display   = "";
+    document.getElementById("btn-csv").style.display        = "";
+      document.getElementById("btn-export-hub").style.display = "";
     document.getElementById("btn-clear").style.display = "";
     document.getElementById("hub-dashboard").style.display = "block";
     document.getElementById("hub-upload-strip")?.classList.add("hub-upload-strip--loaded");
@@ -512,7 +547,8 @@ function loadFiles(fileList) {
 function clearAll() {
   students = []; filtered = [];
   document.getElementById("hub-dashboard").style.display = "none";
-  document.getElementById("btn-csv").style.display = "none";
+  document.getElementById("btn-csv").style.display        = "none";
+  document.getElementById("btn-export-hub").style.display = "none";
   document.getElementById("btn-clear").style.display = "none";
   document.getElementById("hub-upload-strip")?.classList.remove("hub-upload-strip--loaded");
   setStatus("Dépose les JSON des étudiant·e·s ici — journaux, bilans et fichiers de configuration.");
@@ -805,6 +841,28 @@ function buildRow(data) {
     };
   })();
 
+  // ── Pending weekly wraps ──────────────────────────────────────
+  // Count completed past weeks that have logs but no weekly_wrap filed
+  const pendingWraps = (() => {
+    if (!logs.length || !startDate) return 0;
+    const today    = new Date().toISOString().slice(0,10);
+    const weekEndDow = parseInt(ctx?.week_end_day ?? 5);
+    const weekMap  = {};
+    logs.forEach(l => {
+      const wk = getWeekStartISO(l.date);
+      if (!weekMap[wk]) weekMap[wk] = { hasWrap: false, lastDate: wk };
+      if (l.weekly_wrap?.highlight) weekMap[wk].hasWrap = true;
+      if (l.date > weekMap[wk].lastDate) weekMap[wk].lastDate = l.date;
+    });
+    return Object.entries(weekMap).filter(([wk, v]) => {
+      // week end date = Monday of week + (weekEndDow - 1) days
+      const mon = new Date(wk + "T12:00:00");
+      const end = new Date(mon);
+      end.setDate(mon.getDate() + (weekEndDow === 0 ? 6 : weekEndDow - 1));
+      return end.toISOString().slice(0,10) < today && !v.hasWrap;
+    }).length;
+  })();
+
   return {
     uuid:               data.meta?.student_uuid || data.profile?.student_id,
     name:               data.profile?.full_name || "—",
@@ -833,6 +891,7 @@ function buildRow(data) {
     last_obstacle:      lastWithObstacle ? { date: lastWithObstacle.date, text: lastWithObstacle.obstacle, response: lastWithObstacle.obstacle_response } : null,
     last_plan:          lastWithPlan     ? { date: lastWithPlan.date, text: lastWithPlan.plan_tomorrow } : null,
     last_wrap:          lastWrap         ? { date: lastWrap.date, wrap: lastWrap.weekly_wrap }           : null,
+    pending_wraps:      pendingWraps,
     total_target:       totalTarget,
     competency_coverage,
     outcome_coverage,
@@ -905,11 +964,11 @@ function applyFilters() {
     if (prog    && s.program !== prog)          return false;
     if (teacher && s.teacher !== teacher)       return false;
     if (pathway && s.pathway !== pathway)       return false;
-    if (track === "finished") { if (!s.has_reflection)   return false; }
+    if (track === "finished") { if (!isFinished(s))      return false; }
     else if (track)           { if (s.track_band !== track) return false; }
     if (course  && s.course_code !== course)    return false;
     if (activeIntegrity && s.integrity?.ok !== false) return false;
-    if (activeNoReport  && s.has_reflection)          return false;
+    if (activeNoReport  && isFinished(s))             return false;
     if (search  && !s.name.toLowerCase().includes(search)
                 && !s.student_id.toLowerCase().includes(search)) return false;
     return true;
@@ -1220,7 +1279,7 @@ function mergeStudents(uuidA, uuidB) {
 function renderStats() {
   const f = filtered;
   const total      = f.length;
-  const finished   = f.filter(s => s.has_reflection).length;
+  const finished   = f.filter(s => isFinished(s)).length;
   const inProgress = total - finished;
   const onTrack    = f.filter(s => s.track_band === "green").length;
   const behind     = f.filter(s => s.track_band === "red").length;
@@ -1282,7 +1341,7 @@ function renderNoReportFilter() {
   const el = document.getElementById("hub-qf-no-report");
   if (!el) return;
   const isFr  = getCurrentLang() === "fr-CA";
-  const count = students.filter(s => !s.has_reflection).length;
+  const count = students.filter(s => !isFinished(s)).length;
   const label = isFr
     ? `⬜ ${isFr ? "Sans rapport final" : "No final report"} (${count})`
     : `⬜ No final report (${count})`;
@@ -1352,7 +1411,7 @@ const CLUSTER_THRESHOLD_PCT = 0.20; // integrity: created_at span / internship s
 function getAWOLStudents() {
   return filtered.filter(s =>
     s.working_days_absent !== null && s.working_days_absent >= MIA_WORK_DAYS
-    && !s.has_reflection  // students who submitted their final report are done
+    && !isFinished(s)     // students who submitted their final report are done
   ).sort((a, b) => b.working_days_absent - a.working_days_absent);
 }
 
@@ -1390,9 +1449,18 @@ function renderAWOL() {
       border: "rgba(100,100,100,.2)",
       label: isFr ? "MIA — 2 jours ouvrables sans journal" : "MIA — 2 working days without a log",
     },
+    {
+      key: "wraps",
+      students: filtered.filter(s => !isFinished(s) && s.pending_wraps >= 2)
+                        .sort((a, b) => b.pending_wraps - a.pending_wraps),
+      badge: "📅",
+      color: "var(--accent)",
+      border: "rgba(var(--accent-rgb,0,120,180),.2)",
+      label: isFr ? "Bilans hebdomadaires en attente (2+)" : "Weekly wraps pending (2+)",
+    },
   ].filter(g => g.students.length);
 
-  function renderRow(s, color) {
+  function renderRow(s, color, groupKey) {
     const wda = s.working_days_absent;
     const absenceCtx  = s.raw?.context?.planned_absences;
     const absenceNote = absenceCtx?.length
@@ -1417,7 +1485,9 @@ function renderAWOL() {
         </div>
         <div style="text-align:right;flex-shrink:0">
           <div style="color:${color};font-weight:700;font-size:1.5rem">
-            ${wda} ${isFr ? "j. ouv." : "work day·s"}
+            ${groupKey === "wraps"
+              ? `${s.pending_wraps} ${isFr ? "bilan·s manquant·s" : "wrap·s missing"}`
+              : `${wda} ${isFr ? "j. ouv." : "work day·s"}`}
           </div>
           <div style="color:var(--text-subtle);font-size:1.2rem">
             ${isFr ? "dernier" : "last"}: ${s.last_log || (isFr ? "jamais" : "never")}
@@ -1448,7 +1518,7 @@ function renderAWOL() {
         <span style="font-size:1.1rem;margin-left:auto;color:var(--text-muted)" class="awol-arrow">▼</span>
       </summary>
       <div style="padding-left:var(--sp-2)">
-        ${g.students.map(s => renderRow(s, g.color)).join("")}
+        ${g.students.map(s => renderRow(s, g.color, g.key)).join("")}
       </div>
     </details>`
   ).join("");
@@ -1520,7 +1590,7 @@ function renderHoursChart() {
     const expectH  = Math.max(s.expected_hours, 0.1);
     const actualPx = Math.max(Math.round((actualH / maxH) * chartH), 4);
     const expectPx = Math.max(Math.round((expectH / maxH) * chartH), 4);
-    const color    = s.has_reflection ? cols.finished : (cols[s.track_band] || cols.none);
+    const color    = isFinished(s) ? cols.finished : (cols[s.track_band] || cols.none);
     const initials = s.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
     const tip      = `${escHtml(s.name)}: ${s.actual_hours}h / ${s.expected_hours}h attendues`;
 
@@ -2060,10 +2130,13 @@ function buildDetailHTML(s) {
   const weeklyLogs = (s.raw.logs || []).filter(l =>  l.weekly_wrap?.highlight);
   const hasRefl    = s.has_reflection;
 
+  const isManuallyDone = manuallyFinished.has(s.uuid);
+  const isEffDone      = isFinished(s);
+
   const submissionSummary = (() => {
     const rows = [
       {
-        icon: "\uD83D\uDCDD",
+        icon: "📝",
         label: lang === "fr-CA" ? "Journaux quotidiens" : "Daily logs",
         count: dailyLogs.length,
         btn:   lang === "fr-CA" ? "Voir" : "View",
@@ -2071,7 +2144,7 @@ function buildDetailHTML(s) {
         missing: false,
       },
       {
-        icon: "\uD83D\uDCC5",
+        icon: "📅",
         label: lang === "fr-CA" ? "Bilans hebdomadaires" : "Weekly wraps",
         count: weeklyLogs.length,
         btn:   lang === "fr-CA" ? "Voir" : "View",
@@ -2079,14 +2152,26 @@ function buildDetailHTML(s) {
         missing: false,
       },
       {
-        icon: hasRefl ? "\u2705" : "\u2B1C",
+        icon: hasRefl ? "✅" : isManuallyDone ? "✅" : "⬜",
         label: lang === "fr-CA" ? "Rapport final" : "Final report",
         count: hasRefl ? 1 : 0,
         btn:   hasRefl ? (lang === "fr-CA" ? "Voir" : "View") : null,
         onclick: `openFileListModal('${escHtml(s.uuid)}','reflection')`,
-        missing: !hasRefl,
+        missing: !hasRefl && !isManuallyDone,
       },
     ];
+    const manualBtn = !hasRefl ? `
+      <button class="btn btn--sm no-print"
+        onclick="toggleManualFinished('${escHtml(s.uuid)}')"
+        style="align-self:center;font-size:1.2rem;
+               border:1.5px solid ${isManuallyDone ? "var(--success)" : "var(--border)"};
+               background:${isManuallyDone ? "rgba(80,180,80,.1)" : "var(--bg-card)"};
+               color:${isManuallyDone ? "var(--success)" : "var(--text-muted)"};
+               border-radius:var(--r-pill);padding:var(--sp-1) var(--sp-3)">
+        ${isManuallyDone
+          ? (lang === "fr-CA" ? "✅ Terminé (manuel) — annuler" : "✅ Finished (manual) — undo")
+          : (lang === "fr-CA" ? "☑ Marquer comme terminé" : "☑ Mark as finished")}
+      </button>` : "";
     return `
       <div style="display:flex;gap:var(--sp-3);flex-wrap:wrap;margin-bottom:var(--sp-4)">
         ${rows.map(r => `
@@ -2105,7 +2190,8 @@ function buildDetailHTML(s) {
         ).join("")}
         <button class="btn btn--ghost btn--sm" style="align-self:center;font-size:1.2rem"
           onclick="openFileListModal('${escHtml(s.uuid)}','all')"
-          >${lang === "fr-CA" ? "\uD83D\uDCCB Tout voir" : "\uD83D\uDCCB View all"}</button>
+          >${lang === "fr-CA" ? "📋 Tout voir" : "📋 View all"}</button>
+        ${manualBtn}
       </div>`;
   })();
 
@@ -2586,6 +2672,57 @@ function exportCSV() {
   a.download = `hub_stage_${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+function exportHubState() {
+  const isFr = getCurrentLang() === "fr-CA";
+  const now  = new Date();
+  const ts   = now.toISOString().slice(0,10) + "_" +
+    String(now.getHours()).padStart(2,"0") + "-" +
+    String(now.getMinutes()).padStart(2,"0");
+
+  const payload = {
+    meta: {
+      type:        "hub_state",
+      exported_at: now.toISOString(),
+      student_count: students.length,
+    },
+    manually_finished: [...manuallyFinished],
+    students: students.map(s => s.raw),
+    milestones: hubMilestones,
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)],
+    { type: "application/json;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `hub_etat_${ts}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function loadHubState(data) {
+  // Restore manually-finished marks
+  if (Array.isArray(data.manually_finished)) {
+    data.manually_finished.forEach(uuid => manuallyFinished.add(uuid));
+    sessionStorage.setItem("hub_manually_finished", JSON.stringify([...manuallyFinished]));
+  }
+  // Restore milestones
+  if (data.milestones && typeof data.milestones === "object") {
+    Object.assign(hubMilestones, data.milestones);
+  }
+  // Restore student rows from raw data
+  if (Array.isArray(data.students)) {
+    data.students.forEach(raw => {
+      const row = buildRow(raw);
+      row.file_type_counts = { daily:0, weekly:0, full:0, reflection:0, config:0 };
+      const existing = students.findIndex(s => s.uuid === row.uuid);
+      if (existing >= 0) students[existing] = row;
+      else students.push(row);
+    });
+  }
+  applyFilters();
 }
 
 // ── Hub monthly grid view ─────────────────────────────────────
