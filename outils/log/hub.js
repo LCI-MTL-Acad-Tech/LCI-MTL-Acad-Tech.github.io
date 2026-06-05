@@ -1494,6 +1494,23 @@ function renderAWOL() {
           </div>
         </div>
         ${s.email ? `<a href="mailto:${escHtml(s.email)}" class="btn btn--ghost btn--sm" style="flex-shrink:0">✉</a>` : ""}
+        ${!isFinished(s) ? `
+          <button class="btn btn--ghost btn--sm no-print"
+            onclick="toggleManualFinished('${escHtml(s.uuid)}')"
+            style="flex-shrink:0;font-size:1.1rem;color:var(--text-muted);
+                   border:1px solid var(--border);border-radius:var(--r-pill);
+                   padding:2px 8px"
+            title="${isFr ? 'Marquer comme terminé' : 'Mark as finished'}">
+            ☑
+          </button>` : `
+          <button class="btn btn--ghost btn--sm no-print"
+            onclick="toggleManualFinished('${escHtml(s.uuid)}')"
+            style="flex-shrink:0;font-size:1.1rem;color:var(--success);
+                   border:1px solid var(--success);border-radius:var(--r-pill);
+                   padding:2px 8px"
+            title="${isFr ? 'Terminé (annuler)' : 'Finished (undo'}">
+            ✅
+          </button>`}
       </div>`;
   }
 
