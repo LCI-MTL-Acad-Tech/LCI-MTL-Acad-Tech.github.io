@@ -110,12 +110,12 @@ int main() {
       },
       {
         id:'i02_3', type:'bug', xp:20,
-        instr:{ fr:`Cette fonction compilera mais donnera toujours 0. Pourquoi ?`, en:`This function will compile but always returns 0. Why?` },
+        instr:{ fr:`Cette fonction compile et s'exécute sans erreur — mais le résultat peut surprendre. Qu'est-ce que half(7) retourne, et pourquoi ?`, en:`This function compiles and runs without error — but the result may surprise you. What does half(7) return, and why?` },
         bugCode:`<span class="kw2">int</span> <span class="fn2">half</span>(<span class="kw2">int</span> a) {
     <span class="kw2">return</span> <span class="bug-line">a / 2</span>;
 }
 <span class="cm">// appelé avec : half(7)</span>`,
-        explanation:{ fr:`a/2 avec deux entiers fait une division entière : half(7) = 3, pas 3.5. Si le résultat doit être décimal, retourner float et utiliser static_cast<float>(a) / 2. Si int est voulu, c'est correct — mais nommer la fonction "half" avec un retour entier peut surprendre.`, en:`a/2 with two integers does integer division: half(7) = 3, not 3.5. If decimal result is needed, return float and use static_cast<float>(a) / 2. If int is intended it's correct — but naming the function "half" with an int return may surprise callers.` }
+        explanation:{ fr:`half(7) retourne 3, pas 3.5 — parce que a/2 avec deux entiers fait une division entière : la partie décimale est tronquée. Ce n'est pas un bug en soi, mais un comportement souvent non voulu par les débutants. Si le résultat doit être décimal, il faut retourner float et écrire static_cast&lt;float&gt;(a) / 2.`, en:`half(7) returns 3, not 3.5 — because a/2 with two integers does integer division: the decimal part is truncated. This is not a bug per se, but a behaviour that often surprises beginners. If a decimal result is needed, return float and write static_cast&lt;float&gt;(a) / 2.` }
       },
       {
         id:'i02_4', type:'fill', xp:15,
