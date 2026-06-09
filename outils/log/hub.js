@@ -180,12 +180,9 @@ function loadFiles(fileList) {
     const hubStateFiles  = enriched.filter(p => p.type === "hub_state");
 
     // Restore hub state from any uploaded hub_state.json files
-    if (hubStateFiles.length) {
-      hubStateFiles.forEach(p => {
-        loadHubState(p.data);
-        console.info(`[LCI Hub] Restored hub state from "${p.name}"`);
-      });
-    }
+    // Stored here and applied in finishLoading() — after all student rows are built —
+    // so the state isn't overwritten by the batched row builder.
+    const pendingHubStates = hubStateFiles.map(p => p.data);
 
     // Merge milestone files into the hub milestone store
     if (milestoneFiles.length) {
@@ -473,6 +470,13 @@ function loadFiles(fileList) {
     }
 
     function finishLoading() {
+      // Apply any hub state files now that all student rows are built
+      if (pendingHubStates.length) {
+        pendingHubStates.forEach((data, i) => {
+          loadHubState(data);
+          console.info(`[LCI Hub] Applied hub state ${i + 1}/${pendingHubStates.length}`);
+        });
+      }
 
     // Stub rows for config-only students not covered by any log file
     configFiles.forEach(({ data: cfg, name }) => {
@@ -842,7 +846,8 @@ function buildRow(data) {
   })();
 
   // ── Pending weekly wraps ──────────────────────────────────────
-  // Count completed past weeks that have logs but no weekly_wrap filed
+  // Only meaningful when a config file is present — without it we can't
+  // know the student's actual schedule and get false positives.
   const pendingWraps = (() => {
     if (!logs.length || !startDate) return 0;
     const today    = new Date().toISOString().slice(0,10);
@@ -1409,9 +1414,21 @@ const LAG_THRESHOLD_DAYS    = 7;    // integrity: days between last log and file
 const CLUSTER_THRESHOLD_PCT = 0.20; // integrity: created_at span / internship span
 
 function getAWOLStudents() {
+  // Students involved in a pending (unconfirmed, non-dismissed) duplicate pair
+  // should not appear in AWOL until the merge decision is made — one side may
+  // be the "real" active student and the other a partial duplicate.
+  const pendingPairs = findProbableDuplicates().filter(p => !p.autoMerge
+    && !dismissedDupPairs.has(dupPairKey(students[p.i]?.uuid, students[p.j]?.uuid)));
+  const inPendingPair = new Set();
+  pendingPairs.forEach(({ i, j }) => {
+    if (students[i]) inPendingPair.add(students[i].uuid);
+    if (students[j]) inPendingPair.add(students[j].uuid);
+  });
+
   return filtered.filter(s =>
     s.working_days_absent !== null && s.working_days_absent >= MIA_WORK_DAYS
-    && !isFinished(s)     // students who submitted their final report are done
+    && !isFinished(s)
+    && !inPendingPair.has(s.uuid)
   ).sort((a, b) => b.working_days_absent - a.working_days_absent);
 }
 
@@ -1451,12 +1468,23 @@ function renderAWOL() {
     },
     {
       key: "wraps",
-      students: filtered.filter(s => !isFinished(s) && s.pending_wraps >= 2)
+      students: filtered.filter(s => !isFinished(s) && s.pending_wraps >= 2
+        && (s.file_type_counts?.config || 0) > 0)  // suppress when config is missing
                         .sort((a, b) => b.pending_wraps - a.pending_wraps),
       badge: "📅",
       color: "var(--accent)",
       border: "rgba(var(--accent-rgb,0,120,180),.2)",
       label: isFr ? "Bilans hebdomadaires en attente (2+)" : "Weekly wraps pending (2+)",
+    },
+    {
+      key: "no_config",
+      students: filtered.filter(s => !isFinished(s)
+        && (s.file_type_counts?.config || 0) === 0
+        && (s.file_type_counts?.daily  || 0) > 0),
+      badge: "⚙",
+      color: "var(--text-muted)",
+      border: "rgba(100,100,100,.2)",
+      label: isFr ? "Fichier de configuration manquant" : "Config file missing",
     },
   ].filter(g => g.students.length);
 
@@ -1487,6 +1515,8 @@ function renderAWOL() {
           <div style="color:${color};font-weight:700;font-size:1.5rem">
             ${groupKey === "wraps"
               ? `${s.pending_wraps} ${isFr ? "bilan·s manquant·s" : "wrap·s missing"}`
+              : groupKey === "no_config"
+              ? `${s.file_type_counts?.daily || 0} ${isFr ? "journal·aux" : "log·s"}`
               : `${wda} ${isFr ? "j. ouv." : "work day·s"}`}
           </div>
           <div style="color:var(--text-subtle);font-size:1.2rem">
@@ -2729,14 +2759,17 @@ function loadHubState(data) {
   if (data.milestones && typeof data.milestones === "object") {
     Object.assign(hubMilestones, data.milestones);
   }
-  // Restore student rows from raw data
+  // Restore student rows only for students NOT already present from uploaded files.
+  // If individual JSON files were also uploaded, those take priority.
   if (Array.isArray(data.students)) {
     data.students.forEach(raw => {
+      const uuid = raw.meta?.student_uuid || raw.profile?.student_id;
+      if (!uuid) return;
+      const alreadyLoaded = students.some(s => s.uuid === normId(uuid) || s.uuid === uuid);
+      if (alreadyLoaded) return; // individual file takes priority — skip
       const row = buildRow(raw);
       row.file_type_counts = { daily:0, weekly:0, full:0, reflection:0, config:0 };
-      const existing = students.findIndex(s => s.uuid === row.uuid);
-      if (existing >= 0) students[existing] = row;
-      else students.push(row);
+      students.push(row);
     });
   }
   applyFilters();
