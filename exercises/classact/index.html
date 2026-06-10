@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Class//Act — Renforcement POO</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wordmark">Class<span>//</span>Act</div>
+  <div class="hdr-r">
+    <button id="theme-btn" aria-label="Toggle theme">🌙</button>
+    <button id="lang-btn">EN</button>
+  </div>
+</header>
+
+<div id="page-home">
+  <div class="home-hero">
+    <h1 id="hero-title">Renforcement <em>POO</em></h1>
+    <p id="hero-sub"></p>
+  </div>
+
+  <div id="schedule-container"></div>
+</div>
+
+<div id="toast"></div>
+<script src="engine.js"></script>
+<script>
+// ── Home strings ──────────────────────────────────────────────
+const HOME = {
+  fr: {
+    heroTitle: 'Renforcement <em>POO</em>',
+    heroSub: 'Quatorze modules hebdomadaires pour consolider les fondements de la Programmation Orientée Objet — classes, héritage, interfaces et collections — avec des exemples en Java, C#, Python, C++ et Rust.',
+    weekLabel: n => `Semaine ${n}`,
+    intro: 'Introduction',
+    oral: 'Examen oral',
+    modules: [
+      { num:'00', title:'Introduction à la POO', sub:'Les 4 piliers, pourquoi l\'OOP, configuration', week:1, type:'special' },
+      { num:'01', title:'Classes et objets I', sub:'Attributs, constructeurs, instanciation', week:2 },
+      { num:'02', title:'Classes et objets II', sub:'Surcharge de méthodes, equals(), classes internes', week:2 },
+      { num:'03', title:'Génériques', sub:'Classes et méthodes génériques', week:3 },
+      { num:'04', title:'Sous-classes et héritage', sub:'extends, super, redéfinition de méthodes', week:3 },
+      { num:'05', title:'Classes abstraites', sub:'Méthodes abstraites, quand les utiliser', week:4 },
+      { num:'06', title:'Interfaces I', sub:'Déclarer et implémenter des interfaces', week:4 },
+      { num:'07', title:'Interfaces II', sub:'Abstraites vs interfaces, interfaces communes', week:5 },
+      { num:'08', title:'Collections I', sub:'List et Queue', week:5 },
+      { num:'09', title:'Collections II', sub:'Set, comparaison des types de collections', week:6 },
+      { num:'10', title:'Maps I', sub:'HashMap et TreeMap', week:6 },
+      { num:'11', title:'Maps II', sub:'LinkedHashMap, choisir le bon type', week:7 },
+      { num:'12', title:'Révision intégrative', sub:'Synthèse, auto-évaluation, exercices croisés', week:7 },
+      { num:'13', title:'Préparation à l\'oral', sub:'Questions de pratique, vocabulaire, feedback', week:8, type:'special' },
+    ],
+  },
+  en: {
+    heroTitle: 'OOP <em>Reinforcement</em>',
+    heroSub: 'Fourteen weekly modules to consolidate the foundations of Object-Oriented Programming — classes, inheritance, interfaces and collections — with examples in Java, C#, Python, C++ and Rust.',
+    weekLabel: n => `Week ${n}`,
+    intro: 'Introduction',
+    oral: 'Oral exam',
+    modules: [
+      { num:'00', title:'Introduction to OOP', sub:'The 4 pillars, why OOP, setup', week:1, type:'special' },
+      { num:'01', title:'Classes and Objects I', sub:'Attributes, constructors, instantiation', week:2 },
+      { num:'02', title:'Classes and Objects II', sub:'Method overloading, equals(), inner classes', week:2 },
+      { num:'03', title:'Generics', sub:'Generic classes and generic methods', week:3 },
+      { num:'04', title:'Subclasses and Inheritance', sub:'extends, super, method overriding', week:3 },
+      { num:'05', title:'Abstract Classes', sub:'Abstract methods, when to use them', week:4 },
+      { num:'06', title:'Interfaces I', sub:'Declaring and implementing interfaces', week:4 },
+      { num:'07', title:'Interfaces II', sub:'Abstract vs interfaces, common interfaces', week:5 },
+      { num:'08', title:'Collections I', sub:'List and Queue', week:5 },
+      { num:'09', title:'Collections II', sub:'Set, comparing collection types', week:6 },
+      { num:'10', title:'Maps I', sub:'HashMap and TreeMap', week:6 },
+      { num:'11', title:'Maps II', sub:'LinkedHashMap, choosing the right type', week:7 },
+      { num:'12', title:'Integrative Review', sub:'Synthesis, self-assessment, cross-topic exercises', week:7 },
+      { num:'13', title:'Oral Exam Prep', sub:'Practice questions, vocabulary, feedback', week:8, type:'special' },
+    ],
+  }
+};
+
+function initHome(){
+  const s = HOME[L];
+  document.title = L==='fr' ? 'Class//Act — Renforcement POO' : 'Class//Act — OOP Reinforcement';
+  const heroTitle = document.getElementById('hero-title');
+  const heroSub   = document.getElementById('hero-sub');
+  if(heroTitle) heroTitle.innerHTML = s.heroTitle;
+  if(heroSub)   heroSub.textContent = s.heroSub;
+
+  // Group by week
+  const weeks = {};
+  s.modules.forEach(m=>{
+    if(!weeks[m.week]) weeks[m.week] = [];
+    weeks[m.week].push(m);
+  });
+
+  const container = document.getElementById('schedule-container');
+  let html = '';
+  Object.keys(weeks).sort((a,b)=>a-b).forEach(w=>{
+    html += `<div class="week-block"><div class="week-label">${s.weekLabel(w)}</div><div class="schedule-grid">`;
+    weeks[w].forEach(m=>{
+      html += `<a class="mcard${m.type==='special'?' special':''}" href="modules/m${m.num}.html">
+        <div class="mcard-num">M${m.num}</div>
+        <div class="mcard-title">${m.title}</div>
+        <div class="mcard-sub">${m.sub}</div>
+      </a>`;
+    });
+    html += `</div></div>`;
+  });
+  container.innerHTML = html;
+}
+</script>
+</body>
+</html>

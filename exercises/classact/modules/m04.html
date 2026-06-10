@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Class//Act — M04</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wordmark">Class<span>//</span>Act</div>
+  <div class="hdr-r">
+    <button id="theme-btn" aria-label="Toggle theme">🌙</button>
+    <button id="lang-btn">EN</button>
+    <button id="back-btn">← Accueil</button>
+  </div>
+</header>
+
+<!-- Language selector -->
+<div class="lang-selector">
+  <span class="lang-selector-label" id="pl-label"></span>
+  <div id="pl-selector" style="display:flex;gap:.6rem;flex-wrap:wrap"></div>
+</div>
+
+<div id="page-module">
+  <div class="module-hero">
+    <div class="mod-num" id="mod-num"></div>
+    <h1 id="mod-title"></h1>
+    <p class="mod-sub" id="mod-sub"></p>
+  </div>
+
+  <div id="module-body"></div>
+  <div id="mod-hw"></div>
+  <div id="mod-refs"></div>
+
+  <div class="mod-nav">
+    <button class="mod-nav-btn hidden" id="prev-mod-btn"></button>
+    <button class="mod-nav-btn primary" id="next-mod-btn"></button>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script src="../engine.js"></script>
+<script src="m04.js"></script>
+</body>
+</html>

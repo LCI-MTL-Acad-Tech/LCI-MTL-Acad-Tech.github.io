@@ -2530,7 +2530,6 @@ function openFileListModal(uuid, filter = "all") {
     const refl = s.raw.reflection;
     document.getElementById("hub-file-modal-title").textContent =
       `${s.name} — ${isFr ? "Rapport final" : "Final report"}`;
-    if (exportBtn) exportBtn.style.display = "none";
     document.getElementById("hub-file-modal-body").innerHTML = refl && Object.keys(refl).length
       ? `<div style="font-size:1.4rem;line-height:1.7">
           ${Object.entries(refl).map(([k, v]) =>
@@ -2561,11 +2560,6 @@ function openFileListModal(uuid, filter = "all") {
 
   document.getElementById("hub-file-modal-title").textContent =
     `${s.name} — ${filterLabel} (${logs.length})`;
-
-  if (exportBtn) {
-    exportBtn.style.display = "";
-    exportBtn.textContent = isFr ? "⬇ Exporter JSON complet" : "⬇ Export full JSON";
-  }
 
   if (!logs.length) {
     document.getElementById("hub-file-modal-body").innerHTML =
