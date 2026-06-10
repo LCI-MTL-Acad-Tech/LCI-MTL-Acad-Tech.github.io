@@ -8,8 +8,8 @@ const MODULE = {
       id: 'c07_1',
       title: { fr: '1 — Abstraite vs interface : tableau comparatif', en: '1 — Abstract class vs interface: comparison' },
       body: {
-        fr: `Le choix entre classe abstraite et interface repose sur une question clé : est-ce que les classes partagent un <strong>état commun</strong> (attributs d'instance) ? Si oui → classe abstraite. Si non, et qu'on définit seulement un <strong>contrat de comportement</strong> → interface. Une classe peut hériter d'une seule classe (abstraite ou non) mais implémenter plusieurs interfaces.`,
-        en: `The choice between abstract class and interface comes down to a key question: do the classes share <strong>common state</strong> (instance attributes)? If yes → abstract class. If not, and you're only defining a <strong>behaviour contract</strong> → interface. A class can only inherit from one class (abstract or not) but implement multiple interfaces.`,
+        fr: `Le choix entre classe abstraite et interface repose sur une question clé : est-ce que les classes partagent un <strong>état commun</strong> (attributs d\'instance) ? Si oui → classe abstraite. Si non, et qu\'on définit seulement un <strong>contrat de comportement</strong> → interface. Une classe peut hériter d\'une seule classe (abstraite ou non) mais implémenter plusieurs interfaces.`,
+        en: `The choice between abstract class and interface comes down to a key question: do the classes share <strong>common state</strong> (instance attributes)? If yes → abstract class. If not, and you\'re only defining a <strong>behaviour contract</strong> → interface. A class can only inherit from one class (abstract or not) but implement multiple interfaces.`,
       },
       code: {
         java: `<span class="cm">┌─────────────────────┬──────────────────┬──────────────────────┐</span>
@@ -90,7 +90,7 @@ const MODULE = {
       id: 'c07_2',
       title: { fr: '2 — Interfaces communes : Comparable et Iterable', en: '2 — Common interfaces: Comparable and Iterable' },
       body: {
-        fr: `Java fournit des interfaces standard très utilisées. <strong>Comparable&lt;T&gt;</strong> impose une méthode <code>compareTo(T o)</code> qui retourne négatif, zéro, ou positif. Implémenter Comparable permet de trier des objets avec <code>Collections.sort()</code>. <strong>Iterable&lt;T&gt;</strong> impose <code>iterator()</code> et permet d'utiliser la boucle <code>for-each</code> sur une classe personnalisée.`,
+        fr: `Java fournit des interfaces standard très utilisées. <strong>Comparable&lt;T&gt;</strong> impose une méthode <code>compareTo(T o)</code> qui retourne négatif, zéro, ou positif. Implémenter Comparable permet de trier des objets avec <code>Collections.sort()</code>. <strong>Iterable&lt;T&gt;</strong> impose <code>iterator()</code> et permet d\'utiliser la boucle <code>for-each</code> sur une classe personnalisée.`,
         en: `Java provides commonly used standard interfaces. <strong>Comparable&lt;T&gt;</strong> requires a <code>compareTo(T o)</code> method returning negative, zero, or positive. Implementing Comparable allows sorting objects with <code>Collections.sort()</code>. <strong>Iterable&lt;T&gt;</strong> requires <code>iterator()</code> and allows using the <code>for-each</code> loop on a custom class.`,
       },
       code: {

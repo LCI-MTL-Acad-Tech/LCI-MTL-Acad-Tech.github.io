@@ -8,8 +8,8 @@ const MODULE = {
       id: 'c11_1',
       title: { fr: '1 — LinkedHashMap : ordre d\'insertion garanti', en: '1 — LinkedHashMap: guaranteed insertion order' },
       body: {
-        fr: `<code>LinkedHashMap</code> combine les performances de <code>HashMap</code> (O(1)) avec la garantie de l'ordre d'insertion. Les entrées sont itérées dans l'ordre où elles ont été ajoutées. C'est utile pour implémenter des caches LRU (Least Recently Used), des historiques, ou simplement quand l'affichage doit refléter l'ordre de saisie.`,
-        en: `<code>LinkedHashMap</code> combines <code>HashMap</code> performance (O(1)) with guaranteed insertion order. Entries are iterated in the order they were added. It's useful for implementing LRU (Least Recently Used) caches, histories, or simply when display must reflect input order.`,
+        fr: `<code>LinkedHashMap</code> combine les performances de <code>HashMap</code> (O(1)) avec la garantie de l\'ordre d\'insertion. Les entrées sont itérées dans l\'ordre où elles ont été ajoutées. C\'est utile pour implémenter des caches LRU (Least Recently Used), des historiques, ou simplement quand l\'affichage doit refléter l\'ordre de saisie.`,
+        en: `<code>LinkedHashMap</code> combines <code>HashMap</code> performance (O(1)) with guaranteed insertion order. Entries are iterated in the order they were added. It\'s useful for implementing LRU (Least Recently Used) caches, histories, or simply when display must reflect input order.`,
       },
       code: {
         java: `<span class="kw">import</span> java.util.*;
@@ -89,8 +89,8 @@ std::unordered_map&lt;std::<span class="ty">string</span>,
       id: 'c11_2',
       title: { fr: '2 — Choisir la bonne Map', en: '2 — Choosing the right Map' },
       body: {
-        fr: `Le choix dépend de trois questions : as-tu besoin d'<strong>ordre</strong> ? De quel type ? Les trois principales options Java : <code>HashMap</code> si l'ordre est sans importance et la vitesse prime, <code>TreeMap</code> si tu as besoin de clés triées (ordre naturel ou personnalisé), <code>LinkedHashMap</code> si tu as besoin de conserver l'ordre d'insertion ou d'accès.`,
-        en: `The choice depends on three questions: do you need <strong>order</strong>? Of what type? The three main Java options: <code>HashMap</code> if order doesn't matter and speed is key, <code>TreeMap</code> if you need sorted keys (natural or custom order), <code>LinkedHashMap</code> if you need to preserve insertion or access order.`,
+        fr: `Le choix dépend de trois questions : as-tu besoin d'<strong>ordre</strong> ? De quel type ? Les trois principales options Java : <code>HashMap</code> si l\'ordre est sans importance et la vitesse prime, <code>TreeMap</code> si tu as besoin de clés triées (ordre naturel ou personnalisé), <code>LinkedHashMap</code> si tu as besoin de conserver l\'ordre d\'insertion ou d\'accès.`,
+        en: `The choice depends on three questions: do you need <strong>order</strong>? Of what type? The three main Java options: <code>HashMap</code> if order doesn\'t matter and speed is key, <code>TreeMap</code> if you need sorted keys (natural or custom order), <code>LinkedHashMap</code> if you need to preserve insertion or access order.`,
       },
       code: {
         java: `<span class="cm">┌──────────────────┬──────────────┬───────────────┬──────────────────┐</span>

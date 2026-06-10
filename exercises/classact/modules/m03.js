@@ -8,8 +8,8 @@ const MODULE = {
       id: 'c03_1',
       title: { fr: '1 — Classes génériques', en: '1 — Generic classes' },
       body: {
-        fr: `Une <strong>classe générique</strong> est paramétrée par un type noté <code>T</code> (ou autre lettre). Elle permet d'écrire une seule implémentation qui fonctionne pour n'importe quel type. Sans génériques, il faudrait une classe par type, ou utiliser <code>Object</code> et risquer des erreurs de cast à l'exécution. Les génériques déplacent ces erreurs au moment de la compilation.`,
-        en: `A <strong>generic class</strong> is parameterised by a type written <code>T</code> (or another letter). It allows writing a single implementation that works for any type. Without generics, you'd need a separate class per type, or use <code>Object</code> and risk cast errors at runtime. Generics move those errors to compile time.`,
+        fr: `Une <strong>classe générique</strong> est paramétrée par un type noté <code>T</code> (ou autre lettre). Elle permet d\'écrire une seule implémentation qui fonctionne pour n\'importe quel type. Sans génériques, il faudrait une classe par type, ou utiliser <code>Object</code> et risquer des erreurs de cast à l\'exécution. Les génériques déplacent ces erreurs au moment de la compilation.`,
+        en: `A <strong>generic class</strong> is parameterised by a type written <code>T</code> (or another letter). It allows writing a single implementation that works for any type. Without generics, you\'d need a separate class per type, or use <code>Object</code> and risk cast errors at runtime. Generics move those errors to compile time.`,
       },
       code: {
         java: `<span class="cm">// Classe générique : Boîte qui peut contenir n'importe quoi</span>
@@ -71,7 +71,7 @@ println!(<span class="str">"{} {}"</span>, sb.get(), ib.get());`,
       id: 'c03_2',
       title: { fr: '2 — Méthodes génériques', en: '2 — Generic methods' },
       body: {
-        fr: `Une <strong>méthode générique</strong> déclare son propre paramètre de type, indépendamment de la classe. On peut aussi contraindre le type avec <code>extends</code> (Java/C#) pour n'accepter que les types qui respectent une certaine interface — par exemple <code>T extends Comparable&lt;T&gt;</code> pour pouvoir comparer des éléments.`,
+        fr: `Une <strong>méthode générique</strong> déclare son propre paramètre de type, indépendamment de la classe. On peut aussi contraindre le type avec <code>extends</code> (Java/C#) pour n\'accepter que les types qui respectent une certaine interface — par exemple <code>T extends Comparable&lt;T&gt;</code> pour pouvoir comparer des éléments.`,
         en: `A <strong>generic method</strong> declares its own type parameter, independently from the class. You can also constrain the type with <code>extends</code> (Java/C#) to only accept types that implement a certain interface — for example <code>T extends Comparable&lt;T&gt;</code> to be able to compare elements.`,
       },
       code: {

@@ -10,8 +10,8 @@ const MODULE = {
       id: 'c01_1',
       title: { fr: '1 — Attributs et constructeurs', en: '1 — Attributes and constructors' },
       body: {
-        fr: `Un <strong>attribut</strong> stocke l'état d'un objet. Un <strong>constructeur</strong> est une méthode spéciale appelée lors de la création d'un objet avec <code>new</code> — il initialise les attributs. Sans constructeur explicite, la plupart des langages fournissent un constructeur par défaut sans paramètres.`,
-        en: `An <strong>attribute</strong> stores an object's state. A <strong>constructor</strong> is a special method called when an object is created with <code>new</code> — it initialises the attributes. Without an explicit constructor, most languages provide a default no-argument constructor.`,
+        fr: `Un <strong>attribut</strong> stocke l\'état d\'un objet. Un <strong>constructeur</strong> est une méthode spéciale appelée lors de la création d\'un objet avec <code>new</code> — il initialise les attributs. Sans constructeur explicite, la plupart des langages fournissent un constructeur par défaut sans paramètres.`,
+        en: `An <strong>attribute</strong> stores an object\'s state. A <strong>constructor</strong> is a special method called when an object is created with <code>new</code> — it initialises the attributes. Without an explicit constructor, most languages provide a default no-argument constructor.`,
       },
       code: {
         java: `<span class="kw">class</span> <span class="ty">Student</span> {
@@ -69,8 +69,8 @@ println!(<span class="str">"{}"</span>, s.name);`,
       id: 'c01_2',
       title: { fr: '2 — Méthodes et encapsulation', en: '2 — Methods and encapsulation' },
       body: {
-        fr: `Les <strong>méthodes</strong> définissent le comportement d'un objet. Pour protéger les données, on déclare les attributs <code>private</code> et on y accède via des <strong>getters</strong> et <strong>setters</strong>. Le setter peut valider la valeur avant de l'assigner — c'est l'encapsulation en pratique.`,
-        en: `<strong>Methods</strong> define an object's behaviour. To protect data, attributes are declared <code>private</code> and accessed via <strong>getters</strong> and <strong>setters</strong>. The setter can validate the value before assigning it — that's encapsulation in practice.`,
+        fr: `Les <strong>méthodes</strong> définissent le comportement d\'un objet. Pour protéger les données, on déclare les attributs <code>private</code> et on y accède via des <strong>getters</strong> et <strong>setters</strong>. Le setter peut valider la valeur avant de l\'assigner — c\'est l\'encapsulation en pratique.`,
+        en: `<strong>Methods</strong> define an object\'s behaviour. To protect data, attributes are declared <code>private</code> and accessed via <strong>getters</strong> and <strong>setters</strong>. The setter can validate the value before assigning it — that\'s encapsulation in practice.`,
       },
       code: {
         java: `<span class="kw">class</span> <span class="ty">BankAccount</span> {

@@ -8,7 +8,7 @@ const MODULE = {
       id: 'c10_1',
       title: { fr: '1 — HashMap : accès O(1) par clé', en: '1 — HashMap: O(1) key access' },
       body: {
-        fr: `Une <strong>Map</strong> associe des <em>clés</em> à des <em>valeurs</em>. Chaque clé est unique ; une valeur peut être dupliquée. <code>HashMap</code> utilise une table de hachage : accès, insertion et suppression sont en O(1) en moyenne. L'ordre d'itération n'est pas garanti. Comme pour <code>HashSet</code>, les clés doivent avoir <code>equals()</code> et <code>hashCode()</code> correctement implémentés.`,
+        fr: `Une <strong>Map</strong> associe des <em>clés</em> à des <em>valeurs</em>. Chaque clé est unique ; une valeur peut être dupliquée. <code>HashMap</code> utilise une table de hachage : accès, insertion et suppression sont en O(1) en moyenne. L\'ordre d\'itération n\'est pas garanti. Comme pour <code>HashSet</code>, les clés doivent avoir <code>equals()</code> et <code>hashCode()</code> correctement implémentés.`,
         en: `A <strong>Map</strong> associates <em>keys</em> with <em>values</em>. Each key is unique; a value can be duplicated. <code>HashMap</code> uses a hash table: access, insertion and removal are O(1) on average. Iteration order is not guaranteed. As with <code>HashSet</code>, keys must have <code>equals()</code> and <code>hashCode()</code> correctly implemented.`,
       },
       code: {
@@ -74,7 +74,7 @@ println!(<span class="str">"{}"</span>, scores.get(<span class="str">"Zara"</spa
       id: 'c10_2',
       title: { fr: '2 — TreeMap : clés triées', en: '2 — TreeMap: sorted keys' },
       body: {
-        fr: `<code>TreeMap</code> maintient les clés dans leur <strong>ordre naturel</strong> (ou selon un <code>Comparator</code> fourni). L'accès est O(log n). Utilise <code>TreeMap</code> quand tu as besoin d'itérer sur les entrées dans un ordre précis, de trouver les clés minimale/maximale, ou de travailler avec des sous-maps (plages de clés) via <code>subMap()</code>, <code>headMap()</code>, <code>tailMap()</code>.`,
+        fr: `<code>TreeMap</code> maintient les clés dans leur <strong>ordre naturel</strong> (ou selon un <code>Comparator</code> fourni). L\'accès est O(log n). Utilise <code>TreeMap</code> quand tu as besoin d\'itérer sur les entrées dans un ordre précis, de trouver les clés minimale/maximale, ou de travailler avec des sous-maps (plages de clés) via <code>subMap()</code>, <code>headMap()</code>, <code>tailMap()</code>.`,
         en: `<code>TreeMap</code> keeps keys in their <strong>natural order</strong> (or according to a provided <code>Comparator</code>). Access is O(log n). Use <code>TreeMap</code> when you need to iterate over entries in a specific order, find minimum/maximum keys, or work with sub-maps (key ranges) via <code>subMap()</code>, <code>headMap()</code>, <code>tailMap()</code>.`,
       },
       code: {

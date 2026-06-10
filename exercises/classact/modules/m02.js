@@ -8,7 +8,7 @@ const MODULE = {
       id: 'c02_1',
       title: { fr: '1 — Surcharge de méthodes (overloading)', en: '1 — Method overloading' },
       body: {
-        fr: `La <strong>surcharge</strong> consiste à définir plusieurs méthodes avec le <strong>même nom</strong> mais des <strong>signatures différentes</strong> (nombre ou types de paramètres différents). Le compilateur choisit la bonne version selon les arguments fournis à l'appel. La surcharge ne dépend <em>pas</em> du type de retour.`,
+        fr: `La <strong>surcharge</strong> consiste à définir plusieurs méthodes avec le <strong>même nom</strong> mais des <strong>signatures différentes</strong> (nombre ou types de paramètres différents). Le compilateur choisit la bonne version selon les arguments fournis à l\'appel. La surcharge ne dépend <em>pas</em> du type de retour.`,
         en: `<strong>Overloading</strong> means defining multiple methods with the <strong>same name</strong> but <strong>different signatures</strong> (different number or types of parameters). The compiler picks the right version based on the arguments provided. Overloading does <em>not</em> depend on the return type.`,
       },
       code: {
@@ -60,8 +60,8 @@ p.print(<span class="str">"Score"</span>, <span class="num">10</span>); <span cl
       id: 'c02_2',
       title: { fr: '2 — equals() et classes internes', en: '2 — equals() and inner classes' },
       body: {
-        fr: `Par défaut, <code>equals()</code> compare les <strong>références</strong> (adresses mémoire). Pour comparer les <strong>contenus</strong>, il faut redéfinir equals(). En Java, on redéfinit aussi <code>hashCode()</code> pour maintenir le contrat : si deux objets sont égaux selon equals(), ils doivent avoir le même hashCode. Une <strong>classe interne</strong> est une classe définie à l'intérieur d'une autre — elle a accès aux membres privés de la classe externe.`,
-        en: `By default, <code>equals()</code> compares <strong>references</strong> (memory addresses). To compare <strong>contents</strong>, equals() must be overridden. In Java, <code>hashCode()</code> must also be overridden to maintain the contract: if two objects are equal by equals(), they must have the same hashCode. An <strong>inner class</strong> is a class defined inside another — it has access to the outer class's private members.`,
+        fr: `Par défaut, <code>equals()</code> compare les <strong>références</strong> (adresses mémoire). Pour comparer les <strong>contenus</strong>, il faut redéfinir equals(). En Java, on redéfinit aussi <code>hashCode()</code> pour maintenir le contrat : si deux objets sont égaux selon equals(), ils doivent avoir le même hashCode. Une <strong>classe interne</strong> est une classe définie à l\'intérieur d\'une autre — elle a accès aux membres privés de la classe externe.`,
+        en: `By default, <code>equals()</code> compares <strong>references</strong> (memory addresses). To compare <strong>contents</strong>, equals() must be overridden. In Java, <code>hashCode()</code> must also be overridden to maintain the contract: if two objects are equal by equals(), they must have the same hashCode. An <strong>inner class</strong> is a class defined inside another — it has access to the outer class\'s private members.`,
       },
       code: {
         java: `<span class="kw">class</span> <span class="ty">Point</span> {
@@ -133,11 +133,11 @@ println!(<span class="str">"{}"</span>, a == b); <span class="cm">// true</span>
   activities: [
     {
       id: 'a02_1', concept: 'c02_1', type: 'quiz', xp: 10,
-      question: { fr: 'Sur quoi repose le choix de la méthode surchargée à l'appel ?', en: 'What determines which overloaded method is called?' },
+      question: { fr: 'Sur quoi repose le choix de la méthode surchargée à l\'appel ?', en: 'What determines which overloaded method is called?' },
       choices: [
-        { text: { fr: 'Le type de retour de la méthode.', en: 'The return type of the method.' }, correct: false, fb: { fr: 'Non. Le type de retour n'est pas pris en compte pour la résolution de surcharge.', en: 'No. Return type is not considered for overload resolution.' } },
-        { text: { fr: 'Le nombre et les types des arguments à l'appel.', en: 'The number and types of arguments at the call site.' }, correct: true, fb: { fr: 'Correct ! Le compilateur choisit la signature qui correspond le mieux aux arguments fournis.', en: 'Correct! The compiler selects the signature that best matches the provided arguments.' } },
-        { text: { fr: 'L'ordre de déclaration des méthodes dans la classe.', en: 'The order of method declarations in the class.' }, correct: false, fb: { fr: 'Non.', en: 'No.' } },
+        { text: { fr: 'Le type de retour de la méthode.', en: 'The return type of the method.' }, correct: false, fb: { fr: 'Non. Le type de retour n\'est pas pris en compte pour la résolution de surcharge.', en: 'No. Return type is not considered for overload resolution.' } },
+        { text: { fr: 'Le nombre et les types des arguments à l\'appel.', en: 'The number and types of arguments at the call site.' }, correct: true, fb: { fr: 'Correct ! Le compilateur choisit la signature qui correspond le mieux aux arguments fournis.', en: 'Correct! The compiler selects the signature that best matches the provided arguments.' } },
+        { text: { fr: 'L\'ordre de déclaration des méthodes dans la classe.', en: 'The order of method declarations in the class.' }, correct: false, fb: { fr: 'Non.', en: 'No.' } },
         { text: { fr: 'Le nom de la variable qui appelle la méthode.', en: 'The name of the variable calling the method.' }, correct: false, fb: { fr: 'Non.', en: 'No.' } },
       ],
     },
@@ -146,7 +146,7 @@ println!(<span class="str">"{}"</span>, a == b); <span class="cm">// true</span>
       instr: { fr: 'Complète la deuxième surcharge de print() qui accepte un entier :', en: 'Complete the second overload of print() that accepts an integer:' },
       template: { fr: 'void ______(int n) { System.out.println(n); }', en: 'void ______(int n) { System.out.println(n); }' },
       answer: 'print',
-      hint: { fr: 'Même nom que la première méthode — c'est le principe de surcharge.', en: 'Same name as the first method — that's the overloading principle.' },
+      hint: { fr: 'Même nom que la première méthode — c\'est le principe de surcharge.', en: 'Same name as the first method — that\'s the overloading principle.' },
     },
     {
       id: 'a02_3', concept: 'c02_2', type: 'predict', xp: 8,
@@ -154,15 +154,15 @@ println!(<span class="str">"{}"</span>, a == b); <span class="cm">// true</span>
       code: `<span class="ty">Point</span> a = <span class="kw">new</span> <span class="ty">Point</span>(<span class="num">1</span>, <span class="num">2</span>);
 <span class="ty">Point</span> b = <span class="kw">new</span> <span class="ty">Point</span>(<span class="num">1</span>, <span class="num">2</span>);
 <span class="ty">System</span>.out.println(a.equals(b));`,
-      explanation: { fr: 'false. Sans redéfinition, equals() compare les références — a et b pointent vers deux objets différents en mémoire, même si leurs contenus sont identiques. C'est pourquoi il faut toujours redéfinir equals() pour les classes dont on veut comparer les contenus.', en: 'false. Without overriding, equals() compares references — a and b point to two different objects in memory, even if their contents are identical. That's why equals() must always be overridden for classes whose content you want to compare.' },
+      explanation: { fr: 'false. Sans redéfinition, equals() compare les références — a et b pointent vers deux objets différents en mémoire, même si leurs contenus sont identiques. C\'est pourquoi il faut toujours redéfinir equals() pour les classes dont on veut comparer les contenus.', en: 'false. Without overriding, equals() compares references — a and b point to two different objects in memory, even if their contents are identical. That\'s why equals() must always be overridden for classes whose content you want to compare.' },
     },
     {
       id: 'a02_4', concept: 'c02_2', type: 'quiz', xp: 10,
       question: { fr: 'En Java, si on redéfinit equals(), que doit-on aussi redéfinir ?', en: 'In Java, if equals() is overridden, what else must be overridden?' },
       choices: [
-        { text: { fr: 'toString()', en: 'toString()' }, correct: false, fb: { fr: 'toString() est souvent utile à redéfinir mais n'est pas lié au contrat equals().', en: 'toString() is often useful to override but is not tied to the equals() contract.' } },
+        { text: { fr: 'toString()', en: 'toString()' }, correct: false, fb: { fr: 'toString() est souvent utile à redéfinir mais n\'est pas lié au contrat equals().', en: 'toString() is often useful to override but is not tied to the equals() contract.' } },
         { text: { fr: 'hashCode()', en: 'hashCode()' }, correct: true, fb: { fr: 'Correct ! Le contrat Java : si a.equals(b) est true, alors a.hashCode() == b.hashCode() doit être vrai. Sans cela, les HashMap et HashSet ne fonctionnent pas correctement.', en: 'Correct! The Java contract: if a.equals(b) is true, then a.hashCode() == b.hashCode() must also be true. Without this, HashMaps and HashSets break.' } },
-        { text: { fr: 'compareTo()', en: 'compareTo()' }, correct: false, fb: { fr: 'compareTo() est pour l'ordre naturel (Comparable), pas directement lié à equals().', en: 'compareTo() is for natural ordering (Comparable), not directly linked to equals().' } },
+        { text: { fr: 'compareTo()', en: 'compareTo()' }, correct: false, fb: { fr: 'compareTo() est pour l\'ordre naturel (Comparable), pas directement lié à equals().', en: 'compareTo() is for natural ordering (Comparable), not directly linked to equals().' } },
         { text: { fr: 'clone()', en: 'clone()' }, correct: false, fb: { fr: 'Non.', en: 'No.' } },
       ],
     },
@@ -173,7 +173,7 @@ println!(<span class="str">"{}"</span>, a == b); <span class="cm">// true</span>
     <span class="ty">Point</span> p = (<span class="ty">Point</span>) <span class="bug-line">o</span>;
     <span class="kw">return</span> x == p.x && y == p.y;
 }`,
-      explanation: { fr: 'Il manque deux vérifications essentielles : <code>if (this == o) return true;</code> (optimisation pour le même objet) et <code>if (!(o instanceof Point)) return false;</code> (protection contre le cast invalide qui causerait une ClassCastException si o n'est pas un Point).', en: 'Two essential checks are missing: <code>if (this == o) return true;</code> (optimisation for the same object) and <code>if (!(o instanceof Point)) return false;</code> (protection against an invalid cast that would throw a ClassCastException if o is not a Point).' },
+      explanation: { fr: 'Il manque deux vérifications essentielles : <code>if (this == o) return true;</code> (optimisation pour le même objet) et <code>if (!(o instanceof Point)) return false;</code> (protection contre le cast invalide qui causerait une ClassCastException si o n\'est pas un Point).', en: 'Two essential checks are missing: <code>if (this == o) return true;</code> (optimisation for the same object) and <code>if (!(o instanceof Point)) return false;</code> (protection against an invalid cast that would throw a ClassCastException if o is not a Point).' },
     },
   ],
   homework: {

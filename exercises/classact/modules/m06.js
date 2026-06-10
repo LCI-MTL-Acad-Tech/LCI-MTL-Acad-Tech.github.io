@@ -8,7 +8,7 @@ const MODULE = {
       id: 'c06_1',
       title: { fr: '1 — Déclarer une interface', en: '1 — Declaring an interface' },
       body: {
-        fr: `Une <strong>interface</strong> est un contrat qui définit ce qu'une classe <em>peut faire</em>, sans dire comment. Elle liste des méthodes que toute classe implémentant l'interface devra fournir. En Java, les méthodes d'interface sont implicitement <code>public abstract</code>. Une interface ne peut pas avoir d'attributs d'instance ni de constructeurs — seulement des constantes et (depuis Java 8) des méthodes <code>default</code> ou <code>static</code>.`,
+        fr: `Une <strong>interface</strong> est un contrat qui définit ce qu\'une classe <em>peut faire</em>, sans dire comment. Elle liste des méthodes que toute classe implémentant l\'interface devra fournir. En Java, les méthodes d\'interface sont implicitement <code>public abstract</code>. Une interface ne peut pas avoir d\'attributs d\'instance ni de constructeurs — seulement des constantes et (depuis Java 8) des méthodes <code>default</code> ou <code>static</code>.`,
         en: `An <strong>interface</strong> is a contract that defines what a class <em>can do</em>, without saying how. It lists methods that any class implementing the interface must provide. In Java, interface methods are implicitly <code>public abstract</code>. An interface cannot have instance attributes or constructors — only constants and (since Java 8) <code>default</code> or <code>static</code> methods.`,
       },
       code: {
@@ -99,7 +99,7 @@ const MODULE = {
       id: 'c06_2',
       title: { fr: '2 — Utiliser les interfaces comme types', en: '2 — Using interfaces as types' },
       body: {
-        fr: `Une interface peut être utilisée comme <strong>type de variable</strong> — c'est un des usages les plus puissants. Cela permet d'écrire du code qui fonctionne avec n'importe quelle classe qui implémente l'interface, sans connaître la classe concrète. C'est le principe de la programmation orientée abstraction : <em>coder vers une interface, pas vers une implémentation</em>.`,
+        fr: `Une interface peut être utilisée comme <strong>type de variable</strong> — c\'est un des usages les plus puissants. Cela permet d\'écrire du code qui fonctionne avec n\'importe quelle classe qui implémente l\'interface, sans connaître la classe concrète. C\'est le principe de la programmation orientée abstraction : <em>coder vers une interface, pas vers une implémentation</em>.`,
         en: `An interface can be used as a <strong>variable type</strong> — this is one of its most powerful uses. It allows writing code that works with any class implementing the interface, without knowing the concrete class. This is the principle of programming to an abstraction: <em>code to an interface, not to an implementation</em>.`,
       },
       code: {

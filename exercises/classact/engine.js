@@ -26,7 +26,7 @@ const UI = {
     back:'Accueil', langBtn:'EN', checkBtn:'Vérifier',
     retryBtn:'Réessayer', revealBtn:'Voir la réponse',
     correctMsg:'Correct !', wrongMsg:'Incorrect.',
-    xpGain: xp => `+${xp} XP`,
+    starGain: '⭐',
     glossary:'Glossaire', glossSearch:'Chercher un terme…',
     hwLabel:'Devoir de la semaine', hwSub:'À remettre dans ton dépôt GitHub avant le prochain module.',
     mdNote:'Crée un fichier README.md à la racine de ton dépôt. Inclus les sections demandées et au moins un fichier de code dans le langage de ton choix.',
@@ -40,7 +40,7 @@ const UI = {
     back:'Home', langBtn:'FR', checkBtn:'Check',
     retryBtn:'Try again', revealBtn:'Show answer',
     correctMsg:'Correct!', wrongMsg:'Incorrect.',
-    xpGain: xp => `+${xp} XP`,
+    starGain: '⭐',
     glossary:'Glossary', glossSearch:'Search a term…',
     hwLabel:'Weekly homework', hwSub:'Submit in your GitHub repository before the next module.',
     mdNote:'Create a README.md at the root of your repository. Include the required sections and at least one code file in the language of your choice.',
@@ -117,9 +117,17 @@ function switchPL(pl){
   document.querySelectorAll('.lang-block').forEach(b=>{
     b.classList.toggle('active', b.dataset.lang===pl);
   });
-  // Re-apply glossary on newly visible content
+  // Show activity language notice when non-Java is selected
+  const isJava = pl === 'java';
+  document.querySelectorAll('.act-lang-notice').forEach(el=>{
+    el.classList.toggle('act-lang-notice--hidden', isJava);
+  });
+  // Re-apply glossary and init any newly visible code blocks
   const panel = document.getElementById('module-body');
-  if(panel) applyGlossary(panel);
+  if(panel){
+    initCodeBlocks(panel);
+    applyGlossary(panel);
+  }
 }
 
 // ── Activities ────────────────────────────────────────────────
@@ -147,6 +155,17 @@ function updateProgress(modId){
   const label = document.getElementById('mod-prog-label');
   if(fill) fill.style.width = pct+'%';
   if(label) label.textContent = `${done}/${all.length}`;
+  // Stars: 0/1/2/3/4
+  const starsEl = document.getElementById('mod-stars');
+  if(starsEl){
+    let stars = 0;
+    if(done > 0){ stars=1; }
+    if(pct >= 34){ stars=2; }
+    if(pct >= 67){ stars=3; }
+    if(pct === 100){ stars=4; }
+    starsEl.textContent = '★'.repeat(stars) + '☆'.repeat(4-stars);
+    starsEl.style.color = stars > 0 ? 'var(--amber)' : 'var(--ch4)';
+  }
 }
 
 // ── Quiz ──────────────────────────────────────────────────────
@@ -162,7 +181,7 @@ function checkQ(modId, actId, idx, total, ns){
   if(!correct) btn.classList.add('wrong');
   const f=document.getElementById('fb-'+actId);
   if(f){ f.textContent=fb; f.className=`feedback show ${correct?'ok':'nok'}`; }
-  if(correct){ markAct(modId,actId); updateActCheck(actId,true); showToast(t('xpGain')(10)); updateProgress(modId); }
+  if(correct){ markAct(modId,actId); updateActCheck(actId,true); showToast(t('starGain')); updateProgress(modId); }
 }
 
 // ── Fill ──────────────────────────────────────────────────────
@@ -177,7 +196,7 @@ function checkF(modId, actId){
   input.disabled = true;
   const f = document.getElementById('fb-'+actId);
   if(f){ f.textContent=correct?t('correctMsg'):(t('wrongMsg')+' '+(act.hint?.[L]||act.hint?.fr||'')); f.className=`feedback show ${correct?'ok':'nok'}`; }
-  if(correct){ markAct(modId,actId); updateActCheck(actId,true); showToast(t('xpGain')(15)); updateProgress(modId); }
+  if(correct){ markAct(modId,actId); updateActCheck(actId,true); showToast(t('starGain')); updateProgress(modId); }
 }
 
 // ── Replit launcher ───────────────────────────────────────────
@@ -469,16 +488,24 @@ function initModulePage(){
   initLangSelector();
   switchPL(PL); // apply initial language visibility
 
-  // Glossary
-  setTimeout(()=>applyGlossary(body), 300);
+  // Glossary + code blocks (after DOM settles)
+  setTimeout(()=>{
+    _cbCounter = 0; // reset per page
+    initCodeBlocks(body);
+    applyGlossary(body);
+  }, 100);
 }
 
 // ── Render module body ────────────────────────────────────────
 function renderModuleBody(M){
   let h='';
-  // Progress bar
+  // Stars + progress bar
   const total=(M.activities||[]).length;
-  h+=`<div class="mod-progress-row"><span class="mod-progress-label" id="mod-prog-label">0/${total}</span><div class="mod-progress-bar"><div class="mod-progress-fill" id="mod-prog-fill" style="width:0%"></div></div></div>`;
+  h+=`<div class="mod-progress-row">`;
+  h+=`<span class="mod-stars" id="mod-stars">☆☆☆☆</span>`;
+  h+=`<div class="mod-progress-bar"><div class="mod-progress-fill" id="mod-prog-fill" style="width:0%"></div></div>`;
+  h+=`<span class="mod-progress-label" id="mod-prog-label">0/${total}</span>`;
+  h+=`</div>`;
   // Concepts
   (M.concepts||[]).forEach(concept=>{
     h+=renderConcept(concept,M);
@@ -516,8 +543,15 @@ function renderActivity(act, modId){
   const isDone=actDone(modId,act.id);
   const typeLabels={quiz:'Quiz',fill:'Fill-in',predict:'Predict',bug:'Find the bug'};
   const badgeClass={quiz:'bq',fill:'bf',predict:'bpredict',bug:'bbug'};
+  const starWeight={quiz:'★',fill:'★★',predict:'★',bug:'★★'};
+  const noticeText={
+    fr:'Les exercices interactifs sont en Java — les concepts s\'appliquent dans tous les langages.',
+    en:'Interactive exercises are in Java — the concepts apply across all languages.',
+  };
   let h=`<div class="activity${isDone?' completed':''}" id="wrap-${act.id}">`;
-  h+=`<div class="act-top"><span class="abadge ${badgeClass[act.type]||'bq'}">${typeLabels[act.type]||act.type} · ${act.xp||10} XP</span><button class="acheck${isDone?' done':''}" data-act="${act.id}">${isDone?'✓':''}</button></div>`;
+  h+=`<div class="act-top"><span class="abadge ${badgeClass[act.type]||'bq'}">${typeLabels[act.type]||act.type} <span class="act-stars">${starWeight[act.type]||'★'}</span></span><button class="acheck${isDone?' done':''}" data-act="${act.id}">${isDone?'✓':''}</button></div>`;
+  // Language notice: visible when a non-Java language is active
+  h+=`<div class="act-lang-notice act-lang-notice--hidden">${noticeText[L]||noticeText.fr}</div>`;
   if(act.type==='quiz')    h+=renderQuiz(act,modId);
   if(act.type==='fill')    h+=renderFill(act,modId);
   if(act.type==='predict') h+=renderPredict(act,modId);
@@ -563,7 +597,7 @@ function revealPred(modId, actId){
   const btn=document.getElementById('pred-btn-'+actId);
   if(ans){ ans.textContent=act.explanation?.[L]||act.explanation?.en||''; ans.className='feedback ok show'; }
   if(btn) btn.style.display='none';
-  markAct(modId,actId); updateActCheck(actId,true); showToast(t('xpGain')(8)); updateProgress(modId);
+  markAct(modId,actId); updateActCheck(actId,true); showToast(t('starGain')); updateProgress(modId);
 }
 
 function renderBug(act, modId){
@@ -580,7 +614,7 @@ function revealBug(modId, actId){
   const btn=document.getElementById('bug-btn-'+actId);
   if(fb){ fb.innerHTML=act.explanation?.[L]||act.explanation?.en||''; fb.className='feedback ok show'; }
   if(btn) btn.style.display='none';
-  markAct(modId,actId); updateActCheck(actId,true); showToast(t('xpGain')(20)); updateProgress(modId);
+  markAct(modId,actId); updateActCheck(actId,true); showToast(t('starGain')); updateProgress(modId);
 }
 
 function renderReplitLauncher(frameId){
@@ -598,16 +632,143 @@ function renderReferences(M){
   }).join('');
   return `<div class="ref-section"><h3 class="ref-heading">${label[L]}</h3><ul class="ref-list">${items}</ul></div>`;
 }
+
+function renderHomework(M){
   const hw=M.homework;
   return `<div class="hw-section"><button class="hw-toggle" onclick="this.parentElement.classList.toggle('hw-open')"><span class="hw-icon">▸</span><span class="hw-label">${t('hwLabel')}</span><span class="hw-sub">${t('hwSub')}</span></button><div class="hw-body"><div class="hw-prompt">${hw[L]||hw.fr}</div><div class="hw-md-note">${t('mdNote')}</div></div></div>`;
 }
 
-// ── Auto-init ─────────────────────────────────────────────────
+// ── Code block numbering ──────────────────────────────────────
+let _cbCounter = 0;
+const _cbToastEl = () => document.getElementById('cb-toast');
+
+// Language display names for header tag
+const CB_LANG_LABELS = {
+  java:'Java', cs:'C#', py:'Python', cpp:'C++', rust:'Rust',
+  // activity blocks (no lang)
+  predict:'Predict', bug:'Bug',
+};
+
+// Call after rendering body HTML to transform all .code-block elements
+// into the numbered layout with header and line refs.
+function initCodeBlocks(rootEl) {
+  if (!rootEl) return;
+  // Inject toast if not present
+  if (!document.getElementById('cb-toast')) {
+    const t = document.createElement('div');
+    t.id = 'cb-toast';
+    document.body.appendChild(t);
+  }
+  rootEl.querySelectorAll('.code-block').forEach(block => {
+    // Already processed
+    if (block.closest('.cb-wrap')) return;
+
+    _cbCounter++;
+    const blockId = 'B' + _cbCounter;
+    const langBlock = block.closest('.lang-block');
+    const langKey   = langBlock ? (langBlock.dataset.lang || '') : '';
+    const langLabel = CB_LANG_LABELS[langKey] || '';
+
+    // Split existing innerHTML into lines preserving span tags
+    const lines = splitHtmlLines(block.innerHTML);
+
+    // Build rows — one div per line, number + code side by side
+    let rowsHtml = '';
+    lines.forEach((line, i) => {
+      const lineNum = i + 1;
+      const lineRef = blockId + ':' + lineNum;
+      rowsHtml +=
+        `<div class="cb-row" id="${blockId}-L${lineNum}">` +
+          `<span class="cb-line-num" data-ref="${lineRef}" data-block="${blockId}" data-line="${lineNum}" title="${lineRef}">${lineNum}</span>` +
+          `<span class="cb-line-code">${line || ''}</span>` +
+        `</div>`;
+    });
+
+    // Replace block interior
+    block.innerHTML = rowsHtml;
+    block.style.whiteSpace = '';
+
+    // Wrap with header
+    const wrap = document.createElement('div');
+    wrap.className = 'cb-wrap';
+    wrap.dataset.blockId = blockId;
+
+    const hdr = document.createElement('div');
+    hdr.className = 'cb-header';
+    hdr.innerHTML =
+      `<span class="cb-id">${blockId}</span>` +
+      (langLabel ? `<span class="cb-lang-tag">${langLabel}</span>` : '') +
+      `<button class="cb-copy-btn" title="${L==='fr'?'Copier le bloc':'Copy block'}" onclick="cbCopyBlock('${blockId}')">⧉</button>`;
+
+    block.parentNode.insertBefore(wrap, block);
+    wrap.appendChild(hdr);
+    wrap.appendChild(block);
+  });
+
+  // Delegated click on line numbers
+  rootEl.addEventListener('click', e => {
+    const btn = e.target.closest('.cb-line-num');
+    if (!btn) return;
+    const ref     = btn.dataset.ref;
+    const blockId = btn.dataset.block;
+    const lineNum = btn.dataset.line;
+    // Toggle highlight on the whole row
+    const rowEl = document.getElementById(blockId + '-L' + lineNum);
+    if (rowEl) rowEl.classList.toggle('cb-line-highlight');
+    btn.classList.toggle('cb-highlighted');
+    // Copy ref to clipboard
+    navigator.clipboard.writeText(ref).catch(()=>{});
+    cbShowToast(ref);
+  });
+}
+
+// Split HTML string into lines without breaking tags
+function splitHtmlLines(html) {
+  // Replace literal \n in non-tag content with a marker, then split
+  const lines = [];
+  let current = '';
+  let inTag = false;
+  for (let i = 0; i < html.length; i++) {
+    const ch = html[i];
+    if (ch === '<') { inTag = true; current += ch; continue; }
+    if (ch === '>') { inTag = false; current += ch; continue; }
+    if (ch === '\n' && !inTag) {
+      lines.push(current);
+      current = '';
+      continue;
+    }
+    current += ch;
+  }
+  if (current) lines.push(current);
+  // Remove leading/trailing empty lines
+  while (lines.length && !lines[0].trim()) lines.shift();
+  while (lines.length && !lines[lines.length-1].trim()) lines.pop();
+  return lines;
+}
+
+function cbCopyBlock(blockId) {
+  const wrap = document.querySelector(`[data-block-id="${blockId}"]`);
+  if (!wrap) return;
+  const lines = wrap.querySelectorAll('.cb-line-code');
+  const text = Array.from(lines).map(l => l.textContent).join('\n');
+  navigator.clipboard.writeText(text).catch(()=>{});
+  cbShowToast(L==='fr' ? `${blockId} copié` : `${blockId} copied`);
+}
+
+let _cbToastTimer = null;
+function cbShowToast(msg) {
+  const el = document.getElementById('cb-toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_cbToastTimer);
+  _cbToastTimer = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
 document.addEventListener('DOMContentLoaded',()=>{
   initHeader();
   initGlossaryTip();
   initGlossaryDrawer();
   injectFooter();
   if(typeof MODULE!=='undefined') initModulePage();
-  else if(typeof initHome==='function') initHome();
 });

@@ -8,8 +8,8 @@ const MODULE = {
       id: 'c05_1',
       title: { fr: '1 — Déclarer une classe abstraite', en: '1 — Declaring an abstract class' },
       body: {
-        fr: `Une <strong>classe abstraite</strong> ne peut pas être instanciée directement — elle doit être héritée. Elle peut contenir des <strong>méthodes abstraites</strong> (sans corps) que les sous-classes sont obligées d'implémenter, ainsi que des méthodes concrètes (avec corps) partagées. C'est le bon choix quand plusieurs classes partagent du code commun mais doivent chacune définir certains comportements spécifiques.`,
-        en: `An <strong>abstract class</strong> cannot be instantiated directly — it must be inherited. It can contain <strong>abstract methods</strong> (no body) that subclasses are required to implement, as well as concrete methods (with body) that are shared. It's the right choice when several classes share common code but each must define certain specific behaviours.`,
+        fr: `Une <strong>classe abstraite</strong> ne peut pas être instanciée directement — elle doit être héritée. Elle peut contenir des <strong>méthodes abstraites</strong> (sans corps) que les sous-classes sont obligées d\'implémenter, ainsi que des méthodes concrètes (avec corps) partagées. C\'est le bon choix quand plusieurs classes partagent du code commun mais doivent chacune définir certains comportements spécifiques.`,
+        en: `An <strong>abstract class</strong> cannot be instantiated directly — it must be inherited. It can contain <strong>abstract methods</strong> (no body) that subclasses are required to implement, as well as concrete methods (with body) that are shared. It\'s the right choice when several classes share common code but each must define certain specific behaviours.`,
       },
       code: {
         java: `<span class="kw">abstract class</span> <span class="ty">Shape</span> {
@@ -96,7 +96,7 @@ r.printInfo(); <span class="cm">// bleu, area=20.0</span>`,
       id: 'c05_2',
       title: { fr: '2 — Quand utiliser une classe abstraite ?', en: '2 — When to use an abstract class?' },
       body: {
-        fr: `Utilise une classe abstraite quand : les sous-classes <strong>partagent du code commun</strong> (attributs, méthodes concrètes) qu'il serait dupliqué sinon, ET certains comportements doivent être imposés aux sous-classes. Compare avec une interface (M06) : une interface ne peut pas avoir d'attributs d'instance ni de constructeurs — elle définit seulement un contrat. En Java, une classe peut hériter d'une seule classe abstraite mais implémenter plusieurs interfaces.`,
+        fr: `Utilise une classe abstraite quand : les sous-classes <strong>partagent du code commun</strong> (attributs, méthodes concrètes) qu\'il serait dupliqué sinon, ET certains comportements doivent être imposés aux sous-classes. Compare avec une interface (M06) : une interface ne peut pas avoir d\'attributs d\'instance ni de constructeurs — elle définit seulement un contrat. En Java, une classe peut hériter d\'une seule classe abstraite mais implémenter plusieurs interfaces.`,
         en: `Use an abstract class when: subclasses <strong>share common code</strong> (attributes, concrete methods) that would otherwise be duplicated, AND certain behaviours must be enforced on subclasses. Compare with an interface (M06): an interface cannot have instance attributes or constructors — it only defines a contract. In Java, a class can inherit from only one abstract class but implement multiple interfaces.`,
       },
       code: {

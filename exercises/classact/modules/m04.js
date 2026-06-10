@@ -83,7 +83,7 @@ d.eat(); d.bark()`,
       id: 'c04_2',
       title: { fr: '2 — Redéfinition de méthodes (overriding)', en: '2 — Method overriding' },
       body: {
-        fr: `La <strong>redéfinition</strong> (overriding) consiste à réécrire dans la sous-classe une méthode héritée de la super-classe pour lui donner un comportement différent. En Java, l'annotation <code>@Override</code> est fortement conseillée — elle permet au compilateur de détecter les erreurs de signature. Pour appeler la version parente depuis la version redéfinie, on utilise <code>super.methode()</code>.`,
+        fr: `La <strong>redéfinition</strong> (overriding) consiste à réécrire dans la sous-classe une méthode héritée de la super-classe pour lui donner un comportement différent. En Java, l\'annotation <code>@Override</code> est fortement conseillée — elle permet au compilateur de détecter les erreurs de signature. Pour appeler la version parente depuis la version redéfinie, on utilise <code>super.methode()</code>.`,
         en: `<strong>Overriding</strong> means rewriting in the subclass an inherited method from the superclass to give it different behaviour. In Java, the <code>@Override</code> annotation is strongly recommended — it lets the compiler detect signature errors. To call the parent version from the overridden version, use <code>super.method()</code>.`,
       },
       code: {

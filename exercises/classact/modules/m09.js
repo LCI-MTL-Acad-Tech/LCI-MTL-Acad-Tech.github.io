@@ -8,7 +8,7 @@ const MODULE = {
       id: 'c09_1',
       title: { fr: '1 — Set : collection sans doublons', en: '1 — Set: no-duplicate collection' },
       body: {
-        fr: `Un <strong>Set</strong> est une collection qui <em>refuse les doublons</em>. Ajouter un élément déjà présent n'a aucun effet. Il n'y a pas d'accès par index. <code>HashSet</code> est non ordonné mais très rapide (O(1) pour add/contains/remove). <code>TreeSet</code> maintient les éléments triés (O(log n)). Pour que <code>HashSet</code> fonctionne correctement avec des objets personnalisés, ces objets doivent implémenter <code>equals()</code> et <code>hashCode()</code>.`,
+        fr: `Un <strong>Set</strong> est une collection qui <em>refuse les doublons</em>. Ajouter un élément déjà présent n\'a aucun effet. Il n\'y a pas d\'accès par index. <code>HashSet</code> est non ordonné mais très rapide (O(1) pour add/contains/remove). <code>TreeSet</code> maintient les éléments triés (O(log n)). Pour que <code>HashSet</code> fonctionne correctement avec des objets personnalisés, ces objets doivent implémenter <code>equals()</code> et <code>hashCode()</code>.`,
         en: `A <strong>Set</strong> is a collection that <em>rejects duplicates</em>. Adding an element already present has no effect. There is no index access. <code>HashSet</code> is unordered but very fast (O(1) for add/contains/remove). <code>TreeSet</code> keeps elements sorted (O(log n)). For <code>HashSet</code> to work correctly with custom objects, those objects must implement <code>equals()</code> and <code>hashCode()</code>.`,
       },
       code: {
@@ -79,7 +79,7 @@ println!(<span class="str">"{}"</span>, hash.contains(<span class="str">"apple"<
       id: 'c09_2',
       title: { fr: '2 — Choisir entre List, Set et Queue', en: '2 — Choosing between List, Set, and Queue' },
       body: {
-        fr: `Le choix dépend du <strong>besoin</strong> : utilise <code>List</code> si l'ordre et les doublons importent, <code>Set</code> si tu as besoin de garantir l'unicité (dédoublonnage, appartenance rapide), <code>Queue</code> si tu traites des éléments dans l'ordre d'arrivée (FIFO). Ces structures s'utilisent souvent ensemble : une Queue pour l'ordre d'arrivée, un Set pour vérifier si un élément a déjà été traité.`,
+        fr: `Le choix dépend du <strong>besoin</strong> : utilise <code>List</code> si l\'ordre et les doublons importent, <code>Set</code> si tu as besoin de garantir l\'unicité (dédoublonnage, appartenance rapide), <code>Queue</code> si tu traites des éléments dans l\'ordre d\'arrivée (FIFO). Ces structures s\'utilisent souvent ensemble : une Queue pour l\'ordre d\'arrivée, un Set pour vérifier si un élément a déjà été traité.`,
         en: `The choice depends on <strong>need</strong>: use <code>List</code> if order and duplicates matter, <code>Set</code> if you need guaranteed uniqueness (deduplication, fast membership check), <code>Queue</code> if you process elements in arrival order (FIFO). These structures are often used together: a Queue for arrival order, a Set to check if an element has already been processed.`,
       },
       code: {

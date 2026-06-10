@@ -8,8 +8,8 @@ const MODULE = {
       id: 'c13_1',
       title: { fr: '1 — Comment répondre à une question d\'oral', en: '1 — How to answer an oral question' },
       body: {
-        fr: `Un examen oral de POO évalue ta capacité à <em>expliquer</em>, pas seulement à coder. La structure recommandée pour n'importe quelle question : <strong>1. Définir</strong> le concept en une phrase. <strong>2. Donner un exemple concret</strong> dans un langage. <strong>3. Expliquer pourquoi</strong> c'est utile (quel problème ça résout). <strong>4. Mentionner une limite ou un piège</strong> pour montrer la maîtrise. Prends le temps de reformuler la question si elle est ambiguë — c'est apprécié.`,
-        en: `An OOP oral exam evaluates your ability to <em>explain</em>, not just code. The recommended structure for any question: <strong>1. Define</strong> the concept in one sentence. <strong>2. Give a concrete example</strong> in a language. <strong>3. Explain why</strong> it's useful (what problem it solves). <strong>4. Mention a limitation or pitfall</strong> to show mastery. Take time to rephrase an ambiguous question — it's appreciated.`,
+        fr: `Un examen oral de POO évalue ta capacité à <em>expliquer</em>, pas seulement à coder. La structure recommandée pour n\'importe quelle question : <strong>1. Définir</strong> le concept en une phrase. <strong>2. Donner un exemple concret</strong> dans un langage. <strong>3. Expliquer pourquoi</strong> c\'est utile (quel problème ça résout). <strong>4. Mentionner une limite ou un piège</strong> pour montrer la maîtrise. Prends le temps de reformuler la question si elle est ambiguë — c\'est apprécié.`,
+        en: `An OOP oral exam evaluates your ability to <em>explain</em>, not just code. The recommended structure for any question: <strong>1. Define</strong> the concept in one sentence. <strong>2. Give a concrete example</strong> in a language. <strong>3. Explain why</strong> it\'s useful (what problem it solves). <strong>4. Mention a limitation or pitfall</strong> to show mastery. Take time to rephrase an ambiguous question — it\'s appreciated.`,
       },
       code: {
         java: `<span class="cm">// Question : "Qu'est-ce que l'encapsulation ?"</span>
@@ -125,8 +125,8 @@ shapes = [<span class="ty">Shape</span>(), <span class="ty">Circle</span>()]
       id: 'c13_2',
       title: { fr: '2 — Questions types et réponses modèles', en: '2 — Practice questions and model answers' },
       body: {
-        fr: `Voici les questions les plus fréquentes dans un oral de POO, avec la structure de réponse attendue. Entraîne-toi à répondre à voix haute, sans regarder tes notes, en moins de 2 minutes. L'objectif n'est pas de réciter une définition mais de montrer que tu comprends <em>pourquoi</em> le concept existe.`,
-        en: `Here are the most common questions in an OOP oral, with the expected answer structure. Practice answering out loud, without notes, in under 2 minutes. The goal isn't to recite a definition but to show you understand <em>why</em> the concept exists.`,
+        fr: `Voici les questions les plus fréquentes dans un oral de POO, avec la structure de réponse attendue. Entraîne-toi à répondre à voix haute, sans regarder tes notes, en moins de 2 minutes. L\'objectif n\'est pas de réciter une définition mais de montrer que tu comprends <em>pourquoi</em> le concept existe.`,
+        en: `Here are the most common questions in an OOP oral, with the expected answer structure. Practice answering out loud, without notes, in under 2 minutes. The goal isn\'t to recite a definition but to show you understand <em>why</em> the concept exists.`,
       },
       code: {
         java: `<span class="cm">// Q1 : Qu'est-ce qu'un constructeur ? Pourquoi en a-t-on besoin ?</span>

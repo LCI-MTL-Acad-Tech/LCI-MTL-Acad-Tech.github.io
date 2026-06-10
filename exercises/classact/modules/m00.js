@@ -20,7 +20,7 @@ const MODULE = {
       id: 'c00_1',
       title: { fr: '1 — Qu\'est-ce que la POO ?', en: '1 — What is OOP?' },
       body: {
-        fr: `La programmation orientée objet organise le code autour d'<strong>objets</strong> — des entités qui regroupent des données (<em>attributs</em>) et des comportements (<em>méthodes</em>). Un objet est une instance concrète d'une <strong>classe</strong>, qui en est le modèle. Plutôt que d'écrire des fonctions isolées qui manipulent des données séparées, la POO permet de modéliser le problème en termes d'entités du monde réel.`,
+        fr: `La programmation orientée objet organise le code autour d'<strong>objets</strong> — des entités qui regroupent des données (<em>attributs</em>) et des comportements (<em>méthodes</em>). Un objet est une instance concrète d\'une <strong>classe</strong>, qui en est le modèle. Plutôt que d\'écrire des fonctions isolées qui manipulent des données séparées, la POO permet de modéliser le problème en termes d\'entités du monde réel.`,
         en: `Object-oriented programming organises code around <strong>objects</strong> — entities that bundle data (<em>attributes</em>) and behaviours (<em>methods</em>). An object is a concrete instance of a <strong>class</strong>, which serves as its blueprint. Rather than writing isolated functions that manipulate separate data, OOP lets you model problems in terms of real-world entities.`,
       },
       code: {
@@ -93,7 +93,7 @@ a.speak();`,
       title: { fr: '2 — Les 4 piliers', en: '2 — The 4 pillars' },
       body: {
         fr: `La POO repose sur quatre principes fondamentaux. L\'<strong>encapsulation</strong> regroupe données et méthodes dans une classe et restreint l\'accès direct via des modificateurs (<code>private</code>, <code>public</code>). L\'<strong>héritage</strong> permet à une classe de reprendre les membres d\'une autre. Le <strong>polymorphisme</strong> permet d\'appeler la bonne méthode selon le type réel de l\'objet. L\'<strong>abstraction</strong> expose uniquement ce qui est nécessaire et masque les détails internes.`,
-        en: `OOP rests on four fundamental principles. <strong>Encapsulation</strong> bundles data and methods in a class and restricts direct access via modifiers (<code>private</code>, <code>public</code>). <strong>Inheritance</strong> allows a class to reuse members from another. <strong>Polymorphism</strong> allows calling the right method based on the object's actual type. <strong>Abstraction</strong> exposes only what is necessary and hides internal details.`,
+        en: `OOP rests on four fundamental principles. <strong>Encapsulation</strong> bundles data and methods in a class and restricts direct access via modifiers (<code>private</code>, <code>public</code>). <strong>Inheritance</strong> allows a class to reuse members from another. <strong>Polymorphism</strong> allows calling the right method based on the object\'s actual type. <strong>Abstraction</strong> exposes only what is necessary and hides internal details.`,
       },
       code: {
         java: `<span class="cm">// Encapsulation — données privées, accès via méthodes</span>
