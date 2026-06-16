@@ -2217,7 +2217,7 @@ function buildDetailHTML(s) {
         label: lang === "fr-CA" ? "Journaux quotidiens" : "Daily logs",
         count: dailyLogs.length,
         btn:   lang === "fr-CA" ? "Voir" : "View",
-        onclick: `openFileListModal('${escHtml(s.uuid)}','daily')`,
+        onclick: `openFileListModal(&apos;${escHtml(s.uuid)}&apos;,&apos;daily&apos;)`,
         missing: false,
       },
       {
@@ -2225,7 +2225,7 @@ function buildDetailHTML(s) {
         label: lang === "fr-CA" ? "Bilans hebdomadaires" : "Weekly wraps",
         count: weeklyLogs.length,
         btn:   lang === "fr-CA" ? "Voir" : "View",
-        onclick: `openFileListModal('${escHtml(s.uuid)}','weekly')`,
+        onclick: `openFileListModal(&apos;${escHtml(s.uuid)}&apos;,&apos;weekly&apos;)`,
         missing: false,
       },
       {
@@ -2233,7 +2233,7 @@ function buildDetailHTML(s) {
         label: lang === "fr-CA" ? "Rapport final" : "Final report",
         count: hasRefl ? 1 : 0,
         btn:   hasRefl ? (lang === "fr-CA" ? "Voir" : "View") : null,
-        onclick: `openFileListModal('${escHtml(s.uuid)}','reflection')`,
+        onclick: `openFileListModal(&apos;${escHtml(s.uuid)}&apos;,&apos;reflection&apos;)`,
         missing: !hasRefl && !isManuallyDone,
       },
     ];
@@ -2579,8 +2579,9 @@ function openFileListModal(uuid, filter = "all") {
 
   // Log views (daily / weekly / all)
   let logs = (s.raw.logs || []).slice().sort((a, b) => b.date.localeCompare(a.date));
-  if (filter === "daily")  logs = logs.filter(l => !l.weekly_wrap?.highlight);
-  if (filter === "weekly") logs = logs.filter(l =>  l.weekly_wrap?.highlight);
+  if (filter === "daily")  logs = logs.filter(l => !l.weekly_wrap);
+  if (filter === "weekly") logs = logs.filter(l =>  l.weekly_wrap && (
+    l.weekly_wrap.highlight || l.weekly_wrap.learning || l.weekly_wrap.change));
 
   const filterLabel = filter === "weekly"
     ? (isFr ? "Bilans hebdomadaires" : "Weekly wraps")

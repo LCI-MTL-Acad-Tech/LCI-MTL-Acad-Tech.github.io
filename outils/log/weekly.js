@@ -55,6 +55,39 @@ function resetWeekly() {
 
 // Downloads the current merged weekly data as a JSON file.
 // This file can be re-uploaded to weekly.html later, or submitted to the hub.
+// Download a single week's logs as a standalone JSON file.
+// Includes full profile and context so it can be re-imported independently.
+function downloadWeekJSON(weekStart, logs) {
+  if (!weeklyData || !logs.length) return;
+  const p    = weeklyData.profile;
+  const id   = p?.student_id || p?.full_name || "etudiant";
+  const now  = new Date();
+  const time = String(now.getHours()).padStart(2,"0") + "-" + String(now.getMinutes()).padStart(2,"0");
+  const fname = `${id}_weekly_${weekStart}_${time}.json`;
+
+  const payload = {
+    meta: {
+      ...weeklyData.meta,
+      type:          "weekly",
+      exported_at:   now.toISOString(),
+      week_start:    weekStart,
+      last_modified: now.toISOString(),
+    },
+    profile: weeklyData.profile,
+    context: weeklyData.context,
+    activity_types: weeklyData.activity_types || [],
+    logs: logs,  // only this week's logs
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = fname;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function downloadWeeklyJSON() {
   if (!weeklyData) return;
   const p    = weeklyData.profile;
@@ -225,6 +258,24 @@ function buildWeekSection(weekStart, logs, defaultOpen, collapsible, isCurrent =
     <span class="weekly-chevron" style="font-size:1.6rem;color:var(--text-subtle);
       transition:transform var(--dur-mod);transform:rotate(${defaultOpen ? "90deg" : "0deg"})"
       aria-hidden="true">›</span>`;
+
+  // Per-week download button — always present on completed weeks
+  if (!isCurrent) {
+    const dlBtn = document.createElement("button");
+    dlBtn.className = "btn btn--ghost btn--sm no-print";
+    dlBtn.style.cssText = "font-size:1.2rem;flex-shrink:0;color:var(--text-muted);margin-right:var(--sp-2)";
+    dlBtn.title = getCurrentLang() === "fr-CA"
+      ? `Télécharger le JSON de la semaine du ${weekStart}`
+      : `Download JSON for week of ${weekStart}`;
+    dlBtn.textContent = "⬇";
+    dlBtn.onclick = (e) => {
+      e.stopPropagation();
+      downloadWeekJSON(weekStart, logs);
+    };
+    const printBtn = header.querySelector("button");
+    if (printBtn) header.insertBefore(dlBtn, printBtn);
+    else header.appendChild(dlBtn);
+  }
 
   // Retro-wrap button: inserted into header after innerHTML is set
   if (!isCurrent && !hasWrap) {
@@ -693,12 +744,12 @@ function renderRetroWrapAnswers(section, weekStart, logs, wrap) {
     <div style="margin-top:var(--sp-5);padding-top:var(--sp-4);border-top:1px solid var(--border);
                 display:flex;align-items:center;gap:var(--sp-4);flex-wrap:wrap">
       <button class="btn btn--primary no-print" onclick="downloadWeeklyJSON()">
-        ⬇ ${isFr ? "Télécharger et déposer sur OneDrive" : "Download and upload to OneDrive"}
+        ⬇ ${isFr ? "Télécharger mon journal complet et déposer sur OneDrive" : "Download my full journal and upload to OneDrive"}
       </button>
       <span style="font-size:1.2rem;color:var(--text-muted)">
         ${isFr
-          ? "Quand tu es satisfait·e de tes réponses, télécharge le fichier et dépose-le sur OneDrive."
-          : "When you are happy with your answers, download the file and upload it to OneDrive."}
+          ? "Ce fichier contient tous tes journaux, y compris ce bilan. Dépose-le sur OneDrive pour remplacer la version précédente."
+          : "This file contains all your logs, including this wrap. Upload it to OneDrive to replace the previous version."}
       </span>
     </div>`;
 
