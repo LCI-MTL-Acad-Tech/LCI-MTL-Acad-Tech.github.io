@@ -50,8 +50,9 @@ function programColor(prog) {
 // Active quick-filter values (program / teacher buttons)
 let activeProgram   = "";
 let activeTeacher   = "";
-let activeIntegrity = false; // filter: show only students with integrity issues
-let activeNoReport  = false; // filter: show only students missing final report
+let activeIntegrity    = false; // filter: show only students with integrity issues
+let activeNoReport     = false; // filter: show only students missing final report
+let activeHideFinished = false; // filter: hide finished students
 
 document.addEventListener("DOMContentLoaded", () => {
   // Only run hub-specific init when on the actual hub page
@@ -972,8 +973,9 @@ function applyFilters() {
     if (track === "finished") { if (!isFinished(s))      return false; }
     else if (track)           { if (s.track_band !== track) return false; }
     if (course  && s.course_code !== course)    return false;
-    if (activeIntegrity && s.integrity?.ok !== false) return false;
-    if (activeNoReport  && isFinished(s))             return false;
+    if (activeIntegrity    && s.integrity?.ok !== false) return false;
+    if (activeNoReport     && isFinished(s))             return false;
+    if (activeHideFinished && isFinished(s))             return false;
     if (search  && !s.name.toLowerCase().includes(search)
                 && !s.student_id.toLowerCase().includes(search)) return false;
     return true;
@@ -999,7 +1001,7 @@ function applyFilters() {
 }
 
 function clearFilters() {
-  activeProgram = ""; activeTeacher = ""; activeIntegrity = false; activeNoReport = false;
+  activeProgram = ""; activeTeacher = ""; activeIntegrity = false; activeNoReport = false; activeHideFinished = false;
   ["filter-program","filter-teacher","filter-pathway","filter-track","filter-course"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = "";
@@ -1314,6 +1316,7 @@ function renderQuickFilters() {
   renderQuickFilterGroup("hub-qf-teachers", "teacher",  activeTeacher);
   renderIntegrityFilter();
   renderNoReportFilter();
+  renderHideFinishedFilter();
 }
 
 function renderIntegrityFilter() {
@@ -1367,6 +1370,33 @@ function renderNoReportFilter() {
 
 function toggleNoReportFilter() {
   activeNoReport = !activeNoReport;
+  applyFilters();
+}
+
+function renderHideFinishedFilter() {
+  const el = document.getElementById("hub-qf-hide-finished");
+  if (!el) return;
+  const isFr  = getCurrentLang() === "fr-CA";
+  const count = students.filter(s => isFinished(s)).length;
+  if (!count) { el.innerHTML = ""; return; }
+  const label = activeHideFinished
+    ? (isFr ? `👁 Afficher les terminé·e·s (${count})` : `👁 Show finished (${count})`)
+    : (isFr ? `✅ Masquer les terminé·e·s (${count})` : `✅ Hide finished (${count})`);
+  el.innerHTML = `<button
+    onclick="toggleHideFinishedFilter()"
+    style="padding:var(--sp-1) var(--sp-3);border-radius:var(--r-pill);font-size:1.2rem;
+           font-family:inherit;cursor:pointer;
+           border:1.5px solid ${activeHideFinished ? "#1a6fa8" : "var(--border)"};
+           background:${activeHideFinished ? "#1a6fa8" : "var(--bg-card)"};
+           color:${activeHideFinished ? "white" : "var(--text)"};
+           font-weight:${activeHideFinished ? "600" : "400"};
+           transition:all var(--dur-fast)">
+    ${label}
+  </button>`;
+}
+
+function toggleHideFinishedFilter() {
+  activeHideFinished = !activeHideFinished;
   applyFilters();
 }
 
