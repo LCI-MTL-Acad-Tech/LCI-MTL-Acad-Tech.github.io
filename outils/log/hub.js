@@ -2775,28 +2775,79 @@ function exportHubState() {
 }
 
 function loadHubState(data) {
-  // Restore manually-finished marks
+  // Restore manually-finished marks — union across all loaded states
   if (Array.isArray(data.manually_finished)) {
     data.manually_finished.forEach(uuid => manuallyFinished.add(uuid));
     sessionStorage.setItem("hub_manually_finished", JSON.stringify([...manuallyFinished]));
   }
-  // Restore milestones
+
+  // Restore milestones — keep most recently exported project per id
   if (data.milestones && typeof data.milestones === "object") {
-    Object.assign(hubMilestones, data.milestones);
+    Object.entries(data.milestones).forEach(([id, entry]) => {
+      const existing = hubMilestones[id];
+      if (!existing || (entry.exported_at || "") >= (existing.exported_at || "")) {
+        hubMilestones[id] = entry;
+      }
+    });
   }
-  // Restore student rows only for students NOT already present from uploaded files.
-  // If individual JSON files were also uploaded, those take priority.
+
+  // Re-apply merged_pairs — deduplicated union across all loaded states
+  if (Array.isArray(data.merged_pairs)) {
+    data.merged_pairs.forEach(({ donorUUID, baseUUID }) => {
+      const base  = students.find(s => s.uuid === baseUUID  || s.uuid === normId(baseUUID));
+      const donor = students.find(s => s.uuid === donorUUID || s.uuid === normId(donorUUID));
+      if (!base || !donor) return;
+      const logMap = new Map();
+      [...(base.raw.logs || []), ...(donor.raw.logs || [])].forEach(l => {
+        const ex = logMap.get(l.log_id);
+        if (!ex || l.revision > ex.revision) logMap.set(l.log_id, l);
+      });
+      base.raw.logs = [...logMap.values()].sort((a, b) => a.date.localeCompare(b.date));
+      const rebuilt = buildRow(base.raw);
+      rebuilt.file_type_counts = {
+        daily:      (base.file_type_counts?.daily      || 0) + (donor.file_type_counts?.daily      || 0),
+        weekly:     (base.file_type_counts?.weekly     || 0) + (donor.file_type_counts?.weekly     || 0),
+        full:       (base.file_type_counts?.full       || 0) + (donor.file_type_counts?.full       || 0),
+        reflection: (base.file_type_counts?.reflection || 0) + (donor.file_type_counts?.reflection || 0),
+        config:     (base.file_type_counts?.config     || 0) + (donor.file_type_counts?.config     || 0),
+      };
+      students = students.filter(s => s.uuid !== base.uuid && s.uuid !== donor.uuid);
+      students.push(rebuilt);
+      const key = `${donorUUID}|${baseUUID}`;
+      if (!sessionMerges.some(m => `${m.donorUUID}|${m.baseUUID}` === key)) {
+        sessionMerges.push({ donorUUID, baseUUID });
+      }
+      console.info(`[LCI Hub] Re-applied merge: "${donorUUID}" → "${baseUUID}"`);
+    });
+  }
+
+  // Restore student rows — keep whichever version has more logs; on tie keep newer
   if (Array.isArray(data.students)) {
     data.students.forEach(raw => {
       const uuid = raw.meta?.student_uuid || raw.profile?.student_id;
       if (!uuid) return;
-      const alreadyLoaded = students.some(s => s.uuid === normId(uuid) || s.uuid === uuid);
-      if (alreadyLoaded) return; // individual file takes priority — skip
+      const normUUID = normId(uuid) || uuid;
+      const existing = students.find(s => s.uuid === normUUID || s.uuid === uuid);
+      if (existing) {
+        const existingLogs = (existing.raw?.logs || []).length;
+        const stateLogs    = (raw.logs || []).length;
+        if (stateLogs > existingLogs ||
+           (stateLogs === existingLogs &&
+            (raw.meta?.last_modified || "") > (existing.raw?.meta?.last_modified || ""))) {
+          const row = buildRow(raw);
+          row.file_type_counts = existing.file_type_counts ||
+            { daily:0, weekly:0, full:0, reflection:0, config:0 };
+          students = students.filter(s => s.uuid !== existing.uuid);
+          students.push(row);
+        }
+        return;
+      }
       const row = buildRow(raw);
       row.file_type_counts = { daily:0, weekly:0, full:0, reflection:0, config:0 };
       students.push(row);
     });
   }
+
   applyFilters();
 }
 
