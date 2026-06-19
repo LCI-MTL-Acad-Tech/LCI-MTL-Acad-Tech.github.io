@@ -6,349 +6,154 @@
 <title>Conseil IA du jour — Collège LaSalle Montréal</title>
 <style>
   :root {
-    --gold:   #cc9f11;
-    --gold-bg: #fffbe6;
-    --gold-border: #f0d060;
-    --ink:    #1a1a1a;
-    --mid:    #555;
-    --light:  #f7f7f3;
+    --gold: #cc9f11; --gold-bg: #fffbe6; --gold-border: #f0d060;
+    --ink: #1a1a1a; --mid: #555;
     --c0: #eb2d37; --c1: #cc9f11; --c2: #5b8000; --c3: #337996; --c4: #7b4fa6;
+    --bg0: #fde8e9; --bg1: #fdf3d9; --bg2: #e8f0d6; --bg3: #d9edf5; --bg4: #ece3f5;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
-    background: var(--gold-bg);
-    color: var(--ink);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .wrap {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 32px 24px 40px;
-    flex: 1;
-  }
-
-  /* Header */
-  .header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 28px;
-  }
-  .bulb {
-    font-size: 2rem;
-    line-height: 1;
-    flex-shrink: 0;
-  }
-  .header-text h1 {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--gold);
-    letter-spacing: .02em;
-  }
-  .header-text p {
-    font-size: .78rem;
-    color: var(--mid);
-    margin-top: 2px;
-  }
-
-  /* Day counter */
-  .day-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: .72rem;
-    font-weight: 700;
-    color: var(--gold);
-    background: #fff;
-    border: 1.5px solid var(--gold-border);
-    border-radius: 20px;
-    padding: 3px 12px;
-    margin-bottom: 20px;
-  }
-
-  /* Tip card */
-  .tip-card {
-    background: #fff;
-    border: 2px solid var(--gold-border);
-    border-radius: 14px;
-    padding: 24px 26px;
-    margin-bottom: 20px;
-    position: relative;
-  }
-  .tip-card::before {
-    content: '« ';
-    position: absolute;
-    top: -16px;
-    left: 18px;
-    font-size: 3rem;
-    color: var(--gold-border);
-    font-family: Georgia, serif;
-    line-height: 1;
-  }
-  .tip-text {
-    font-size: 1.05rem;
-    line-height: 1.7;
-    color: var(--ink);
-    font-style: italic;
-  }
+  body { font-family: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif; background: var(--gold-bg); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 28px 24px 36px; flex: 1; }
+  .day-badge { display: inline-flex; align-items: center; gap: 6px; font-size: .72rem; font-weight: 700; color: var(--gold); background: #fff; border: 1.5px solid var(--gold-border); border-radius: 20px; padding: 3px 12px; margin-bottom: 20px; }
+  .tip-card { background: #fff; border: 2px solid var(--gold-border); border-radius: 14px; padding: 24px 26px; margin-bottom: 20px; position: relative; }
+  .tip-card::before { content: '«'; position: absolute; top: -18px; left: 18px; font-size: 3rem; color: var(--gold-border); font-family: Georgia, serif; line-height: 1; }
+  .tip-text { font-size: 1.05rem; line-height: 1.7; font-style: italic; }
   .tip-text em { font-style: normal; font-weight: 700; color: var(--gold); }
-
-  /* Source link */
-  .tip-source {
-    font-size: .78rem;
-    color: var(--mid);
-    margin-top: 14px;
-    padding-top: 12px;
-    border-top: 1px solid #f0ecd8;
-  }
+  .tip-source { font-size: .78rem; color: var(--mid); margin-top: 14px; padding-top: 12px; border-top: 1px solid #f0ecd8; }
   .tip-source a { color: var(--c3); text-decoration: none; }
   .tip-source a:hover { text-decoration: underline; }
-
-  /* Tags */
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 28px;
-  }
-  .tag {
-    font-size: .7rem;
-    font-weight: 700;
-    padding: 3px 10px;
-    border-radius: 20px;
-    letter-spacing: .03em;
-  }
-
-  /* Nav -->  prev / next -->  date indicator */
-  .nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-  .nav-btn {
-    font-size: .8rem;
-    font-weight: 600;
-    color: var(--gold);
-    background: #fff;
-    border: 1.5px solid var(--gold-border);
-    border-radius: 8px;
-    padding: 6px 16px;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background .15s;
-  }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 28px; }
+  .tag { font-size: .7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; letter-spacing: .03em; }
+  .nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .nav-btn { font-size: .8rem; font-weight: 600; color: var(--gold); background: #fff; border: 1.5px solid var(--gold-border); border-radius: 8px; padding: 6px 16px; cursor: pointer; transition: background .15s; }
   .nav-btn:hover { background: var(--gold-bg); }
   .nav-btn:disabled { opacity: .35; cursor: default; }
-  .nav-date {
-    font-size: .75rem;
-    color: var(--mid);
-    text-align: center;
-  }
-
-  /* Footer */
-  footer {
-    text-align: center;
-    font-size: .68rem;
-    color: #bbb;
-    padding: 12px 24px 20px;
-    line-height: 1.6;
-  }
+  .nav-date { font-size: .75rem; color: var(--mid); text-align: center; }
+  footer { text-align: center; font-size: .68rem; color: #bbb; padding: 12px 24px 20px; line-height: 1.7; }
   footer a { color: #bbb; }
-
-  /* Iframe-friendly: compact mode when viewport is narrow */
-  @media (max-width: 500px) {
-    .wrap { padding: 20px 16px 28px; }
-    .tip-text { font-size: .95rem; }
-  }
+  @media (max-width: 500px) { .wrap { padding: 20px 16px 28px; } .tip-text { font-size: .95rem; } }
 </style>
 </head>
 <body>
 <div class="wrap">
-
-  <div class="header">
-    <div class="bulb">💡</div>
-    <div class="header-text">
-      <h1>Conseil IA du jour</h1>
-      <p>Outil pédagogique · IA en enseignement</p>
-    </div>
-  </div>
-
-  <div class="day-badge">
-    <span>📅</span>
-    <span id="date-label">—</span>
-  </div>
-
+  <div class="day-badge"><span>📅</span><span id="date-label">—</span></div>
   <div class="tip-card">
-    <p class="tip-text" id="tip-text">Chargement…</p>
+    <p class="tip-text" id="tip-text">…</p>
     <div class="tip-source" id="tip-source" style="display:none"></div>
   </div>
-
   <div class="tags" id="tip-tags"></div>
-
   <div class="nav">
-    <button class="nav-btn" id="btn-prev" onclick="go(-1)">← précédent</button>
+    <button class="nav-btn" id="btn-prev" onclick="go(-1)">←</button>
     <div class="nav-date" id="nav-date"></div>
-    <button class="nav-btn" id="btn-next" onclick="go(1)">suivant →</button>
+    <button class="nav-btn" id="btn-next" onclick="go(1)">→</button>
   </div>
-
 </div>
-
-<footer>
-  Conception assistée par IA — contenu structuré en collaboration avec <a href="https://claude.ai" target="_blank">Claude Sonnet (Anthropic)</a> · 2026<br>
-  Les décisions éditoriales et la responsabilité institutionnelle demeurent entièrement humaines.<br>
-  <a href="https://lci-mtl-acad-tech.github.io/outils/tip.html" target="_blank">lci-mtl-acad-tech.github.io/outils/tip.html</a>
-</footer>
+<footer id="footer-text"></footer>
 
 <script>
-const TIPS = [
-  {
-    text: "Avant d'utiliser un outil d'IA, vérifiez qu'il figure sur la liste des outils autorisés par l'institution. L'utilisation de comptes personnels avec des données d'étudiant.e.s est interdite, même pour des outils bien connus.",
-    tags: [{label:"Politique", c:"c3"},{label:"Sécurité", c:"c0"}],
-    source: null
-  },
-  {
-    text: "L'IA générative produit la réponse <em>statistiquement la plus probable</em>, pas nécessairement la plus exacte. Traitez toujours ses sorties comme un premier jet à vérifier, pas comme une source fiable.",
-    tags: [{label:"Fonctionnement", c:"c1"},{label:"Pensée critique", c:"c4"}],
-    source: null
-  },
-  {
-    text: "Les détecteurs IA ont tendance à signaler les étudiant.e.s qui écrivent avec un style soutenu et cohérent. Évitez de les utiliser comme seul critère de jugement sur l'intégrité académique.",
-    tags: [{label:"Évaluation", c:"c1"},{label:"Intégrité", c:"c0"}],
-    source: null
-  },
-  {
-    text: "Une requête à un grand modèle de langage consomme environ 10× plus d'énergie qu'une recherche Google classique. Encourager un usage réfléchi de l'IA, c'est aussi un geste écologique.",
-    tags: [{label:"Impact écologique", c:"c2"},{label:"Éthique", c:"c0"}],
-    source: null
-  },
-  {
-    text: "Même à niveau 1 (Planification IA), demandez aux étudiant.e.s de documenter les prompts utilisés. C'est un réflexe de transparence qui les prépare au monde professionnel.",
-    tags: [{label:"Échelle IA", c:"c1"},{label:"Transparence", c:"c3"}],
-    source: {label:"Échelle d'utilisation de l'IA", href:"https://satuelisa.github.io/talks/aqpc2026.html"}
-  },
-  {
-    text: "Un.e enseignant.e ne peut pas soumettre les travaux d'étudiant.e.s dans un outil d'IA gratuit pour obtenir du feedback. Utilisez uniquement des outils couverts par une licence institutionnelle.",
-    tags: [{label:"Droits étudiants", c:"c0"},{label:"Politique", c:"c3"}],
-    source: null
-  },
-  {
-    text: "La dépendance précoce à l'IA pour des tâches fondamentales — rédaction, résolution de problèmes — peut freiner le développement de compétences disciplinaires essentielles. Calibrez le niveau selon l'objectif pédagogique.",
-    tags: [{label:"Pédagogie", c:"c4"},{label:"Atrophie cognitive", c:"c0"}],
-    source: null
-  },
-  {
-    text: "Certains outils de génération d'images sont déjà inclus dans les licences institutionnelles existantes (ex. : suites créatives). Vérifiez avec votre coordonnateur.trice avant d'en chercher un autre.",
-    tags: [{label:"Outils approuvés", c:"c2"},{label:"Design", c:"c3"}],
-    source: null
-  },
-  {
-    text: "Quand vous intégrez l'IA dans un cours, précisez le niveau d'utilisation autorisé directement dans le plan de cours <em>et</em> dans chaque consigne d'évaluation. La cohérence évite les malentendus.",
-    tags: [{label:"Échelle IA", c:"c1"},{label:"Clarté", c:"c3"}],
-    source: null
-  },
-  {
-    text: "Les contenus de Reddit, Wikipedia et d'autres plateformes à fort volume de texte influencent significativement les réponses des IAg. Un biais de popularité, pas de vérité.",
-    tags: [{label:"Fonctionnement", c:"c1"},{label:"Pensée critique", c:"c4"}],
-    source: null
-  },
-  {
-    text: "Certains outils IA sont déjà accessibles à tou.te.s les étudiant.e.s et enseignant.e.s sans frais supplémentaires. Consultez la liste des outils autorisés par l'institution avant d'en chercher un autre.",
-    tags: [{label:"Outils approuvés", c:"c2"},{label:"Débutant", c:"c3"}],
-    source: null
-  },
-  {
-    text: "Un lien de partage vers une conversation IA (ChatGPT, Claude, etc.) est une forme de référencement valide pour les travaux aux niveaux 2–3. Encouragez les étudiant.e.s à l'inclure dans leurs remises.",
-    tags: [{label:"Référencement", c:"c3"},{label:"Échelle IA", c:"c1"}],
-    source: null
-  },
-  {
-    text: "Concevoir une activité d'apprentissage avec l'IA ne signifie pas simplement demander aux étudiant.e.s de l'utiliser. L'objectif pédagogique doit rester au centre : l'IA est un moyen, pas une fin.",
-    tags: [{label:"Pédagogie", c:"c4"},{label:"Conception", c:"c2"}],
-    source: null
-  },
-  {
-    text: "La transparence s'enseigne par l'exemple : si vous utilisez l'IA pour préparer du matériel de cours, mentionnez-le. Vos étudiant.e.s apprennent autant de vos pratiques que de vos consignes.",
-    tags: [{label:"Transparence", c:"c3"},{label:"Modélisation", c:"c4"}],
-    source: null
-  },
-  {
-    text: "Le prompt engineering n'est pas une compétence réservée aux experts techniques. Savoir formuler une demande claire et précise à un outil IA est une compétence transversale utile dans tous les programmes.",
-    tags: [{label:"Prompt engineering", c:"c1"},{label:"Compétences", c:"c2"}],
-    source: null
-  },
-];
+const COLOR_MAP = { c0:"#eb2d37", c1:"#cc9f11", c2:"#5b8000", c3:"#337996", c4:"#7b4fa6" };
+const BG_MAP    = { c0:"#fde8e9", c1:"#fdf3d9", c2:"#e8f0d6", c3:"#d9edf5", c4:"#ece3f5" };
 
-const COLOR_MAP = {
-  c0:"#eb2d37", c1:"#cc9f11", c2:"#5b8000", c3:"#337996", c4:"#7b4fa6"
-};
-const BG_MAP = {
-  c0:"#fde8e9", c1:"#fdf3d9", c2:"#e8f0d6", c3:"#d9edf5", c4:"#ece3f5"
+const UI = {
+  fr: {
+    today:"aujourd'hui", prev:function(n){return n+" jour"+(n>1?"s":"")+" plus tôt";}, next:function(n){return n+" jour"+(n>1?"s":"")+" plus tard";},
+    prevBtn:"← précédent", nextBtn:"suivant →",
+    disclaimer:"Ces conseils sont des points de départ, non des directives. Leur application requiert le jugement professionnel du lecteur ou de la lectrice.",
+    attribution:'Conception assistée par IA — contenu structuré en collaboration avec <a href="https://claude.ai" target="_blank">Claude Sonnet (Anthropic)</a>',
+    url:"https://lci-mtl-acad-tech.github.io/outils/tip.html"
+  },
+  en: {
+    today:"today", prev:function(n){return n+" day"+(n>1?"s":"")+" earlier";}, next:function(n){return n+" day"+(n>1?"s":"")+" later";},
+    prevBtn:"← previous", nextBtn:"next →",
+    disclaimer:"These tips are starting points, not directives. Applying them requires the reader's own professional judgement.",
+    attribution:'AI-assisted design — content structured in collaboration with <a href="https://claude.ai" target="_blank">Claude Sonnet (Anthropic)</a>',
+    url:"https://lci-mtl-acad-tech.github.io/outils/tip.html?lang=en"
+  },
+  es: {
+    today:"hoy", prev:function(n){return "hace "+n+" día"+(n>1?"s":"");}, next:function(n){return "en "+n+" día"+(n>1?"s":"");},
+    prevBtn:"← anterior", nextBtn:"siguiente →",
+    disclaimer:"Estos consejos son puntos de partida, no directivas. Su aplicación requiere el juicio profesional del lector o la lectora.",
+    attribution:'Diseño asistido por IA — contenido estructurado en colaboración con <a href="https://claude.ai" target="_blank">Claude Sonnet (Anthropic)</a>',
+    url:"https://lci-mtl-acad-tech.github.io/outils/tip.html?lang=es"
+  }
 };
 
-// Day-of-year for deterministic daily rotation
+var params = new URLSearchParams(window.location.search);
+var lang = ['fr','en','es'].indexOf(params.get('lang')) >= 0 ? params.get('lang') : 'fr';
+var ui = UI[lang];
+
+document.documentElement.lang = lang;
+if (lang === 'en') document.title = 'AI Tip of the Day — Collège LaSalle Montréal';
+if (lang === 'es') document.title = 'Consejo IA del día — Collège LaSalle Montréal';
+
+document.getElementById('btn-prev').textContent = ui.prevBtn;
+document.getElementById('btn-next').textContent = ui.nextBtn;
+document.getElementById('footer-text').innerHTML =
+  ui.attribution + '<br>' + ui.disclaimer + '<br>' +
+  '<a href="' + ui.url + '" target="_blank">' + ui.url + '</a>';
+
 function dayOfYear() {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 0);
-  return Math.floor((now - start) / 86400000);
+  var now = new Date();
+  return Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
 }
 
 function formatDate(offset) {
-  const d = new Date();
-  d.setDate(d.getDate() + offset);
-  return d.toLocaleDateString('fr-CA', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  var d = new Date(); d.setDate(d.getDate() + offset);
+  var locale = lang === 'es' ? 'es-ES' : lang === 'en' ? 'en-CA' : 'fr-CA';
+  return d.toLocaleDateString(locale, {weekday:'long', day:'numeric', month:'long'});
 }
 
-let currentOffset = 0; // 0 = today
+var TIPS = [];
+var currentOffset = 0;
 
 function render(offset) {
-  const idx = (dayOfYear() + offset % TIPS.length + TIPS.length) % TIPS.length;
-  const tip = TIPS[idx];
+  if (!TIPS.length) return;
+  var idx = ((dayOfYear() + offset) % TIPS.length + TIPS.length) % TIPS.length;
+  var tip = TIPS[idx];
 
-  document.getElementById('tip-text').innerHTML = tip.text;
+  document.getElementById('tip-text').innerHTML = tip[lang];
 
-  const src = document.getElementById('tip-source');
-  if (tip.source) {
-    src.innerHTML = '🔗 <a href="' + tip.source.href + '" target="_blank">' + tip.source.label + '</a>';
+  var src = document.getElementById('tip-source');
+  if (tip.source && tip.source[lang]) {
+    src.innerHTML = '🔗 <a href="' + tip.source[lang].href + '" target="_blank">' + tip.source[lang].label + '</a>';
     src.style.display = 'block';
-  } else {
-    src.style.display = 'none';
-  }
+  } else { src.style.display = 'none'; }
 
-  const tagsEl = document.getElementById('tip-tags');
+  var tagsEl = document.getElementById('tip-tags');
   tagsEl.innerHTML = '';
-  (tip.tags || []).forEach(function(t) {
-    const span = document.createElement('span');
+  var tagLabels = (tip.tags && tip.tags[lang]) ? tip.tags[lang] : [];
+  var colors = tip.colors || [];
+  tagLabels.forEach(function(label, i) {
+    var c = colors[i] || 'c1';
+    var span = document.createElement('span');
     span.className = 'tag';
-    span.textContent = t.label;
-    span.style.background = BG_MAP[t.c];
-    span.style.color = COLOR_MAP[t.c];
-    span.style.border = '1px solid ' + COLOR_MAP[t.c] + '44';
+    span.textContent = label;
+    span.style.background = BG_MAP[c];
+    span.style.color = COLOR_MAP[c];
+    span.style.border = '1px solid ' + COLOR_MAP[c] + '44';
     tagsEl.appendChild(span);
   });
 
   document.getElementById('date-label').textContent = formatDate(offset);
+  var abs = Math.abs(offset);
   document.getElementById('nav-date').textContent =
-    offset === 0 ? "aujourd'hui" :
-    offset < 0   ? Math.abs(offset) + ' jour' + (Math.abs(offset)>1?'s':'') + ' plus tôt' :
-                   offset + ' jour' + (offset>1?'s':'') + ' plus tard';
+    offset === 0 ? ui.today : offset < 0 ? ui.prev(abs) : ui.next(abs);
 
   document.getElementById('btn-prev').disabled = offset <= -(TIPS.length - 1);
   document.getElementById('btn-next').disabled = offset >= 0;
 }
 
-function go(dir) {
-  currentOffset += dir;
-  render(currentOffset);
-}
+function go(dir) { currentOffset += dir; render(currentOffset); }
 
-render(0);
+fetch('tips.json')
+  .then(function(r){ return r.json(); })
+  .then(function(data){ TIPS = data; render(0); })
+  .catch(function(){
+    document.getElementById('tip-text').textContent =
+      lang==='en' ? 'Could not load tips.' :
+      lang==='es' ? 'No se pudieron cargar los consejos.' :
+                    'Impossible de charger les conseils.';
+  });
 </script>
 </body>
 </html>

@@ -1,0 +1,112 @@
+[
+  {
+    "fr": "Avant d'utiliser un outil d'IA, vérifiez qu'il figure sur la liste des outils autorisés par l'institution. L'utilisation de comptes personnels avec des données d'étudiant.e.s est interdite, même pour des outils bien connus.",
+    "en": "Before using an AI tool, check that it appears on the list of tools authorised by the institution. Using personal accounts with student data is prohibited, even for well-known tools.",
+    "es": "Antes de utilizar una herramienta de IA, verifica que figure en la lista de herramientas autorizadas por la institución. Está prohibido utilizar cuentas personales con datos de estudiantes, incluso para herramientas conocidas.",
+    "tags": { "fr": ["Politique", "Sécurité"], "en": ["Policy", "Security"], "es": ["Política", "Seguridad"] },
+    "colors": ["c3", "c0"]
+  },
+  {
+    "fr": "L'IA générative produit la réponse <em>statistiquement la plus probable</em>, pas nécessairement la plus exacte. Traitez toujours ses sorties comme un premier jet à vérifier, pas comme une source fiable.",
+    "en": "Generative AI produces the <em>statistically most likely</em> response, not necessarily the most accurate one. Always treat its output as a first draft to verify, not as a reliable source.",
+    "es": "La IA generativa produce la respuesta <em>estadísticamente más probable</em>, no necesariamente la más exacta. Trata siempre sus resultados como un primer borrador a verificar, no como una fuente fiable.",
+    "tags": { "fr": ["Fonctionnement", "Pensée critique"], "en": ["How it works", "Critical thinking"], "es": ["Funcionamiento", "Pensamiento crítico"] },
+    "colors": ["c1", "c4"]
+  },
+  {
+    "fr": "Les détecteurs IA ont tendance à signaler les étudiant.e.s qui écrivent avec un style soutenu et cohérent. Évitez de les utiliser comme seul critère de jugement sur l'intégrité académique.",
+    "en": "AI detectors tend to flag students who write with a consistent, polished style. Avoid using them as the sole criterion for judging academic integrity.",
+    "es": "Los detectores de IA tienden a señalar a los estudiantes que escriben con un estilo cuidado y coherente. Evita usarlos como único criterio para juzgar la integridad académica.",
+    "tags": { "fr": ["Évaluation", "Intégrité"], "en": ["Assessment", "Integrity"], "es": ["Evaluación", "Integridad"] },
+    "colors": ["c1", "c0"]
+  },
+  {
+    "fr": "Une requête à un grand modèle de langage consomme environ 10× plus d'énergie qu'une recherche Google classique. Encourager un usage réfléchi de l'IA, c'est aussi un geste écologique.",
+    "en": "A query to a large language model uses roughly 10× more energy than a standard Google search. Encouraging mindful AI use is also an ecological choice.",
+    "es": "Una consulta a un modelo de lenguaje grande consume aproximadamente 10 veces más energía que una búsqueda en Google. Fomentar un uso reflexivo de la IA es también un gesto ecológico.",
+    "tags": { "fr": ["Impact écologique", "Éthique"], "en": ["Ecological impact", "Ethics"], "es": ["Impacto ecológico", "Ética"] },
+    "colors": ["c2", "c0"]
+  },
+  {
+    "fr": "Même à niveau 1 (Planification IA), demandez aux étudiant.e.s de documenter les prompts utilisés. C'est un réflexe de transparence qui les prépare au monde professionnel.",
+    "en": "Even at level 1 (AI Planning), ask students to document the prompts they used. It is a transparency habit that prepares them for professional life.",
+    "es": "Incluso en el nivel 1 (Planificación IA), pide a los estudiantes que documenten los prompts utilizados. Es un hábito de transparencia que los prepara para el mundo profesional.",
+    "tags": { "fr": ["Échelle IA", "Transparence"], "en": ["AI scale", "Transparency"], "es": ["Escala IA", "Transparencia"] },
+    "colors": ["c1", "c3"],
+    "source": {
+      "fr": { "label": "Échelle d'utilisation de l'IA", "href": "https://satuelisa.github.io/talks/aqpc2026.html" },
+      "en": { "label": "AI usage scale", "href": "https://satuelisa.github.io/talks/aqpc2026.html" },
+      "es": { "label": "Escala de uso de la IA", "href": "https://satuelisa.github.io/talks/aqpc2026.html" }
+    }
+  },
+  {
+    "fr": "Un.e enseignant.e ne peut pas soumettre les travaux d'étudiant.e.s dans un outil d'IA gratuit pour obtenir du feedback. Utilisez uniquement des outils couverts par une licence institutionnelle.",
+    "en": "A teacher cannot submit student work into a free AI tool to obtain feedback. Only use tools covered by an institutional licence.",
+    "es": "Un docente no puede enviar trabajos de estudiantes a una herramienta de IA gratuita para obtener retroalimentación. Utiliza únicamente herramientas cubiertas por una licencia institucional.",
+    "tags": { "fr": ["Droits étudiants", "Politique"], "en": ["Student rights", "Policy"], "es": ["Derechos del estudiante", "Política"] },
+    "colors": ["c0", "c3"]
+  },
+  {
+    "fr": "La dépendance précoce à l'IA pour des tâches fondamentales — rédaction, résolution de problèmes — peut freiner le développement de compétences disciplinaires essentielles. Calibrez le niveau selon l'objectif pédagogique.",
+    "en": "Early over-reliance on AI for foundational tasks — writing, problem-solving — can hinder the development of essential disciplinary skills. Calibrate the level according to the pedagogical goal.",
+    "es": "La dependencia temprana de la IA para tareas fundamentales — redacción, resolución de problemas — puede frenar el desarrollo de competencias disciplinares esenciales. Ajusta el nivel según el objetivo pedagógico.",
+    "tags": { "fr": ["Pédagogie", "Atrophie cognitive"], "en": ["Pedagogy", "Cognitive atrophy"], "es": ["Pedagogía", "Atrofia cognitiva"] },
+    "colors": ["c4", "c0"]
+  },
+  {
+    "fr": "Certains outils de génération d'images sont déjà inclus dans les licences institutionnelles existantes. Vérifiez avec votre coordonnateur.trice avant d'en chercher un autre.",
+    "en": "Some image generation tools are already included in existing institutional licences. Check with your programme coordinator before looking for another one.",
+    "es": "Algunas herramientas de generación de imágenes ya están incluidas en las licencias institucionales existentes. Consulta con tu coordinador/a antes de buscar otra.",
+    "tags": { "fr": ["Outils autorisés", "Design"], "en": ["Authorised tools", "Design"], "es": ["Herramientas autorizadas", "Diseño"] },
+    "colors": ["c2", "c3"]
+  },
+  {
+    "fr": "Quand vous intégrez l'IA dans un cours, précisez le niveau d'utilisation autorisé directement dans le plan de cours <em>et</em> dans chaque consigne d'évaluation. La cohérence évite les malentendus.",
+    "en": "When integrating AI into a course, specify the permitted usage level directly in the course outline <em>and</em> in each assessment instruction. Consistency prevents misunderstandings.",
+    "es": "Cuando integres la IA en un curso, especifica el nivel de uso permitido directamente en el plan de curso <em>y</em> en cada consigna de evaluación. La coherencia evita malentendidos.",
+    "tags": { "fr": ["Échelle IA", "Clarté"], "en": ["AI scale", "Clarity"], "es": ["Escala IA", "Claridad"] },
+    "colors": ["c1", "c3"]
+  },
+  {
+    "fr": "Les contenus de Reddit, Wikipedia et d'autres plateformes à fort volume de texte influencent significativement les réponses des IAg. Un biais de popularité, pas de vérité.",
+    "en": "Content from Reddit, Wikipedia, and other high-volume text platforms significantly influences generative AI responses. This is a popularity bias, not a truth bias.",
+    "es": "Los contenidos de Reddit, Wikipedia y otras plataformas de alto volumen de texto influyen significativamente en las respuestas de la IA generativa. Es un sesgo de popularidad, no de verdad.",
+    "tags": { "fr": ["Fonctionnement", "Pensée critique"], "en": ["How it works", "Critical thinking"], "es": ["Funcionamiento", "Pensamiento crítico"] },
+    "colors": ["c1", "c4"]
+  },
+  {
+    "fr": "Certains outils IA sont déjà accessibles à tou.te.s sans frais supplémentaires via les licences institutionnelles. Consultez la liste des outils autorisés avant d'en chercher un autre.",
+    "en": "Some AI tools are already available to everyone at no extra cost through institutional licences. Check the list of authorised tools before looking for another one.",
+    "es": "Algunas herramientas de IA ya están disponibles para todos sin coste adicional a través de las licencias institucionales. Consulta la lista de herramientas autorizadas antes de buscar otra.",
+    "tags": { "fr": ["Outils autorisés", "Débutant"], "en": ["Authorised tools", "Beginner"], "es": ["Herramientas autorizadas", "Principiante"] },
+    "colors": ["c2", "c3"]
+  },
+  {
+    "fr": "Un lien de partage vers une conversation IA (ChatGPT, Claude, etc.) est une forme de référencement valide pour les travaux aux niveaux 2–3. Encouragez les étudiant.e.s à l'inclure dans leurs remises.",
+    "en": "A share link to an AI conversation (ChatGPT, Claude, etc.) is a valid form of attribution for work at levels 2–3. Encourage students to include it in their submissions.",
+    "es": "Un enlace compartido a una conversación de IA (ChatGPT, Claude, etc.) es una forma válida de referenciación para trabajos en los niveles 2–3. Anima a los estudiantes a incluirlo en sus entregas.",
+    "tags": { "fr": ["Référencement", "Échelle IA"], "en": ["Attribution", "AI scale"], "es": ["Referenciación", "Escala IA"] },
+    "colors": ["c3", "c1"]
+  },
+  {
+    "fr": "Concevoir une activité d'apprentissage avec l'IA ne signifie pas simplement demander aux étudiant.e.s de l'utiliser. L'objectif pédagogique doit rester au centre : l'IA est un moyen, pas une fin.",
+    "en": "Designing a learning activity with AI does not simply mean asking students to use it. The pedagogical goal must remain central: AI is a means, not an end.",
+    "es": "Diseñar una actividad de aprendizaje con IA no significa simplemente pedir a los estudiantes que la usen. El objetivo pedagógico debe seguir siendo central: la IA es un medio, no un fin.",
+    "tags": { "fr": ["Pédagogie", "Conception"], "en": ["Pedagogy", "Design"], "es": ["Pedagogía", "Diseño"] },
+    "colors": ["c4", "c2"]
+  },
+  {
+    "fr": "La transparence s'enseigne par l'exemple : si vous utilisez l'IA pour préparer du matériel de cours, mentionnez-le. Vos étudiant.e.s apprennent autant de vos pratiques que de vos consignes.",
+    "en": "Transparency is taught by example: if you use AI to prepare course materials, say so. Students learn as much from your practices as from your instructions.",
+    "es": "La transparencia se enseña con el ejemplo: si usas la IA para preparar materiales de curso, menciónalo. Los estudiantes aprenden tanto de tus prácticas como de tus consignas.",
+    "tags": { "fr": ["Transparence", "Modélisation"], "en": ["Transparency", "Modelling"], "es": ["Transparencia", "Modelado"] },
+    "colors": ["c3", "c4"]
+  },
+  {
+    "fr": "Le prompt engineering n'est pas une compétence réservée aux experts techniques. Savoir formuler une demande claire et précise à un outil IA est une compétence transversale utile dans tous les programmes.",
+    "en": "Prompt engineering is not a skill reserved for technical experts. Knowing how to frame a clear, precise request to an AI tool is a transferable skill useful across all programmes.",
+    "es": "La ingeniería de prompts no es una habilidad reservada a expertos técnicos. Saber formular una solicitud clara y precisa a una herramienta de IA es una competencia transversal útil en todos los programas.",
+    "tags": { "fr": ["Prompt engineering", "Compétences"], "en": ["Prompt engineering", "Skills"], "es": ["Ingeniería de prompts", "Competencias"] },
+    "colors": ["c1", "c2"]
+  }
+]

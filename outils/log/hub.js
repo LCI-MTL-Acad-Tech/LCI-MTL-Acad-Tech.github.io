@@ -1134,7 +1134,13 @@ function findProbableDuplicates() {
         pairs.push({ i, j, reason: "same_name_diff_id", autoMerge: false }); continue;
       }
 
-      // All other combinations (similar names + different IDs, ID typo + different names) — ignored
+      // FLAG for review: one name is a subset of the other but IDs differ
+      if (namesSubset) {
+        // Check if the ID difference is just a typo (Levenshtein 1) — flag for merge
+        const idTypo = ii && ij && ii.length === ij.length && levenshtein(ii, ij, 1) === 1;
+        pairs.push({ i, j, reason: idTypo ? "name_subset_id_typo" : "name_subset_diff_id", autoMerge: false });
+        continue;
+      }
     }
   }
   return pairs;
@@ -1186,8 +1192,10 @@ function renderDupStudentBanner() {
   const rows = pairs.map(({ i, j, reason }) => {
     const si = students[i], sj = students[j];
     const reasonLabel = {
-      same_id:           isFr ? "Même numéro étudiant·e, noms différents"  : "Same student ID, different names",
-      same_name_diff_id: isFr ? "Nom identique, numéros différents"        : "Identical name, different student IDs",
+      same_id:              isFr ? "Même numéro étudiant·e, noms différents"          : "Same student ID, different names",
+      same_name_diff_id:    isFr ? "Nom identique, numéros différents"                : "Identical name, different student IDs",
+      name_subset_diff_id:  isFr ? "Nom inclus dans l'autre, numéros différents"      : "One name contains the other, different IDs",
+      name_subset_id_typo:  isFr ? "Nom inclus dans l'autre, numéro étudiant·e proche (faute probable)" : "One name contains the other, student ID near-match (likely typo)",
     }[reason] || reason;
 
     return `
@@ -1246,14 +1254,39 @@ function mergeStudents(uuidA, uuidB) {
   const sj = students.find(s => s.uuid === uuidB);
   if (!si || !sj) return;
 
-  // Confirm
-  const msg = isFr
-    ? `Fusionner "${si.name}" et "${sj.name}" ?\n\nTous les journaux seront combinés sous le premier profil (${si.log_count} + ${sj.log_count} journaux). Cette opération ne peut pas être annulée dans cette session.`
-    : `Merge "${si.name}" and "${sj.name}"?\n\nAll logs will be combined under the first profile (${si.log_count} + ${sj.log_count} logs). This cannot be undone in this session.`;
-  if (!confirm(msg)) return;
+  const idA = si.raw?.profile?.student_id || si.uuid;
+  const idB = sj.raw?.profile?.student_id || sj.uuid;
+  const idsDiffer = normId(idA) !== normId(idB);
 
-  // Pick the row with more logs as the base; the other donates its logs
+  // If IDs differ, ask which is the correct one before merging
+  let canonicalId = null;
+  if (idsDiffer) {
+    const choice = isFr
+      ? `Ces deux étudiant·e·s ont des numéros différents :\n\n  A) ${idA}  (${si.name}, ${si.log_count} journaux)\n  B) ${idB}  (${sj.name}, ${sj.log_count} journaux)\n\nQuel est le bon numéro étudiant·e ?\n\nTape A ou B :`
+      : `These two students have different IDs:\n\n  A) ${idA}  (${si.name}, ${si.log_count} logs)\n  B) ${idB}  (${sj.name}, ${sj.log_count} logs)\n\nWhich is the correct student ID?\n\nType A or B:`;
+    const answer = prompt(choice);
+    if (!answer) return; // cancelled
+    const pick = answer.trim().toUpperCase();
+    if (pick !== "A" && pick !== "B") {
+      alert(isFr ? "Réponse invalide. Fusion annulée." : "Invalid answer. Merge cancelled.");
+      return;
+    }
+    canonicalId = pick === "A" ? idA : idB;
+  } else {
+    const msg = isFr
+      ? `Fusionner "${si.name}" et "${sj.name}" ?\n\n${si.log_count + sj.log_count} journaux combinés. Cette opération ne peut pas être annulée dans cette session.`
+      : `Merge "${si.name}" and "${sj.name}"?\n\n${si.log_count + sj.log_count} logs combined. This cannot be undone in this session.`;
+    if (!confirm(msg)) return;
+  }
+
+  // Pick the row with more logs as the base
   const [base, donor] = si.log_count >= sj.log_count ? [si, sj] : [sj, si];
+
+  // If a canonical ID was chosen, apply it to the base profile
+  if (canonicalId) {
+    base.raw.profile = { ...base.raw.profile, student_id: canonicalId };
+    base.raw.meta    = { ...base.raw.meta,    student_uuid: canonicalId };
+  }
 
   // Merge donor logs into base (deduplicate by log_id, revision wins)
   const logMap = new Map();
@@ -1263,7 +1296,6 @@ function mergeStudents(uuidA, uuidB) {
   });
   base.raw.logs = [...logMap.values()].sort((a, b) => a.date.localeCompare(b.date));
 
-  // Rebuild base row with merged logs
   const rebuilt = buildRow(base.raw);
   rebuilt.file_type_counts = {
     daily:      (base.file_type_counts?.daily      || 0) + (donor.file_type_counts?.daily      || 0),
@@ -1273,11 +1305,17 @@ function mergeStudents(uuidA, uuidB) {
     config:     (base.file_type_counts?.config     || 0) + (donor.file_type_counts?.config     || 0),
   };
 
-  // Remove both, re-insert merged
   students = students.filter(s => s.uuid !== base.uuid && s.uuid !== donor.uuid);
   students.push(rebuilt);
 
-  console.info(`[LCI Hub] Merged "${donor.name}" (${donor.uuid}) into "${base.name}" (${base.uuid}) — ${base.raw.logs.length} logs total`);
+  // Record merge including canonical ID correction
+  sessionMerges.push({
+    donorUUID:   donor.uuid,
+    baseUUID:    base.uuid,
+    canonicalId: canonicalId || null,
+  });
+
+  console.info(`[LCI Hub] Merged "${donor.name}" (${donor.uuid}) into "${base.name}" (${base.uuid})${canonicalId ? ` — canonical ID: ${canonicalId}` : ""} — ${base.raw.logs.length} logs total`);
 
   applyFilters();
   renderDupStudentBanner();
@@ -2747,21 +2785,20 @@ function exportCSV() {
 }
 
 function exportHubState() {
-  const isFr = getCurrentLang() === "fr-CA";
   const now  = new Date();
   const ts   = now.toISOString().slice(0,10) + "_" +
     String(now.getHours()).padStart(2,"0") + "-" +
     String(now.getMinutes()).padStart(2,"0");
 
+  // Only store administrative decisions — student data comes from individual files.
   const payload = {
     meta: {
-      type:        "hub_state",
-      exported_at: now.toISOString(),
+      type:          "hub_state",
+      exported_at:   now.toISOString(),
       student_count: students.length,
     },
     manually_finished: [...manuallyFinished],
-    students: students.map(s => s.raw),
-    milestones: hubMilestones,
+    merged_pairs:      sessionMerges,
   };
 
   const blob = new Blob([JSON.stringify(payload, null, 2)],
@@ -2781,22 +2818,16 @@ function loadHubState(data) {
     sessionStorage.setItem("hub_manually_finished", JSON.stringify([...manuallyFinished]));
   }
 
-  // Restore milestones — keep most recently exported project per id
-  if (data.milestones && typeof data.milestones === "object") {
-    Object.entries(data.milestones).forEach(([id, entry]) => {
-      const existing = hubMilestones[id];
-      if (!existing || (entry.exported_at || "") >= (existing.exported_at || "")) {
-        hubMilestones[id] = entry;
-      }
-    });
-  }
-
   // Re-apply merged_pairs — deduplicated union across all loaded states
   if (Array.isArray(data.merged_pairs)) {
-    data.merged_pairs.forEach(({ donorUUID, baseUUID }) => {
+    data.merged_pairs.forEach(({ donorUUID, baseUUID, canonicalId }) => {
       const base  = students.find(s => s.uuid === baseUUID  || s.uuid === normId(baseUUID));
       const donor = students.find(s => s.uuid === donorUUID || s.uuid === normId(donorUUID));
       if (!base || !donor) return;
+      if (canonicalId) {
+        base.raw.profile = { ...base.raw.profile, student_id: canonicalId };
+        base.raw.meta    = { ...base.raw.meta,    student_uuid: canonicalId };
+      }
       const logMap = new Map();
       [...(base.raw.logs || []), ...(donor.raw.logs || [])].forEach(l => {
         const ex = logMap.get(l.log_id);
@@ -2818,33 +2849,6 @@ function loadHubState(data) {
         sessionMerges.push({ donorUUID, baseUUID });
       }
       console.info(`[LCI Hub] Re-applied merge: "${donorUUID}" → "${baseUUID}"`);
-    });
-  }
-
-  // Restore student rows — keep whichever version has more logs; on tie keep newer
-  if (Array.isArray(data.students)) {
-    data.students.forEach(raw => {
-      const uuid = raw.meta?.student_uuid || raw.profile?.student_id;
-      if (!uuid) return;
-      const normUUID = normId(uuid) || uuid;
-      const existing = students.find(s => s.uuid === normUUID || s.uuid === uuid);
-      if (existing) {
-        const existingLogs = (existing.raw?.logs || []).length;
-        const stateLogs    = (raw.logs || []).length;
-        if (stateLogs > existingLogs ||
-           (stateLogs === existingLogs &&
-            (raw.meta?.last_modified || "") > (existing.raw?.meta?.last_modified || ""))) {
-          const row = buildRow(raw);
-          row.file_type_counts = existing.file_type_counts ||
-            { daily:0, weekly:0, full:0, reflection:0, config:0 };
-          students = students.filter(s => s.uuid !== existing.uuid);
-          students.push(row);
-        }
-        return;
-      }
-      const row = buildRow(raw);
-      row.file_type_counts = { daily:0, weekly:0, full:0, reflection:0, config:0 };
-      students.push(row);
     });
   }
 
