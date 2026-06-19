@@ -100,7 +100,7 @@ function dayOfYear() {
 function formatDate(offset) {
   var d = new Date(); d.setDate(d.getDate() + offset);
   var locale = lang === 'es' ? 'es-ES' : lang === 'en' ? 'en-CA' : 'fr-CA';
-  return d.toLocaleDateString(locale, {weekday:'long', day:'numeric', month:'long'});
+  return d.toLocaleDateString(locale, {day:'numeric', month:'long'});
 }
 
 var TIPS = [];
