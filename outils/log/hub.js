@@ -324,6 +324,9 @@ function loadFiles(fileList) {
         // Then digits anywhere in the name (e.g. "AREL_JUNIOR_2320505_2026-05-25_r1.json")
         const mAny = p.name.match(/[_\-](\d{5,10})[_\-]/);
         if (mAny) return normId(mAny[1]) || mAny[1];
+        // No ID found — file content has no student ID and filename has no recognisable number
+        // This usually means the student renamed the file. Log it clearly.
+        console.warn(`[LCI Hub] Cannot identify student for "${p.name}" — no student_uuid in content and no numeric ID in filename. File may have been renamed. It will be treated as its own student row.`);
         return p.name;
       }
 
