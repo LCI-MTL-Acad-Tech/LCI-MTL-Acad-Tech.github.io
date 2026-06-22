@@ -318,9 +318,12 @@ function loadFiles(fileList) {
       function groupKey(p) {
         const raw = p.data.meta?.student_uuid || p.data.profile?.student_id;
         if (raw) return normId(raw) || raw;
-        // Try to extract leading digits from filename (e.g. "202411884_2026-05-22_r1.json")
-        const m = p.name.match(/^(\d{5,10})[_\-]/);
-        if (m) return normId(m[1]) || m[1];
+        // Try leading digits first (e.g. "202411884_2026-05-22_r1.json")
+        const mLead = p.name.match(/^(\d{5,10})[_\-]/);
+        if (mLead) return normId(mLead[1]) || mLead[1];
+        // Then digits anywhere in the name (e.g. "AREL_JUNIOR_2320505_2026-05-25_r1.json")
+        const mAny = p.name.match(/[_\-](\d{5,10})[_\-]/);
+        if (mAny) return normId(mAny[1]) || mAny[1];
         return p.name;
       }
 
@@ -378,8 +381,10 @@ function loadFiles(fileList) {
       if (rawUid) {
         uid = /^\d{7,9}$/.test(rawUid) ? normId(rawUid) : rawUid;
       } else {
-        // Fall back to student ID parsed from filename
-        const m = name.match(/^(\d{5,10})[_\-]/);
+        // Leading digits first, then embedded digits
+        const mLead = name.match(/^(\d{5,10})[_\-]/);
+        const mAny  = !mLead && name.match(/[_\-](\d{5,10})[_\-]/);
+        const m = mLead || mAny;
         uid = m ? normId(m[1]) : name;
       }
       (byUUID[uid] = byUUID[uid] || []).push(d);
