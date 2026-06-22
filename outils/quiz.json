@@ -380,5 +380,169 @@
         "explanation": "Un contexto específico, una defensa oral, revisiones documentadas y la reflexión personal son elementos difíciles de delegar a la IA: no conoce el contexto real, no puede defender en directo y no ha vivido la experiencia del estudiante. Exigir solo un producto final sin proceso, en cambio, facilita la delegación."
       }
     }
+  ],
+  "ethique": [
+    {
+      "type": "mcq",
+      "fr": {
+        "question": "Une requête à un grand modèle de langage consomme environ combien de fois plus d'énergie qu'une recherche Google classique ?",
+        "options": [
+          "2 fois plus",
+          "5 fois plus",
+          "10 fois plus",
+          "La même quantité"
+        ],
+        "correct": 2,
+        "explanation": "Les estimations actuelles situent la consommation d'une requête LLM à environ 10 fois celle d'une recherche Google. À l'échelle de millions d'utilisateurs quotidiens, cela représente un impact écologique considérable — un argument pour un usage réfléchi plutôt que systématique."
+      },
+      "en": {
+        "question": "A query to a large language model uses approximately how many times more energy than a standard Google search?",
+        "options": [
+          "2 times more",
+          "5 times more",
+          "10 times more",
+          "The same amount"
+        ],
+        "correct": 2,
+        "explanation": "Current estimates place the energy cost of an LLM query at roughly 10 times that of a Google search. At the scale of millions of daily users, this represents a significant ecological impact — an argument for thoughtful rather than automatic use."
+      },
+      "es": {
+        "question": "Una consulta a un modelo de lenguaje grande consume aproximadamente cuántas veces más energía que una búsqueda estándar en Google?",
+        "options": [
+          "2 veces más",
+          "5 veces más",
+          "10 veces más",
+          "La misma cantidad"
+        ],
+        "correct": 2,
+        "explanation": "Las estimaciones actuales sitúan el consumo energético de una consulta a un LLM en unas 10 veces el de una búsqueda en Google. A escala de millones de usuarios diarios, esto representa un impacto ecológico considerable, argumento para un uso reflexivo más que sistemático."
+      }
+    },
+    {
+      "type": "truefalse",
+      "fr": {
+        "question": "Un.e enseignant.e peut soumettre les travaux de ses étudiant.e.s dans un outil d'IA gratuit pour obtenir du feedback, sans violer leurs droits.",
+        "correct": false,
+        "explanation": "Faux. Les travaux des étudiant.e.s leur appartiennent. Les soumettre dans un outil gratuit signifie que ces données transitent sur des serveurs externes sans garantie de confidentialité, sans consentement éclairé des étudiant.e.s, et en violation des politiques institutionnelles. Seuls les outils couverts par une licence institutionnelle peuvent être utilisés avec des données d'étudiant.e.s."
+      },
+      "en": {
+        "question": "A teacher may submit student work into a free AI tool to obtain feedback, without violating their rights.",
+        "correct": false,
+        "explanation": "False. Student work belongs to the students. Submitting it to a free tool means their data passes through external servers with no confidentiality guarantee, no informed consent, and in violation of institutional policies. Only tools covered by an institutional licence may be used with student data."
+      },
+      "es": {
+        "question": "Un docente puede enviar los trabajos de sus estudiantes a una herramienta de IA gratuita para obtener retroalimentación, sin violar sus derechos.",
+        "correct": false,
+        "explanation": "Falso. Los trabajos de los estudiantes les pertenecen. Enviarlos a una herramienta gratuita significa que sus datos pasan por servidores externos sin garantía de confidencialidad, sin consentimiento informado y en violación de las políticas institucionales. Solo pueden usarse con datos de estudiantes las herramientas cubiertas por una licencia institucional."
+      }
+    },
+    {
+      "type": "oddoneout",
+      "fr": {
+        "question": "Trois de ces affirmations sur la dépendance cognitive à l'IA sont fondées. Laquelle ne l'est pas ?",
+        "options": [
+          "Déléguer systématiquement la rédaction à l'IA peut réduire le développement de la compétence rédactionnelle",
+          "L'IA peut prendre en charge les tâches de bas niveau pour libérer la cognition pour des tâches de haut niveau",
+          "Plus un.e étudiant.e utilise l'IA, plus ses compétences cognitives s'améliorent automatiquement",
+          "La difficulté productive (brouillons, révisions) est une condition de l'apprentissage en profondeur"
+        ],
+        "correct": 2,
+        "explanation": "L'usage de l'IA n'améliore pas automatiquement les compétences cognitives — il peut au contraire les atrophier si l'étudiant.e délègue des processus qui devraient être internalisés. Le bénéfice cognitif dépend entièrement de comment l'outil est utilisé et à quel niveau de la tâche."
+      },
+      "en": {
+        "question": "Three of these statements about cognitive dependency on AI are well-founded. Which one is not?",
+        "options": [
+          "Systematically delegating writing to AI can reduce the development of writing competency",
+          "AI can handle low-level tasks to free up cognition for higher-level tasks",
+          "The more a student uses AI, the more their cognitive skills automatically improve",
+          "Productive struggle (drafting, revising) is a condition for deep learning"
+        ],
+        "correct": 2,
+        "explanation": "Using AI does not automatically improve cognitive skills — it can in fact atrophy them if the student delegates processes that should be internalised. The cognitive benefit depends entirely on how the tool is used and at which level of the task."
+      },
+      "es": {
+        "question": "Tres de estas afirmaciones sobre la dependencia cognitiva de la IA están bien fundamentadas. ¿Cuál no lo está?",
+        "options": [
+          "Delegar sistemáticamente la redacción a la IA puede reducir el desarrollo de la competencia escrita",
+          "La IA puede encargarse de tareas de bajo nivel para liberar la cognición para tareas de alto nivel",
+          "Cuanto más usa un estudiante la IA, más mejoran automáticamente sus habilidades cognitivas",
+          "La dificultad productiva (borradores, revisiones) es una condición del aprendizaje profundo"
+        ],
+        "correct": 2,
+        "explanation": "Usar IA no mejora automáticamente las habilidades cognitivas — puede atrofiarlas si el estudiante delega procesos que deberían internalizarse. El beneficio cognitivo depende enteramente de cómo se usa la herramienta y a qué nivel de la tarea."
+      }
+    },
+    {
+      "type": "mcqmulti",
+      "fr": {
+        "question": "Quelles pratiques respectent les droits et la vie privée des étudiant.e.s dans l'usage de l'IA ? (Plusieurs réponses correctes)",
+        "options": [
+          "Utiliser uniquement des outils couverts par une licence institutionnelle pour traiter des données d'étudiant.e.s",
+          "Informer les étudiant.e.s explicitement si l'IA est utilisée pour donner du feedback sur leur travail",
+          "Soumettre un travail anonymisé dans un outil gratuit pour gagner du temps",
+          "Ne jamais partager des données personnelles identifiables dans un outil IA",
+          "Obtenir le consentement éclairé des étudiant.e.s avant d'utiliser l'IA dans des contextes d'évaluation sensibles"
+        ],
+        "correct": [
+          0,
+          1,
+          3,
+          4
+        ],
+        "explanation": "Les pratiques respectueuses passent par les licences institutionnelles, la transparence, la protection des données personnelles et le consentement. Soumettre un travail anonymisé dans un outil gratuit reste problématique : même anonymisé, le contenu appartient à l'étudiant.e et les conditions d'utilisation de l'outil peuvent autoriser l'entraînement sur ces données."
+      },
+      "en": {
+        "question": "Which practices respect student rights and privacy in AI use? (Multiple correct answers)",
+        "options": [
+          "Only use tools covered by an institutional licence to process student data",
+          "Explicitly inform students if AI is used to give feedback on their work",
+          "Submit anonymised work to a free tool to save time",
+          "Never share personally identifiable data in an AI tool",
+          "Obtain informed consent from students before using AI in sensitive assessment contexts"
+        ],
+        "correct": [
+          0,
+          1,
+          3,
+          4
+        ],
+        "explanation": "Respectful practices involve institutional licences, transparency, personal data protection, and consent. Submitting anonymised work to a free tool is still problematic: even anonymised, the content belongs to the student and the tool's terms of use may permit training on that data."
+      },
+      "es": {
+        "question": "¿Qué prácticas respetan los derechos y la privacidad de los estudiantes en el uso de la IA? (Varias respuestas correctas)",
+        "options": [
+          "Usar únicamente herramientas cubiertas por una licencia institucional para tratar datos de estudiantes",
+          "Informar explícitamente a los estudiantes si se usa IA para dar retroalimentación sobre su trabajo",
+          "Enviar un trabajo anonimizado a una herramienta gratuita para ahorrar tiempo",
+          "Nunca compartir datos personales identificables en una herramienta de IA",
+          "Obtener el consentimiento informado de los estudiantes antes de usar IA en contextos de evaluación sensibles"
+        ],
+        "correct": [
+          0,
+          1,
+          3,
+          4
+        ],
+        "explanation": "Las prácticas respetuosas pasan por las licencias institucionales, la transparencia, la protección de datos personales y el consentimiento. Enviar un trabajo anonimizado a una herramienta gratuita sigue siendo problemático: incluso anonimizado, el contenido pertenece al estudiante y las condiciones de uso pueden permitir el entrenamiento con esos datos."
+      }
+    },
+    {
+      "type": "truefalse",
+      "fr": {
+        "question": "L'empreinte carbone de l'IA générative est négligeable par rapport aux autres usages numériques courants comme la diffusion vidéo en continu.",
+        "correct": false,
+        "explanation": "Faux. L'entraînement des grands modèles consomme des quantités d'énergie comparables à celles de vols intercontinentaux répétés, et l'inférence à grande échelle s'accumule rapidement. Si la diffusion vidéo consomme globalement plus (par le volume), une requête LLM individuelle est nettement plus coûteuse qu'une recherche web ordinaire. L'impact mérite d'être pris en compte dans une pédagogie responsable."
+      },
+      "en": {
+        "question": "The carbon footprint of generative AI is negligible compared to other common digital uses such as video streaming.",
+        "correct": false,
+        "explanation": "False. Training large models consumes energy comparable to repeated intercontinental flights, and large-scale inference accumulates quickly. While video streaming consumes more overall (by volume), an individual LLM query is significantly more costly than an ordinary web search. The impact deserves consideration in responsible pedagogy."
+      },
+      "es": {
+        "question": "La huella de carbono de la IA generativa es despreciable en comparación con otros usos digitales habituales como la transmisión de vídeo en streaming.",
+        "correct": false,
+        "explanation": "Falso. El entrenamiento de grandes modelos consume energía comparable a la de varios vuelos intercontinentales, y la inferencia a gran escala se acumula rápidamente. Aunque el streaming consume más en total (por volumen), una consulta individual a un LLM es significativamente más costosa que una búsqueda web ordinaria. El impacto merece considerarse en una pedagogía responsable."
+      }
+    }
   ]
 }
