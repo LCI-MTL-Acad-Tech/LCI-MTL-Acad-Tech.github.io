@@ -75,7 +75,7 @@
   .feedback.show{display:block}
 
   /* Progress + nav */
-  .nav-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto}
+  .nav-row{display:none}
   .progress{font-size:.75rem;color:#aaa}
   .nav-btn{
     padding:5px 14px;border:1.5px solid #cc9f11;border-radius:7px;
@@ -188,17 +188,7 @@ function render() {
   fb.id = 'feedback';
   wrap.appendChild(fb);
 
-  var nav = el('div','nav-row');
-  var prog = el('span','progress');
-  prog.textContent = (current+1) + ' / ' + questions.length;
-  var nextBtn = el('button','nav-btn');
-  nextBtn.id = 'nextBtn';
-  nextBtn.textContent = (current < questions.length-1) ? ui.next : ui.finish;
-  nextBtn.disabled = !answered;
-  nextBtn.onclick = function(){ current++; render(); };
-  nav.appendChild(prog);
-  nav.appendChild(nextBtn);
-  wrap.appendChild(nav);
+  // single-question mode: no nav
 
   if (answered) showFeedback(scores[current], lq.explanation);
 }
@@ -265,7 +255,6 @@ function renderMCQ(wrap, lq, multi) {
     });
     if (document.getElementById('submitBtn')) document.getElementById('submitBtn').disabled=true;
     showFeedback(correct, lq.explanation);
-    document.getElementById('nextBtn').disabled = false;
   }
 
   if (answered) {
@@ -297,7 +286,6 @@ function renderTF(wrap, lq) {
         });
       }
       showFeedback(correct, lq.explanation);
-      document.getElementById('nextBtn').disabled = false;
     };
     row.appendChild(btn);
   });
@@ -353,7 +341,6 @@ function renderRank(wrap, lq) {
     scores[current] = correct ? 1 : 0;
     btn.disabled = true;
     showFeedback(correct, lq.explanation);
-    document.getElementById('nextBtn').disabled = false;
   };
   wrap.appendChild(btn);
 }
