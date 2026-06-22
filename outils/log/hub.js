@@ -4,6 +4,8 @@
 
 let students = [];        // all built rows
 let hubMilestones = {};   // { [project_id]: { exported_at, project } }
+const sessionMerges = []; // { donorUUID, baseUUID, canonicalId? } — for hub state export
+const uuidMap       = {}; // { oldUUID → canonicalUUID } — redirects superseded IDs
 // UUIDs manually marked as finished by the hub admin
 const manuallyFinished = new Set(
   JSON.parse(sessionStorage.getItem("hub_manually_finished") || "[]")
@@ -1282,7 +1284,11 @@ function mergeStudents(uuidA, uuidB) {
   // Pick the row with more logs as the base
   const [base, donor] = si.log_count >= sj.log_count ? [si, sj] : [sj, si];
 
-  // If a canonical ID was chosen, apply it to the base profile
+  // Capture old UUIDs before any mutation
+  const oldBaseUUID  = base.uuid;
+  const oldDonorUUID = donor.uuid;
+
+  // If a canonical ID was chosen, apply it to the base profile BEFORE buildRow
   if (canonicalId) {
     base.raw.profile = { ...base.raw.profile, student_id: canonicalId };
     base.raw.meta    = { ...base.raw.meta,    student_uuid: canonicalId };
@@ -1297,6 +1303,8 @@ function mergeStudents(uuidA, uuidB) {
   base.raw.logs = [...logMap.values()].sort((a, b) => a.date.localeCompare(b.date));
 
   const rebuilt = buildRow(base.raw);
+  const newUUID = rebuilt.uuid; // may differ from oldBaseUUID if canonicalId was set
+
   rebuilt.file_type_counts = {
     daily:      (base.file_type_counts?.daily      || 0) + (donor.file_type_counts?.daily      || 0),
     weekly:     (base.file_type_counts?.weekly     || 0) + (donor.file_type_counts?.weekly     || 0),
@@ -1305,17 +1313,18 @@ function mergeStudents(uuidA, uuidB) {
     config:     (base.file_type_counts?.config     || 0) + (donor.file_type_counts?.config     || 0),
   };
 
-  students = students.filter(s => s.uuid !== base.uuid && s.uuid !== donor.uuid);
+  // Remove old rows by their pre-mutation UUIDs, insert merged row
+  students = students.filter(s => s.uuid !== oldBaseUUID && s.uuid !== oldDonorUUID);
   students.push(rebuilt);
 
-  // Record merge including canonical ID correction
-  sessionMerges.push({
-    donorUUID:   donor.uuid,
-    baseUUID:    base.uuid,
-    canonicalId: canonicalId || null,
-  });
+  // Register redirects so any code still holding an old UUID can resolve it
+  uuidMap[oldDonorUUID] = newUUID;
+  if (oldBaseUUID !== newUUID) uuidMap[oldBaseUUID] = newUUID;
 
-  console.info(`[LCI Hub] Merged "${donor.name}" (${donor.uuid}) into "${base.name}" (${base.uuid})${canonicalId ? ` — canonical ID: ${canonicalId}` : ""} — ${base.raw.logs.length} logs total`);
+  // Record merge for hub state export
+  sessionMerges.push({ donorUUID: oldDonorUUID, baseUUID: oldBaseUUID, canonicalId: canonicalId || null });
+
+  console.info(`[LCI Hub] Merged "${donor.name}" (${oldDonorUUID}) into "${base.name}" → UUID now "${newUUID}"${canonicalId ? ` canonical ID: ${canonicalId}` : ""} — ${rebuilt.raw.logs.length} logs total`);
 
   applyFilters();
   renderDupStudentBanner();
@@ -1892,7 +1901,18 @@ function renderTable() {
 
 // ── Navigation helpers ────────────────────────────────────────
 // Switch to student table view and open that student's detail row.
+function resolveUUID(uuid) {
+  // Follow the redirect chain (handles multi-hop merges)
+  let current = uuid;
+  let steps = 0;
+  while (uuidMap[current] && uuidMap[current] !== current && steps++ < 10) {
+    current = uuidMap[current];
+  }
+  return current;
+}
+
 function openStudentPanel(uuid) {
+  uuid = resolveUUID(uuid);
   setHubView("students");
   // Wait for renderTable to run, then find and open the row
   requestAnimationFrame(() => {
@@ -2844,6 +2864,9 @@ function loadHubState(data) {
       };
       students = students.filter(s => s.uuid !== base.uuid && s.uuid !== donor.uuid);
       students.push(rebuilt);
+      const newUUID2 = rebuilt.uuid;
+      uuidMap[donorUUID] = newUUID2;
+      if (baseUUID !== newUUID2) uuidMap[baseUUID] = newUUID2;
       const key = `${donorUUID}|${baseUUID}`;
       if (!sessionMerges.some(m => `${m.donorUUID}|${m.baseUUID}` === key)) {
         sessionMerges.push({ donorUUID, baseUUID });
