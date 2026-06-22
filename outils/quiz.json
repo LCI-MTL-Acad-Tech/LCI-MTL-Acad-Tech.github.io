@@ -708,5 +708,166 @@
         "explanation": "Correcto. La claridad de las expectativas protege a ambas partes. Si el uso está permitido y se declara correctamente, el estudiante ha respetado el marco — sancionarlo sería injusto. Por eso declarar explícitamente el nivel esperado es una obligación, no una opción."
       }
     }
+  ],
+  "outils": [
+    {
+      "type": "truefalse",
+      "fr": {
+        "question": "Un outil d'IA populaire et bien connu peut être utilisé avec des données institutionnelles dès lors qu'il est gratuit et accessible à tous.",
+        "correct": false,
+        "explanation": "Faux. La popularité d'un outil ne le rend pas conforme aux exigences institutionnelles. Seuls les outils explicitement autorisés par l'institution — couverts par une licence qui inclut des engagements contractuels de confidentialité — peuvent être utilisés avec des données institutionnelles ou des données d'étudiant.e.s."
+      },
+      "en": {
+        "question": "A popular and well-known AI tool can be used with institutional data as long as it is free and widely accessible.",
+        "correct": false,
+        "explanation": "False. Popularity does not make a tool compliant with institutional requirements. Only tools explicitly authorised by the institution — covered by a licence that includes contractual confidentiality commitments — may be used with institutional or student data."
+      },
+      "es": {
+        "question": "Una herramienta de IA popular y conocida puede usarse con datos institucionales siempre que sea gratuita y accesible para todos.",
+        "correct": false,
+        "explanation": "Falso. La popularidad de una herramienta no la hace conforme con los requisitos institucionales. Solo las herramientas explícitamente autorizadas por la institución — cubiertas por una licencia que incluye compromisos contractuales de confidencialidad — pueden usarse con datos institucionales o de estudiantes."
+      }
+    },
+    {
+      "type": "mcq",
+      "fr": {
+        "question": "Qu'est-ce qui distingue un outil d'IA autorisé pour usage institutionnel d'un outil simplement disponible gratuitement ?",
+        "options": [
+          "Le nombre d'utilisateurs dans le monde",
+          "L'existence d'engagements contractuels de confidentialité et de non-utilisation des données pour l'entraînement",
+          "La qualité des réponses générées",
+          "Le fait qu'il soit développé par une entreprise bien établie"
+        ],
+        "correct": 1,
+        "explanation": "La distinction clé est contractuelle : un outil autorisé pour usage institutionnel est couvert par une licence qui engage juridiquement le fournisseur sur la confidentialité des données et leur non-utilisation à des fins d'entraînement. La taille de l'entreprise ou la qualité des réponses ne sont pas des critères suffisants."
+      },
+      "en": {
+        "question": "What distinguishes an AI tool authorised for institutional use from one that is simply freely available?",
+        "options": [
+          "The number of users worldwide",
+          "The existence of contractual commitments on confidentiality and non-use of data for training",
+          "The quality of the generated responses",
+          "The fact that it is developed by a well-established company"
+        ],
+        "correct": 1,
+        "explanation": "The key distinction is contractual: a tool authorised for institutional use is covered by a licence that legally commits the provider on data confidentiality and non-use for training. Company size or response quality are not sufficient criteria."
+      },
+      "es": {
+        "question": "¿Qué distingue a una herramienta de IA autorizada para uso institucional de una simplemente disponible de forma gratuita?",
+        "options": [
+          "El número de usuarios en el mundo",
+          "La existencia de compromisos contractuales de confidencialidad y no uso de datos para entrenamiento",
+          "La calidad de las respuestas generadas",
+          "El hecho de que la desarrolle una empresa consolidada"
+        ],
+        "correct": 1,
+        "explanation": "La distinción clave es contractual: una herramienta autorizada para uso institucional está cubierta por una licencia que compromete jurídicamente al proveedor en materia de confidencialidad y no uso de los datos para entrenamiento. El tamaño de la empresa o la calidad de las respuestas no son criterios suficientes."
+      }
+    },
+    {
+      "type": "oddoneout",
+      "fr": {
+        "question": "Trois de ces usages d'un outil IA non autorisé sont clairement interdits. Lequel pourrait être toléré selon les politiques habituelles ?",
+        "options": [
+          "Analyser des données d'étudiant.e.s pour préparer un rapport de progression",
+          "Soumettre un document institutionnel confidentiel pour obtenir un résumé",
+          "Poser une question générale sur un concept pédagogique sans inclure de données institutionnelles",
+          "Générer des questions d'examen à partir du contenu d'un cours spécifique"
+        ],
+        "correct": 2,
+        "explanation": "Poser une question générale sans données institutionnelles ni données d'étudiant.e.s est généralement toléré — c'est l'exception habituelle prévue par les politiques. Les trois autres impliquent des données institutionnelles ou des données d'étudiant.e.s, ce qui les rend explicitement interdits avec des outils non autorisés."
+      },
+      "en": {
+        "question": "Three of these uses of an unauthorised AI tool are clearly prohibited. Which one might be tolerated under typical policies?",
+        "options": [
+          "Analysing student data to prepare a progress report",
+          "Submitting a confidential institutional document to obtain a summary",
+          "Asking a general question about a pedagogical concept without including any institutional data",
+          "Generating exam questions from the content of a specific course"
+        ],
+        "correct": 2,
+        "explanation": "Asking a general question with no institutional or student data is generally tolerated — it is the typical exception provided for in most policies. The other three involve institutional or student data, making them explicitly prohibited with unauthorised tools."
+      },
+      "es": {
+        "question": "Tres de estos usos de una herramienta de IA no autorizada están claramente prohibidos. ¿Cuál podría tolerarse según las políticas habituales?",
+        "options": [
+          "Analizar datos de estudiantes para preparar un informe de progreso",
+          "Enviar un documento institucional confidencial para obtener un resumen",
+          "Hacer una pregunta general sobre un concepto pedagógico sin incluir datos institucionales",
+          "Generar preguntas de examen a partir del contenido de un curso específico"
+        ],
+        "correct": 2,
+        "explanation": "Hacer una pregunta general sin datos institucionales ni de estudiantes es generalmente tolerado — es la excepción habitual prevista en la mayoría de las políticas. Los otros tres implican datos institucionales o de estudiantes, lo que los hace explícitamente prohibidos con herramientas no autorizadas."
+      }
+    },
+    {
+      "type": "mcqmulti",
+      "fr": {
+        "question": "Quels éléments justifient qu'un enseignant.e demande l'ajout d'un nouvel outil IA à la liste des outils autorisés ? (Plusieurs réponses correctes)",
+        "options": [
+          "L'outil répond à un besoin pédagogique précis non couvert par les outils actuels",
+          "L'outil est populaire auprès des étudiant.e.s",
+          "L'outil propose des conditions d'utilisation compatibles avec la politique de protection des données",
+          "L'enseignant.e peut démontrer la valeur ajoutée pédagogique de l'outil",
+          "L'outil est gratuit"
+        ],
+        "correct": [
+          0,
+          2,
+          3
+        ],
+        "explanation": "Une demande d'ajout doit être justifiée par un besoin pédagogique réel, des conditions d'utilisation compatibles avec la politique de données, et une démonstration de valeur ajoutée. La popularité et la gratuité ne sont pas des critères suffisants — ils ne disent rien sur la conformité aux exigences de confidentialité."
+      },
+      "en": {
+        "question": "Which elements justify a teacher requesting that a new AI tool be added to the authorised list? (Multiple correct answers)",
+        "options": [
+          "The tool meets a specific pedagogical need not covered by current tools",
+          "The tool is popular among students",
+          "The tool offers terms of use compatible with the data protection policy",
+          "The teacher can demonstrate the tool's pedagogical added value",
+          "The tool is free"
+        ],
+        "correct": [
+          0,
+          2,
+          3
+        ],
+        "explanation": "A request for addition must be justified by a real pedagogical need, terms of use compatible with data policy, and a demonstration of added value. Popularity and cost are not sufficient criteria — they say nothing about compliance with confidentiality requirements."
+      },
+      "es": {
+        "question": "¿Qué elementos justifican que un docente solicite añadir una nueva herramienta de IA a la lista de herramientas autorizadas? (Varias respuestas correctas)",
+        "options": [
+          "La herramienta responde a una necesidad pedagógica específica no cubierta por las herramientas actuales",
+          "La herramienta es popular entre los estudiantes",
+          "La herramienta ofrece condiciones de uso compatibles con la política de protección de datos",
+          "El docente puede demostrar el valor pedagógico añadido de la herramienta",
+          "La herramienta es gratuita"
+        ],
+        "correct": [
+          0,
+          2,
+          3
+        ],
+        "explanation": "Una solicitud de incorporación debe justificarse por una necesidad pedagógica real, condiciones de uso compatibles con la política de datos y una demostración de valor añadido. La popularidad y la gratuidad no son criterios suficientes — no dicen nada sobre el cumplimiento de los requisitos de confidencialidad."
+      }
+    },
+    {
+      "type": "truefalse",
+      "fr": {
+        "question": "Un enseignant.e peut utiliser un outil IA non autorisé avec un compte personnel pour des tâches liées à son cours, du moment qu'il.elle n'y soumet pas de données d'étudiant.e.s.",
+        "correct": false,
+        "explanation": "Faux. La politique exige l'utilisation de licences corporatives, pas de comptes personnels — même pour des tâches qui semblent ne pas impliquer de données sensibles. Les comptes personnels ne bénéficient pas des mêmes protections contractuelles et créent un risque pour la sécurité informationnelle de l'institution."
+      },
+      "en": {
+        "question": "A teacher may use an unauthorised AI tool with a personal account for course-related tasks, as long as they do not submit student data.",
+        "correct": false,
+        "explanation": "False. Policy requires the use of corporate licences, not personal accounts — even for tasks that seem not to involve sensitive data. Personal accounts do not benefit from the same contractual protections and create an informational security risk for the institution."
+      },
+      "es": {
+        "question": "Un docente puede usar una herramienta de IA no autorizada con una cuenta personal para tareas relacionadas con su curso, siempre que no envíe datos de estudiantes.",
+        "correct": false,
+        "explanation": "Falso. La política exige el uso de licencias corporativas, no de cuentas personales — incluso para tareas que parecen no implicar datos sensibles. Las cuentas personales no gozan de las mismas protecciones contractuales y crean un riesgo para la seguridad informacional de la institución."
+      }
+    }
   ]
 }
