@@ -869,5 +869,151 @@
         "explanation": "Falso. La política exige el uso de licencias corporativas, no de cuentas personales — incluso para tareas que parecen no implicar datos sensibles. Las cuentas personales no gozan de las mismas protecciones contractuales y crean un riesgo para la seguridad informacional de la institución."
       }
     }
+  ],
+  "former": [
+    {
+      "type": "mcq",
+      "fr": {
+        "question": "Quelle est la première étape recommandée pour un.e enseignant.e qui souhaite intégrer l'IA dans son cours sans formation technique préalable ?",
+        "options": [
+          "Commencer par apprendre à coder des modèles d'IA",
+          "Explorer les outils déjà déployés par l'institution avant d'en chercher de nouveaux",
+          "Attendre que l'institution offre une formation obligatoire",
+          "Consulter les forums en ligne pour connaître les meilleurs outils du moment"
+        ],
+        "correct": 1,
+        "explanation": "Partir des outils déjà déployés par l'institution est la démarche la plus efficace : ils sont autorisés, accessibles, et des ressources de formation existent souvent déjà pour eux. Chercher de nouveaux outils avant d'avoir exploré ceux disponibles est une source fréquente de frustration et de risques inutiles."
+      },
+      "en": {
+        "question": "What is the recommended first step for a teacher who wants to integrate AI into their course with no prior technical training?",
+        "options": [
+          "Start by learning to code AI models",
+          "Explore the tools already deployed by the institution before looking for new ones",
+          "Wait until the institution offers mandatory training",
+          "Check online forums for the best current tools"
+        ],
+        "correct": 1,
+        "explanation": "Starting with tools already deployed by the institution is the most efficient approach: they are authorised, accessible, and training resources often already exist for them. Looking for new tools before exploring available ones is a frequent source of frustration and unnecessary risk."
+      },
+      "es": {
+        "question": "¿Cuál es el primer paso recomendado para un docente que quiere integrar la IA en su curso sin formación técnica previa?",
+        "options": [
+          "Empezar aprendiendo a programar modelos de IA",
+          "Explorar las herramientas ya desplegadas por la institución antes de buscar nuevas",
+          "Esperar a que la institución ofrezca una formación obligatoria",
+          "Consultar foros en línea para conocer las mejores herramientas del momento"
+        ],
+        "correct": 1,
+        "explanation": "Partir de las herramientas ya desplegadas por la institución es el enfoque más eficaz: están autorizadas, son accesibles y a menudo ya existen recursos de formación para ellas. Buscar nuevas herramientas antes de explorar las disponibles es una fuente frecuente de frustración y riesgos innecesarios."
+      }
+    },
+    {
+      "type": "truefalse",
+      "fr": {
+        "question": "Maîtriser un seul outil d'IA en profondeur est moins utile professionnellement que développer des compétences transférables de prompt engineering et d'évaluation critique applicables à n'importe quel outil.",
+        "correct": true,
+        "explanation": "Exact. Les outils changent rapidement — ce qui est standard aujourd'hui peut être remplacé dans deux ans. Les compétences transférables (formuler des demandes claires, évaluer la qualité d'une sortie, identifier les biais) restent pertinentes quel que soit l'outil. C'est ce que les employeurs recherchent : l'adaptabilité, pas la maîtrise d'un produit spécifique."
+      },
+      "en": {
+        "question": "Mastering a single AI tool in depth is less professionally useful than developing transferable prompt engineering and critical evaluation skills applicable to any tool.",
+        "correct": true,
+        "explanation": "Correct. Tools change rapidly — what is standard today may be replaced in two years. Transferable skills (formulating clear requests, evaluating output quality, identifying biases) remain relevant regardless of the tool. This is what employers seek: adaptability, not mastery of a specific product."
+      },
+      "es": {
+        "question": "Dominar en profundidad una sola herramienta de IA es menos útil profesionalmente que desarrollar competencias transferibles de ingeniería de prompts y evaluación crítica aplicables a cualquier herramienta.",
+        "correct": true,
+        "explanation": "Correcto. Las herramientas cambian rápidamente — lo que es estándar hoy puede ser reemplazado en dos años. Las competencias transferibles (formular peticiones claras, evaluar la calidad de una salida, identificar sesgos) siguen siendo relevantes independientemente de la herramienta. Eso es lo que buscan los empleadores: adaptabilidad, no dominio de un producto específico."
+      }
+    },
+    {
+      "type": "oddoneout",
+      "fr": {
+        "question": "Trois de ces sources sont appropriées pour se former à l'IA en éducation. Laquelle est à éviter comme référence principale ?",
+        "options": [
+          "Le cadre de compétences IA pour les enseignant.e.s de l'UNESCO",
+          "Un fil de discussion Reddit sur les meilleurs prompts ChatGPT",
+          "Les parcours d'apprentissage Microsoft Learn sur Copilot",
+          "Elements of AI — cours gratuit de l'Université d'Helsinki"
+        ],
+        "correct": 1,
+        "explanation": "Un fil Reddit peut contenir des conseils utiles, mais ce n'est pas une source fiable pour se former : le contenu n'est pas révisé, les informations peuvent être périmées rapidement, et les biais de confirmation y sont fréquents. Pour une formation sérieuse, privilégier des sources institutionnelles, académiques ou officielles."
+      },
+      "en": {
+        "question": "Three of these sources are appropriate for training in AI in education. Which one should be avoided as a primary reference?",
+        "options": [
+          "The UNESCO AI Competency Framework for Teachers",
+          "A Reddit thread about the best ChatGPT prompts",
+          "Microsoft Learn learning paths on Copilot",
+          "Elements of AI — free course from the University of Helsinki"
+        ],
+        "correct": 1,
+        "explanation": "A Reddit thread may contain useful tips, but it is not a reliable training source: the content is not reviewed, information can become outdated quickly, and confirmation bias is common. For serious training, prefer institutional, academic, or official sources."
+      },
+      "es": {
+        "question": "Tres de estas fuentes son apropiadas para formarse en IA en educación. ¿Cuál debe evitarse como referencia principal?",
+        "options": [
+          "El Marco de Competencias en IA para Docentes de la UNESCO",
+          "Un hilo de Reddit sobre los mejores prompts de ChatGPT",
+          "Los itinerarios de aprendizaje de Microsoft Learn sobre Copilot",
+          "Elements of AI — curso gratuito de la Universidad de Helsinki"
+        ],
+        "correct": 1,
+        "explanation": "Un hilo de Reddit puede contener consejos útiles, pero no es una fuente fiable para formarse: el contenido no está revisado, la información puede quedar obsoleta rápidamente y el sesgo de confirmación es frecuente. Para una formación seria, es mejor optar por fuentes institucionales, académicas u oficiales."
+      }
+    },
+    {
+      "type": "mcqmulti",
+      "fr": {
+        "question": "Quelles pratiques aident à maintenir ses compétences IA à jour sur le long terme ? (Plusieurs réponses correctes)",
+        "options": [
+          "S'abonner à une ou deux lettres d'information spécialisées et fiables",
+          "Participer à une communauté de pratique avec des collègues",
+          "Maîtriser tous les nouveaux outils dès leur sortie",
+          "Lire un rapport annuel de référence sur l'état de l'IA",
+          "Tester régulièrement les outils autorisés dans des contextes pédagogiques réels"
+        ],
+        "correct": [
+          0,
+          1,
+          3,
+          4
+        ],
+        "explanation": "La veille durable passe par des sources fiables et régulières, l'échange avec des pairs, la lecture de rapports de référence et l'expérimentation pratique. Vouloir maîtriser tous les nouveaux outils dès leur sortie est contre-productif : le rythme de publication est trop rapide et la majorité des outils ne survivent pas à leur première année."
+      },
+      "en": {
+        "question": "Which practices help maintain AI skills over the long term? (Multiple correct answers)",
+        "options": [
+          "Subscribing to one or two reliable specialised newsletters",
+          "Participating in a community of practice with colleagues",
+          "Mastering every new tool as soon as it is released",
+          "Reading an annual reference report on the state of AI",
+          "Regularly testing authorised tools in real pedagogical contexts"
+        ],
+        "correct": [
+          0,
+          1,
+          3,
+          4
+        ],
+        "explanation": "Sustainable professional development involves reliable and regular sources, peer exchange, reference reports, and practical experimentation. Trying to master every new tool at release is counterproductive: the pace of publication is too fast and most tools do not survive their first year."
+      },
+      "es": {
+        "question": "¿Qué prácticas ayudan a mantener las competencias en IA a largo plazo? (Varias respuestas correctas)",
+        "options": [
+          "Suscribirse a uno o dos boletines especializados y fiables",
+          "Participar en una comunidad de práctica con colegas",
+          "Dominar todas las herramientas nuevas en cuanto salen",
+          "Leer un informe anual de referencia sobre el estado de la IA",
+          "Probar regularmente las herramientas autorizadas en contextos pedagógicos reales"
+        ],
+        "correct": [
+          0,
+          1,
+          3,
+          4
+        ],
+        "explanation": "La formación continua sostenible pasa por fuentes fiables y regulares, el intercambio con colegas, informes de referencia y la experimentación práctica. Intentar dominar todas las herramientas nuevas al salir es contraproducente: el ritmo de publicación es demasiado rápido y la mayoría no sobrevive su primer año."
+      }
+    }
   ]
 }
