@@ -1,0 +1,187 @@
+{
+  "comprendre": [
+    {
+      "type": "mcq",
+      "fr": {
+        "question": "Qu'est-ce qu'un modèle d'apprentissage automatique apprend réellement ?",
+        "options": [
+          "Des règles explicites programmées par ses créateurs",
+          "Des corrélations statistiques dans les données d'entraînement",
+          "La signification des mots telle qu'un humain la comprend",
+          "Un ensemble de faits vérifiés sur le monde"
+        ],
+        "correct": 1,
+        "explanation": "Un modèle apprend des corrélations statistiques — pas des règles explicites, pas la signification, pas des faits vérifiés. C'est pourquoi il peut généraliser à de nouveaux cas, mais aussi se tromper si ses données étaient biaisées."
+      },
+      "en": {
+        "question": "What does a machine learning model actually learn?",
+        "options": [
+          "Explicit rules programmed by its creators",
+          "Statistical correlations in the training data",
+          "The meaning of words the way a human understands them",
+          "A set of verified facts about the world"
+        ],
+        "correct": 1,
+        "explanation": "A model learns statistical correlations — not explicit rules, not meaning, not verified facts. This is why it can generalise to new cases, but also why it can be wrong if its training data was biased."
+      },
+      "es": {
+        "question": "¿Qué aprende realmente un modelo de aprendizaje automático?",
+        "options": [
+          "Reglas explícitas programadas por sus creadores",
+          "Correlaciones estadísticas en los datos de entrenamiento",
+          "El significado de las palabras tal como lo entiende un humano",
+          "Un conjunto de hechos verificados sobre el mundo"
+        ],
+        "correct": 1,
+        "explanation": "Un modelo aprende correlaciones estadísticas, no reglas explícitas, no significados, no hechos verificados. Por eso puede generalizar a casos nuevos, pero también equivocarse si sus datos de entrenamiento eran sesgados."
+      }
+    },
+    {
+      "type": "truefalse",
+      "fr": {
+        "question": "Un arbre de décision est une « boîte noire » : il est impossible de retracer pourquoi il a pris une décision donnée.",
+        "correct": false,
+        "explanation": "Faux. C'est exactement l'inverse : un arbre de décision est l'un des modèles les plus lisibles — chaque nœud est une question traçable. Ce sont les réseaux de neurones profonds qui sont des boîtes noires."
+      },
+      "en": {
+        "question": "A decision tree is a \"black box\": it is impossible to trace why it made a given decision.",
+        "correct": false,
+        "explanation": "False. It's exactly the opposite: a decision tree is one of the most readable models — each node is a traceable question. It is deep neural networks that are black boxes."
+      },
+      "es": {
+        "question": "Un árbol de decisión es una \"caja negra\": es imposible rastrear por qué tomó una decisión determinada.",
+        "correct": false,
+        "explanation": "Falso. Es exactamente lo contrario: un árbol de decisión es uno de los modelos más legibles — cada nodo es una pregunta trazable. Son las redes neuronales profundas las que son cajas negras."
+      }
+    },
+    {
+      "type": "oddoneout",
+      "fr": {
+        "question": "Trois de ces affirmations décrivent correctement la génération d'un LLM. Laquelle est fausse ?",
+        "options": [
+          "Le modèle calcule une distribution de probabilité sur son vocabulaire à chaque étape",
+          "Le modèle sélectionne le token le plus probable pour continuer le texte",
+          "Le modèle consulte une base de données de faits vérifiés avant de répondre",
+          "Les hallucinations correspondent aux zones de faible probabilité du modèle"
+        ],
+        "correct": 2,
+        "explanation": "Un LLM ne consulte aucune base de données — il génère du texte de façon purement probabiliste. Il ne « cherche » pas des faits : il produit ce qui ressemble statistiquement à une bonne continuation."
+      },
+      "en": {
+        "question": "Three of these statements correctly describe LLM generation. Which one is false?",
+        "options": [
+          "The model calculates a probability distribution over its vocabulary at each step",
+          "The model selects the most probable token to continue the text",
+          "The model consults a database of verified facts before responding",
+          "Hallucinations correspond to low-probability zones of the model"
+        ],
+        "correct": 2,
+        "explanation": "An LLM consults no database — it generates text in a purely probabilistic way. It does not \"look up\" facts: it produces what statistically resembles a good continuation."
+      },
+      "es": {
+        "question": "Tres de estas afirmaciones describen correctamente la generación de un LLM. ¿Cuál es falsa?",
+        "options": [
+          "El modelo calcula una distribución de probabilidad sobre su vocabulario en cada paso",
+          "El modelo selecciona el token más probable para continuar el texto",
+          "El modelo consulta una base de datos de hechos verificados antes de responder",
+          "Las alucinaciones corresponden a las zonas de baja probabilidad del modelo"
+        ],
+        "correct": 2,
+        "explanation": "Un LLM no consulta ninguna base de datos — genera texto de forma puramente probabilística. No «busca» hechos: produce lo que estadísticamente se parece a una buena continuación."
+      }
+    },
+    {
+      "type": "mcq",
+      "fr": {
+        "question": "Pourquoi dit-on qu'un LLM est « sans état » (stateless) ?",
+        "options": [
+          "Parce qu'il oublie les mots au fur et à mesure qu'il les génère",
+          "Parce qu'il n'a aucun souvenir persistant entre les sessions — l'historique est relu depuis zéro à chaque requête",
+          "Parce qu'il ne peut pas traiter plusieurs conversations en même temps",
+          "Parce que ses paramètres changent à chaque conversation"
+        ],
+        "correct": 1,
+        "explanation": "Un LLM est stateless : il n'a aucune mémoire entre les sessions. Ce qui ressemble à de la continuité, c'est l'application cliente qui réinjecte l'historique complet à chaque requête — pas le modèle qui se souvient."
+      },
+      "en": {
+        "question": "Why is an LLM said to be \"stateless\"?",
+        "options": [
+          "Because it forgets words as it generates them",
+          "Because it has no persistent memory between sessions — the history is re-read from scratch with each request",
+          "Because it cannot handle multiple conversations at the same time",
+          "Because its parameters change with each conversation"
+        ],
+        "correct": 1,
+        "explanation": "An LLM is stateless: it has no memory between sessions. What feels like continuity is the client application re-injecting the full history with each request — not the model remembering."
+      },
+      "es": {
+        "question": "¿Por qué se dice que un LLM es \"sin estado\" (stateless)?",
+        "options": [
+          "Porque olvida las palabras a medida que las genera",
+          "Porque no tiene memoria persistente entre sesiones — el historial se relee desde cero en cada solicitud",
+          "Porque no puede gestionar varias conversaciones al mismo tiempo",
+          "Porque sus parámetros cambian con cada conversación"
+        ],
+        "correct": 1,
+        "explanation": "Un LLM es stateless: no tiene memoria entre sesiones. Lo que parece continuidad es la aplicación cliente que reinyecta el historial completo en cada solicitud, no el modelo que recuerda."
+      }
+    },
+    {
+      "type": "mcqmulti",
+      "fr": {
+        "question": "Parmi ces éléments, lesquels peuvent être générés par des modèles utilisant le même principe probabiliste que les LLM ? (Plusieurs réponses correctes)",
+        "options": [
+          "Images",
+          "Musique",
+          "Code informatique",
+          "Vidéo",
+          "Bases de données factuelles vérifiées"
+        ],
+        "correct": [0, 1, 2, 3],
+        "explanation": "Images, musique, code et vidéo — tous peuvent être générés par des modèles probabilistes (Midjourney, Suno, GitHub Copilot, Sora). Les bases de données factuelles vérifiées sont une tout autre chose : elles sont construites manuellement et ne sont pas générées statistiquement."
+      },
+      "en": {
+        "question": "Which of these can be generated by models using the same probabilistic principle as LLMs? (Multiple correct answers)",
+        "options": [
+          "Images",
+          "Music",
+          "Computer code",
+          "Video",
+          "Verified factual databases"
+        ],
+        "correct": [0, 1, 2, 3],
+        "explanation": "Images, music, code, and video can all be generated by probabilistic models (Midjourney, Suno, GitHub Copilot, Sora). Verified factual databases are something else entirely — they are built manually and are not statistically generated."
+      },
+      "es": {
+        "question": "¿Cuáles de estos elementos pueden ser generados por modelos que usan el mismo principio probabilístico que los LLM? (Varias respuestas correctas)",
+        "options": [
+          "Imágenes",
+          "Música",
+          "Código informático",
+          "Vídeo",
+          "Bases de datos factuales verificadas"
+        ],
+        "correct": [0, 1, 2, 3],
+        "explanation": "Imágenes, música, código y vídeo pueden generarse con modelos probabilísticos (Midjourney, Suno, GitHub Copilot, Sora). Las bases de datos factuales verificadas son otra cosa: se construyen manualmente y no se generan estadísticamente."
+      }
+    },
+    {
+      "type": "truefalse",
+      "fr": {
+        "question": "Le fait de trouver un outil d'IA sympathique, utile et bien intentionné est une preuve que le modèle a été bien conçu éthiquement.",
+        "correct": false,
+        "explanation": "Faux. Ces impressions sont en grande partie le résultat de l'anthropomorphisme cognitif et de la sycophantie entraînée — les modèles sont optimisés pour maximiser l'approbation humaine, pas pour être éthiquement neutres. La perception de bienveillance n'est pas une garantie de qualité ou de fiabilité."
+      },
+      "en": {
+        "question": "Finding an AI tool friendly, helpful, and well-intentioned is proof that the model was well designed ethically.",
+        "correct": false,
+        "explanation": "False. These impressions are largely the result of cognitive anthropomorphism and trained sycophancy — models are optimised to maximise human approval, not to be ethically neutral. The perception of benevolence is not a guarantee of quality or reliability."
+      },
+      "es": {
+        "question": "Encontrar una herramienta de IA simpática, útil y bien intencionada es una prueba de que el modelo fue bien diseñado éticamente.",
+        "correct": false,
+        "explanation": "Falso. Estas impresiones son en gran parte el resultado del antropomorfismo cognitivo y la sycophantie entrenada — los modelos están optimizados para maximizar la aprobación humana, no para ser éticamente neutros. La percepción de benevolencia no es garantía de calidad ni de fiabilidad."
+      }
+    }
+  ]
+}

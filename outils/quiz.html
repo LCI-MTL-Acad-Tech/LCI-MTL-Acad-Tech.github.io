@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz IA — LCI Éducation</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+    background:#fff;color:#1a1a1a;
+    min-height:100vh;display:flex;flex-direction:column;
+  }
+  .wrap{padding:14px 18px 12px;flex:1;display:flex;flex-direction:column;gap:10px}
+
+  /* Question text */
+  .qtext{font-size:.92rem;font-weight:600;color:#1a1a1a;line-height:1.45}
+
+  /* Options grid — single/odd-one-out */
+  .opts{display:flex;flex-direction:column;gap:6px}
+  .opt{
+    display:flex;align-items:center;gap:9px;padding:7px 12px;
+    border:1.5px solid #ddd;border-radius:8px;cursor:pointer;
+    font-size:.85rem;color:#333;line-height:1.3;
+    transition:border-color .15s,background .15s;
+    user-select:none;
+  }
+  .opt:hover:not(.locked){border-color:#cc9f11;background:#fffbe6}
+  .opt.selected{border-color:#cc9f11;background:#fdf3d9}
+  .opt.correct{border-color:#5b8000;background:#e8f0d6;color:#2a4000}
+  .opt.wrong{border-color:#eb2d37;background:#fde8e9;color:#8b0000}
+  .opt .mark{font-size:1rem;line-height:1;flex-shrink:0}
+
+  /* True/false row */
+  .tf-row{display:flex;gap:10px}
+  .tf-btn{
+    flex:1;padding:10px;border:1.5px solid #ddd;border-radius:8px;
+    font-size:.9rem;font-weight:600;cursor:pointer;text-align:center;
+    transition:border-color .15s,background .15s;user-select:none;
+  }
+  .tf-btn:hover:not(.locked){border-color:#cc9f11;background:#fffbe6}
+  .tf-btn.correct{border-color:#5b8000;background:#e8f0d6;color:#2a4000}
+  .tf-btn.wrong{border-color:#eb2d37;background:#fde8e9;color:#8b0000}
+
+  /* Multi-select submit button */
+  .submit-btn{
+    align-self:flex-start;padding:7px 18px;background:#cc9f11;color:#fff;
+    border:none;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;
+    transition:background .15s;
+  }
+  .submit-btn:hover{background:#b8860b}
+  .submit-btn:disabled{background:#ddd;color:#aaa;cursor:default}
+
+  /* Drag-to-rank */
+  .rank-list{display:flex;flex-direction:column;gap:5px}
+  .rank-item{
+    display:flex;align-items:center;gap:8px;padding:6px 10px;
+    border:1.5px solid #ddd;border-radius:8px;cursor:grab;
+    font-size:.84rem;background:#fafafa;user-select:none;
+  }
+  .rank-item.dragging{opacity:.4}
+  .rank-item.dragover{border-color:#cc9f11;background:#fffbe6}
+  .rank-item .handle{color:#bbb;font-size:1rem}
+  .rank-check-btn{
+    align-self:flex-start;padding:7px 18px;background:#cc9f11;color:#fff;
+    border:none;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;
+  }
+
+  /* Feedback */
+  .feedback{
+    padding:9px 12px;border-radius:8px;font-size:.82rem;line-height:1.5;display:none;
+  }
+  .feedback.correct{background:#e8f0d6;color:#2a4000;border-left:3px solid #5b8000}
+  .feedback.wrong{background:#fde8e9;color:#8b0000;border-left:3px solid #eb2d37}
+  .feedback.show{display:block}
+
+  /* Progress + nav */
+  .nav-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto}
+  .progress{font-size:.75rem;color:#aaa}
+  .nav-btn{
+    padding:5px 14px;border:1.5px solid #cc9f11;border-radius:7px;
+    background:#fff;color:#cc9f11;font-size:.82rem;font-weight:600;
+    cursor:pointer;transition:background .15s;
+  }
+  .nav-btn:hover{background:#fffbe6}
+  .nav-btn:disabled{border-color:#ddd;color:#ccc;cursor:default}
+
+  /* Score end screen */
+  .score-screen{
+    flex:1;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:10px;padding:16px;text-align:center;
+  }
+  .score-num{font-size:2rem;font-weight:700;color:#cc9f11}
+  .score-label{font-size:.9rem;color:#555}
+  .retry-btn{
+    padding:8px 20px;background:#cc9f11;color:#fff;border:none;
+    border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;
+  }
+
+  /* Loading / error */
+  .loading{padding:20px;color:#aaa;font-size:.85rem;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <div class="loading" id="loading">Chargement…</div>
+</div>
+
+<script>
+// ── URL params ────────────────────────────────────────────
+var params = new URLSearchParams(window.location.search);
+var section = params.get('section') || 'comprendre';
+var startQ  = parseInt(params.get('q') || '1', 10) - 1; // 0-indexed
+var lang    = ['fr','en','es'].indexOf(params.get('lang')) >= 0 ? params.get('lang') : 'fr';
+
+// ── UI strings ────────────────────────────────────────────
+var UI = {
+  fr: { loading:'Chargement…', error:'Impossible de charger les questions.',
+        submit:'Valider', next:'Question suivante →', finish:'Voir le résultat',
+        retry:'Recommencer', correct:'Bonne réponse !', wrong:'Pas tout à fait.',
+        score:function(c,t){return c+' / '+t+' bonne'+(c>1?'s':'')+' réponse'+(c>1?'s':'');},
+        tf_true:'Vrai', tf_false:'Faux',
+        drag_instruction:'Glissez pour réordonner, puis validez.',
+        drag_submit:'Valider l\'ordre' },
+  en: { loading:'Loading…', error:'Could not load questions.',
+        submit:'Submit', next:'Next question →', finish:'See result',
+        retry:'Try again', correct:'Correct!', wrong:'Not quite.',
+        score:function(c,t){return c+' / '+t+' correct answer'+(c!==1?'s':'');},
+        tf_true:'True', tf_false:'False',
+        drag_instruction:'Drag to reorder, then submit.',
+        drag_submit:'Submit order' },
+  es: { loading:'Cargando…', error:'No se pudieron cargar las preguntas.',
+        submit:'Validar', next:'Siguiente pregunta →', finish:'Ver resultado',
+        retry:'Reintentar', correct:'¡Correcto!', wrong:'No del todo.',
+        score:function(c,t){return c+' / '+t+' respuesta'+(c!==1?'s':'')+' correcta'+(c!==1?'s':'');},
+        tf_true:'Verdadero', tf_false:'Falso',
+        drag_instruction:'Arrastra para reordenar y luego valida.',
+        drag_submit:'Validar orden' }
+};
+var ui = UI[lang];
+document.documentElement.lang = lang;
+
+// ── State ─────────────────────────────────────────────────
+var questions = [];
+var current   = startQ;
+var scores    = [];
+var answered  = false;
+
+// ── Load questions ────────────────────────────────────────
+document.getElementById('loading').textContent = ui.loading;
+
+fetch('quiz.json')
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    questions = data[section] || [];
+    if (!questions.length) {
+      document.getElementById('loading').textContent = ui.error;
+      return;
+    }
+    if (current >= questions.length) current = 0;
+    scores = new Array(questions.length).fill(null);
+    render();
+  })
+  .catch(function(){
+    document.getElementById('loading').textContent = ui.error;
+  });
+
+// ── Render current question ───────────────────────────────
+function render() {
+  if (current >= questions.length) { renderScore(); return; }
+  var q   = questions[current];
+  var lq  = q[lang];
+  answered = (scores[current] !== null);
+  var wrap = document.getElementById('wrap');
+  wrap.innerHTML = '';
+
+  var qtxt = el('div','qtext');
+  qtxt.textContent = lq.question;
+  wrap.appendChild(qtxt);
+
+  if (q.type === 'mcq')       renderMCQ(wrap, lq, false);
+  else if (q.type === 'mcqmulti') renderMCQ(wrap, lq, true);
+  else if (q.type === 'truefalse') renderTF(wrap, lq);
+  else if (q.type === 'oddoneout') renderMCQ(wrap, lq, false);
+  else if (q.type === 'rank')  renderRank(wrap, lq);
+
+  var fb = el('div','feedback');
+  fb.id = 'feedback';
+  wrap.appendChild(fb);
+
+  var nav = el('div','nav-row');
+  var prog = el('span','progress');
+  prog.textContent = (current+1) + ' / ' + questions.length;
+  var nextBtn = el('button','nav-btn');
+  nextBtn.id = 'nextBtn';
+  nextBtn.textContent = (current < questions.length-1) ? ui.next : ui.finish;
+  nextBtn.disabled = !answered;
+  nextBtn.onclick = function(){ current++; render(); };
+  nav.appendChild(prog);
+  nav.appendChild(nextBtn);
+  wrap.appendChild(nav);
+
+  if (answered) showFeedback(scores[current], lq.explanation);
+}
+
+// ── MCQ (single or multi) ─────────────────────────────────
+function renderMCQ(wrap, lq, multi) {
+  var opts = el('div','opts');
+  var selected = [];
+
+  lq.options.forEach(function(txt, i) {
+    var opt = el('div','opt');
+    var mark = el('span','mark');
+    mark.textContent = multi ? '☐' : '○';
+    opt.appendChild(mark);
+    var span = document.createElement('span');
+    span.textContent = txt;
+    opt.appendChild(span);
+    opt.dataset.i = i;
+    opt.onclick = function() {
+      if (answered) return;
+      if (multi) {
+        var idx = selected.indexOf(i);
+        if (idx >= 0) { selected.splice(idx,1); opt.classList.remove('selected'); mark.textContent='☐'; }
+        else { selected.push(i); opt.classList.add('selected'); mark.textContent='☑'; }
+        document.getElementById('submitBtn') && (document.getElementById('submitBtn').disabled = selected.length===0);
+      } else {
+        selected = [i];
+        opts.querySelectorAll('.opt').forEach(function(o){ o.classList.remove('selected'); o.querySelector('.mark').textContent='○'; });
+        opt.classList.add('selected'); mark.textContent='●';
+        submit();
+      }
+    };
+    opts.appendChild(opt);
+  });
+  wrap.appendChild(opts);
+
+  if (multi) {
+    var btn = el('button','submit-btn');
+    btn.id = 'submitBtn';
+    btn.textContent = ui.submit;
+    btn.disabled = true;
+    btn.onclick = function(){ submit(); };
+    wrap.appendChild(btn);
+  }
+
+  function submit() {
+    answered = true;
+    var correct;
+    if (multi) {
+      var correctSet = lq.correct.slice().sort().join(',');
+      var selSet = selected.slice().sort().join(',');
+      correct = (correctSet === selSet);
+    } else {
+      correct = (selected[0] === lq.correct);
+    }
+    scores[current] = correct ? 1 : 0;
+    opts.classList.add('locked');
+    opts.querySelectorAll('.opt').forEach(function(o,i){
+      o.classList.add('locked');
+      var isCorrect = multi ? lq.correct.indexOf(i)>=0 : i===lq.correct;
+      var isSelected = selected.indexOf(i)>=0;
+      if (isCorrect) o.classList.add('correct');
+      if (isSelected && !isCorrect) o.classList.add('wrong');
+    });
+    if (document.getElementById('submitBtn')) document.getElementById('submitBtn').disabled=true;
+    showFeedback(correct, lq.explanation);
+    document.getElementById('nextBtn').disabled = false;
+  }
+
+  if (answered) {
+    opts.classList.add('locked');
+    var correctArr = multi ? lq.correct : [lq.correct];
+    opts.querySelectorAll('.opt').forEach(function(o,i){
+      o.classList.add('locked');
+      if (correctArr.indexOf(i)>=0) o.classList.add('correct');
+    });
+  }
+}
+
+// ── True/False ────────────────────────────────────────────
+function renderTF(wrap, lq) {
+  var row = el('div','tf-row');
+  [true, false].forEach(function(val) {
+    var btn = el('button','tf-btn');
+    btn.textContent = val ? ui.tf_true : ui.tf_false;
+    btn.onclick = function() {
+      if (answered) return;
+      answered = true;
+      var correct = (val === lq.correct);
+      scores[current] = correct ? 1 : 0;
+      row.querySelectorAll('.tf-btn').forEach(function(b){ b.classList.add('locked'); });
+      btn.classList.add(correct ? 'correct' : 'wrong');
+      if (!correct) {
+        row.querySelectorAll('.tf-btn').forEach(function(b){
+          if ((b.textContent === ui.tf_true) === lq.correct) b.classList.add('correct');
+        });
+      }
+      showFeedback(correct, lq.explanation);
+      document.getElementById('nextBtn').disabled = false;
+    };
+    row.appendChild(btn);
+  });
+  wrap.appendChild(row);
+  if (answered) {
+    row.querySelectorAll('.tf-btn').forEach(function(b){
+      b.classList.add('locked');
+      if ((b.textContent === ui.tf_true) === lq.correct) b.classList.add('correct');
+    });
+  }
+}
+
+// ── Rank ──────────────────────────────────────────────────
+function renderRank(wrap, lq) {
+  var note = el('div'); note.style.cssText='font-size:.78rem;color:#888;font-style:italic';
+  note.textContent = ui.drag_instruction;
+  wrap.appendChild(note);
+
+  var list = el('ul','rank-list');
+  list.style.listStyle='none';
+  var order = lq.shuffled.slice();
+  order.forEach(function(idx, pos) {
+    var item = el('li','rank-item');
+    item.dataset.idx = idx;
+    item.draggable = true;
+    var handle = el('span','handle'); handle.textContent='⠿';
+    var span = document.createElement('span'); span.textContent = lq.items[idx];
+    item.appendChild(handle); item.appendChild(span);
+    item.addEventListener('dragstart',function(e){ e.dataTransfer.setData('text/plain',pos); item.classList.add('dragging'); });
+    item.addEventListener('dragend',function(){ item.classList.remove('dragging'); });
+    item.addEventListener('dragover',function(e){ e.preventDefault(); item.classList.add('dragover'); });
+    item.addEventListener('dragleave',function(){ item.classList.remove('dragover'); });
+    item.addEventListener('drop',function(e){
+      e.preventDefault(); item.classList.remove('dragover');
+      var from = parseInt(e.dataTransfer.getData('text/plain'));
+      var items = Array.from(list.children);
+      var to = items.indexOf(item);
+      if (from===to) return;
+      var moved = items[from];
+      if (from < to) list.insertBefore(moved, item.nextSibling);
+      else list.insertBefore(moved, item);
+    });
+    list.appendChild(item);
+  });
+  wrap.appendChild(list);
+
+  var btn = el('button','rank-check-btn');
+  btn.textContent = ui.drag_submit;
+  btn.onclick = function(){
+    answered = true;
+    var current_order = Array.from(list.children).map(function(li){ return parseInt(li.dataset.idx); });
+    var correct = JSON.stringify(current_order) === JSON.stringify(lq.correct);
+    scores[current] = correct ? 1 : 0;
+    btn.disabled = true;
+    showFeedback(correct, lq.explanation);
+    document.getElementById('nextBtn').disabled = false;
+  };
+  wrap.appendChild(btn);
+}
+
+// ── Feedback ──────────────────────────────────────────────
+function showFeedback(correct, explanation) {
+  var fb = document.getElementById('feedback');
+  if (!fb) return;
+  fb.className = 'feedback show ' + (correct ? 'correct' : 'wrong');
+  fb.innerHTML = '<strong>' + (correct ? '✓ '+ui.correct : '✗ '+ui.wrong) + '</strong> ' + explanation;
+}
+
+// ── Score screen ──────────────────────────────────────────
+function renderScore() {
+  var total   = questions.length;
+  var correct = scores.filter(function(s){ return s===1; }).length;
+  var wrap    = document.getElementById('wrap');
+  wrap.innerHTML = '';
+  var scr = el('div','score-screen');
+  var num = el('div','score-num'); num.textContent = correct + ' / ' + total;
+  var lbl = el('div','score-label'); lbl.textContent = ui.score(correct, total);
+  var btn = el('button','retry-btn'); btn.textContent = ui.retry;
+  btn.onclick = function(){ current=startQ; scores=new Array(questions.length).fill(null); render(); };
+  scr.appendChild(num); scr.appendChild(lbl); scr.appendChild(btn);
+  wrap.appendChild(scr);
+}
+
+// ── Helper ────────────────────────────────────────────────
+function el(tag, cls) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  return e;
+}
+</script>
+</body>
+</html>
