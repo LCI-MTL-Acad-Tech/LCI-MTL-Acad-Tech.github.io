@@ -61,13 +61,13 @@ document.addEventListener("DOMContentLoaded", () => {
 // ── Clear cached session ──────────────────────────────────────
 function clearReportCache() {
   clearReportData();
+  clearAllData(true); // clear localStorage logs too so fresh files take effect
   mergedData = null;
   uploadedFiles = [];
   // Reset UI
   document.getElementById("upload-files-list").classList.add("hidden");
   document.getElementById("upload-files-list").innerHTML = "";
   document.getElementById("proceed-btn").classList.add("hidden");
-  document.getElementById("clear-cache-row").style.display = "none";
   document.getElementById("upload-errors").classList.add("hidden");
   document.getElementById("upload-conflicts").classList.add("hidden");
   // Remove any "session restored" alert
@@ -117,7 +117,10 @@ function validateAndMerge(files) {
   conflictEl.classList.add("hidden");
   conflictEl.innerHTML = "";
 
-  const result = mergeInternshipFiles(files);
+  // files may be raw data objects OR { data, name, ok } wrapped objects
+  const dataObjects = files.map(f => (f && f.ok !== undefined ? f.data : f)).filter(Boolean);
+
+  const result = mergeInternshipFiles(dataObjects);
 
   if (result.errors.length) {
     errEl.classList.remove("hidden");
@@ -155,9 +158,13 @@ function validateAndMerge(files) {
   const okDiv = document.createElement("div");
   okDiv.className = "alert alert--success";
   okDiv.style.marginTop = "var(--sp-3)";
-  const logCount = mergedData.logs.length;
-  const lang = getCurrentLang();
-  okDiv.textContent = t("report.validation_ok") + ` — ${logCount} ${lang === "fr-CA" ? "journaux fusionnés" : "logs merged"}`;
+  const lang      = getCurrentLang();
+  const logCount  = mergedData.logs.length;
+  const sdKey     = mergedData.context?.internship_start_date || mergedData.context?.start_date;
+  const inRange   = sdKey ? mergedData.logs.filter(l => l.date >= sdKey).length : logCount;
+  const excluded  = logCount - inRange;
+  okDiv.textContent = t("report.validation_ok") + ` — ${inRange} ${lang === "fr-CA" ? "journaux" : "logs"}`
+    + (excluded > 0 ? ` (+ ${excluded} ${lang === "fr-CA" ? "antérieur·s au stage, exclus du tableau de bord" : "pre-start, excluded from dashboard"})` : "");
   document.getElementById("upload-files-list").after(okDiv);
 
   document.getElementById("proceed-btn").classList.remove("hidden");
@@ -610,8 +617,28 @@ function generateDashboard() {
 
 // ── Dashboard ─────────────────────────────────────────────────
 function buildDashboard() {
-  const data = mergedData;
-  const logs = data.logs || [];
+  const data      = mergedData;
+  const startDate = data.context?.internship_start_date || data.context?.start_date;
+  const allLogs   = data.logs || [];
+
+  // Exclude logs dated before the internship start — these are drafts or setup artifacts
+  const preStartLogs = startDate ? allLogs.filter(l => l.date < startDate) : [];
+  const logs         = startDate ? allLogs.filter(l => l.date >= startDate) : allLogs;
+
+  if (preStartLogs.length) {
+    const isFr = getCurrentLang() === "fr-CA";
+    const note = document.getElementById("dashboard-prestart-note") || (() => {
+      const el = document.createElement("div");
+      el.id = "dashboard-prestart-note";
+      el.style.cssText = "font-size:1.3rem;color:var(--text-muted);padding:var(--sp-2) var(--sp-4);" +
+        "background:rgba(100,100,100,.08);border-radius:var(--r-md);margin-bottom:var(--sp-4)";
+      document.getElementById("phase-dashboard")?.prepend(el);
+      return el;
+    })();
+    note.textContent = isFr
+      ? `ℹ ${preStartLogs.length} journal·aux antérieur·s à la date de début (${startDate}) exclu·s du tableau de bord.`
+      : `ℹ ${preStartLogs.length} log${preStartLogs.length > 1 ? "s" : ""} dated before the internship start (${startDate}) excluded from the dashboard.`;
+  }
 
   buildStatGrid(logs, data);
   buildNav();

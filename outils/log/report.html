@@ -86,12 +86,13 @@
 
           <div id="upload-files-list" class="upload-files-list hidden"></div>
 
-          <!-- Clear cached session — useful for testing / switching students -->
-          <div id="clear-cache-row" style="text-align:right;margin-top:var(--sp-3);display:none">
+          <!-- Clear cached session — always visible, prominent enough to find -->
+          <div id="clear-cache-row" style="text-align:center;margin-top:var(--sp-4)">
             <button onclick="clearReportCache()"
-              style="background:none;border:none;cursor:pointer;font-family:inherit;
-                     font-size:1.3rem;color:var(--text-subtle);text-decoration:underline;padding:0">
-              ✕ <span data-i18n="report.clear_cache">Effacer la session en cache</span>
+              style="background:none;border:1px solid var(--border);border-radius:var(--r-pill);
+                     cursor:pointer;font-family:inherit;padding:var(--sp-1) var(--sp-4);
+                     font-size:1.3rem;color:var(--text-muted)">
+              🗑 <span data-i18n="report.clear_cache">Effacer la session en cache et recharger depuis mes fichiers</span>
             </button>
           </div>
 
@@ -114,6 +115,8 @@
         <div class="flex items-center justify-between mb-6" style="flex-wrap:wrap;gap:var(--sp-4)">
           <h2 data-i18n="dashboard.title" id="dashboard-name"></h2>
           <div class="flex gap-2">
+            <button class="btn btn--ghost btn--sm" onclick="clearReportCache();goToPhase('phase-upload')"
+              style="color:var(--text-muted)" data-i18n="report.reload_files"></button>
             <button class="btn btn--ghost btn--sm" onclick="editReflection()" data-i18n="report.edit_reflection"></button>
 <button class="btn btn--secondary btn--sm" onclick="printReport()"
                 data-i18n="dashboard.print_report" style="print-display:none"></button>
