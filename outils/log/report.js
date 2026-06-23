@@ -165,6 +165,10 @@ function validateAndMerge(files) {
   const excluded  = logCount - inRange;
   okDiv.textContent = t("report.validation_ok") + ` — ${inRange} ${lang === "fr-CA" ? "journaux" : "logs"}`
     + (excluded > 0 ? ` (+ ${excluded} ${lang === "fr-CA" ? "antérieur·s au stage, exclus du tableau de bord" : "pre-start, excluded from dashboard"})` : "");
+
+  // Stash messiness flags so the dashboard can surface a help message
+  mergedData.meta = mergedData.meta || {};
+  mergedData.meta._messy = excluded > 0 || result.warnings.length > 0 || result.conflicts.length > 0;
   document.getElementById("upload-files-list").after(okDiv);
 
   document.getElementById("proceed-btn").classList.remove("hidden");
@@ -642,6 +646,27 @@ function buildDashboard() {
 
   buildStatGrid(logs, data);
   buildNav();
+
+  // Show organiser tip if data had any messiness (pre-start logs, warnings, conflicts)
+  if (data.meta?._messy) {
+    const isFr2 = getCurrentLang() === "fr-CA";
+    const tipId = "dashboard-organiser-tip";
+    if (!document.getElementById(tipId)) {
+      const tip = document.createElement("div");
+      tip.id = tipId;
+      tip.style.cssText =
+        "font-size:1.3rem;padding:var(--sp-3) var(--sp-4);margin-bottom:var(--sp-4);" +
+        "background:rgba(var(--accent-rgb,0,120,180),.08);border-radius:var(--r-md);" +
+        "border-left:3px solid var(--accent);display:flex;gap:var(--sp-3);align-items:flex-start";
+      tip.innerHTML = `
+        <span style="font-size:1.6rem;flex-shrink:0">ℹ</span>
+        <span>${isFr2
+          ? `Des irrégularités ont été détectées dans tes fichiers (journaux en double, dates erronées ou antérieures au stage). Si ton tableau de bord ne reflète pas fidèlement ta progression, tu peux corriger ou supprimer les fichiers concernés dans l'<a href="organizer.html" style="color:var(--accent)">outil d'organisation</a>, puis revenir ici avec tes fichiers nettoyés.`
+          : `Some irregularities were found in your files (duplicate logs, incorrect or pre-internship dates). If the dashboard doesn't accurately reflect your progress, you can fix or remove the affected files in the <a href="organizer.html" style="color:var(--accent)">organiser tool</a>, then come back here with your cleaned-up files.`
+        }</span>`;
+      document.getElementById("phase-dashboard")?.prepend(tip);
+    }
+  }
   buildTimeline(logs, data);
   buildBreakdown(logs, data);
   buildModality(logs);
@@ -733,6 +758,22 @@ function switchSection(sectionId, btn) {
 }
 
 // ── Timeline chart ────────────────────────────────────────────
+// ── Filtered logs helper ─────────────────────────────────────
+// Always use this instead of mergedData.logs directly in the dashboard
+// so pre-start logs are excluded consistently everywhere.
+function getFilteredLogs(data) {
+  const d = data || mergedData;
+  if (!d) return [];
+  const startDate = d.context?.internship_start_date || d.context?.start_date;
+  return startDate ? (d.logs || []).filter(l => l.date >= startDate) : (d.logs || []);
+}
+
+function rebuildTimeline() {
+  if (typeof mergedData !== "undefined" && mergedData?.logs?.length) {
+    buildTimeline(getFilteredLogs(mergedData), mergedData);
+  }
+}
+
 function buildTimeline(logs, data) {
   const chart   = document.getElementById("timeline-chart");
   const legend  = document.getElementById("timeline-legend");
@@ -769,22 +810,49 @@ function buildTimeline(logs, data) {
   const usable = Math.max(targetH - 32, MIN_TALLEST_PX - 32); // 32px for date label + padding
   chart.style.height = (targetH + 32) + "px"; // extra room for date labels
 
-  chart.innerHTML = logs.map(log => {
-    const dayTotal = log.day_duration_minutes || log.task_total_minutes || 0;
-    // Column height in px — tallest day fills usable height
+  const showGaps = document.getElementById("timeline-show-gaps")?.checked ?? false;
+
+  // Build a map of date → log for gap insertion
+  const logByDate = {};
+  logs.filter(l => (l.day_duration_minutes || l.task_total_minutes || 0) > 0)
+      .forEach(l => { logByDate[l.date] = l; });
+
+  // Build the ordered list of columns to render
+  let columns = [];
+  if (showGaps && logs.length >= 2) {
+    const sorted = Object.keys(logByDate).sort();
+    const first  = new Date(sorted[0] + "T12:00:00");
+    const last   = new Date(sorted[sorted.length - 1] + "T12:00:00");
+    for (let d = new Date(first); d <= last; d.setDate(d.getDate() + 1)) {
+      const ds = d.toISOString().slice(0, 10);
+      columns.push({ date: ds, log: logByDate[ds] || null });
+    }
+  } else {
+    columns = Object.keys(logByDate).sort().map(ds => ({ date: ds, log: logByDate[ds] }));
+  }
+
+  chart.innerHTML = columns.map(({ date, log }) => {
+    if (!log) {
+      // Gap day — thin grey bar
+      return `
+        <div style="display:flex;flex-direction:column;align-items:center;flex:0 0 0.8rem;min-width:0.8rem;max-width:1.2rem">
+          <div style="height:4px;width:100%;background:var(--border);border-radius:2px;margin-bottom:auto"></div>
+          <div class="timeline-date" style="color:var(--text-subtle);font-size:0.9rem">${date.slice(5)}</div>
+        </div>`;
+    }
+    const log2 = log;
+    const dayTotal = log2.day_duration_minutes || log2.task_total_minutes || 0;
     const colH = dayTotal ? Math.max(Math.round((dayTotal / maxMinutes) * usable), 2) : 2;
 
-    // Group minutes by activity type
     const byType = {};
-    (log.tasks || []).forEach(task => {
+    (log2.tasks || []).forEach(task => {
       const tid = task.activity_type_id || "sys-gray";
       byType[tid] = (byType[tid] || 0) + (task.duration_minutes || 0);
     });
-    if ((log.grayzone_minutes || 0) > 0) {
-      byType["sys-gray"] = (byType["sys-gray"] || 0) + log.grayzone_minutes;
+    if ((log2.grayzone_minutes || 0) > 0) {
+      byType["sys-gray"] = (byType["sys-gray"] || 0) + log2.grayzone_minutes;
     }
 
-    // Segments as explicit px heights so they work regardless of parent layout state
     const segments = Object.entries(byType)
       .sort(([a], [b]) => (actOrder[a] ?? 999) - (actOrder[b] ?? 999))
       .map(([tid, mins]) => {
@@ -795,15 +863,14 @@ function buildTimeline(logs, data) {
         title="${actMap[tid]?.label || tid}: ${mins}min"></div>`;
     }).join("");
 
-    // Opacity encodes day rating
-    const opacity = 0.35 + ((log.day_rating || 3) / 5) * 0.65;
+    const opacity = 0.35 + ((log2.day_rating || 3) / 5) * 0.65;
 
     return `
       <div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:1.4rem;max-width:3.2rem;">
         <div class="timeline-col" style="height:${colH}px;opacity:${opacity}">
           ${segments}
         </div>
-        <div class="timeline-date">${log.date.slice(5)}</div>
+        <div class="timeline-date">${log2.date.slice(5)}</div>
       </div>
     `;
   }).join("");
@@ -839,7 +906,7 @@ function sizeTimelineColumns(container, maxMinutes, knownHeight) {
   // Heights are baked into inline styles during build; on resize just scale them
   // by re-running buildTimeline if mergedData is available
   if (typeof mergedData !== "undefined" && mergedData?.logs?.length) {
-    buildTimeline(mergedData.logs, mergedData);
+    buildTimeline(getFilteredLogs(mergedData), mergedData);
   }
 }
 
@@ -851,7 +918,7 @@ window.addEventListener("resize", () => {
   clearTimeout(_resizeTimer);
   _resizeTimer = setTimeout(() => {
     if (typeof mergedData !== "undefined" && mergedData?.logs?.length) {
-      buildTimeline(mergedData.logs, mergedData);
+      buildTimeline(getFilteredLogs(mergedData), mergedData);
     }
   }, 150);
 });
@@ -1513,7 +1580,7 @@ function printReport() {
   // Re-size timeline charts for print (they need a moment to render)
   if (typeof mergedData !== "undefined" && mergedData?.logs?.length) {
     setTimeout(() => {
-      buildTimeline(mergedData.logs, mergedData);
+      buildTimeline(getFilteredLogs(mergedData), mergedData);
       window.print();
       // Restore after print dialog closes
       setTimeout(restoreAfterPrint, 800);
