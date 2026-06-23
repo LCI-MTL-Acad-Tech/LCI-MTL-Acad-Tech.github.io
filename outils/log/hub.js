@@ -2248,12 +2248,14 @@ function buildDetailHTML(s) {
   const lang = getCurrentLang();
 
   const acts = Object.entries(s.act_totals)
-    .sort((a, b) => b[1] - a[1])
+    .sort((a, b) => b[1] - a[1]);
+  const actTaskTotal = acts.reduce((sum, [, m]) => sum + m, 0);
+  const actRows = acts
     .map(([tid, mins]) => {
       const label = getActivityTypeLabel(s.raw, tid);
       const color = getActivityTypeColor(s.raw, tid);
-      const pct = s.actual_hours > 0
-        ? Math.round((mins / 60 / s.actual_hours) * 100) : 0;
+      const pct = actTaskTotal > 0
+        ? Math.round((mins / actTaskTotal) * 100) : 0;
       return `
         <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-2)">
           <div style="width:1rem;height:1rem;border-radius:3px;background:${color};flex-shrink:0"></div>
@@ -2426,7 +2428,7 @@ function buildDetailHTML(s) {
                     letter-spacing:0.08em;color:var(--text-subtle);margin-bottom:var(--sp-3)">
           Activités
         </div>
-        ${acts || "<span style='color:var(--text-subtle)'>—</span>"}
+        ${actRows || "<span style='color:var(--text-subtle)'>—</span>"}
         ${compSection}
         ${outcomeSection}
       </div>
