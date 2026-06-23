@@ -859,18 +859,20 @@ function openWeekPrint(weekStart) {
       ${l.obstacle_response ? `<div style="color:#555;margin-top:2px">→ ${escHtml(l.obstacle_response)}</div>` : ""}
     </div>`).join("");
 
-  // Activity totals
+  // Activity totals — sum task.duration_minutes across all logs
   const actTotals = {};
   logs.forEach(l => (l.tasks || []).forEach(t => {
     const tid = t.activity_type_id || "sys-gray";
     actTotals[tid] = (actTotals[tid] || 0) + (t.duration_minutes || 0);
   }));
+  const actTaskTotal = Object.values(actTotals).reduce((s, m) => s + m, 0);
   const actRows = Object.entries(actTotals)
     .sort((a, b) => b[1] - a[1])
     .map(([tid, mins]) => {
       const label = getActivityTypeLabel(weeklyData, tid);
       const color = weeklyData.activity_types?.find(a => a.type_id === tid)?.color || "#888";
-      const pct   = Math.round((mins / totalMins) * 100);
+      // % of task-allocated time, not of total clock time
+      const pct   = actTaskTotal > 0 ? Math.round((mins / actTaskTotal) * 100) : 0;
       return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
         <div style="width:10px;height:10px;border-radius:2px;background:${color};flex-shrink:0"></div>
         <div style="flex:1;font-size:12px">${escHtml(label)}</div>
