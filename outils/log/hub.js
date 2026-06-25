@@ -156,7 +156,7 @@ function loadFiles(fileList) {
       try { res({ data: JSON.parse(e.target.result), name: f.name }); }
       catch (err) {
         console.error(`[LCI Hub] Failed to parse JSON: "${f.name}"`, err);
-        res(null);
+        res({ data: null, name: f.name }); // keep name so error report is useful
       }
     };
     r.readAsText(f);
@@ -536,6 +536,15 @@ function loadFiles(fileList) {
     if (nFailed) {
       const failedNames = parsed.filter(p => !p?.data).map(p => p?.name || "unknown");
       console.error(`[LCI Hub] ${nFailed} file(s) failed to parse (invalid JSON):`, failedNames);
+      const isFr = getCurrentLang() === "fr-CA";
+      const warn = document.createElement("div");
+      warn.style.cssText = "font-size:1.3rem;color:var(--warning);margin-top:var(--sp-3);" +
+        "padding:var(--sp-2) var(--sp-3);background:rgba(230,184,48,.1);" +
+        "border-radius:var(--r-md);border-left:3px solid var(--warning)";
+      warn.textContent = isFr
+        ? `⚠ ${nFailed} fichier${nFailed > 1 ? "s" : ""} ignoré${nFailed > 1 ? "s" : ""} (JSON invalide) : ${failedNames.join(", ")}`
+        : `⚠ ${nFailed} file${nFailed > 1 ? "s" : ""} skipped (invalid JSON): ${failedNames.join(", ")}`;
+      document.getElementById("hub-status-text")?.after(warn);
     }
     console.groupEnd();
 
