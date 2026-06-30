@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instructions — Fin du stage / End of Internship</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+  /* ── Design tokens ── */
+  :root {
+    --blue: #00587c;
+    --blue-dim: #004a69;
+    --red: #eb2d37;
+    --cream: #f8f5e9;
+    --charcoal: #07181e;
+    --light: #e8f2f7;
+    --card-bg: #ffffff;
+    --card-border: #d0e4ec;
+    --text: #07181e;
+    --text-dim: #3a5560;
+    --text-faint: #6a8a96;
+    --divider: #c8dde6;
+    --note-bg: #f0f7fb;
+    --warn-bg: #fff3f3;
+    --warn-border: #eb2d37;
+    --body-bg: #f8f5e9;
+    --header-bg: #00587c;
+    --toggle-bg: #cce3ed;
+    --toggle-knob: #00587c;
+  }
+
+  [data-theme="dark"] {
+    --blue: #3db0dc;
+    --blue-dim: #2a90b8;
+    --red: #ff5a62;
+    --cream: #0d2028;
+    --charcoal: #e8f2f7;
+    --light: #0f2a36;
+    --card-bg: #102030;
+    --card-border: #1e3d50;
+    --text: #ddeef5;
+    --text-dim: #8ab8cc;
+    --text-faint: #5a8899;
+    --divider: #1e3d50;
+    --note-bg: #0d2535;
+    --warn-bg: #2a0d0f;
+    --warn-border: #ff5a62;
+    --body-bg: #071820;
+    --header-bg: #051520;
+    --toggle-bg: #1e3d50;
+    --toggle-knob: #3db0dc;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--body-bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.5;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--header-bg);
+    color: white;
+    padding: 24px 40px 20px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  header .header-text h1 {
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  header .header-text .sub {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-top: 3px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  header .header-text .schedule {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-top: 8px;
+  }
+
+  /* ── Dark mode toggle ── */
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .toggle-label {
+    font-size: 11px;
+    opacity: 0.7;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: white;
+  }
+
+  .toggle {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    cursor: pointer;
+  }
+
+  .toggle input { opacity: 0; width: 0; height: 0; }
+
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: var(--toggle-bg);
+    border-radius: 11px;
+    transition: background 0.3s;
+  }
+
+  .toggle-knob {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+  }
+
+  .toggle input:checked + .toggle-track { background: #1e3d50; }
+  .toggle input:checked ~ .toggle-knob { transform: translateX(18px); }
+
+  /* ── Layout ── */
+  .container {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 28px 24px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--divider);
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin-bottom: 32px;
+  }
+
+  .col-fr { padding-right: 24px; border-right: 1px solid var(--divider); }
+  .col-en { padding-left: 24px; }
+
+  .lang-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 14px;
+  }
+
+  /* ── Cards ── */
+  .step {
+    margin-bottom: 12px;
+    padding: 14px 16px;
+    background: var(--card-bg);
+    border-radius: 6px;
+    border: 1px solid var(--card-border);
+    border-left: 3px solid var(--blue);
+    transition: background 0.3s, border-color 0.3s;
+  }
+
+  .step.warn {
+    background: var(--warn-bg);
+    border-color: var(--warn-border);
+    border-left: 3px solid var(--red);
+  }
+
+  .step.note {
+    background: var(--note-bg);
+    border-left: 3px solid var(--text-faint);
+    border-color: var(--card-border);
+  }
+
+  .step.success {
+    background: var(--note-bg);
+    border-left: 3px solid var(--blue);
+    border-color: var(--card-border);
+  }
+
+  .step-number {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 4px;
+  }
+
+  .step.warn .step-number { color: var(--red); }
+  .step.note .step-number { color: var(--text-faint); }
+
+  .step h2 {
+    font-size: 13.5px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    line-height: 1.3;
+    color: var(--text);
+  }
+
+  .step p {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.55;
+  }
+
+  .step p + p { margin-top: 5px; }
+
+  .step a {
+    color: var(--blue);
+    font-weight: 600;
+    word-break: break-all;
+  }
+
+  .step ul {
+    margin: 6px 0 0 18px;
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  .pill {
+    display: inline-block;
+    font-family: monospace;
+    font-size: 11.5px;
+    background: var(--light);
+    color: var(--blue);
+    padding: 1px 7px;
+    border-radius: 3px;
+    border: 1px solid var(--card-border);
+  }
+
+  [data-theme="dark"] .pill {
+    background: #0d2535;
+    border-color: #1e3d50;
+  }
+
+  .hl {
+    background: var(--note-bg);
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-top: 8px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    border: 1px solid var(--card-border);
+  }
+
+  .hl strong { color: var(--text); }
+
+  /* ── Checklist table ── */
+  .checklist-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    margin-top: 10px;
+  }
+
+  .checklist-table th {
+    text-align: left;
+    padding: 6px 10px;
+    background: var(--light);
+    color: var(--blue);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--divider);
+  }
+
+  .checklist-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--divider);
+    vertical-align: top;
+    color: var(--text-dim);
+  }
+
+  .checklist-table td:first-child {
+    font-weight: 600;
+    color: var(--blue);
+    white-space: nowrap;
+  }
+
+  .checklist-table tr:last-child td { border-bottom: none; }
+
+  /* ── Section divider ── */
+  .section-block {
+    margin-bottom: 36px;
+  }
+
+  /* ── Print ── */
+  @media print {
+    [data-theme="dark"] {
+      --blue: #00587c;
+      --red: #c0000a;
+      --body-bg: white;
+      --header-bg: #00587c;
+      --card-bg: white;
+      --card-border: #ccc;
+      --text: #000;
+      --text-dim: #222;
+      --text-faint: #666;
+      --divider: #ccc;
+      --note-bg: #f0f0f0;
+      --warn-bg: #fff3f3;
+      --light: #eef4f8;
+    }
+
+    body { font-size: 9.5pt; }
+    header { padding: 12px 20px; }
+    header .header-text h1 { font-size: 12pt; }
+    .toggle-wrap { display: none; }
+    .container { padding: 12px 10px; }
+    .col-fr { padding-right: 12px; }
+    .col-en { padding-left: 12px; }
+    .step { padding: 8px 10px; margin-bottom: 7px; page-break-inside: avoid; }
+    .step h2 { font-size: 10pt; }
+    .step p { font-size: 9pt; }
+
+    header, .step, .checklist-table th, .hl, .pill {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .columns { grid-template-columns: 1fr; }
+    .col-fr { padding-right: 0; border-right: none; border-bottom: 1px solid var(--divider); padding-bottom: 24px; margin-bottom: 24px; }
+    .col-en { padding-left: 0; }
+    header { flex-direction: column; gap: 12px; padding: 18px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-text">
+    <div class="sub">Innovation Hub</div>
+    <h1>Fin du stage — fin du stage &nbsp;/&nbsp; End of Internship — end of internship</h1>
+    <div class="schedule">Toutes les étapes doivent être complétées au plus tard à ta date de fin officielle</div>
+    <div class="schedule" style="opacity:0.7; font-size:12px; margin-top:2px;">All steps must be completed no later than your official end date</div>
+    <div class="schedule" style="opacity:0.6; font-size:11px; margin-top:4px;">Ta date de fin figure sur ton document B &nbsp;·&nbsp; Your end date is on your Document B</div>
+  </div>
+  <div class="toggle-wrap">
+    <span class="toggle-label">Dark</span>
+    <label class="toggle">
+      <input type="checkbox" id="theme-toggle" onchange="toggleTheme()">
+      <span class="toggle-track"></span>
+      <span class="toggle-knob"></span>
+    </label>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ══════════════════════════════════════════════════
+       DANS L'OUTIL DE JOURNAL
+  ═══════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-label">Dans l'outil de journal &nbsp;/&nbsp; In the Log Tool</div>
+    <div class="columns">
+      <div class="col-fr">
+        <div class="lang-label">Français</div>
+
+        <div class="step">
+          <div class="step-number">Étape 1</div>
+          <h2>Remplis ton dernier journal quotidien</h2>
+          <p>Ouvre l'outil, section <strong>Journal</strong>. Enregistre tes heures et tes tâches du jour comme d'habitude. Télécharge le fichier JSON et dépose-le sur OneDrive avant de continuer.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Étape 2</div>
+          <h2>Remplis ton dernier bilan hebdomadaire</h2>
+          <p>Section <strong>Bilan hebdo</strong>. Complète toutes les sections de réflexion, incluant la réflexion sur les compétences du cours. Télécharge le JSON et dépose-le sur OneDrive.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Étape 3</div>
+          <h2>Remplis le rapport final</h2>
+          <p>C'est le <strong>même outil</strong> que celui utilisé pour le journal quotidien — section <span class="pill">Rapport final</span>, le dernier onglet à droite dans la barre de navigation, après le suivi de progression.</p>
+          <p>Réponds à toutes les questions de réflexion finale : comparaison attentes/réalité, moments significatifs, apprentissages, suggestions.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Étape 4</div>
+          <h2>Exporte le JSON du rapport final</h2>
+          <p>Une fois les questions complétées, exporte le fichier JSON comme pour tes autres dépôts. Dépose-le dans le <strong>même dossier OneDrive</strong> que tous tes autres fichiers de stage — sous son nom d'origine, sans le renommer.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Étape 5</div>
+          <h2>Utilise le suivi de progression et l'organisateur de fichiers</h2>
+          <p>Avant de quitter l'outil, ouvre la section <span class="pill">Suivi de progression</span> pour confirmer que tous tes fichiers ont bien été chargés et fusionnés correctement.</p>
+          <p>Utilise aussi l'<span class="pill">Organisateur de fichiers</span> pour repérer rapidement s'il manque un journal, un bilan, ou si une date semble incohérente — c'est plus rapide que de vérifier fichier par fichier.</p>
+        </div>
+
+      </div>
+      <div class="col-en">
+        <div class="lang-label">English</div>
+
+        <div class="step">
+          <div class="step-number">Step 1</div>
+          <h2>Fill in your last daily log</h2>
+          <p>Open the tool, <strong>Log</strong> section. Record your hours and tasks for the day as usual. Download the JSON file and upload it to OneDrive before continuing.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Step 2</div>
+          <h2>Fill in your last weekly summary</h2>
+          <p><strong>Weekly summary</strong> section. Complete all the reflection fields, including the course competency reflection. Download the JSON and upload it to OneDrive.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Step 3</div>
+          <h2>Fill in the final report</h2>
+          <p>This is the <strong>same tool</strong> you use for your daily log — <span class="pill">Final report</span> section, the last tab on the right in the navigation bar, after the progress tracker.</p>
+          <p>Answer all the final reflection questions: expectations vs. reality, significant moments, lessons learned, suggestions.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Step 4</div>
+          <h2>Export the final report JSON</h2>
+          <p>Once the questions are completed, export the JSON file just like your other uploads. Upload it to the <strong>same OneDrive folder</strong> as all your other internship files — under its original name, without renaming it.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Step 5</div>
+          <h2>Use the progress tracker and file organizer</h2>
+          <p>Before leaving the tool, open the <span class="pill">Progress tracker</span> section to confirm that all your files have loaded and merged correctly.</p>
+          <p>Also use the <span class="pill">File organizer</span> to quickly spot a missing log, a missing summary, or an inconsistent date — it is faster than checking file by file.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       VÉRIFICATION DES FICHIERS
+  ═══════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-label">Vérification des fichiers &nbsp;/&nbsp; File Check</div>
+    <div class="columns">
+      <div class="col-fr">
+        <div class="lang-label">Français</div>
+
+        <div class="step note">
+          <div class="step-number">Avant de continuer</div>
+          <h2>Confirme que ton dossier OneDrive est complet</h2>
+          <table class="checklist-table">
+            <tr><th>Fichier</th><th>Quantité attendue</th></tr>
+            <tr><td>Configuration</td><td>1 fichier (déposé au début du stage)</td></tr>
+            <tr><td>Journal quotidien</td><td>1 fichier par jour travaillé</td></tr>
+            <tr><td>Bilan hebdomadaire</td><td>1 fichier par semaine travaillée</td></tr>
+            <tr><td>Rapport final</td><td>1 fichier</td></tr>
+          </table>
+          <p style="margin-top:10px;"><strong>S'il manque un fichier, retourne dans l'outil et remplis-le rétroactivement maintenant</strong> — choisis la date concernée et coche l'option « Journal en retard » si elle est disponible. Un journal rempli en retard reste préférable à un journal jamais rempli.</p>
+        </div>
+
+        <div class="step note">
+          <div class="step-number">Astuce OneDrive</div>
+          <h2>Filtre le dossier par la colonne « Modifié par »</h2>
+          <p>Le dossier OneDrive contient les fichiers de <strong>tou·tes les stagiaires</strong> — pas seulement les tiens. Pour repérer facilement tes propres fichiers :</p>
+          <ul>
+            <li>Ouvre le dossier OneDrive dans le navigateur (pas dans l'application de bureau)</li>
+            <li>Passe en vue <strong>Liste</strong> si ce n'est pas déjà le cas</li>
+            <li>Clique sur l'en-tête de la colonne <strong>Modifié par</strong> pour trier ou filtrer</li>
+            <li>Sélectionne ton propre nom dans la liste de filtre</li>
+          </ul>
+          <p style="margin-top:8px;">Tu verras alors uniquement les fichiers que tu as toi-même déposés — beaucoup plus simple pour vérifier que rien ne manque sans avoir à chercher parmi les fichiers de tout le monde.</p>
+        </div>
+
+      </div>
+      <div class="col-en">
+        <div class="lang-label">English</div>
+
+        <div class="step note">
+          <div class="step-number">Before continuing</div>
+          <h2>Confirm your OneDrive folder is complete</h2>
+          <table class="checklist-table">
+            <tr><th>File</th><th>Expected quantity</th></tr>
+            <tr><td>Configuration</td><td>1 file (uploaded at the start)</td></tr>
+            <tr><td>Daily log</td><td>1 file per day worked</td></tr>
+            <tr><td>Weekly summary</td><td>1 file per week worked</td></tr>
+            <tr><td>Final report</td><td>1 file</td></tr>
+          </table>
+          <p style="margin-top:10px;"><strong>If a file is missing, go back into the tool and fill it in retroactively now</strong> — choose the relevant date and check the "Late filing" option if available. A log filled in late is still better than one never filled in at all.</p>
+        </div>
+
+        <div class="step note">
+          <div class="step-number">OneDrive tip</div>
+          <h2>Filter the folder by the "Modified by" column</h2>
+          <p>The OneDrive folder contains files from <strong>all interns</strong> — not just yours. To easily spot your own files:</p>
+          <ul>
+            <li>Open the OneDrive folder in the browser (not the desktop app)</li>
+            <li>Switch to <strong>List</strong> view if it is not already</li>
+            <li>Click the <strong>Modified by</strong> column header to sort or filter</li>
+            <li>Select your own name from the filter list</li>
+          </ul>
+          <p style="margin-top:8px;">You will then see only the files you uploaded yourself — much simpler for checking that nothing is missing without having to search through everyone else's files.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       VÉRIFICATIONS AUPRÈS DE L'ENSEIGNANT·E
+  ═══════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-label">Vérifications auprès de l'enseignant·e &nbsp;/&nbsp; Checking In With Your Teacher</div>
+    <div class="columns">
+      <div class="col-fr">
+        <div class="lang-label">Français</div>
+
+        <div class="step">
+          <div class="step-number">Étape 6</div>
+          <h2>Confirme que tu as remis tout ce que ton·ta enseignant·e superviseur·e de stage attend</h2>
+          <p>En plus du journal de stage, ton·ta enseignant·e superviseur·e de stage peut exiger d'autres livrables propres à ton cours : rapports écrits, présentation finale, formulaires d'évaluation, ou autres documents. Ces exigences varient d'un cours à l'autre et <strong>ne passent pas par l'outil de journal</strong>.</p>
+          <p>Contacte ton·ta enseignant·e superviseur·e de stage pour confirmer que tu as bien remis tout ce qui est attendu — y compris une éventuelle présentation finale.</p>
+        </div>
+
+        <div class="step warn">
+          <div class="step-number">Vérifie tous tes canaux</div>
+          <h2>Ne laisse rien passer inaperçu</h2>
+          <p>Les instructions et rappels d'échéances peuvent arriver sur différents canaux selon l'enseignant·e. Avant de considérer ton stage terminé, vérifie chacun de ces canaux :</p>
+          <ul>
+            <li><strong>Omnivox</strong> — messages et annonces de cours</li>
+            <li><strong>MIO</strong> — messagerie interne Omnivox</li>
+            <li><strong>MS Teams</strong> — messages et canaux de cours</li>
+            <li><strong>Courriel institutionnel</strong></li>
+            <li><strong>Courriel personnel</strong> — certain·es enseignant·es y écrivent aussi</li>
+          </ul>
+          <p style="margin-top:8px;">Une échéance manquée parce qu'un message n'a pas été vu n'est généralement pas une excuse acceptée.</p>
+        </div>
+
+      </div>
+      <div class="col-en">
+        <div class="lang-label">English</div>
+
+        <div class="step">
+          <div class="step-number">Step 6</div>
+          <h2>Confirm you have submitted everything your supervising teacher expects</h2>
+          <p>In addition to the internship log, your teacher who supervises the internship may require other course-specific deliverables: written reports, a final presentation, evaluation forms, or other documents. These requirements vary from course to course and <strong>do not go through the log tool</strong>.</p>
+          <p>Contact your teacher who supervises the internship to confirm you have submitted everything expected — including any final presentation.</p>
+        </div>
+
+        <div class="step warn">
+          <div class="step-number">Check all your channels</div>
+          <h2>Do not let anything slip by unnoticed</h2>
+          <p>Instructions and deadline reminders can arrive on different channels depending on the teacher. Before considering your internship finished, check each of these:</p>
+          <ul>
+            <li><strong>Omnivox</strong> — course messages and announcements</li>
+            <li><strong>MIO</strong> — Omnivox internal messaging</li>
+            <li><strong>MS Teams</strong> — course messages and channels</li>
+            <li><strong>Institutional email</strong></li>
+            <li><strong>Personal email</strong> — some teachers also write there</li>
+          </ul>
+          <p style="margin-top:8px;">A missed deadline because a message went unseen is generally not an accepted excuse.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       CLÔTURE PROFESSIONNELLE
+  ═══════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-label">Clôture professionnelle &nbsp;/&nbsp; Professional Wrap-up</div>
+    <div class="columns">
+      <div class="col-fr">
+        <div class="lang-label">Français</div>
+
+        <div class="step">
+          <div class="step-number">Étape 7</div>
+          <h2>Préviens ton·ta (ou tes) chef·fe(s) d'équipe</h2>
+          <p>Si tu travailles sur plusieurs projets, tu as probablement plusieurs chef·fes d'équipe — préviens-les <strong>chacun·e individuellement</strong> dans le fil Discord concerné. Annonce que tu termines ton stage, pour que chaque équipe puisse s'organiser sans toi à partir de maintenant.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Étape 8</div>
+          <h2>Remercie tes coéquipier·es</h2>
+          <p>Prends un moment pour remercier tes coéquipier·es de chaque équipe dans une conversation de groupe ou directement dans le fil. C'est aussi le bon moment pour utiliser une dernière fois le canal <strong>#kudos</strong> sur Discord et souligner publiquement la contribution de quelqu'un qui t'a aidé·e pendant ton stage.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Étape 9</div>
+          <h2>Remercie ton ou tes client(s)</h2>
+          <p>Si tu as travaillé avec plus d'un client, remercie <strong>chacun d'entre eux</strong> séparément. Un message poli dans le canal du projet concerné ou via la liaison client(s) suffit. C'est une marque de professionnalisme simple et appréciée.</p>
+        </div>
+
+        <div class="step success">
+          <div class="step-number">Dernière étape</div>
+          <h2>Préviens l'administration du hub</h2>
+          <p>Envoie un message privé à l'administration du hub sur MS Teams pour lui signaler que ton stage est terminé et que tous tes fichiers sont déposés. <strong>C'est ce qui déclenche le début de ton évaluation par le hub.</strong></p>
+        </div>
+
+        <div class="step warn">
+          <div class="step-number">Rappel important</div>
+          <h2>Ton nombre d'heures doit être complété au plus tard à ta date de fin</h2>
+          <p>Ton document B indique ta <strong>date de fin officielle</strong> et ton <strong>nombre total d'heures requis</strong>. Voici comment ces deux éléments s'articulent :</p>
+          <ul>
+            <li><strong>Si tu termines tes heures un peu avant ta date de fin</strong> — aucun problème. Préviens simplement ton·ta (ou tes) chef·fe(s) d'équipe à l'avance pour que la planification du travail ne soit pas perturbée par ton départ.</li>
+            <li><strong>Si tu arrives à ta date de fin sans avoir complété tes heures</strong> — c'est ce qui pose problème. <strong>Cela aura des répercussions sur ta note et peut mener à un échec du stage.</strong></li>
+          </ul>
+          <p style="margin-top:8px;">Si tu réalises que tu prends du retard sur tes heures, <strong>la priorité est d'accélérer ton rythme de travail</strong> — pas d'attendre la date de fin en espérant que ça se résorbe tout seul. Si malgré tes efforts l'écart reste trop important pour être comblé, contacte l'administration du hub pour évaluer la situation, le plus tôt possible.</p>
+        </div>
+
+      </div>
+      <div class="col-en">
+        <div class="lang-label">English</div>
+
+        <div class="step">
+          <div class="step-number">Step 7</div>
+          <h2>Let your team lead(s) know</h2>
+          <p>If you are working on multiple projects, you likely have more than one team lead — let <strong>each one individually</strong> know in the relevant Discord thread. Announce that you are wrapping up your internship, so each team can organize without you going forward.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Step 8</div>
+          <h2>Thank your teammates</h2>
+          <p>Take a moment to thank your teammates from each team in a group chat or directly in the thread. This is also a good time to use the <strong>#kudos</strong> channel on Discord one last time to publicly recognize someone who helped you during your internship.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">Step 9</div>
+          <h2>Thank your client(s)</h2>
+          <p>If you worked with more than one client, thank <strong>each one</strong> separately. A polite message in the relevant project channel or through the client liaison is enough. It is a simple and appreciated mark of professionalism.</p>
+        </div>
+
+        <div class="step success">
+          <div class="step-number">Final step</div>
+          <h2>Let hub administration know</h2>
+          <p>Send hub administration a private message on MS Teams to let them know your internship is complete and all your files are uploaded. <strong>This is what triggers the start of your evaluation by the hub.</strong></p>
+        </div>
+
+        <div class="step warn">
+          <div class="step-number">Important reminder</div>
+          <h2>Your hours must be completed no later than your end date</h2>
+          <p>Your Document B states your <strong>official end date</strong> and your <strong>total required hours</strong>. Here is how the two fit together:</p>
+          <ul>
+            <li><strong>If you finish your hours a bit before your end date</strong> — that is no issue at all. Just let your team lead(s) know in advance so work planning is not disrupted by your early exit.</li>
+            <li><strong>If you reach your end date without having completed your hours</strong> — that is the problem. <strong>This will have repercussions on your grade and may even lead to failing the internship.</strong></li>
+          </ul>
+          <p style="margin-top:8px;">If you realize you are falling behind on your hours, <strong>the priority is to pick up the pace</strong> — not to wait until the end date hoping it will sort itself out. If, despite your efforts, the gap remains too large to close, contact hub administration to assess the situation, as early as possible.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer style="text-align:center; font-size:12px; color:var(--text-faint); padding:20px;">
+  Innovation Hub
+</footer>
+
+<script>
+  function toggleTheme() {
+    const isDark = document.getElementById('theme-toggle').checked;
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  }
+
+  // Respect system preference on load
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.getElementById('theme-toggle').checked = true;
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+</script>
+
+</body>
+</html>
