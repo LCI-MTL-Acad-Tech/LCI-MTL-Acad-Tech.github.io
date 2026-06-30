@@ -659,7 +659,7 @@ function confirmAbsence() {
 
   if (isAbsMode) {
     // Save absence
-    const reason = document.getElementById("absence-reason-input").value.trim();
+    const reason = sanitizeSingleLine(document.getElementById("absence-reason-input").value);
     ctx.planned_absences.push({ date, reason });
     ctx.planned_absences.sort((a,b) => a.date.localeCompare(b.date));
   } else {
@@ -787,8 +787,8 @@ function saveMilestoneEditor() {
   const lang = getCurrentLang();
   const isFr = lang === "fr-CA";
 
-  const team  = document.getElementById("ms-team-name").value.trim();
-  const name  = document.getElementById("ms-project-name").value.trim();
+  const team  = sanitizeSingleLine(document.getElementById("ms-team-name").value);
+  const name  = sanitizeSingleLine(document.getElementById("ms-project-name").value);
   const emoji = document.getElementById("ms-project-emoji").value.trim() || "🚩";
 
   if (!team && !name) {

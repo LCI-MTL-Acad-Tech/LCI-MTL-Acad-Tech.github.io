@@ -13,6 +13,18 @@ const SETTINGS = {
 // Returns today's date as YYYY-MM-DD in the user's LOCAL timezone.
 // Never use new Date().toISOString().slice(0,10) for "today" — that's UTC
 // and shows tomorrow's date for students in negative UTC offsets after ~7pm.
+// Strip newlines, carriage returns, tabs, and other control characters from
+// single-line text inputs (names, professor, email, cohort, etc.) before saving.
+// Prevents pasted text with embedded line breaks from producing invalid JSON
+// or corrupting layout in single-line display contexts.
+function sanitizeSingleLine(str) {
+  if (typeof str !== "string") return str;
+  return str
+    .replace(/[\r\n\t\v\f\u0000-\u001F\u007F]/g, " ") // control chars → single space
+    .replace(/\s+/g, " ")                              // collapse repeated spaces
+    .trim();
+}
+
 function localDateISO(d) {
   const dt = d || new Date();
   return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`;

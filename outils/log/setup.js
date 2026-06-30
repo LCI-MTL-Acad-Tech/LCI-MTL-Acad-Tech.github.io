@@ -313,9 +313,9 @@ function renderSteps(containerId, activeIdx) {
 
 // ── Save profile ─────────────────────────────────────────────
 function saveProfileAndNext() {
-  const name      = document.getElementById("profile-name").value.trim();
-  const studentId = document.getElementById("profile-student-id").value.trim();
-  const email     = document.getElementById("profile-email").value.trim();
+  const name      = sanitizeSingleLine(document.getElementById("profile-name").value);
+  const studentId = sanitizeSingleLine(document.getElementById("profile-student-id").value);
+  const email     = sanitizeSingleLine(document.getElementById("profile-email").value);
   const programSel = document.getElementById("profile-program-select");
   const programCode = programSel ? programSel.value : "";
 
@@ -333,8 +333,8 @@ function saveProfileAndNext() {
     student_id:            studentId,
     email,
     program:               programCode,          // controlled code, e.g. "420.BR" or "other"
-    cohort:                document.getElementById("profile-cohort").value.trim(),
-    supervising_professor: document.getElementById("profile-professor").value.trim(),
+    cohort:                sanitizeSingleLine(document.getElementById("profile-cohort").value),
+    supervising_professor: sanitizeSingleLine(document.getElementById("profile-professor").value),
   };
 
   // Resolve course code: read the course dropdown (already filtered to this program)
@@ -424,8 +424,8 @@ function collectProjects() {
   const blocks = document.querySelectorAll("#ctx-projects-list .repeatable-block");
   return Array.from(blocks).map(b => ({
     project_id:          b.dataset.id,
-    project_name:        b.querySelector(".proj-name")?.value.trim()        || "",
-    client_name:         b.querySelector(".proj-client")?.value.trim()      || "",
+    project_name:        sanitizeSingleLine(b.querySelector(".proj-name")?.value || ""),
+    client_name:         sanitizeSingleLine(b.querySelector(".proj-client")?.value || ""),
     brief_summary:       b.querySelector(".proj-brief")?.value.trim()       || "",
     project_start_date:  b.querySelector(".proj-start")?.value              || null,
     student_joined_date: b.querySelector(".proj-joined")?.value             || new Date().toISOString().slice(0, 10),
@@ -477,13 +477,13 @@ function saveContextAndNext() {
 
   if (currentPathway === "company") {
     setupData.context.company = {
-      organization_name: document.getElementById("ctx-org-name").value.trim(),
-      industry:          document.getElementById("ctx-industry").value.trim(),
-      city:              document.getElementById("ctx-city").value.trim(),
-      country:           document.getElementById("ctx-country").value.trim(),
+      organization_name: sanitizeSingleLine(document.getElementById("ctx-org-name").value),
+      industry:          sanitizeSingleLine(document.getElementById("ctx-industry").value),
+      city:              sanitizeSingleLine(document.getElementById("ctx-city").value),
+      country:           sanitizeSingleLine(document.getElementById("ctx-country").value),
     };
-    setupData.context.supervisor_name    = document.getElementById("ctx-sup-name").value.trim();
-    setupData.context.supervisor_role    = document.getElementById("ctx-sup-role").value.trim();
+    setupData.context.supervisor_name    = sanitizeSingleLine(document.getElementById("ctx-sup-name").value);
+    setupData.context.supervisor_role    = sanitizeSingleLine(document.getElementById("ctx-sup-role").value);
     setupData.context.situation_before   = document.getElementById("ctx-situation-before").value.trim();
   } else {
     setupData.context.faculty_supervisor = setupData.profile.supervising_professor || "";
