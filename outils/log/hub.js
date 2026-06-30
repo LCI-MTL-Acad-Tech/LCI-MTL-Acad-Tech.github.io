@@ -1373,21 +1373,24 @@ function mergeStudents(uuidA, uuidB) {
 
 function renderStats() {
   const f = filtered;
-  const total      = f.length;
-  const finished   = f.filter(s => isFinished(s)).length;
-  const inProgress = total - finished;
-  const onTrack    = f.filter(s => s.track_band === "green").length;
-  const behind     = f.filter(s => s.track_band === "red").length;
-  const avgH       = total ? (f.reduce((s, r) => s + r.actual_hours, 0) / total).toFixed(1) : "—";
-  const programs   = new Set(f.map(s => s.program?.slice(0,6))).size;
-  const isFr       = getCurrentLang() === "fr-CA";
+  const total       = f.length;
+  const finished    = f.filter(s => isFinished(s)).length;
+  const inProgFiltered = f.filter(s => !isFinished(s));
+  const inProgress  = inProgFiltered.length;
+  const onTrack     = inProgFiltered.filter(s => s.track_band === "green").length;
+  const behind      = inProgFiltered.filter(s => s.track_band === "red").length;
+  const avgH        = inProgress
+    ? (inProgFiltered.reduce((s, r) => s + r.actual_hours, 0) / inProgress).toFixed(1)
+    : "—";
+  const programs    = new Set(f.map(s => s.program?.slice(0,6))).size;
+  const isFr        = getCurrentLang() === "fr-CA";
 
   document.getElementById("hub-stats").innerHTML = [
     { val: inProgress + " / " + total,  label: isFr ? "En cours / Total"   : "In progress / Total", color: "var(--accent)" },
     { val: finished,                     label: isFr ? "Terminé·e·s ✅"     : "Finished ✅",          color: "#1a6fa8" },
-    { val: onTrack + " / " + inProgress, label: isFr ? "Dans les temps"     : "On track",            color: "#3a6e00" },
-    { val: behind  + " / " + inProgress, label: isFr ? "En retard"          : "Behind",              color: "#a00" },
-    { val: avgH + " h",                  label: isFr ? "Moy. heures"        : "Avg. hours",          color: "var(--accent)" },
+    { val: onTrack + " / " + inProgress, label: isFr ? "Dans les temps (en cours)" : "On track (in progress)", color: "#3a6e00" },
+    { val: behind  + " / " + inProgress, label: isFr ? "En retard (en cours)"      : "Behind (in progress)",   color: "#a00" },
+    { val: avgH + " h",                  label: isFr ? "Moy. heures (en cours)"    : "Avg. hours (in progress)", color: "var(--accent)" },
     { val: programs,                     label: isFr ? "Programmes"         : "Programs",            color: "var(--accent)" },
   ].map(s => `
     <div class="hub-stat">
