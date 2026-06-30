@@ -322,6 +322,7 @@ function loadFiles(fileList) {
       const nS = students.length;
       setStatus(`${nC} fichier${nC > 1 ? "s" : ""} de configuration — ${nS} étudiant·e${nS > 1 ? "·s" : ""} au total.`);
       document.getElementById("btn-csv").style.display        = "";
+      document.getElementById("btn-csv-eval").style.display   = "";
       document.getElementById("btn-export-hub").style.display = "";
       document.getElementById("btn-clear").style.display = "";
       document.getElementById("hub-dashboard").style.display = "block";
@@ -577,6 +578,7 @@ function loadFiles(fileList) {
     setStatus(statusMsg + ".");
 
     document.getElementById("btn-csv").style.display        = "";
+      document.getElementById("btn-csv-eval").style.display   = "";
       document.getElementById("btn-export-hub").style.display = "";
     document.getElementById("btn-clear").style.display = "";
     document.getElementById("hub-dashboard").style.display = "block";
@@ -596,6 +598,7 @@ function clearAll() {
   students = []; filtered = [];
   document.getElementById("hub-dashboard").style.display = "none";
   document.getElementById("btn-csv").style.display        = "none";
+  document.getElementById("btn-csv-eval").style.display    = "none";
   document.getElementById("btn-export-hub").style.display = "none";
   document.getElementById("btn-clear").style.display = "none";
   document.getElementById("hub-upload-strip")?.classList.remove("hub-upload-strip--loaded");
@@ -2836,6 +2839,34 @@ function previewLog(uuid, logId) {
 }
 
 // ── CSV export ────────────────────────────────────────────────
+function exportEvalCSV() {
+  const headers = [
+    "Nom", "Numéro_étudiant", "Courriel", "Programme", "Enseignant·e", "Parcours",
+    "Heures_réelles", "Heures_attendues", "Statut", "Terminé",
+    "Fichiers_config", "Fichiers_journaliers", "Fichiers_hebdomadaires", "Fichiers_rapport_final",
+  ];
+  const statusLabel = s => s.track_band === "green" ? "Dans les temps"
+    : s.track_band === "red" ? "En retard"
+    : "—";
+  const rows = students.map(s => {
+    const fc = s.file_type_counts || {};
+    return [
+      s.name, s.student_id, s.email || "", s.program, s.teacher, s.pathway,
+      s.actual_hours, s.expected_hours, statusLabel(s), isFinished(s) ? "oui" : "non",
+      fc.config || 0, fc.daily || 0, fc.weekly || 0, fc.reflection || 0,
+    ];
+  }).map(row => row.map(v => `"${String(v).replace(/"/g,'""')}"`));
+
+  const csv  = [headers, ...rows].map(r => r.join(",")).join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = `hub_evaluation_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function exportCSV() {
   const headers = ["Nom","ID","Programme","Superviseur·e","Cohorte","Type",
     "Jours_journalisés","Heures_attendues","Heures_réelles","Progression_%",
