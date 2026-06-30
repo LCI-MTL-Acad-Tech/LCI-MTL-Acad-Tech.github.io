@@ -212,7 +212,34 @@ img { max-width: 100%; }
   width: 100%;
 }
 .container--wide { max-width: 112rem; }
+.container--full { max-width: 140rem; }
 .container--narrow { max-width: 60rem; }
+
+.copy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0 0.3rem;
+  color: var(--text-subtle);
+  vertical-align: middle;
+  opacity: 0.6;
+  transition: opacity var(--dur-fast), color var(--dur-fast);
+}
+.copy-btn:hover { opacity: 1; color: var(--accent); }
+.copy-btn.copied { opacity: 1; color: var(--success); }
+
+.hub-name-cell {
+  max-width: 16rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: middle;
+}
+@media (min-width: 1400px) {
+  .hub-name-cell { max-width: 22rem; }
+}
 
 /* ── Header ───────────────────────────────────────────────── */
 .site-header {

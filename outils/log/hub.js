@@ -2,6 +2,30 @@
 // No backend · no persistence · no cookies
 // All state lives in memory and is gone on refresh.
 
+// Copy text to clipboard and briefly flash the triggering button as feedback
+function copyToClipboard(text, btn) {
+  navigator.clipboard?.writeText(text).then(() => {
+    if (!btn) return;
+    const original = btn.textContent;
+    btn.textContent = "✓";
+    btn.classList.add("copied");
+    setTimeout(() => {
+      btn.textContent = original;
+      btn.classList.remove("copied");
+    }, 1200);
+  }).catch(() => {
+    // Fallback for browsers without clipboard API permission
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+  });
+}
+
 let students = [];        // all built rows
 let hubMilestones = {};   // { [project_id]: { exported_at, project } }
 const sessionMerges = []; // { donorUUID, baseUUID, canonicalId? } — for hub state export
@@ -1876,8 +1900,16 @@ function renderTable() {
 
     return `
       <tr class="data-row" onclick="toggleDetail(${i})">
-        <td><strong>${escHtml(s.name)}</strong>${integBadge}</td>
-        <td style="color:var(--text-subtle);font-size:1.2rem">${escHtml(s.student_id)}</td>
+        <td>
+          <span class="hub-name-cell" title="${escHtml(s.name)}"><strong>${escHtml(s.name)}</strong></span>${integBadge}
+          <button class="copy-btn" title="${lang === 'fr-CA' ? 'Copier le nom' : 'Copy name'}"
+            onclick="event.stopPropagation();copyToClipboard('${escHtml(s.name).replace(/'/g, "\\'")}', this)">⧉</button>
+        </td>
+        <td style="color:var(--text-subtle);font-size:1.2rem;white-space:nowrap">
+          ${escHtml(s.student_id)}
+          <button class="copy-btn" title="${lang === 'fr-CA' ? 'Copier le numéro' : 'Copy ID'}"
+            onclick="event.stopPropagation();copyToClipboard('${escHtml(s.student_id)}', this)">⧉</button>
+        </td>
         <td style="max-width:20rem;overflow:hidden;text-overflow:ellipsis">
           <button onclick="event.stopPropagation();filterByProgram('${escHtml(s.program)}')"
             title="${escHtml(s.program)}"
