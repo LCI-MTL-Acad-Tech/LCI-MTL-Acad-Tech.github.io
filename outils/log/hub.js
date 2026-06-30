@@ -3,6 +3,29 @@
 // All state lives in memory and is gone on refresh.
 
 // Copy text to clipboard and briefly flash the triggering button as feedback
+function setExportButtonLabels() {
+  const isFr = getCurrentLang() === "fr-CA";
+  const csvBtn  = document.getElementById("btn-csv");
+  const evalBtn = document.getElementById("btn-csv-eval");
+  const hubBtn  = document.getElementById("btn-export-hub");
+  if (csvBtn) {
+    csvBtn.textContent = isFr ? "⬇ CSV détaillé" : "⬇ Detailed CSV";
+    csvBtn.title = isFr
+      ? "Export détaillé : progression, heures hebdo, dernier journal, note moyenne, etc."
+      : "Detailed export: progress, weekly hours, last log, average rating, etc.";
+  }
+  if (evalBtn) {
+    evalBtn.title = isFr
+      ? "Export pour préparer les évaluations : nom, numéro, courriel, statut terminé, comptage des fichiers soumis"
+      : "Export for evaluation prep: name, ID, email, finished status, submitted file counts";
+  }
+  if (hubBtn) {
+    hubBtn.title = isFr
+      ? "Sauvegarde des fusions et des statuts « terminé » manuels (à recharger avec les fichiers JSON la prochaine fois)"
+      : "Saves merges and manual 'finished' marks (reload together with the JSON files next time)";
+  }
+}
+
 function copyToClipboard(text, btn) {
   navigator.clipboard?.writeText(text).then(() => {
     if (!btn) return;
@@ -98,6 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
       renderProgramPie();
       renderQuickFilters();
       renderCurrentView();
+      setExportButtonLabels();
     }
   });
   langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
@@ -323,6 +347,7 @@ function loadFiles(fileList) {
       setStatus(`${nC} fichier${nC > 1 ? "s" : ""} de configuration — ${nS} étudiant·e${nS > 1 ? "·s" : ""} au total.`);
       document.getElementById("btn-csv").style.display        = "";
       document.getElementById("btn-csv-eval").style.display   = "";
+      setExportButtonLabels();
       document.getElementById("btn-export-hub").style.display = "";
       document.getElementById("btn-clear").style.display = "";
       document.getElementById("hub-dashboard").style.display = "block";
@@ -579,6 +604,7 @@ function loadFiles(fileList) {
 
     document.getElementById("btn-csv").style.display        = "";
       document.getElementById("btn-csv-eval").style.display   = "";
+      setExportButtonLabels();
       document.getElementById("btn-export-hub").style.display = "";
     document.getElementById("btn-clear").style.display = "";
     document.getElementById("hub-dashboard").style.display = "block";
