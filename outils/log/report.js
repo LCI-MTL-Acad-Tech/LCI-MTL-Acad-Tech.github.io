@@ -212,6 +212,70 @@ function proceedToFinalReflection() {
   populateReflectionForms();
 }
 
+// ── Reflection draft autosave ───────────────────────────────────
+// Free-text reflection fields are autosaved to localStorage as the student
+// types, so switching tabs to check past logs doesn't lose their work.
+const REFLECTION_DRAFT_KEY = "lci_reflection_draft_v1";
+const REFLECTION_FIELD_IDS = [
+  "r-reality", "r-significant", "r-proud", "r-failure", "r-failure-lesson",
+  "r-env", "r-supervisor", "r-advice", "r-different", "r-comments",
+  "r-suggestions-school", "r-future-direction", "r-future-steps", "r-future-skills",
+];
+
+let _draftSaveTimer = null;
+function saveReflectionDraft() {
+  clearTimeout(_draftSaveTimer);
+  _draftSaveTimer = setTimeout(() => {
+    const draft = { saved_at: new Date().toISOString(), fields: {} };
+    REFLECTION_FIELD_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) draft.fields[id] = el.value;
+    });
+    try { localStorage.setItem(REFLECTION_DRAFT_KEY, JSON.stringify(draft)); }
+    catch (e) { /* storage full or unavailable — fail silently */ }
+
+    // Aggressive save: also fold the draft into mergedData.reflection and
+    // persist the whole student record, so a full page reload (not just a
+    // tab switch) restores everything without needing to re-upload files.
+    if (typeof mergedData !== "undefined" && mergedData) {
+      try {
+        mergedData.reflection = { ...(mergedData.reflection || {}), ...collectReflection() };
+        saveReportData(mergedData);
+      } catch (e) { /* collectReflection may rely on fields not all present yet — ignore */ }
+    }
+  }, 400);
+}
+
+function restoreReflectionDraftIfNewer() {
+  let draft;
+  try { draft = JSON.parse(localStorage.getItem(REFLECTION_DRAFT_KEY) || "null"); }
+  catch (e) { return; }
+  if (!draft?.fields) return;
+
+  // Only restore fields that are currently empty — don't clobber data
+  // already loaded from an uploaded/merged reflection.
+  REFLECTION_FIELD_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.value && draft.fields[id]) {
+      el.value = draft.fields[id];
+    }
+  });
+}
+
+function clearReflectionDraft() {
+  try { localStorage.removeItem(REFLECTION_DRAFT_KEY); } catch (e) {}
+}
+
+function wireReflectionAutosave() {
+  REFLECTION_FIELD_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el._draftWired) {
+      el.addEventListener("input", saveReflectionDraft);
+      el._draftWired = true;
+    }
+  });
+}
+
 function editReflection() {
   goToPhase("phase-reflection");
   populateReflectionForms();
@@ -246,6 +310,11 @@ function populateReflectionForms() {
     document.getElementById("project-outcomes-card").classList.remove("hidden");
     renderProjectOutcomes(r.project_outcomes || []);
   }
+
+  // Restore any unsaved draft text (only fills fields left empty above),
+  // then start autosaving as the student types.
+  restoreReflectionDraftIfNewer();
+  wireReflectionAutosave();
 }
 
 function setField(id, val) {
@@ -607,6 +676,7 @@ function validateAndGenerateDashboard() {
 function generateDashboard() {
   mergedData.reflection = collectReflection();
   saveReportData(mergedData); // persist updated reflection
+  clearReflectionDraft();     // data is safely stored — no need for the draft anymore
 
   // Flag settings deviation
   const snap = mergedData.meta?.settings_snapshot || {};
