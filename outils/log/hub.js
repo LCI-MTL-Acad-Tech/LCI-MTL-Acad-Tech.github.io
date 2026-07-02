@@ -2473,6 +2473,7 @@ function buildDetailHTML(s) {
         </div>
       </div>
     </div>` : "";
+  const isManuallyDone = manuallyFinished.has(s.uuid);
   const isEffDone      = isFinished(s);
 
   const submissionSummary = (() => {
