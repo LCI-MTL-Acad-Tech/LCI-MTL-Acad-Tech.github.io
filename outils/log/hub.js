@@ -805,7 +805,7 @@ function buildRow(data) {
 
   const lastWithObstacle = [...logs].reverse().find(l => l.obstacle);
   const lastWithPlan     = [...logs].reverse().find(l => l.plan_tomorrow);
-  const lastWrap         = [...logs].reverse().find(l => l.weekly_wrap?.highlight);
+  const lastWrap         = [...logs].reverse().find(l => hasWeeklyWrap(l));
 
   // ── Competency coverage ───────────────────────────────────────
   let competency_coverage = [];
@@ -829,7 +829,7 @@ function buildRow(data) {
         const weekLogs  = logs.filter(l => toWeekKey(l.date) === wk);
         const dailyDays = weekLogs.filter(l => l.competency_notes?.[comp.code]);
         const d         = dailyDays.length;
-        const hasWeekly = weekLogs.some(l => l.weekly_wrap?.competency_notes?.[comp.code]);
+        const hasWeekly = weekLogs.some(l => hasWeeklyWrap(l) && l.weekly_wrap?.competency_notes?.[comp.code]);
         if (hasWeekly) weeklyCount++;
         dailyCount += d;
         totalEngagement += d > 0 ? d : (hasWeekly ? 1 : 0);
@@ -929,7 +929,7 @@ function buildRow(data) {
     logs.forEach(l => {
       const wk = getWeekStartISO(l.date);
       if (!weekMap[wk]) weekMap[wk] = { hasWrap: false, lastDate: wk };
-      if (l.weekly_wrap?.highlight) weekMap[wk].hasWrap = true;
+      if (hasWeeklyWrap(l)) weekMap[wk].hasWrap = true;
       if (l.date > weekMap[wk].lastDate) weekMap[wk].lastDate = l.date;
     });
     return Object.entries(weekMap).filter(([wk, v]) => {
@@ -1982,6 +1982,15 @@ function renderTable() {
 
 // ── Navigation helpers ────────────────────────────────────────
 // Switch to student table view and open that student's detail row.
+// A log has a weekly wrap if weekly_wrap exists with any meaningful field filled in.
+// Do not require "highlight" specifically — any of the main fields suffices.
+function hasWeeklyWrap(log) {
+  const w = log?.weekly_wrap;
+  if (!w) return false;
+  return !!(w.highlight || w.learning || w.change || w.teacher_note || w.grayzone_note ||
+    (w.competency_notes && Object.keys(w.competency_notes).length));
+}
+
 function resolveUUID(uuid) {
   // Follow the redirect chain (handles multi-hop merges)
   let current = uuid;
@@ -2344,8 +2353,8 @@ function buildDetailHTML(s) {
 
   // ── Submission summary ────────────────────────────────────
   const ftc        = s.file_type_counts || {};
-  const dailyLogs  = (s.raw.logs || []).filter(l => !l.weekly_wrap?.highlight);
-  const weeklyLogs = (s.raw.logs || []).filter(l =>  l.weekly_wrap?.highlight);
+  const dailyLogs  = (s.raw.logs || []).filter(l => !hasWeeklyWrap(l));
+  const weeklyLogs = (s.raw.logs || []).filter(l =>  hasWeeklyWrap(l));
   const hasRefl    = s.has_reflection;
 
   const isManuallyDone = manuallyFinished.has(s.uuid);

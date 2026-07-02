@@ -195,6 +195,14 @@ function renderAllWeeks() {
 }
 
 // ── Build one week section ────────────────────────────────────
+// A log has a weekly wrap if any meaningful wrap field is filled in
+function hasWeeklyWrap(log) {
+  const w = log?.weekly_wrap;
+  if (!w) return false;
+  return !!(w.highlight || w.learning || w.change || w.teacher_note || w.grayzone_note ||
+    (w.competency_notes && Object.keys(w.competency_notes).length));
+}
+
 function buildWeekSection(weekStart, logs, defaultOpen, collapsible, isCurrent = false) {
   logs = [...logs].sort((a, b) => a.date.localeCompare(b.date));
 
@@ -205,8 +213,7 @@ function buildWeekSection(weekStart, logs, defaultOpen, collapsible, isCurrent =
     ? (logs.reduce((s, l) => s + (l.day_rating || 0), 0) /
        logs.filter(l => l.day_rating).length).toFixed(1)
     : "—";
-  const hasWrap = logs.some(l =>
-    l.weekly_wrap?.highlight || l.weekly_wrap?.learning || l.weekly_wrap?.change);
+  const hasWrap = logs.some(l => hasWeeklyWrap(l));
   const hasFutureFiled = logs.some(l => l.future_filing);
 
   const section = document.createElement("div");
