@@ -371,15 +371,12 @@ function loadFiles(fileList) {
       // from filename (pattern: {digits}_{date}... or {digits}_weekly_...) → filename.
       function groupKey(p) {
         const raw = p.data.meta?.student_uuid || p.data.profile?.student_id;
-        if (raw) return normId(raw) || raw;
-        // Try leading digits first (e.g. "202411884_2026-05-22_r1.json")
+        if (raw) return String(raw).trim();
+        // Try leading digits first, then embedded digits — use raw digit string, no normId
         const mLead = p.name.match(/^(\d{5,10})[_\-]/);
-        if (mLead) return normId(mLead[1]) || mLead[1];
-        // Then digits anywhere in the name (e.g. "AREL_JUNIOR_2320505_2026-05-25_r1.json")
+        if (mLead) return mLead[1];
         const mAny = p.name.match(/[_\-](\d{5,10})[_\-]/);
-        if (mAny) return normId(mAny[1]) || mAny[1];
-        // No ID found — file content has no student ID and filename has no recognisable number
-        // This usually means the student renamed the file. Log it clearly.
+        if (mAny) return mAny[1];
         console.warn(`[LCI Hub] Cannot identify student for "${p.name}" — no student_uuid in content and no numeric ID in filename. File may have been renamed. It will be treated as its own student row.`);
         return p.name;
       }
@@ -436,13 +433,18 @@ function loadFiles(fileList) {
       const rawUid = d.meta?.student_uuid || d.profile?.student_id;
       let uid;
       if (rawUid) {
-        uid = /^\d{7,9}$/.test(rawUid) ? normId(rawUid) : rawUid;
+        // Use the raw ID as the bucket key — do NOT normId here.
+        // normId strips leading "20" which can cause genuinely different students
+        // (e.g. ID "2012345" vs "12345") to be incorrectly merged into one row.
+        // The duplicate detection in findProbableDuplicates uses normId for comparison
+        // and will surface real duplicates for manual review.
+        uid = String(rawUid).trim();
       } else {
         // Leading digits first, then embedded digits
         const mLead = name.match(/^(\d{5,10})[_\-]/);
         const mAny  = !mLead && name.match(/[_\-](\d{5,10})[_\-]/);
         const m = mLead || mAny;
-        uid = m ? normId(m[1]) : name;
+        uid = m ? m[1] : name;
       }
       (byUUID[uid] = byUUID[uid] || []).push(d);
       const c = (typesByUUID[uid] = typesByUUID[uid] || { daily:0, weekly:0, full:0, reflection:0, config:0, unknown:0 });
@@ -997,8 +999,8 @@ function buildRow(data) {
     }).length;
   })();
 
-  const rawUUID = data.meta?.student_uuid || data.profile?.student_id || "";
-  const normUUID = (/^\d{7,9}$/.test(rawUUID) ? normId(rawUUID) : rawUUID) || rawUUID;
+  const rawUUID  = data.meta?.student_uuid || data.profile?.student_id || "";
+  const normUUID = String(rawUUID).trim() || rawUUID;
 
   return {
     uuid:               normUUID,
@@ -1250,9 +1252,13 @@ function findProbableDuplicates() {
       const namesReordered = !!(ni && nj && wi.length > 0 && wj.length > 0 && arraysEqual(wi, wj) && !namesExact);
       const namesSubset    = !!(ni && nj && (isSubset(wi, wj) || isSubset(wj, wi)));
 
-      // AUTO-MERGE: IDs match + names are clearly the same person
-      // (exact match, reordered words, or one name is a subset of the other)
-      if (idsMatch && (namesExact || namesReordered || namesSubset)) {
+      // AUTO-MERGE: IDs match + names are clearly the same person.
+      // - Exact match: safe to auto-merge always
+      // - Reordered words: safe (same words, different order)
+      // - Subset: only safe when the shorter name has ≥2 words (avoid single-word
+      //   false positives like "Jean" being a subset of "Jean-Claude Dupont")
+      const subsetSafe = namesSubset && Math.min(wi.length, wj.length) >= 2;
+      if (idsMatch && (namesExact || namesReordered || subsetSafe)) {
         pairs.push({ i, j, reason: "auto_name_order", autoMerge: true }); continue;
       }
 
