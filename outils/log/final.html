@@ -63,24 +63,55 @@
       <div id="phase-upload" style="text-align:center;padding:var(--sp-12) var(--sp-6)">
         <div style="font-size:3rem;margin-bottom:var(--sp-4)">🎓</div>
         <h2 style="margin-bottom:var(--sp-3)" data-i18n="report.upload_title"></h2>
-        <p class="text-muted" style="max-width:48rem;margin:0 auto var(--sp-6);font-size:1.4rem" data-i18n="final.upload_hint"></p>
-        <div id="final-drop-zone"
-          style="border:2px dashed var(--border);border-radius:var(--r-lg);
-                 padding:var(--sp-8) var(--sp-6);text-align:center;cursor:pointer;
-                 transition:border-color var(--dur-fast);max-width:40rem;margin:0 auto var(--sp-4)"
-          onclick="document.getElementById('final-file-input').click()"
-          ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
-          ondragleave="this.style.borderColor=''"
-          ondrop="event.preventDefault();this.style.borderColor='';handleFinalDrop(event.dataTransfer.files)">
-          <div style="font-size:2.4rem;margin-bottom:var(--sp-2)">📂</div>
-          <div style="font-size:1.4rem;color:var(--text-muted);margin-bottom:var(--sp-3)" data-i18n="report.drop_hint"></div>
-          <button class="btn btn--secondary btn--sm"
-            onclick="event.stopPropagation();document.getElementById('final-file-input').click()"
-            data-i18n="report.browse_btn"></button>
-          <input type="file" id="final-file-input" accept=".json" multiple style="display:none"
-            onchange="handleFinalDrop(this.files)">
+        <p style="max-width:52rem;margin:0 auto var(--sp-2);font-size:1.5rem;font-weight:600">
+          <span data-i18n="final.what_is_this"></span>
+        </p>
+        <p class="text-muted" style="max-width:52rem;margin:0 auto var(--sp-6);font-size:1.4rem">
+          <span data-i18n="final.upload_hint"></span>
+        </p>
+
+        <!-- Option A: upload files first (recommended) -->
+        <div style="background:var(--bg-subtle);border-radius:var(--r-lg);padding:var(--sp-4) var(--sp-6);
+                    max-width:52rem;margin:0 auto var(--sp-4);text-align:left">
+          <div style="font-size:1.3rem;font-weight:700;margin-bottom:var(--sp-3);color:var(--text)">
+            <span data-i18n="final.option_upload_title">Option A — Charger mes fichiers JSON d'abord (recommandé)</span>
+          </div>
+          <p class="text-muted" style="font-size:1.3rem;margin-bottom:var(--sp-3)" data-i18n="final.option_upload_hint">
+            Tes réponses seront automatiquement sauvegardées dans ton journal.
+          </p>
+          <div id="final-drop-zone"
+            style="border:2px dashed var(--border);border-radius:var(--r-lg);
+                   padding:var(--sp-6) var(--sp-4);text-align:center;cursor:pointer;
+                   transition:border-color var(--dur-fast)"
+            onclick="document.getElementById('final-file-input').click()"
+            ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+            ondragleave="this.style.borderColor=''"
+            ondrop="event.preventDefault();this.style.borderColor='';handleFinalDrop(event.dataTransfer.files)">
+            <div style="font-size:2.4rem;margin-bottom:var(--sp-2)">📂</div>
+            <div style="font-size:1.4rem;color:var(--text-muted);margin-bottom:var(--sp-3)" data-i18n="report.drop_hint"></div>
+            <button class="btn btn--secondary btn--sm"
+              onclick="event.stopPropagation();document.getElementById('final-file-input').click()"
+              data-i18n="report.browse_btn"></button>
+            <input type="file" id="final-file-input" accept=".json" multiple style="display:none"
+              onchange="handleFinalDrop(this.files)">
+          </div>
+          <div id="final-load-status" style="color:var(--text-muted);font-size:1.3rem;margin-top:var(--sp-2)"></div>
         </div>
-        <div id="final-load-status" style="color:var(--text-muted);font-size:1.3rem;margin-top:var(--sp-2)"></div>
+
+        <!-- Option B: answer questions directly without uploading -->
+        <div style="background:var(--bg-subtle);border-radius:var(--r-lg);padding:var(--sp-4) var(--sp-6);
+                    max-width:52rem;margin:0 auto var(--sp-4);text-align:left">
+          <div style="font-size:1.3rem;font-weight:700;margin-bottom:var(--sp-3);color:var(--text)">
+            <span data-i18n="final.option_direct_title">Option B — Répondre directement aux questions</span>
+          </div>
+          <p class="text-muted" style="font-size:1.3rem;margin-bottom:var(--sp-3)" data-i18n="final.option_direct_hint">
+            Tu as déjà tout soumis sur OneDrive et tu veux juste remplir le questionnaire.
+            Tes réponses seront sauvegardées automatiquement — tu pourras exporter ton fichier à la fin.
+          </p>
+          <button class="btn btn--primary" onclick="startReflectionDirectly()" data-i18n="final.start_directly">
+            ✏ Commencer le questionnaire
+          </button>
+        </div>
       </div>
 
       <!-- ── Reflection form (reused from report.js) ── -->
@@ -219,21 +250,31 @@
           </div>
         </div>
 
-        <div class="flex justify-between" style="flex-wrap:wrap;gap:var(--sp-3)">
+        <div style="margin-top:var(--sp-6);padding:var(--sp-4) var(--sp-5);
+                    background:rgba(var(--accent-rgb,0,120,180),.1);
+                    border-radius:var(--r-lg);border:2px solid var(--accent)">
+          <div style="font-size:1.5rem;font-weight:700;margin-bottom:var(--sp-2)" data-i18n="final.submit_reminder_title">
+            ⬇ Dernière étape : télécharge et dépose sur OneDrive
+          </div>
+          <p style="font-size:1.4rem;color:var(--text-muted);margin:0" data-i18n="final.submit_reminder_body">
+            Télécharge <strong>l'un ou l'autre</strong> des fichiers ci-dessous et dépose-le dans le même dossier OneDrive que tes journaux quotidiens. C'est ce fichier que ton enseignant·e utilisera pour évaluer ta réflexion.
+          </p>
+        </div>
+
+        <div class="flex justify-between" style="flex-wrap:wrap;gap:var(--sp-3);margin-top:var(--sp-4)">
           <button class="btn btn--ghost" onclick="goToPhase('phase-upload')" data-i18n="action.back"></button>
           <div class="flex gap-3" style="flex-wrap:wrap;">
             <button class="btn btn--download" onclick="downloadFullJSON()" data-i18n="report.download_full_json"></button>
-            <button class="btn btn--secondary" onclick="downloadReflectionJSON()" data-i18n="report.download_reflection"></button>
-            <button class="btn btn--primary btn--lg" onclick="validateAndGenerateDashboard()" data-i18n="action.confirm"></button>
+            <button class="btn btn--primary btn--lg" onclick="downloadReflectionJSON()" data-i18n="report.download_reflection"></button>
           </div>
         </div>
       </div>
       </div>
 
-<script src="lang.js?v=20260703"></script>
-<script src="app.js?v=20260703"></script>
-<script src="courses.js?v=20260703"></script>
-<script src="report.js?v=20260703"></script>
+<script src="lang.js?v=202607021505"></script>
+<script src="app.js?v=202607021505"></script>
+<script src="courses.js?v=202607021505"></script>
+<script src="report.js?v=202607021505"></script>
 <script>
 // ── final.html bootstrap ──────────────────────────────────────
 // Reuses report.js functions. On load, try localStorage first;
@@ -323,10 +364,10 @@ function handleFinalDrop(fileList) {
   </footer>
 </div>
 
-<script src="lang.js?v=20260703"></script>
-<script src="app.js?v=20260703"></script>
-<script src="courses.js?v=20260703"></script>
-<script src="report.js?v=20260703"></script>
+<script src="lang.js?v=202607021505"></script>
+<script src="app.js?v=202607021505"></script>
+<script src="courses.js?v=202607021505"></script>
+<script src="report.js?v=202607021505"></script>
 
   <!-- Global file sidebar -->
   <aside id="file-sidebar" class="file-sidebar" aria-label="Chargeur de fichiers">
@@ -351,10 +392,10 @@ function handleFinalDrop(fileList) {
       <div id="sidebar-status" class="file-sidebar__status status-info"></div>
     </div>
   </aside>
-<script src="lang.js?v=20260703"></script>
-<script src="app.js?v=20260703"></script>
-<script src="courses.js?v=20260703"></script>
-<script src="report.js?v=20260703"></script>
+<script src="lang.js?v=202607021505"></script>
+<script src="app.js?v=202607021505"></script>
+<script src="courses.js?v=202607021505"></script>
+<script src="report.js?v=202607021505"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   initPage();

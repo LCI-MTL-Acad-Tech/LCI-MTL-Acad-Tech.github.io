@@ -217,6 +217,10 @@ function loadFiles(fileList) {
           console.error(`[LCI Hub] File skipped — could not be read (null result).`);
           return false;
         }
+        // Migrate old schema in place before any type detection or validation.
+        // This ensures profile.full_name, meta.student_uuid, etc. are always present
+        // regardless of which schema version the file was exported from.
+        if (typeof migrateData === "function") migrateData(p.data);
         return true;
       })
       .map(p => {

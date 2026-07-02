@@ -276,6 +276,38 @@ function wireReflectionAutosave() {
   });
 }
 
+function startReflectionDirectly() {
+  // Try to restore from any previously saved session first
+  const saved = loadReportData();
+  const basic = loadData();
+  const best  = (saved?.logs?.length || 0) >= (basic?.logs?.length || 0) ? saved : basic;
+
+  if (best?.profile?.full_name) {
+    mergedData = best;
+  } else {
+    // No data at all — create a minimal stub so the reflection form can open.
+    // The student will export at the end and the file will contain their answers.
+    const isFr = getCurrentLang() === "fr-CA";
+    const name = prompt(isFr
+      ? "Entre ton nom complet pour identifier ton questionnaire :"
+      : "Enter your full name to identify your questionnaire:");
+    if (!name?.trim()) return;
+    const id = prompt(isFr
+      ? "Entre ton numéro étudiant·e :"
+      : "Enter your student ID:");
+    mergedData = {
+      meta:    { schema_version: "1.5", student_uuid: id?.trim() || "unknown",
+                 type: "full", last_modified: new Date().toISOString() },
+      profile: { full_name: name.trim(), student_id: id?.trim() || "" },
+      context: {}, logs: [], activity_types: [], tools: [],
+      people: [], projects: [], reflection: null,
+    };
+    saveReportData(mergedData);
+  }
+  goToPhase("phase-reflection");
+  populateReflectionForms();
+}
+
 function editReflection() {
   goToPhase("phase-reflection");
   populateReflectionForms();
