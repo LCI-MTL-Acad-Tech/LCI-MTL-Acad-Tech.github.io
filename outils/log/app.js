@@ -778,7 +778,17 @@ function mergeInternshipFiles(files) {
   // Separate by file type
   const reflectionFiles = files.filter(f => f.meta?.type === "reflection");
   const configFiles     = files.filter(f => f.meta?.type === "config");
+  // "weekly" and "full" files are supplementary log sources — they are merged in
+  // alongside main files. "main" = full journal (no type, or legacy "internship").
+  const weeklyFiles     = files.filter(f => f.meta?.type === "weekly" || f.meta?.type === "full");
   const mainFiles       = files.filter(f => !f.meta?.type || f.meta.type === "internship");
+
+  // If there are no main files but weekly files exist, use the most complete
+  // weekly file as the base (for students who only uploaded per-week exports)
+  if (!mainFiles.length && weeklyFiles.length) {
+    weeklyFiles.sort((a, b) => (b.logs?.length || 0) - (a.logs?.length || 0));
+    mainFiles.push(weeklyFiles[0]);
+  }
 
   if (configFiles.length && !mainFiles.length) {
     result.errors.push("error.config_not_log");
@@ -819,9 +829,9 @@ function mergeInternshipFiles(files) {
     result.warnings.push({ type: "reflection_preloaded", date: reflectionFiles[0].meta.saved_at });
   }
 
-  // Merge logs from all files
+  // Merge logs from all files — main journals, weekly/full exports, and reflections
   const logMap = new Map();
-  for (const file of [...mainFiles, ...reflectionFiles]) {
+  for (const file of [...mainFiles, ...weeklyFiles, ...reflectionFiles]) {
     for (const log of (file.logs || [])) {
       const existing = logMap.get(log.log_id);
       if (!existing) {
