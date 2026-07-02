@@ -627,7 +627,7 @@ function loadFiles(fileList) {
     console.info("Students loaded:", students.map(s => ({
       name: s.name,
       uuid: s.uuid,
-      logs: s.log_count,
+      logs: s.days_logged,
       file_types: s.file_type_counts,
     })));
     if (nC)       console.info(`Config files applied: ${nC}`);
@@ -1024,8 +1024,11 @@ function buildRow(data) {
     }).length;
   })();
 
+  const rawUUID = data.meta?.student_uuid || data.profile?.student_id || "";
+  const normUUID = (/^\d{7,9}$/.test(rawUUID) ? normId(rawUUID) : rawUUID) || rawUUID;
+
   return {
-    uuid:               data.meta?.student_uuid || data.profile?.student_id,
+    uuid:               normUUID,
     name:               data.profile?.full_name || "—",
     student_id:         data.profile?.student_id || "—",
     email:              data.profile?.email || "",
@@ -1323,7 +1326,7 @@ function renderDupStudentBanner() {
     autoMergePairs.forEach(({ i, j }) => {
       const si = students[i], sj = students[j];
       if (!si || !sj) return;
-      const [base, donor] = si.log_count >= sj.log_count ? [si, sj] : [sj, si];
+      const [base, donor] = si.days_logged >= sj.days_logged ? [si, sj] : [sj, si];
       const logMap = new Map();
       [...(base.raw.logs || []), ...(donor.raw.logs || [])].forEach(l => {
         const ex = logMap.get(l.log_id);
@@ -1364,7 +1367,7 @@ function renderDupStudentBanner() {
           <span style="font-size:1.2rem;color:var(--text-muted);margin-left:var(--sp-3)">${reasonLabel}</span>
           <div style="font-size:1.1rem;color:var(--text-subtle);margin-top:2px">
             ID: ${escHtml(si.raw?.profile?.student_id || "—")} / ${escHtml(sj.raw?.profile?.student_id || "—")}
-            · ${isFr ? "Journaux" : "Logs"}: ${si.log_count} / ${sj.log_count}
+            · ${isFr ? "Journaux" : "Logs"}: ${si.days_logged} / ${sj.days_logged}
           </div>
         </div>
         <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap">
@@ -1417,8 +1420,8 @@ function mergeStudents(uuidA, uuidB) {
   let canonicalId = null;
   if (idsDiffer) {
     const choice = isFr
-      ? `Ces deux étudiant·e·s ont des numéros différents :\n\n  A) ${idA}  (${si.name}, ${si.log_count} journaux)\n  B) ${idB}  (${sj.name}, ${sj.log_count} journaux)\n\nQuel est le bon numéro étudiant·e ?\n\nTape A ou B :`
-      : `These two students have different IDs:\n\n  A) ${idA}  (${si.name}, ${si.log_count} logs)\n  B) ${idB}  (${sj.name}, ${sj.log_count} logs)\n\nWhich is the correct student ID?\n\nType A or B:`;
+      ? `Ces deux étudiant·e·s ont des numéros différents :\n\n  A) ${idA}  (${si.name}, ${si.days_logged} journaux)\n  B) ${idB}  (${sj.name}, ${sj.days_logged} journaux)\n\nQuel est le bon numéro étudiant·e ?\n\nTape A ou B :`
+      : `These two students have different IDs:\n\n  A) ${idA}  (${si.name}, ${si.days_logged} logs)\n  B) ${idB}  (${sj.name}, ${sj.days_logged} logs)\n\nWhich is the correct student ID?\n\nType A or B:`;
     const answer = prompt(choice);
     if (!answer) return; // cancelled
     const pick = answer.trim().toUpperCase();
@@ -1429,13 +1432,13 @@ function mergeStudents(uuidA, uuidB) {
     canonicalId = pick === "A" ? idA : idB;
   } else {
     const msg = isFr
-      ? `Fusionner "${si.name}" et "${sj.name}" ?\n\n${si.log_count + sj.log_count} journaux combinés. Cette opération ne peut pas être annulée dans cette session.`
-      : `Merge "${si.name}" and "${sj.name}"?\n\n${si.log_count + sj.log_count} logs combined. This cannot be undone in this session.`;
+      ? `Fusionner "${si.name}" et "${sj.name}" ?\n\n${si.days_logged + sj.days_logged} journaux combinés. Cette opération ne peut pas être annulée dans cette session.`
+      : `Merge "${si.name}" and "${sj.name}"?\n\n${si.days_logged + sj.days_logged} logs combined. This cannot be undone in this session.`;
     if (!confirm(msg)) return;
   }
 
   // Pick the row with more logs as the base
-  const [base, donor] = si.log_count >= sj.log_count ? [si, sj] : [sj, si];
+  const [base, donor] = si.days_logged >= sj.days_logged ? [si, sj] : [sj, si];
 
   // Capture old UUIDs before any mutation
   const oldBaseUUID  = base.uuid;
@@ -1475,7 +1478,11 @@ function mergeStudents(uuidA, uuidB) {
   if (oldBaseUUID !== newUUID) uuidMap[oldBaseUUID] = newUUID;
 
   // Record merge for hub state export
-  sessionMerges.push({ donorUUID: oldDonorUUID, baseUUID: oldBaseUUID, canonicalId: canonicalId || null });
+  sessionMerges.push({
+    donorUUID:   normId(oldDonorUUID) || oldDonorUUID,
+    baseUUID:    normId(oldBaseUUID)  || oldBaseUUID,
+    canonicalId: canonicalId || null,
+  });
 
   console.info(`[LCI Hub] Merged "${donor.name}" (${oldDonorUUID}) into "${base.name}" → UUID now "${newUUID}"${canonicalId ? ` canonical ID: ${canonicalId}` : ""} — ${rebuilt.raw.logs.length} logs total`);
 
