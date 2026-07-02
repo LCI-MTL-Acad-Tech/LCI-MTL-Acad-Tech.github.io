@@ -31,9 +31,9 @@ const SESSION = {
   ide:{
     demoSteps:[
       {
-        label:{ fr:'Stack vs Heap — l\'analogie des plateaux', en:'Stack vs Heap — the tray analogy' },
-        fr:`Stack : variables locales dans une fonction. Créées automatiquement, détruites quand la fonction se termine. Analogie : plateaux de cafétéria empilés — chaque appel de fonction pose un plateau, quand elle retourne le plateau disparaît. Heap : mémoire allouée explicitement avec new, qui persiste jusqu'à ce qu'on la libère avec delete. Les objets dynamiques (taille inconnue à la compilation) vivent sur le heap.`,
-        en:`Stack: local variables inside a function. Created automatically, destroyed when the function ends. Analogy: stacked cafeteria trays — each function call places a tray, when it returns the tray disappears. Heap: memory explicitly allocated with new, persisting until freed with delete. Dynamic objects (size unknown at compile time) live on the heap.`
+        label:{ fr:'Stack vs Heap — deux zones mémoire', en:'Stack vs Heap — two memory regions' },
+        fr:`La stack stocke les variables locales d'une fonction. Quand la fonction est appelée, l'espace est réservé automatiquement; quand elle se termine, il est libéré automatiquement. La taille de chaque variable doit être connue à la compilation. Le heap stocke les objets alloués explicitement avec new — leur durée de vie est indépendante des fonctions et persiste jusqu'à un delete explicite. Note : stack et heap sont ici des concepts de gestion mémoire, pas les structures de données du même nom — ne pas confondre les deux usages du terme.`,
+        en:`The stack stores local variables for a function. When the function is called, space is reserved automatically; when it returns, it is freed automatically. Each variable's size must be known at compile time. The heap stores objects explicitly allocated with new — their lifetime is independent of any function and persists until an explicit delete. Note: stack and heap here are runtime memory management concepts, not the data structures of the same name — don't conflate the two uses of the term.`
       },
       {
         label:{ fr:'new et delete — démonstration live', en:'new and delete — live demo' },
@@ -137,18 +137,20 @@ int main() {
       },
       {
         id:'i06_3', type:'bug', xp:25,
-        instr:{ fr:`Ce code a deux problèmes de gestion mémoire. Identifie-les.`, en:`This code has two memory management problems. Identify them.` },
-        bugCode:`<span class="kw2">int</span>* <span class="fn2">makeValue</span>() {
+        instr:{ fr:`Ce code a un problème de gestion mémoire. Identifie-le.`, en:`This code has one memory management problem. Identify it.` },
+        bugCode:`<span class="kw2">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="kw2">int</span>* <span class="fn2">makeValue</span>() {
     <span class="kw2">int</span>* p = <span class="kw2">new</span> <span class="kw2">int</span>(<span class="num">10</span>);
     <span class="kw2">return</span> p;
 }
 <span class="kw2">int</span> main() {
     <span class="kw2">int</span>* val = <span class="fn2">makeValue</span>();
     std::cout &lt;&lt; *val;
-    <span class="bug-line"><span class="kw2">delete</span> val;</span>
+    <span class="kw2">delete</span> val;
     <span class="bug-line">std::cout &lt;&lt; *val;</span>
+    <span class="kw2">return</span> <span class="num">0</span>;
 }`,
-        explanation:{ fr:`Problème 1 : après delete val, val est un dangling pointer. Accéder à *val est un comportement indéfini — crash possible ou données corrompues. Correction : ajouter val = nullptr; après delete et vérifier avant d'utiliser. Problème 2 : pas de return 0 dans main (mineur mais bonne pratique).`, en:`Problem 1: after delete val, val is a dangling pointer. Accessing *val is undefined behavior — possible crash or corrupted data. Fix: add val = nullptr; after delete and check before using. Problem 2: no return 0 in main (minor but good practice).` }
+        explanation:{ fr:`Après delete val, val est un dangling pointer — il pointe vers de la mémoire déjà libérée. Accéder à *val est un comportement indéfini : crash possible, données corrompues, ou silence trompeur selon le compilateur et le moment. Correction : ajouter val = nullptr; immédiatement après delete, et ne jamais déréférencer un pointeur sans savoir qu'il est valide.`, en:`After delete val, val is a dangling pointer — it points to memory that has already been freed. Accessing *val is undefined behaviour: possible crash, corrupted data, or deceptive silence depending on the compiler and timing. Fix: add val = nullptr; immediately after delete, and never dereference a pointer without knowing it is valid.` }
       },
       {
         id:'i06_4', type:'fill', xp:15,
@@ -248,3 +250,33 @@ Enemy-&gt;<span class="fn2">Destroy</span>();
   },
 };
 document.addEventListener('DOMContentLoaded',()=>{});
+
+// ── Further reading — displayed by engine if SESSION.references exists ──
+const REFERENCES = [
+  {
+    label:{ fr:'Stack vs Heap en C++ — cppreference (stockage automatique vs dynamique)', en:'Stack vs Heap in C++ — cppreference (automatic vs dynamic storage)' },
+    url:'https://en.cppreference.com/w/cpp/language/storage_duration',
+    note:{ fr:'Définitions formelles des durées de stockage. Les termes "stack" et "heap" y apparaissent sous "automatic" et "dynamic" — c\'est le vocabulaire exact du standard.', en:'Formal definitions of storage durations. "Stack" and "heap" appear as "automatic" and "dynamic" — the exact vocabulary of the standard.' }
+  },
+  {
+    label:{ fr:'Stack (structure de données) — Wikipedia', en:'Stack (data structure) — Wikipedia' },
+    url:'https://en.wikipedia.org/wiki/Stack_(abstract_data_type)',
+    note:{ fr:'Pour ne pas confondre avec la mémoire stack : la structure de données pile est un concept séparé. La mémoire stack s\'appelle ainsi parce qu\'elle se comporte comme une pile LIFO — mais ce n\'est pas nécessaire de maîtriser les détails internes pour écrire du C++ correct.', en:'Not to be confused with the memory stack: the stack data structure is a separate concept. The memory stack is called that because it behaves like a LIFO stack — but you don\'t need to master the internals to write correct C++.' }
+  },
+  {
+    label:{ fr:'new et delete — cppreference', en:'new and delete — cppreference' },
+    url:'https://en.cppreference.com/w/cpp/memory/new/operator_new',
+    note:{ fr:'Référence complète sur l\'allocation dynamique en C++.', en:'Complete reference on dynamic allocation in C++.' }
+  },
+  {
+    label:{ fr:'AddressSanitizer — détection de leaks et dangling pointers', en:'AddressSanitizer — leak and dangling pointer detection' },
+    url:'https://github.com/google/sanitizers/wiki/AddressSanitizer',
+    note:{ fr:'L\'outil standard pour trouver les erreurs mémoire en C++. Compile avec -fsanitize=address.', en:'The standard tool for finding memory errors in C++. Compile with -fsanitize=address.' }
+  },
+  {
+    label:{ fr:'Smart pointers (unique_ptr, shared_ptr) — cppreference', en:'Smart pointers (unique_ptr, shared_ptr) — cppreference' },
+    url:'https://en.cppreference.com/w/cpp/memory',
+    note:{ fr:'En C++ moderne, les raw pointers avec delete manuel sont évités. Les smart pointers gèrent la durée de vie automatiquement.', en:'In modern C++, raw pointers with manual delete are avoided. Smart pointers manage lifetime automatically.' }
+  },
+];
+
