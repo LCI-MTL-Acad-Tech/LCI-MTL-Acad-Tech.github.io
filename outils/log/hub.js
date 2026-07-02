@@ -441,15 +441,66 @@ function loadFiles(fileList) {
         uid = m ? normId(m[1]) : name;
       }
       (byUUID[uid] = byUUID[uid] || []).push(d);
-      const c = (typesByUUID[uid] = typesByUUID[uid] || { daily:0, weekly:0, full:0, reflection:0, config:0 });
+      const c = (typesByUUID[uid] = typesByUUID[uid] || { daily:0, weekly:0, full:0, reflection:0, config:0, unknown:0 });
       if (type in c) c[type]++;
+    });
+
+    // Count unknown-schema files per student UUID.
+    // Try to find a student ID from the filename first, then dig into the file content
+    // for any field that looks like a student number (7-10 digits).
+    function extractUIDFromUnknown(data, name) {
+      // 1. Filename leading/embedded digits
+      const mLead = name.match(/^(\d{5,10})[_\-]/);
+      if (mLead) return normId(mLead[1]);
+      const mAny = name.match(/[_\-](\d{5,10})[_\-]/);
+      if (mAny) return normId(mAny[1]);
+
+      // 2. Recursively search all string values in the object for known ID field names
+      // or any value that looks like a 7-10 digit student number.
+      const ID_KEYS = new Set([
+        "student_id", "studentid", "student_number", "studentnumber",
+        "intern_id", "internid", "matricule", "numero_etudiant",
+        "id_etudiant", "student_uuid", "student_no", "studentno",
+        "id_number", "idnumber", "numéro_étudiant", "numéro",
+      ]);
+
+      function search(obj, depth) {
+        if (!obj || typeof obj !== "object" || depth > 4) return null;
+        for (const [key, val] of Object.entries(obj)) {
+          const keyLower = key.toLowerCase().replace(/[\s\-]/g, "_");
+          if (ID_KEYS.has(keyLower)) {
+            const str = String(val || "");
+            if (/^\d{5,10}$/.test(str)) return normId(str);
+          }
+          if (val && typeof val === "object") {
+            const found = search(val, depth + 1);
+            if (found) return found;
+          }
+        }
+        // Second pass: any string value that looks like a student number
+        for (const val of Object.values(obj)) {
+          if (typeof val === "string" && /^\d{7,9}$/.test(val.trim())) {
+            return normId(val.trim());
+          }
+        }
+        return null;
+      }
+
+      return search(data, 0);
+    }
+
+    enriched.filter(p => p.type === "unknown").forEach(({ name, data }) => {
+      const uid = extractUIDFromUnknown(data, name);
+      if (!uid) return;
+      const c = (typesByUUID[uid] = typesByUUID[uid] || { daily:0, weekly:0, full:0, reflection:0, config:0, unknown:0 });
+      c.unknown++;
     });
 
     // Count config files per UUID
     configFiles.forEach(({ data: d }) => {
       const uid = d.meta?.student_uuid || d.profile?.student_id;
       if (!uid) return;
-      const c = (typesByUUID[uid] = typesByUUID[uid] || { daily:0, weekly:0, full:0, reflection:0, config:0 });
+      const c = (typesByUUID[uid] = typesByUUID[uid] || { daily:0, weekly:0, full:0, reflection:0, config:0, unknown:0 });
       c.config++;
     });
 
@@ -501,17 +552,18 @@ function loadFiles(fileList) {
         }
 
         const row = buildRow(base);
-        row.file_type_counts = typesByUUID[uid] || { daily:0, weekly:0, full:0, reflection:0, config:0 };
+        row.file_type_counts = typesByUUID[uid] || { daily:0, weekly:0, full:0, reflection:0, config:0, unknown:0 };
 
         const existing = students.findIndex(s => s.uuid === row.uuid);
         if (existing >= 0) {
-          const prev = students[existing].file_type_counts || { daily:0, weekly:0, full:0, reflection:0, config:0 };
+          const prev = students[existing].file_type_counts || { daily:0, weekly:0, full:0, reflection:0, config:0, unknown:0 };
           row.file_type_counts = {
             daily:      prev.daily      + row.file_type_counts.daily,
             weekly:     prev.weekly     + row.file_type_counts.weekly,
             full:       prev.full       + row.file_type_counts.full,
             reflection: prev.reflection + row.file_type_counts.reflection,
             config:     prev.config     + row.file_type_counts.config,
+            unknown:    (prev.unknown   || 0) + (row.file_type_counts.unknown  || 0),
           };
           students[existing] = row;
         } else {
@@ -582,6 +634,37 @@ function loadFiles(fileList) {
     if (nUnknown) {
       const unknownNames = enriched.filter(p => p.type === "unknown").map(p => p.name);
       console.warn(`[LCI Hub] ${nUnknown} file(s) of unknown type skipped:`, unknownNames);
+      const isFr2 = getCurrentLang() === "fr-CA";
+      const uw = document.createElement("div");
+      uw.style.cssText = "font-size:1.3rem;margin-top:var(--sp-3);" +
+        "padding:var(--sp-3) var(--sp-4);background:rgba(255,80,80,.07);" +
+        "border-radius:var(--r-md);border-left:3px solid var(--danger)";
+      uw.innerHTML = (isFr2
+        ? `<strong>⛔ ${nUnknown} fichier${nUnknown > 1 ? "s" : ""} ignoré${nUnknown > 1 ? "s" : ""} — schéma non reconnu</strong>
+           <div style="margin-top:var(--sp-2);color:var(--text-muted)">
+             Ces fichiers ne correspondent pas au format attendu du journal de stage LCI.
+             Ils ont probablement été créés manuellement ou générés par un outil externe
+             (IA, script, etc.) plutôt que par l'application. Les étudiant·e·s concerné·e·s
+             doivent saisir leurs journaux via <strong>log.html</strong>.
+           </div>
+           <div style="margin-top:var(--sp-2);font-family:monospace;font-size:1.1rem;
+                       color:var(--text-subtle);word-break:break-all">
+             ${unknownNames.map(n => `<span style="display:inline-block;margin:2px 4px 2px 0;
+               padding:1px 6px;background:var(--bg-subtle);border-radius:4px">${escHtml(n)}</span>`).join("")}
+           </div>`
+        : `<strong>⛔ ${nUnknown} file${nUnknown > 1 ? "s" : ""} skipped — unrecognized schema</strong>
+           <div style="margin-top:var(--sp-2);color:var(--text-muted)">
+             These files do not match the expected LCI internship log format.
+             They were likely created manually or generated by an external tool
+             (AI, script, etc.) rather than by the app. The students concerned
+             must enter their logs through <strong>log.html</strong>.
+           </div>
+           <div style="margin-top:var(--sp-2);font-family:monospace;font-size:1.1rem;
+                       color:var(--text-subtle);word-break:break-all">
+             ${unknownNames.map(n => `<span style="display:inline-block;margin:2px 4px 2px 0;
+               padding:1px 6px;background:var(--bg-subtle);border-radius:4px">${escHtml(n)}</span>`).join("")}
+           </div>`);
+      document.getElementById("hub-status-text")?.after(uw);
     }
     if (nFailed) {
       const failedNames = parsed.filter(p => !p?.data).map(p => p?.name || "unknown");
@@ -1934,6 +2017,10 @@ function renderTable() {
       <tr class="data-row" onclick="toggleDetail(${i})">
         <td>
           <span class="hub-name-cell" title="${escHtml(s.name)}"><strong>${escHtml(s.name)}</strong></span>${integBadge}
+          ${(s.file_type_counts?.unknown || 0) > 0
+            ? `<span style="font-size:1rem;color:var(--danger);margin-left:var(--sp-1)"
+                title="${lang === 'fr-CA' ? s.file_type_counts.unknown + ' fichier(s) non conforme(s)' : s.file_type_counts.unknown + ' non-compliant file(s)'}">⛔</span>`
+            : ""}
           <button class="copy-btn" title="${lang === 'fr-CA' ? 'Copier le nom' : 'Copy name'}"
             onclick="event.stopPropagation();copyToClipboard('${escHtml(s.name).replace(/'/g, "\\'")}', this)">⧉</button>
         </td>
@@ -2357,7 +2444,24 @@ function buildDetailHTML(s) {
   const weeklyLogs = (s.raw.logs || []).filter(l =>  hasWeeklyWrap(l));
   const hasRefl    = s.has_reflection;
 
-  const isManuallyDone = manuallyFinished.has(s.uuid);
+  const fabricatedWarning = ftc.unknown > 0 ? `
+    <div style="display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-2) var(--sp-4);
+                background:rgba(255,80,80,.07);border-radius:var(--r-lg);
+                border:1.5px solid var(--danger);margin-top:var(--sp-2)">
+      <span style="font-size:1.6rem;flex-shrink:0">⛔</span>
+      <div>
+        <div style="font-size:1.1rem;color:var(--danger);text-transform:uppercase;
+                    letter-spacing:.06em;font-weight:600">
+          ${lang === "fr-CA" ? "Fichiers non conformes" : "Non-compliant files"}
+        </div>
+        <div style="font-size:1.8rem;font-weight:700;color:var(--danger)">${ftc.unknown}</div>
+        <div style="font-size:1.2rem;color:var(--text-muted)">
+          ${lang === "fr-CA"
+            ? "Schéma non reconnu — probablement créés manuellement ou par IA, pas via log.html"
+            : "Unrecognized schema — likely created manually or by AI, not via log.html"}
+        </div>
+      </div>
+    </div>` : "";
   const isEffDone      = isFinished(s);
 
   const submissionSummary = (() => {
@@ -2419,7 +2523,8 @@ function buildDetailHTML(s) {
           onclick="openFileListModal('${escHtml(s.uuid)}','all')"
           >${lang === "fr-CA" ? "📋 Tout voir" : "📋 View all"}</button>
         ${manualBtn}
-      </div>`;
+      </div>
+      ${fabricatedWarning}`;
   })();
 
     // Work hours display
