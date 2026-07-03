@@ -2552,8 +2552,13 @@ function buildDetailHTML(s) {
       },
       {
         icon: hasRefl ? "✅" : isManuallyDone ? "✅" : "⬜",
-        label: lang === "fr-CA" ? "Rapport final" : "Final report",
+        label: lang === "fr-CA" ? "Réflexion finale" : "Final reflection",
         count: hasRefl ? 1 : 0,
+        sublabel: hasRefl
+          ? (ftc.reflection > 0
+            ? (lang === "fr-CA" ? "fichier séparé" : "separate file")
+            : (lang === "fr-CA" ? "incluse dans le journal" : "embedded in journal"))
+          : null,
         btn:   hasRefl ? (lang === "fr-CA" ? "Voir" : "View") : null,
         onclick: `openFileListModal(&apos;${escHtml(s.uuid)}&apos;,&apos;reflection&apos;)`,
         missing: !hasRefl && !isManuallyDone,
@@ -2582,6 +2587,7 @@ function buildDetailHTML(s) {
               <div style="font-size:1.1rem;color:var(--text-muted);text-transform:uppercase;
                           letter-spacing:.06em">${r.label}</div>
               <div style="font-size:1.8rem;font-weight:700;color:${r.missing ? "var(--danger)" : r.count > 0 ? "var(--text)" : "var(--text-subtle)"}">${r.count}</div>
+              ${r.sublabel ? `<div style="font-size:1.1rem;color:var(--text-subtle);margin-top:1px">${r.sublabel}</div>` : ""}
             </div>
             ${r.btn ? `<button class="btn btn--ghost btn--sm" onclick="${r.onclick}"
               style="font-size:1.2rem;margin-left:var(--sp-1)">${r.btn}</button>` : ""}
