@@ -840,8 +840,12 @@ function mergeInternshipFiles(files) {
         if (log.revision > existing.revision) {
           logMap.set(log.log_id, log);
         } else if (log.revision === existing.revision) {
-          // Same revision, different content → conflict
-          if (JSON.stringify(log) !== JSON.stringify(existing)) {
+          // Same revision: prefer the one that has weekly_wrap data
+          const incomingHasWrap = !!(log.weekly_wrap && Object.keys(log.weekly_wrap).length);
+          const existingHasWrap = !!(existing.weekly_wrap && Object.keys(existing.weekly_wrap).length);
+          if (incomingHasWrap && !existingHasWrap) {
+            logMap.set(log.log_id, log);
+          } else if (JSON.stringify(log) !== JSON.stringify(existing)) {
             result.conflicts.push({ log_id: log.log_id, a: existing, b: log });
           }
         }
