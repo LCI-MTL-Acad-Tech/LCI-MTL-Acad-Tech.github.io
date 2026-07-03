@@ -94,8 +94,10 @@ function downloadWeeklyJSON() {
   const slug = (p?.full_name || "etudiant").toLowerCase()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "");
-  const date  = new Date().toISOString().slice(0, 10);
-  const fname = `${p?.student_id || slug}_weekly_${date}.json`;
+  const now   = new Date();
+  const date  = now.toISOString().slice(0, 10);
+  const time  = String(now.getHours()).padStart(2,"0") + "-" + String(now.getMinutes()).padStart(2,"0");
+  const fname = `${p?.student_id || slug}_weekly_${date}_${time}.json`;
 
   // Stamp type so hub.js detectFileType() classifies this correctly
   const payload = JSON.parse(JSON.stringify(weeklyData));
