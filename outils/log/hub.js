@@ -186,6 +186,17 @@ function detectFileType(d) {
 }
 
 // ── File loading ──────────────────────────────────────────────
+function handleHubDrop(fileList) {
+  const files = Array.from(fileList).filter(f => f.name.endsWith(".json"));
+  if (!files.length) {
+    setStatus("⚠ Aucun fichier JSON trouvé dans la sélection.");
+    return;
+  }
+  setStatus(`📂 ${files.length} fichier${files.length > 1 ? "s" : ""} JSON sélectionné${files.length > 1 ? "s" : ""} — lecture en cours…`);
+  setProgress(0);
+  setTimeout(() => loadFiles(fileList), 50);
+}
+
 function loadFiles(fileList) {
   const files = Array.from(fileList).filter(f => f.name.endsWith(".json"));
   if (!files.length) return;
