@@ -673,7 +673,7 @@ const LANG = {
     "making.p1":       "Cet outil a été construit par une collaboration itérative entre Elisa Schaeffer, Doyenne de la Technologie et du Design au Collège LaSalle Montréal, et Claude (Anthropic), un assistant IA. Le contenu pédagogique, la structure, les fonctionnalités, les priorités et les choix éditoriaux ont été définis, questionnés et affinés par Elisa à chaque étape. Claude a généré le code, proposé des formulations et signalé les incohérences — mais chaque décision substantielle a été prise par un être humain.",
     "making.p2":       "Ce n'est pas du contenu IA généré en une seule fois. C'est le résultat d'un dialogue de révision prolongé : chaque session a été lue, critiquée et corrigée. L'outil évolue.",
     "making.p3":       "Utilisation réfléchie de l'IA — L'IA générative est un outil de travail, non un substitut au jugement professionnel. Ce projet illustre une approche où l'humain reste l'auteur·rice : l'IA amplifie la capacité de production, mais la responsabilité éditoriale, pédagogique et éthique reste entièrement humaine.",
-    "making.updated":  "Dernière mise à jour : avril 2026.",
+    "making.updated":  "Dernière mise à jour : juillet 2026.",
   },
 
   "en-CA": {
@@ -1234,7 +1234,7 @@ const LANG = {
     "making.p1":      "This internship journal was designed and built at Collège LaSalle Montréal as an open educational tool.",
     "making.p2":      "It runs entirely in your browser. No data is sent anywhere. Everything stays on your device.",
     "making.p3":      "Built with Claude (Anthropic) · Collège LaSalle Montréal",
-    "making.updated": "April 2026",
+    "making.updated": "July 2026",
 
     // ── Dashboard ────────────────────────────────────────────────
     "dashboard.weekly_highlight":     "Highlight",
