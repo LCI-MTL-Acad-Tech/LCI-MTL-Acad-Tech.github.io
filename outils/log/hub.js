@@ -211,6 +211,8 @@ function loadFiles(fileList) {
   }));
 
   Promise.all(readers).then(parsed => {
+    const _t0 = performance.now();
+    console.info(`[LCI Hub ⏱] Promise.all resolved — ${parsed.length} file(s) read`);
     const enriched = parsed
       .filter(p => {
         if (!p?.data) {
@@ -230,6 +232,7 @@ function loadFiles(fileList) {
       });
 
     // Separate config files from log/report files
+    console.info(`[LCI Hub ⏱] Enriched: ${enriched.length} file(s) in ${(performance.now()-_t0).toFixed(0)}ms`);
     const configFiles    = enriched.filter(p => p.type === "config");
     const milestoneFiles = enriched.filter(p => p.type === "milestones");
     const hubStateFiles  = enriched.filter(p => p.type === "hub_state");
@@ -580,6 +583,7 @@ function loadFiles(fileList) {
         }
       }
 
+      console.info(`[LCI Hub ⏱] Batch ${startIdx}–${end} done in ${(performance.now()-_t0).toFixed(0)}ms total`);
       const pct = Math.round((end / uuidEntries.length) * 80); // 0-80% for rows
       setProgress(pct);
       setStatus((isFrLoad ? "Chargement… " : "Loading… ") + end + " / " + uuidEntries.length);
@@ -592,6 +596,7 @@ function loadFiles(fileList) {
     }
 
     function finishLoading() {
+      console.info(`[LCI Hub ⏱] finishLoading — ${(performance.now()-_t0).toFixed(0)}ms`);
       // Apply any hub state files now that all student rows are built
       if (pendingHubStates.length) {
         pendingHubStates.forEach((data, i) => {
@@ -672,11 +677,14 @@ function loadFiles(fileList) {
     document.getElementById("hub-upload-strip")?.classList.add("hub-upload-strip--loaded");
 
     populateFilterOptions();
+    console.info(`[LCI Hub ⏱] About to applyFilters — ${(performance.now()-_t0).toFixed(0)}ms`);
     setProgress(90);
     applyFilters();
+    console.info(`[LCI Hub ⏱] applyFilters done — ${(performance.now()-_t0).toFixed(0)}ms`);
     setProgress(null);
     } // end finishLoading
 
+    console.info(`[LCI Hub ⏱] Starting batched row build — ${uuidEntries.length} student(s)`);
     buildOneBatch(0);
   }); // end Promise.all
 }
@@ -1301,7 +1309,10 @@ function renderDupStudentBanner() {
   const banner = document.getElementById("hub-dup-student-banner");
   if (!banner) return;
   const isFr = getCurrentLang() === "fr-CA";
+  console.info(`[LCI Hub ⏱] renderDupStudentBanner — ${students.length} student(s)`);
+  const _tDup = performance.now();
   const allPairs = findProbableDuplicates();
+  console.info(`[LCI Hub ⏱] findProbableDuplicates: ${allPairs.length} pair(s) in ${(performance.now()-_tDup).toFixed(0)}ms`);
 
   // Auto-merge silently before rendering
   // Auto-merge: process all pairs at once before calling applyFilters,
@@ -1330,6 +1341,7 @@ function renderDupStudentBanner() {
       anyMerged = true;
       console.info(`[LCI Hub] Auto-merged "${donor.name}" into "${base.name}" (same ID, name reorder/subset)`);
     });
+    console.info(`[LCI Hub ⏱] Auto-merge done — anyMerged=${anyMerged}`);
     if (anyMerged) applyFilters();
     return;
   }
