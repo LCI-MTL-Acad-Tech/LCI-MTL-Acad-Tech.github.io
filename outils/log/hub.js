@@ -371,13 +371,16 @@ function loadFiles(fileList) {
       // from filename (pattern: {digits}_{date}... or {digits}_weekly_...) → filename.
       function groupKey(p) {
         const raw = p.data.meta?.student_uuid || p.data.profile?.student_id;
-        if (raw) return String(raw).trim();
-        // Try leading digits first, then embedded digits — use raw digit string, no normId
+        if (raw) {
+          const str = String(raw).trim();
+          const norm = normId(str);
+          return (norm.length >= 6 && norm !== str) ? norm : str;
+        }
         const mLead = p.name.match(/^(\d{5,10})[_\-]/);
         if (mLead) return mLead[1];
         const mAny = p.name.match(/[_\-](\d{5,10})[_\-]/);
         if (mAny) return mAny[1];
-        console.warn(`[LCI Hub] Cannot identify student for "${p.name}" — no student_uuid in content and no numeric ID in filename. File may have been renamed. It will be treated as its own student row.`);
+        console.warn(`[LCI Hub] Cannot identify student for "${p.name}" — no student_uuid in content and no numeric ID in filename.`);
         return p.name;
       }
 
@@ -433,14 +436,14 @@ function loadFiles(fileList) {
       const rawUid = d.meta?.student_uuid || d.profile?.student_id;
       let uid;
       if (rawUid) {
-        // Use the raw ID as the bucket key — do NOT normId here.
-        // normId strips leading "20" which can cause genuinely different students
-        // (e.g. ID "2012345" vs "12345") to be incorrectly merged into one row.
-        // The duplicate detection in findProbableDuplicates uses normId for comparison
-        // and will surface real duplicates for manual review.
-        uid = String(rawUid).trim();
+        const str = String(rawUid).trim();
+        // Normalise only IDs that look like padded Canadian student numbers
+        // (9 digits starting with 20 → strip the 20 prefix).
+        // Require result to be ≥7 digits to avoid collapsing short IDs like "12345"
+        // with long IDs like "2012345" — those are genuinely different students.
+        const norm = normId(str);
+        uid = (norm.length >= 6 && norm !== str) ? norm : str;
       } else {
-        // Leading digits first, then embedded digits
         const mLead = name.match(/^(\d{5,10})[_\-]/);
         const mAny  = !mLead && name.match(/[_\-](\d{5,10})[_\-]/);
         const m = mLead || mAny;
@@ -1301,11 +1304,18 @@ function renderDupStudentBanner() {
   const allPairs = findProbableDuplicates();
 
   // Auto-merge silently before rendering
+  // Auto-merge: process all pairs at once before calling applyFilters,
+  // and guard against infinite loops (pairs that fail to merge due to UUID mismatch).
   const autoMergePairs = allPairs.filter(p => p.autoMerge);
   if (autoMergePairs.length) {
+    let anyMerged = false;
+    const processedPairs = new Set();
     autoMergePairs.forEach(({ i, j }) => {
+      const key = [i,j].sort().join(",");
+      if (processedPairs.has(key)) return;
+      processedPairs.add(key);
       const si = students[i], sj = students[j];
-      if (!si || !sj) return;
+      if (!si || !sj || si.uuid === sj.uuid) return; // already merged or same object
       const [base, donor] = si.days_logged >= sj.days_logged ? [si, sj] : [sj, si];
       const logMap = new Map();
       [...(base.raw.logs || []), ...(donor.raw.logs || [])].forEach(l => {
@@ -1314,11 +1324,13 @@ function renderDupStudentBanner() {
       });
       base.raw.logs = [...logMap.values()].sort((a, b) => a.date.localeCompare(b.date));
       const rebuilt = buildRow(base.raw);
-      students = students.filter(s => s.uuid !== base.uuid && s.uuid !== donor.uuid);
+      students = students.filter(s => s !== base && s !== donor);
       students.push(rebuilt);
+      sessionMerges.push({ donorUUID: donor.uuid, baseUUID: base.uuid, canonicalId: null });
+      anyMerged = true;
       console.info(`[LCI Hub] Auto-merged "${donor.name}" into "${base.name}" (same ID, name reorder/subset)`);
     });
-    applyFilters(); // will re-run renderDupStudentBanner with fresh pairs
+    if (anyMerged) applyFilters();
     return;
   }
 
