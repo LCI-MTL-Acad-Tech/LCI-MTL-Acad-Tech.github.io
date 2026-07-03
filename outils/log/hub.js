@@ -198,19 +198,51 @@ function loadFiles(fileList) {
     console.info("[LCI Hub] Replace mode — cleared existing data before loading new files.");
   }
 
-  const readers = files.map(f => new Promise(res => {
-    const r = new FileReader();
-    r.onload = e => {
-      try { res({ data: JSON.parse(e.target.result), name: f.name }); }
-      catch (err) {
-        console.error(`[LCI Hub] Failed to parse JSON: "${f.name}"`, err);
-        res({ data: null, name: f.name }); // keep name so error report is useful
-      }
-    };
-    r.readAsText(f);
-  }));
+  console.info(`[LCI Hub] loadFiles — ${files.length} JSON file(s) queued`);
+  setProgress(0);
 
-  Promise.all(readers).then(parsed => {
+  // Process files in small batches to avoid spawning hundreds of concurrent FileReaders
+  const READER_BATCH = 20;
+  const allParsed = [];
+
+  function readBatch(startIdx) {
+    const end = Math.min(startIdx + READER_BATCH, files.length);
+    const batch = files.slice(startIdx, end);
+    const readers = batch.map(f => new Promise(res => {
+      const r = new FileReader();
+      r.onload = e => {
+        try {
+          const data = JSON.parse(e.target.result);
+          console.info(`[LCI Hub] ✓ parsed "${f.name}" (${e.target.result.length} chars)`);
+          res({ data, name: f.name });
+        } catch (err) {
+          console.error(`[LCI Hub] ✗ parse failed: "${f.name}"`, err);
+          res({ data: null, name: f.name });
+        }
+      };
+      r.onerror = () => {
+        console.error(`[LCI Hub] ✗ read error: "${f.name}"`);
+        res({ data: null, name: f.name });
+      };
+      console.info(`[LCI Hub] reading "${f.name}"…`);
+      r.readAsText(f);
+    }));
+
+    Promise.all(readers).then(results => {
+      allParsed.push(...results);
+      setProgress(Math.round((allParsed.length / files.length) * 30));
+      if (end < files.length) {
+        setTimeout(() => readBatch(end), 0); // yield between reader batches
+      } else {
+        processAllParsed(allParsed);
+      }
+    });
+  }
+
+  readBatch(0);
+}
+
+function processAllParsed(parsed) {
     const _t0 = performance.now();
     console.info(`[LCI Hub ⏱] Promise.all resolved — ${parsed.length} file(s) read`);
     const enriched = parsed
@@ -686,8 +718,8 @@ function loadFiles(fileList) {
 
     console.info(`[LCI Hub ⏱] Starting batched row build — ${uuidEntries.length} student(s)`);
     buildOneBatch(0);
-  }); // end Promise.all
-}
+} // end processAllParsed
+
 
 function clearAll() {
   students = []; filtered = [];
