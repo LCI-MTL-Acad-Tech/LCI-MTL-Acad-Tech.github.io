@@ -2480,6 +2480,83 @@ function toggleDetail(i) {
   row.style.display = row.style.display === "none" ? "" : "none";
 }
 
+function buildTextDump(s) {
+  const isFr = getCurrentLang() === "fr-CA";
+  const lines = [];
+  const hr = "─".repeat(60);
+  const add = (label, text) => {
+    if (!text?.trim()) return;
+    lines.push(`\n[${label}]\n${text.trim()}`);
+  };
+
+  lines.push(`${hr}`);
+  lines.push(`${s.name} — ${s.student_id} — ${s.program}`);
+  lines.push(`${s.actual_hours}h logged · ${s.days_logged} days`);
+  lines.push(hr);
+
+  // ── Daily logs ─────────────────────────────────────────
+  const dailyLogs = (s.raw.logs || []).filter(l => !hasWeeklyWrap(l))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  dailyLogs.forEach(log => {
+    lines.push(`\n${"═".repeat(40)}`);
+    lines.push(`📅 ${log.date}`);
+
+    // Task descriptions
+    (log.tasks || []).forEach(t => {
+      if (t.description?.trim()) {
+        const label = getActivityTypeLabel(s.raw, t.activity_type_id) || t.activity_type_id;
+        add(`  Tâche — ${label}`, t.description);
+      }
+    });
+
+    // Day-level narrative fields
+    add(isFr ? "  Obstacle" : "  Obstacle",        log.obstacle_today);
+    add(isFr ? "  Victoire"  : "  Win",             log.win_today);
+    add(isFr ? "  Plan demain" : "  Plan tomorrow", log.plan_tomorrow);
+    add(isFr ? "  Note libre" : "  Free note",      log.free_note);
+
+    // Weekly wrap (if this log carries one)
+    const w = log.weekly_wrap;
+    if (w && Object.keys(w).length) {
+      lines.push(`\n  [${isFr ? "BILAN HEBDOMADAIRE" : "WEEKLY WRAP"}]`);
+      add(isFr ? "  Point fort"            : "  Highlight",     w.highlight);
+      add(isFr ? "  Apprentissage"         : "  Learning",      w.learning);
+      add(isFr ? "  À faire différemment"  : "  Do differently",w.change);
+      add(isFr ? "  Note enseignant"       : "  Teacher note",  w.teacher_note);
+      add(isFr ? "  Temps non alloué"      : "  Unallocated time note", w.grayzone_note);
+      if (w.competency_notes) {
+        Object.entries(w.competency_notes).forEach(([code, note]) => {
+          add(`  Compétence ${code}`, note);
+        });
+      }
+    }
+  });
+
+  // ── Final reflection ───────────────────────────────────
+  const r = s.raw.reflection;
+  if (r && Object.keys(r).length) {
+    lines.push(`\n${"═".repeat(40)}`);
+    lines.push(isFr ? "🎓 RÉFLEXION FINALE" : "🎓 FINAL REFLECTION");
+    add(isFr ? "Réalité vs attentes"        : "Reality vs expectations",      r.internship_reality_vs_expectation);
+    add(isFr ? "Travail significatif"        : "Significant work",             Array.isArray(r.significant_work) ? r.significant_work.join("\n") : r.significant_work);
+    add(isFr ? "Moment de fierté"            : "Proud moment",                 r.proud_moment);
+    add(isFr ? "Échec"                       : "Failure",                      r.failure_moment);
+    add(isFr ? "Leçon de l'échec"            : "Failure lesson",               r.failure_lesson);
+    add(isFr ? "Environnement professionnel" : "Professional environment",     r.professional_environment_lesson);
+    add(isFr ? "Relation superviseur"        : "Supervisor relationship",      r.supervisor_relationship);
+    add(isFr ? "Conseil au prochain étudiant": "Advice to next student",       r.advice_to_next_student);
+    add(isFr ? "Ferais différemment"         : "Would do differently",         r.would_do_differently);
+    add(isFr ? "Direction future"            : "Future direction",             r.future_plans?.career_direction_impact);
+    add(isFr ? "Prochaines étapes"           : "Next steps",                   r.future_plans?.next_steps);
+    add(isFr ? "Commentaires"               : "Additional comments",           r.additional_comments);
+    add(isFr ? "Suggestions à l'école"       : "Suggestions for school",       r.suggestions_for_school);
+  }
+
+  lines.push(`\n${hr}`);
+  return lines.join("\n");
+}
+
 function buildDetailHTML(s) {
   const lang = getCurrentLang();
 
@@ -2596,6 +2673,10 @@ function buildDetailHTML(s) {
         <button class="btn btn--ghost btn--sm" style="align-self:center;font-size:1.2rem"
           onclick="openFileListModal('${escHtml(s.uuid)}','all')"
           >${lang === "fr-CA" ? "📋 Tout voir" : "📋 View all"}</button>
+        <button class="btn btn--ghost btn--sm no-print" style="align-self:center;font-size:1.2rem;color:var(--text-muted)"
+          title="${lang === "fr-CA" ? "Copier toutes les réponses écrites pour analyse" : "Copy all written answers for analysis"}"
+          onclick="(function(btn){const txt=buildTextDump(filtered.find(s=>s.uuid==='${escHtml(s.uuid)}'));navigator.clipboard?.writeText(txt).then(()=>{btn.textContent='✓ Copié';setTimeout(()=>btn.textContent='${lang === "fr-CA" ? "📄 Copier texte" : "📄 Copy text"}',1500);})})(this)"
+          >${lang === "fr-CA" ? "📄 Copier texte" : "📄 Copy text"}</button>
         ${manualBtn}
       </div>
       ${fabricatedWarning}`;
