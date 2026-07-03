@@ -1360,7 +1360,14 @@ function renderDupStudentBanner() {
   // Auto-merge silently before rendering
   // Auto-merge: process all pairs at once before calling applyFilters,
   // and guard against infinite loops (pairs that fail to merge due to UUID mismatch).
-  const autoMergePairs = allPairs.filter(p => p.autoMerge);
+  // Filter out pairs where one side has 0 logs — that's always a ghost row
+  // created from a config or empty file, not a real duplicate student.
+  const meaningfulPairs = allPairs.filter(p => {
+    const si = students[p.i], sj = students[p.j];
+    return si && sj && si.days_logged > 0 && sj.days_logged > 0;
+  });
+
+  const autoMergePairs = meaningfulPairs.filter(p => p.autoMerge);
   if (autoMergePairs.length) {
     let anyMerged = false;
     const processedPairs = new Set();
@@ -1389,7 +1396,7 @@ function renderDupStudentBanner() {
     return;
   }
 
-  const pairs = allPairs.filter(p => !p.autoMerge
+  const pairs = meaningfulPairs.filter(p => !p.autoMerge
     && !dismissedDupPairs.has(dupPairKey(students[p.i]?.uuid, students[p.j]?.uuid))
   );
   if (!pairs.length) { banner.style.display = "none"; return; }
@@ -1704,8 +1711,11 @@ function getAWOLStudents() {
   // Students involved in a pending (unconfirmed, non-dismissed) duplicate pair
   // should not appear in AWOL until the merge decision is made — one side may
   // be the "real" active student and the other a partial duplicate.
-  const pendingPairs = findProbableDuplicates().filter(p => !p.autoMerge
-    && !dismissedDupPairs.has(dupPairKey(students[p.i]?.uuid, students[p.j]?.uuid)));
+  const pendingPairs = findProbableDuplicates().filter(p => {
+    const si = students[p.i], sj = students[p.j];
+    return !p.autoMerge && si && sj && si.days_logged > 0 && sj.days_logged > 0
+      && !dismissedDupPairs.has(dupPairKey(si?.uuid, sj?.uuid));
+  });
   const inPendingPair = new Set();
   pendingPairs.forEach(({ i, j }) => {
     if (students[i]) inPendingPair.add(students[i].uuid);
