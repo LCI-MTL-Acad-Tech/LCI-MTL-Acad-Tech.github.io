@@ -323,28 +323,6 @@ function handleFinalDrop(fileList) {
 }
 </script>
 
-    <a href="index.html" class="mobile-nav-item">
-      <span class="mobile-nav-icon">⚙</span>
-      <span data-i18n="nav.setup">Config</span>
-    </a>
-    <a href="log.html" class="mobile-nav-item">
-      <span class="mobile-nav-icon">📋</span>
-      <span data-i18n="nav.log">Journal</span>
-    </a>
-    <a href="weekly.html" class="mobile-nav-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        <span data-i18n="nav.weekly">Hebdo</span>
-      </a>
-      <a href="report.html" class="mobile-nav-item">
-      <span class="mobile-nav-icon">📊</span>
-      <span data-i18n="nav.report">Rapport</span>
-    </a>
-    <a href="final.html" class="mobile-nav-item">
-            <span class="mobile-nav-icon">🎓</span>
-      <span data-i18n="nav.final">Bilan final</span>
-    </a>
-  </nav>
-
   <footer class="site-footer">
     <div class="making-of">
       <div class="making-of-inner">
@@ -362,8 +340,6 @@ function handleFinalDrop(fileList) {
     </div>
   </footer>
 </div>
-
-
 
   <!-- Global file sidebar -->
   <aside id="file-sidebar" class="file-sidebar" aria-label="Chargeur de fichiers">
@@ -388,48 +364,5 @@ function handleFinalDrop(fileList) {
       <div id="sidebar-status" class="file-sidebar__status status-info"></div>
     </div>
   </aside>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  initPage();
-  initFileSidebar();
-
-  let data = loadData();
-  const saved = loadReportData();
-  if (saved?.profile?.full_name &&
-      (saved.logs?.length || 0) >= (data?.logs?.length || 0)) {
-    data = saved;
-  }
-
-  if (data?.profile?.full_name) {
-    mergedData = data;
-    populateReflectionForms();
-    document.getElementById("phase-upload").classList.add("hidden");
-    document.getElementById("phase-reflection").classList.remove("hidden");
-  }
-
-  applyLanguage(getCurrentLang());
-});
-
-function handleFinalDrop(fileList) {
-  const files = Array.from(fileList).filter(f => f.name.endsWith(".json"));
-  if (!files.length) return;
-  const readers = files.map(f => new Promise(res => {
-    const r = new FileReader();
-    r.onload = e => {
-      try { res({ data: JSON.parse(e.target.result), name: f.name, ok: true }); }
-      catch { res({ name: f.name, ok: false }); }
-    };
-    r.readAsText(f);
-  }));
-  Promise.all(readers).then(results => {
-    validateAndMerge(results);
-    if (mergedData?.profile?.full_name) {
-      populateReflectionForms();
-      document.getElementById("phase-upload").classList.add("hidden");
-      document.getElementById("phase-reflection").classList.remove("hidden");
-    }
-  });
-}
-</script>
 </body>
 </html>
