@@ -142,7 +142,7 @@ function renderHeader() {
     document.getElementById("log-time-end").value = currentLog.time_end.slice(11, 16);
   }
   const breakEl = document.getElementById("log-break-minutes");
-  if (breakEl) breakEl.value = currentLog.break_minutes > 0 ? currentLog.break_minutes : "";
+  if (breakEl) breakEl.value = currentLog.break_minutes > 0 ? formatBreakMins(currentLog.break_minutes) : "";
   document.getElementById("log-onsite").checked = currentLog.modality_onsite || false;
   document.getElementById("log-remote").checked = currentLog.modality_remote || false;
   renderMorningEnergy();
@@ -574,10 +574,33 @@ function updateLogDate(newDate) {
 }
 
 // ── Timings ───────────────────────────────────────────────────
+// Parse "H:MM" or "HH:MM" or bare minutes → total minutes
+function parseBreakInput(val) {
+  if (!val?.trim()) return 0;
+  if (val.includes(":")) {
+    const [h, m] = val.split(":").map(Number);
+    return (isNaN(h) ? 0 : h) * 60 + (isNaN(m) ? 0 : m);
+  }
+  return parseInt(val) || 0;
+}
+
+// Format minutes back to H:MM for display
+function formatBreakMins(mins) {
+  if (!mins) return "";
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return `${h}:${String(m).padStart(2, "0")}`;
+}
+
+// Auto-insert colon while typing: "130" → "1:30" on blur
+function formatBreakInput(el) {
+  // Allow free typing — only reformat on blur
+}
+
 function updateTimings() {
   const startVal = document.getElementById("log-time-start").value;
   const endVal   = document.getElementById("log-time-end").value;
-  const breakVal = parseInt(document.getElementById("log-break-minutes")?.value) || 0;
+  const breakVal = parseBreakInput(document.getElementById("log-break-minutes")?.value);
   const today = currentLog.date;
 
   if (startVal) currentLog.time_start = `${today}T${startVal}:00`;

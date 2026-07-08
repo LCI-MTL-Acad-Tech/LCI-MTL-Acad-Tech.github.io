@@ -320,8 +320,8 @@ const LANG = {
     // ── Daily Log ────────────────────────────────────────────
     "log.time_start":         "Heure de début",
     "log.time_end":           "Heure de fin",
-    "log.break_minutes":      "Temps non travaillé (min)",
-    "log.break_minutes_hint": "Utilise ce champ si ta journée a été divisée en deux blocs ou plus par une pause non rémunérée prolongée (ex. : 90 min de pause entre deux sessions de travail). Ce temps sera soustrait du total.",
+    "log.break_minutes":      "Temps non travaillé (h:mm)",
+    "log.break_minutes_hint": "Utilise ce champ si ta journée a été divisée en deux blocs ou plus par une pause non rémunérée prolongée (ex. : 1:30 pour 90 minutes de pause entre deux sessions de travail). Ce temps sera soustrait du total.",
     "log.day_duration":       "Durée totale",
     "log.day_modality":       "Modalité",
     "log.day_type_onsite":    "En présentiel",
@@ -962,8 +962,8 @@ const LANG = {
     // ── Daily log fields ──────────────────────────────────────────
     "log.time_start":         "Start time",
     "log.time_end":           "End time",
-    "log.break_minutes":      "Break time (min)",
-    "log.break_minutes_hint": "Use this if your work day was split into two or more blocks by an extended unpaid break (e.g. 90 min break between work sessions). This time will be subtracted from your total.",
+    "log.break_minutes":      "Break time (h:mm)",
+    "log.break_minutes_hint": "Use this if your work day was split into two or more blocks by an extended unpaid break (e.g. 1:30 for a 90-minute break between work sessions). This time will be subtracted from your total.",
     "log.day_duration":       "Total duration",
     "log.day_modality":       "Modality",
     "log.day_type_onsite":    "On-site",

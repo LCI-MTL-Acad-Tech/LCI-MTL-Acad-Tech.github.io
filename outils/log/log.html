@@ -151,11 +151,11 @@
               </div>
               <div class="form-group">
                 <label data-i18n="log.break_minutes"></label>
-                <input type="number" id="log-break-minutes" min="0" step="15"
-                  style="max-width:8rem"
-                  placeholder="0"
-                  title=""
-                  onchange="updateTimings()">
+                <input type="text" id="log-break-minutes" inputmode="numeric"
+                  style="max-width:8rem" placeholder="0:00" pattern="^\d+:\d{2}$"
+                  onchange="updateTimings()"
+                  oninput="formatBreakInput(this)"
+                  onblur="const m=parseBreakInput(this.value);this.value=m?formatBreakMins(m):'';updateTimings()">
                 <div class="field-hint" data-i18n="log.break_minutes_hint"></div>
               </div>
               <div class="form-group">
