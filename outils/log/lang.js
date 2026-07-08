@@ -320,6 +320,8 @@ const LANG = {
     // ── Daily Log ────────────────────────────────────────────
     "log.time_start":         "Heure de début",
     "log.time_end":           "Heure de fin",
+    "log.break_minutes":      "Temps non travaillé (min)",
+    "log.break_minutes_hint": "Utilise ce champ si ta journée a été divisée en deux blocs ou plus par une pause non rémunérée prolongée (ex. : 90 min de pause entre deux sessions de travail). Ce temps sera soustrait du total.",
     "log.day_duration":       "Durée totale",
     "log.day_modality":       "Modalité",
     "log.day_type_onsite":    "En présentiel",
@@ -673,7 +675,7 @@ const LANG = {
     "making.p1":       "Cet outil a été construit par une collaboration itérative entre Elisa Schaeffer, Doyenne de la Technologie et du Design au Collège LaSalle Montréal, et Claude (Anthropic), un assistant IA. Le contenu pédagogique, la structure, les fonctionnalités, les priorités et les choix éditoriaux ont été définis, questionnés et affinés par Elisa à chaque étape. Claude a généré le code, proposé des formulations et signalé les incohérences — mais chaque décision substantielle a été prise par un être humain.",
     "making.p2":       "Ce n'est pas du contenu IA généré en une seule fois. C'est le résultat d'un dialogue de révision prolongé : chaque session a été lue, critiquée et corrigée. L'outil évolue.",
     "making.p3":       "Utilisation réfléchie de l'IA — L'IA générative est un outil de travail, non un substitut au jugement professionnel. Ce projet illustre une approche où l'humain reste l'auteur·rice : l'IA amplifie la capacité de production, mais la responsabilité éditoriale, pédagogique et éthique reste entièrement humaine.",
-    "making.updated":  "Dernière mise à jour : juillet 2026..",
+    "making.updated":  "Dernière mise à jour : juillet 2026.",
   },
 
   "en-CA": {
@@ -960,6 +962,8 @@ const LANG = {
     // ── Daily log fields ──────────────────────────────────────────
     "log.time_start":         "Start time",
     "log.time_end":           "End time",
+    "log.break_minutes":      "Break time (min)",
+    "log.break_minutes_hint": "Use this if your work day was split into two or more blocks by an extended unpaid break (e.g. 90 min break between work sessions). This time will be subtracted from your total.",
     "log.day_duration":       "Total duration",
     "log.day_modality":       "Modality",
     "log.day_type_onsite":    "On-site",

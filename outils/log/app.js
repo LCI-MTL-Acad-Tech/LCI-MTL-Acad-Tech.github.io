@@ -379,6 +379,7 @@ function createNewLog(date) {
     future_filing: targetDate > realDate,   // true when logging a future date
     time_start: nowISO,
     time_end: null,
+    break_minutes: 0,
     day_duration_minutes: 0,
     modality_onsite: false,
     modality_remote: false,
@@ -421,8 +422,10 @@ function calcLogMinutes(log) {
   log.task_total_minutes = log.tasks.reduce((sum, t) => sum + (parseInt(t.duration_minutes) || 0), 0);
   if (log.time_start && log.time_end) {
     const start = new Date(log.time_start);
-    const end = new Date(log.time_end);
-    log.day_duration_minutes = Math.round((end - start) / 60000);
+    const end   = new Date(log.time_end);
+    const raw   = Math.round((end - start) / 60000);
+    const brk   = Math.max(0, parseInt(log.break_minutes) || 0);
+    log.day_duration_minutes = Math.max(0, raw - brk);
   }
   log.grayzone_minutes = Math.max(0, log.day_duration_minutes - log.task_total_minutes);
   return log;

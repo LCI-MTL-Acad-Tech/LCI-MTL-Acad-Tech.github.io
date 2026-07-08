@@ -141,6 +141,8 @@ function renderHeader() {
   if (currentLog.time_end) {
     document.getElementById("log-time-end").value = currentLog.time_end.slice(11, 16);
   }
+  const breakEl = document.getElementById("log-break-minutes");
+  if (breakEl) breakEl.value = currentLog.break_minutes > 0 ? currentLog.break_minutes : "";
   document.getElementById("log-onsite").checked = currentLog.modality_onsite || false;
   document.getElementById("log-remote").checked = currentLog.modality_remote || false;
   renderMorningEnergy();
@@ -574,11 +576,13 @@ function updateLogDate(newDate) {
 // ── Timings ───────────────────────────────────────────────────
 function updateTimings() {
   const startVal = document.getElementById("log-time-start").value;
-  const endVal = document.getElementById("log-time-end").value;
-  const today = currentLog.date; // use log's own date, not real today
+  const endVal   = document.getElementById("log-time-end").value;
+  const breakVal = parseInt(document.getElementById("log-break-minutes")?.value) || 0;
+  const today = currentLog.date;
 
   if (startVal) currentLog.time_start = `${today}T${startVal}:00`;
-  if (endVal) currentLog.time_end = `${today}T${endVal}:00`;
+  if (endVal)   currentLog.time_end   = `${today}T${endVal}:00`;
+  currentLog.break_minutes = breakVal;
 
   calcLogMinutes(currentLog);
   updateStats();
