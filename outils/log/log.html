@@ -150,13 +150,19 @@
                 <input type="time" id="log-time-end" onchange="updateTimings()">
               </div>
               <div class="form-group">
-                <label data-i18n="log.break_minutes"></label>
+                <label data-i18n="log.break_minutes" style="display:flex;align-items:center;gap:var(--sp-2)">
+                  <span data-i18n="log.break_minutes"></span>
+                  <button type="button" tabindex="-1"
+                    style="background:none;border:1px solid var(--border);border-radius:50%;
+                           width:1.6rem;height:1.6rem;font-size:1rem;line-height:1;
+                           cursor:help;color:var(--text-muted);padding:0;flex-shrink:0"
+                    data-i18n-title="log.break_minutes_hint">?</button>
+                </label>
                 <input type="text" id="log-break-minutes" inputmode="numeric"
-                  style="max-width:8rem" placeholder="0:00" pattern="^\d+:\d{2}$"
+                  style="max-width:8rem" placeholder="00:00" pattern="^\d+:\d{2}$"
                   onchange="updateTimings()"
                   oninput="formatBreakInput(this)"
                   onblur="const m=parseBreakInput(this.value);this.value=m?formatBreakMins(m):'';updateTimings()">
-                <div class="field-hint" data-i18n="log.break_minutes_hint"></div>
               </div>
               <div class="form-group">
                 <label data-i18n="log.day_modality"></label>
