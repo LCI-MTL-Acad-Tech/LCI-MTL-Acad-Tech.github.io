@@ -320,7 +320,7 @@ const LANG = {
     // ── Daily Log ────────────────────────────────────────────
     "log.time_start":         "Heure de début",
     "log.time_end":           "Heure de fin",
-    "log.break_minutes":      "Temps non travaillé (h:mm)",
+    "log.break_minutes":      "Temps non travaillé (HH:MM)",
     "log.break_minutes_hint": "Utilise ce champ si ta journée a été divisée en deux blocs ou plus par une longue pause entre deux blocs de travail (ex. : 1:30 pour 90 minutes de pause entre deux sessions de travail). Ce temps sera soustrait du total.",
     "log.day_duration":       "Durée totale",
     "log.day_modality":       "Modalité",
@@ -962,7 +962,7 @@ const LANG = {
     // ── Daily log fields ──────────────────────────────────────────
     "log.time_start":         "Start time",
     "log.time_end":           "End time",
-    "log.break_minutes":      "Break time (h:mm)",
+    "log.break_minutes":      "Break time (HH:MM)",
     "log.break_minutes_hint": "Use this if your work day was split into two or more blocks by a long break between two work sessions (e.g. enter 1:30 for a 90-minute break). This time will be subtracted from your total.",
     "log.day_duration":       "Total duration",
     "log.day_modality":       "Modality",

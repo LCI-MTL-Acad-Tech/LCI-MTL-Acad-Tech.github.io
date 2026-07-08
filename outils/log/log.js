@@ -589,7 +589,7 @@ function formatBreakMins(mins) {
   if (!mins) return "";
   const h = Math.floor(mins / 60);
   const m = mins % 60;
-  return `${h}:${String(m).padStart(2, "0")}`;
+  return `${String(h).padStart(2,"0")}:${String(m).padStart(2, "0")}`;
 }
 
 // Auto-insert colon while typing: "130" → "1:30" on blur
