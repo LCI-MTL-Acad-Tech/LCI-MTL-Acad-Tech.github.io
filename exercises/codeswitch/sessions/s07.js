@@ -1,262 +1,124 @@
 'use strict';
-// Session 07 — AActor & UObject
-// IDE arc S07: first class — struct then class, constructor, members, methods
+// Session 07 — Structs & Classes
+// Pure C++ — no Unreal content. Comes after memory/ownership, before Unreal class system.
 
 const SESSION = {
   id:'s07', num:7, prev:6, next:8, xp:120,
-  blocName:{ fr:'Unreal Engine C++', en:'Unreal Engine C++' },
-  blocColor:'#00587c',
-  title:{ fr:'AActor & UObject', en:'AActor & UObject' },
-  sub:{ fr:"L'équivalent de MonoBehaviour — et la hiérarchie Unreal", en:'The MonoBehaviour equivalent — and the Unreal hierarchy' },
-
-  tutor:{
-    concept:{
-      fr:`En Unity, tout objet de scène hérite de MonoBehaviour. En Unreal, la hiérarchie est plus riche : UObject est la base de tout, AActor est pour les objets qui existent dans le monde, APawn peut être contrôlé, ACharacter est un personnage complet. Les macros UCLASS() et GENERATED_BODY() rendent la classe "visible" au moteur pour le GC, l'éditeur, et les Blueprints.`,
-      en:`In Unity, every scene object inherits from MonoBehaviour. In Unreal, the hierarchy is richer: UObject is the base of everything, AActor is for objects that exist in the world, APawn can be controlled, ACharacter is a full character. The UCLASS() and GENERATED_BODY() macros make the class "visible" to the engine for the GC, editor, and Blueprints.`
-    },
-    deep:{
-      fr:`<p><strong>La réflexion Unreal (UHT).</strong> UCLASS(), UPROPERTY(), UFUNCTION() sont des marqueurs traités par l'Unreal Header Tool avant la compilation C++. UHT génère des fichiers .generated.h qui injectent le code permettant au moteur de lister les propriétés d'une classe, de les sérialiser, de les exposer aux Blueprints, et de les gérer dans le GC.</p>
-<p>C'est ce qui rend Unreal plus puissant que du C++ brut — et explique aussi les temps de compilation parfois longs. Quand tu vois "error: include of generated header must be last", c'est UHT qui parle.</p>`,
-      en:`<p><strong>Unreal reflection (UHT).</strong> UCLASS(), UPROPERTY(), UFUNCTION() are markers processed by the Unreal Header Tool before C++ compilation. UHT generates .generated.h files that inject code allowing the engine to list class properties, serialize them, expose them to Blueprints, and manage them in the GC.</p>
-<p>This is what makes Unreal more powerful than raw C++ — and also explains sometimes long compile times. When you see "error: include of generated header must be last", that's UHT talking.</p>`
+  blocName:{ fr:'Ce qui change vraiment', en:'What Really Changes' },
+  blocColor:'#f2f537',
+  title:{ fr:'Structs & Classes', en:'Structs & Classes' },
+  sub:{ fr:'struct, class, membres, constructeurs, encapsulation — le C++ avant Unreal', en:'struct, class, members, constructors, encapsulation — C++ before Unreal' },
+  compare:{
+    std:`<span class="cm">// C# : class uniquement (struct = type valeur différent)</span>
+<span class="kw">public class</span> <span class="ty">Player</span> {
+    <span class="kw">public string</span> Name { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">private int</span> health;
+    <span class="kw">public</span> <span class="ty">Player</span>(<span class="kw">string</span> name, <span class="kw">int</span> hp) {
+        Name = name; health = hp;
     }
+    <span class="kw">public void</span> <span class="fn">TakeDamage</span>(<span class="kw">int</span> d) { health -= d; }
+    <span class="kw">public bool</span> <span class="fn">IsAlive</span>() => health > <span class="num">0</span>;
+}`,
+    cpp:`<span class="cm">// C++ : struct et class — même chose, accès par défaut différent</span>
+<span class="kw">class</span> <span class="ty">Player</span> {               <span class="cm">// struct Player { — quasi identique</span>
+<span class="kw">public</span>:
+    <span class="ty">std::string</span> name;
+    <span class="ty">Player</span>(<span class="ty">std::string</span> n, <span class="kw">int</span> hp)
+        : name(n), health(hp) {}
+    <span class="kw">void</span> <span class="fn">takeDamage</span>(<span class="kw">int</span> d) { health -= d; }
+    <span class="kw">bool</span> <span class="fn">isAlive</span>() <span class="kw">const</span>    { <span class="kw">return</span> health > <span class="num">0</span>; }
+<span class="kw">private</span>:
+    <span class="kw">int</span> health;
+};`
   },
 
   ide:{
     demoSteps:[
       {
-        label:{ fr:'Première struct C++', en:'First C++ struct' },
-        fr:`Dans VS Code, crée player.h et player.cpp. Dans player.h : struct Player { std::string name; int health; int score; };. Dans main.cpp, crée un Player : Player p; p.name = "Héros"; p.health = 100;. Compile et affiche. En C++, struct et class sont quasi identiques — la seule différence : les membres d'une struct sont public par défaut, ceux d'une class sont private.`,
-        en:`In VS Code, create player.h and player.cpp. In player.h: struct Player { std::string name; int health; int score; };. In main.cpp, create a Player: Player p; p.name = "Hero"; p.health = 100;. Compile and print. In C++, struct and class are nearly identical — the only difference: struct members are public by default, class members are private.`
+        label:{ fr:'struct — données groupées, accès public par défaut', en:'struct — grouped data, public by default' },
+        fr:`Crée player.h. Écris : struct Player { std::string name; int health; int score; };. Dans main.cpp : Player p; p.name = "Héros"; p.health = 100; p.score = 0;. Compile et affiche. En C++, struct regroupe des données — tous les membres sont publics par défaut. C'est le choix idiomatique pour les données simples sans logique propre.`,
+        en:`Create player.h. Write: struct Player { std::string name; int health; int score; };. In main.cpp: Player p; p.name = "Héros"; p.health = 100; p.score = 0;. Compile and print. In C++, struct groups data — all members are public by default. It's the idiomatic choice for simple data without its own logic.`
       },
       {
-        label:{ fr:'Ajoute un constructeur', en:'Add a constructor' },
-        fr:`Dans player.h, ajoute dans la struct : Player(std::string n, int h) : name(n), health(h), score(0) {}. C'est un constructeur avec initializer list — la façon idiomatique C++ d'initialiser les membres (plus efficace qu'assigner dans le corps). Montre que Player p("Héros", 100); fonctionne maintenant.`,
-        en:`In player.h, add to the struct: Player(std::string n, int h) : name(n), health(h), score(0) {}. It's a constructor with initializer list — the idiomatic C++ way to initialize members (more efficient than assigning in the body). Show that Player p("Hero", 100); now works.`
+        label:{ fr:'Constructeur et initializer list', en:'Constructor and initializer list' },
+        fr:`Ajoute dans la struct : Player(std::string n, int hp) : name(n), health(hp), score(0) {}. C'est l'initializer list — la façon idiomatique C++ d'initialiser les membres. Plus efficace que d'assigner dans le corps (construit directement, pas construit puis assigné). Montre que Player p("Héros", 100); fonctionne. Insiste : l'ordre dans l'initializer list doit suivre l'ordre de déclaration des membres.`,
+        en:`Add to the struct: Player(std::string n, int hp) : name(n), health(hp), score(0) {}. This is the initializer list — the idiomatic C++ way to initialise members. More efficient than assigning in the body (constructs directly, not construct then assign). Show that Player p("Héros", 100); works. Note: the order in the initializer list must follow the declaration order of members.`
       },
       {
-        label:{ fr:'Ajoute des méthodes', en:'Add methods' },
-        fr:`Déclare void takeDamage(int d); et bool isAlive() const; dans la struct (dans player.h). Implémente dans player.cpp : void Player::takeDamage(int d) { health -= d; } et bool Player::isAlive() const { return health > 0; }. Utilise dans main : p.takeDamage(30); cout << p.isAlive();. C'est une classe fonctionnelle — données + comportement.`,
-        en:`Declare void takeDamage(int d); and bool isAlive() const; in the struct (in player.h). Implement in player.cpp: void Player::takeDamage(int d) { health -= d; } and bool Player::isAlive() const { return health > 0; }. Use in main: p.takeDamage(30); cout << p.isAlive();. It's a functional class — data + behavior.`
+        label:{ fr:'Méthodes et const — donner du comportement', en:'Methods and const — giving behaviour' },
+        fr:`Déclare dans player.h : void takeDamage(int d); et bool isAlive() const;. Implémente dans player.cpp : void Player::takeDamage(int d) { health -= d; } bool Player::isAlive() const { return health > 0; }. Le mot-clé const après la signature garantit que la méthode ne modifie pas l'objet — le compilateur l'enforce. Utilise : p.takeDamage(30); cout << p.isAlive();. Une struct avec constructeur et méthodes est fonctionnellement une classe — la différence n'est que l'accès par défaut.`,
+        en:`Declare in player.h: void takeDamage(int d); and bool isAlive() const;. Implement in player.cpp: void Player::takeDamage(int d) { health -= d; } bool Player::isAlive() const { return health > 0; }. The const keyword after the signature guarantees the method doesn't modify the object — the compiler enforces it. Use: p.takeDamage(30); cout << p.isAlive();. A struct with a constructor and methods is functionally a class — the difference is only default access.`
+      },
+      {
+        label:{ fr:'class : private par défaut — encapsulation explicite', en:'class : private by default — explicit encapsulation' },
+        fr:`Refactorise en class Player. La seule différence : members are private by default. Montre que p.health = 50; ne compile plus — erreur : health is private. Ajoute public: au-dessus de name et du constructeur. Garde health dans private:. Ajoute int getHealth() const { return health; } et void setHealth(int h) { if(h >= 0) health = h; }. Insiste : private protège l'invariant — setHealth valide avant d'assigner, impossible avec un champ public.`,
+        en:`Refactor into class Player. The only difference: members are private by default. Show that p.health = 50; no longer compiles — error: health is private. Add public: above name and the constructor. Keep health in private:. Add int getHealth() const { return health; } and void setHealth(int h) { if(h >= 0) health = h; }. Key point: private protects the invariant — setHealth validates before assigning, impossible with a public field.`
       },
     ],
     discussion:[
-      { fr:`En C++, quelle est la seule différence entre struct et class ? Dans quels cas utilises-tu l'un ou l'autre par convention ?`, en:`In C++, what is the only difference between struct and class? When do you use one vs the other by convention?` },
+      { fr:`En C++, la seule différence entre struct et class est l'accès par défaut (public vs private). Pourtant on les utilise différemment par convention. Quand choisirais-tu l'un plutôt que l'autre ?`, en:`In C++, the only difference between struct and class is default access (public vs private). Yet they're used differently by convention. When would you choose one over the other?` },
     ],
-    compare:{
-      std:`<span class="cm">// C++ — struct avec méthodes</span>
-<span class="kw2">struct</span> <span class="ty">Player</span> {
-    std::<span class="ty">string</span> name;
-    <span class="kw2">int</span> health;
-    <span class="kw2">int</span> score;
-
-    <span class="ty">Player</span>(std::<span class="ty">string</span> n, <span class="kw2">int</span> h)
-        : name(n), health(h), score(<span class="num">0</span>) {}
-
-    <span class="kw2">void</span> <span class="fn2">takeDamage</span>(<span class="kw2">int</span> d) { health -= d; }
-    <span class="kw2">bool</span> <span class="fn2">isAlive</span>() <span class="kw2">const</span> {
-        <span class="kw2">return</span> health &gt; <span class="num">0</span>;
-    }
-};`,
-      unreal:`<span class="cm">// Unreal — AActor avec UCLASS</span>
-<span class="mac">UCLASS</span>()
-<span class="kw2">class</span> <span class="ty">APlayerChar</span>
-    : <span class="kw2">public</span> <span class="ty">AActor</span>
-{
-    <span class="mac">GENERATED_BODY</span>()
-<span class="kw2">private</span>:
-    <span class="mac">UPROPERTY</span>()
-    <span class="kw2">int32</span> Health = <span class="num">100</span>;
-<span class="kw2">public</span>:
-    <span class="kw2">void</span> <span class="fn2">TakeDamage</span>(<span class="kw2">int32</span> D);
-    <span class="kw2">bool</span> <span class="fn2">IsAlive</span>() <span class="kw2">const</span>;
-};`
-    },
     activities:[
       {
-        id:'i07_1', type:'predict', xp:15,
-        code:`#include &lt;iostream&gt;
-#include &lt;string&gt;
-struct Point {
-    float x, y;
-    Point(float a, float b) : x(a), y(b) {}
-    float sum() const { return x + y; }
+        id:'i07_1', type:'predict', xp:10,
+        instr:{ fr:`Qu'affiche ce code ? Pourquoi ?`, en:`What does this code print? Why?` },
+        code:`<span class="kw">struct</span> <span class="ty">Vec2</span> {
+    <span class="kw">float</span> x, y;
+    <span class="ty">Vec2</span>(<span class="kw">float</span> x, <span class="kw">float</span> y) : x(x), y(y) {}
+    <span class="kw">float</span> <span class="fn">length</span>() <span class="kw">const</span> {
+        <span class="kw">return</span> std::sqrt(x*x + y*y);
+    }
 };
-int main() {
-    Point p(3.0f, 4.5f);
-    std::cout &lt;&lt; p.sum() &lt;&lt; std::endl;
-    return 0;
-}`,
-        question:{ fr:`Quelle est la sortie ? Quel est le rôle du const après sum() ?`, en:`What is the output? What does const after sum() do?` },
-        output:`7.5`,
-        explanation:{ fr:`Sortie : 7.5 (3.0 + 4.5). const après la méthode garantit que sum() ne modifie pas les membres x et y de l'objet. Si sum() essayait de faire x = 0;, le compilateur refuserait.`, en:`Output: 7.5 (3.0 + 4.5). const after the method guarantees that sum() doesn't modify the object's x and y members. If sum() tried to do x = 0;, the compiler would refuse.` }
+<span class="ty">Vec2</span> v(<span class="num">3.0f</span>, <span class="num">4.0f</span>);
+std::cout &lt;&lt; v.length();`,
+        explanation:{ fr:`Affiche 5. Vec2 est une struct avec un constructeur par initializer list et une méthode const length(). sqrt(3²+4²) = sqrt(25) = 5. Le mot-clé const après length() est correct : la méthode ne modifie pas l'objet. Une struct peut avoir constructeurs et méthodes — aucune restriction.`, en:`Prints 5. Vec2 is a struct with an initializer list constructor and a const method length(). sqrt(3²+4²) = sqrt(25) = 5. The const keyword after length() is correct: the method doesn't modify the object. A struct can have constructors and methods — no restriction.` }
       },
       {
-        id:'i07_2', type:'cpp', xp:35,
-        instr:{ fr:`Crée une struct Vector2 avec deux membres float x et y, un constructeur qui les initialise, une méthode float length() const qui retourne sqrt(x*x + y*y), et une méthode void print() const qui affiche "(x, y)". Teste avec Vector2(3.0f, 4.0f) — length() devrait retourner 5.`, en:`Create a struct Vector2 with two float members x and y, a constructor that initializes them, a float length() const method that returns sqrt(x*x + y*y), and a void print() const method that displays "(x, y)". Test with Vector2(3.0f, 4.0f) — length() should return 5.` },
-        stub:`#include &lt;iostream&gt;
-#include &lt;cmath&gt;
-// ta struct Vector2 ici / your Vector2 struct here
-
-int main() {
-    Vector2 v(3.0f, 4.0f);
-    v.print();
-    std::cout &lt;&lt; v.length() &lt;&lt; std::endl;
-    return 0;
-}`,
-        hint:{ fr:`#include <cmath> pour sqrt(). Initializer list : Vector2(float a, float b) : x(a), y(b) {}`, en:`#include <cmath> for sqrt(). Initializer list: Vector2(float a, float b) : x(a), y(b) {}` },
-        solution:{
-          fr:`<pre style="font-family:var(--mono);font-size:1.3rem;line-height:1.8;color:#e0e8ef">#include &lt;iostream&gt;
-#include &lt;cmath&gt;
-struct Vector2 {
-    float x, y;
-    Vector2(float a, float b) : x(a), y(b) {}
-    float length() const {
-        return std::sqrt(x*x + y*y);
-    }
-    void print() const {
-        std::cout &lt;&lt; "(" &lt;&lt; x &lt;&lt; ", " &lt;&lt; y &lt;&lt; ")" &lt;&lt; std::endl;
-    }
-};
-int main() {
-    Vector2 v(3.0f, 4.0f);
-    v.print();
-    std::cout &lt;&lt; v.length() &lt;&lt; std::endl;
-    return 0;
-}</pre><p style="margin-top:.8rem;font-size:1.4rem;color:var(--ch2)">Sortie : <code>(3, 4)</code> puis <code>5</code></p>`,
-          en:`<pre style="font-family:var(--mono);font-size:1.3rem;line-height:1.8;color:#e0e8ef">#include &lt;iostream&gt;
-#include &lt;cmath&gt;
-struct Vector2 {
-    float x, y;
-    Vector2(float a, float b) : x(a), y(b) {}
-    float length() const {
-        return std::sqrt(x*x + y*y);
-    }
-    void print() const {
-        std::cout &lt;&lt; "(" &lt;&lt; x &lt;&lt; ", " &lt;&lt; y &lt;&lt; ")" &lt;&lt; std::endl;
-    }
-};
-int main() {
-    Vector2 v(3.0f, 4.0f);
-    v.print();
-    std::cout &lt;&lt; v.length() &lt;&lt; std::endl;
-    return 0;
-}</pre><p style="margin-top:.8rem;font-size:1.4rem;color:var(--ch2)">Output: <code>(3, 4)</code> then <code>5</code></p>`
-        }
+        id:'i07_2', type:'cpp', xp:20,
+        instr:{ fr:`Écris une struct Rectangle avec membres float width et height, un constructeur, une méthode area() const et une méthode perimeter() const. Crée un Rectangle(4.0f, 3.0f) et affiche son aire et son périmètre.`, en:`Write a struct Rectangle with float width and height members, a constructor, an area() const method and a perimeter() const method. Create a Rectangle(4.0f, 3.0f) and print its area and perimeter.` },
+        hint:{ fr:`area() = width * height. perimeter() = 2 * (width + height). N'oublie pas const après les signatures de méthodes qui ne modifient pas l'objet.`, en:`area() = width * height. perimeter() = 2 * (width + height). Don't forget const after method signatures that don't modify the object.` }
       },
       {
-        id:'i07_3', type:'bug', xp:20,
-        instr:{ fr:`Cette méthode causera une erreur de compilation. Pourquoi ?`, en:`This method will cause a compilation error. Why?` },
-        bugCode:`<span class="kw2">struct</span> <span class="ty">Counter</span> {
-    <span class="kw2">int</span> count = <span class="num">0</span>;
-    <span class="kw2">void</span> <span class="fn2">increment</span>() <span class="kw2">const</span> {
-        <span class="bug-line">count++;</span>
-    }
-};`,
-        explanation:{ fr:`const après la méthode promet que increment() ne modifie pas l'objet. Mais count++ modifie le membre count — contradiction. Le compilateur refuse. Correction : supprimer const, car cette méthode est par nature mutante.`, en:`const after the method promises that increment() doesn't modify the object. But count++ modifies the count member — contradiction. The compiler refuses. Fix: remove const, because this method is inherently mutating.` }
+        id:'i07_3', type:'bug', xp:25,
+        instr:{ fr:`Ce code ne compile pas. Identifie le problème et corrige-le.`, en:`This code does not compile. Identify the problem and fix it.` },
+        bugCode:`<span class="kw">class</span> <span class="ty">Timer</span> {
+    <span class="kw">float</span> elapsed = <span class="num">0.0f</span>;
+<span class="kw">public</span>:
+    <span class="kw">void</span> <span class="fn">tick</span>(<span class="kw">float</span> dt) { elapsed += dt; }
+    <span class="kw">float</span> <span class="fn">getElapsed</span>() { <span class="kw">return</span> elapsed; }
+};
+<span class="kw">const</span> <span class="ty">Timer</span> t;
+<span class="bug-line">t.tick(<span class="num">0.016f</span>);</span>
+std::cout &lt;&lt; <span class="bug-line">t.getElapsed()</span>;`,
+        explanation:{ fr:`Deux erreurs liées à const. Premièrement, t est const — appeler tick() qui modifie elapsed est interdit. Deuxièmement, getElapsed() n'est pas marquée const, donc elle ne peut pas être appelée sur un objet const même si elle ne modifie rien. Corrections : supprimer const sur t, ou marquer getElapsed() const et supprimer l'appel à tick(). La règle : tout getter qui ne modifie pas l'objet doit être const.`, en:`Two errors related to const. First, t is const — calling tick() which modifies elapsed is forbidden. Second, getElapsed() is not marked const, so it cannot be called on a const object even if it doesn't modify anything. Fixes: remove const from t, or mark getElapsed() const and remove the tick() call. The rule: any getter that doesn't modify the object must be const.` }
       },
       {
         id:'i07_4', type:'fill', xp:15,
-        instr:{ fr:`Pour initialiser les membres d'un constructeur C++ de façon idiomatique, on utilise :`, en:`To initialize a C++ constructor's members idiomatically, you use:` },
-        template:{ fr:'Player(std::string n, int h)\n    ______ name(n), health(h) {}', en:'Player(std::string n, int h)\n    ______ name(n), health(h) {}' },
+        instr:{ fr:`Complète l'initializer list de ce constructeur (ordre : name, health) :`, en:`Complete the initializer list of this constructor (order: name, health):` },
+        template:{ fr:`Player(std::string n, int hp) ______ name(n), health(hp) {}`, en:`Player(std::string n, int hp) ______ name(n), health(hp) {}` },
         answer:':',
-        hint:{ fr:`Le deux-points qui introduit l'initializer list`, en:`The colon that introduces the initializer list` }
+        hint:{ fr:`Un seul caractère, placé entre la signature et la liste d'initialiseurs.`, en:`A single character, placed between the signature and the initialiser list.` }
       },
     ],
   },
 
   engine:{
-    demoSteps:[
-      {
-        label:{ fr:'La hiérarchie : UObject → AActor → APawn → ACharacter', en:'The hierarchy: UObject → AActor → APawn → ACharacter' },
-        fr:`Dessine la hiérarchie. UObject : base de tout, GC, réflexion. AActor : objet du monde avec Transform. APawn : peut être contrôlé par un Controller. ACharacter : personnage complet avec mouvement, CapsuleComponent, CharacterMovementComponent. En Unity, c'est un GameObject + différents Components qui font tout ça.`,
-        en:`Draw the hierarchy. UObject: base of everything, GC, reflection. AActor: world object with Transform. APawn: can be controlled by a Controller. ACharacter: full character with movement, CapsuleComponent, CharacterMovementComponent. In Unity, it's a GameObject + various Components that do all this.`
-      },
-      {
-        label:{ fr:'Préfixes de nommage Unreal', en:'Unreal naming prefixes' },
-        fr:`Les conventions Unreal sont strictes : A = Actor (hérite de AActor), U = UObject non-Actor, F = struct, T = template/container, I = interface, E = enum. Montre des exemples : APlayerCharacter, UHealthComponent, FVector, TArray<int32>, IDamageable, EWeaponType. Ce n'est pas esthétique mais permet de savoir instantanément de quel type on parle.`,
-        en:`Unreal conventions are strict: A = Actor (inherits from AActor), U = non-Actor UObject, F = struct, T = template/container, I = interface, E = enum. Show examples: APlayerCharacter, UHealthComponent, FVector, TArray<int32>, IDamageable, EWeaponType. Not pretty but lets you instantly know what type you're looking at.`
-      },
-      {
-        label:{ fr:'UCLASS() et GENERATED_BODY()', en:'UCLASS() and GENERATED_BODY()' },
-        fr:`Crée un Actor C++ vide. Montre UCLASS() et GENERATED_BODY() dans le .h. UCLASS() expose la classe au moteur (GC, éditeur, Blueprints, sérialisation). GENERATED_BODY() injecte le code généré par UHT. Sans l'un ou l'autre, la classe C++ fonctionne mais est invisible au moteur. Montre ce qui se passe si on commente GENERATED_BODY().`,
-        en:`Create an empty C++ Actor. Show UCLASS() and GENERATED_BODY() in the .h. UCLASS() exposes the class to the engine (GC, editor, Blueprints, serialization). GENERATED_BODY() injects the code generated by UHT. Without either, the C++ class works but is invisible to the engine. Show what happens if you comment out GENERATED_BODY().`
-      },
-    ],
-    discussion:[
-      { fr:`En Unity, quelle est la différence entre un GameObject et un Component ? Comment ça se traduit dans la hiérarchie AActor / UActorComponent d'Unreal ?`, en:`In Unity, what's the difference between a GameObject and a Component? How does that translate into Unreal's AActor / UActorComponent hierarchy?` },
-    ],
-    compare:{
-      cs:`<span class="cm">// Unity — MonoBehaviour</span>
-<span class="kw">public class</span> <span class="ty">EnemyAI</span>
-    : <span class="ty">MonoBehaviour</span>
-{
-    <span class="kw">void</span> <span class="fn">Start</span>() { }
-    <span class="kw">void</span> <span class="fn">Update</span>() { }
-}`,
-      cpp:`<span class="cm">// Unreal — AActor</span>
-<span class="mac">UCLASS</span>()
-<span class="kw2">class</span> <span class="ty">AEnemyAI</span>
-    : <span class="kw2">public</span> <span class="ty">AActor</span>
-{
-    <span class="mac">GENERATED_BODY</span>()
-<span class="kw2">public</span>:
-    <span class="kw2">virtual void</span> <span class="fn2">BeginPlay</span>() <span class="kw2">override</span>;
-    <span class="kw2">virtual void</span> <span class="fn2">Tick</span>(<span class="kw2">float</span> D) <span class="kw2">override</span>;
-};`
-    },
-    activities:[
-      {
-        id:'e07_1', type:'quiz', xp:15,
-        q:{ fr:`Dans la convention de nommage Unreal, quel préfixe utilise-t-on pour une struct (ex. une struct qui représente un vecteur 2D) ?`, en:`In Unreal naming convention, what prefix is used for a struct (e.g. a struct representing a 2D vector)?` },
-        choices:[
-          { t:'A', c:false, fb:{ fr:`A est pour les classes qui héritent de AActor.`, en:`A is for classes that inherit from AActor.` } },
-          { t:'U', c:false, fb:{ fr:`U est pour les classes qui héritent de UObject mais pas Actor.`, en:`U is for classes that inherit from UObject but not Actor.` } },
-          { t:'F', c:true, fb:{ fr:`Correct. F est le préfixe des structs Unreal : FVector, FRotator, FString, FHitResult…`, en:`Correct. F is the prefix for Unreal structs: FVector, FRotator, FString, FHitResult…` } },
-          { t:'T', c:false, fb:{ fr:`T est pour les templates et containers : TArray, TMap, TSharedPtr…`, en:`T is for templates and containers: TArray, TMap, TSharedPtr…` } },
-        ]
-      },
-      {
-        id:'e07_2', type:'fill', xp:20,
-        instr:{ fr:`Cette macro est obligatoire dans toute classe UCLASS() — elle injecte le code de réflexion généré par UHT :`, en:`This macro is mandatory in any UCLASS() class — it injects the reflection code generated by UHT:` },
-        template:{ fr:'UCLASS()\nclass AMyActor : public AActor {\n    ______\n};', en:'UCLASS()\nclass AMyActor : public AActor {\n    ______\n};' },
-        answer:'GENERATED_BODY()',
-        hint:{ fr:`La macro que tu vois dans tous les headers Unreal, juste après l'ouverture de la classe`, en:`The macro you see in every Unreal header, right after the class opening` }
-      },
-      {
-        id:'e07_3', type:'bug', xp:25,
-        instr:{ fr:`Ce header Unreal provoquera des erreurs cryptiques à la compilation. Qu'est-ce qui manque ?`, en:`This Unreal header will cause cryptic compilation errors. What's missing?` },
-        bugCode:`<span class="mac">UCLASS</span>()
-<span class="kw2">class</span> <span class="ty">AWeapon</span> : <span class="kw2">public</span> <span class="ty">AActor</span>
-{
-    <span class="bug-line"><span class="cm">// manque quelque chose ici</span></span>
-<span class="kw2">public</span>:
-    <span class="kw2">void</span> <span class="fn2">Fire</span>();
-    <span class="kw2">float</span> Damage = <span class="num">10.0f</span>;
-};`,
-        explanation:{ fr:`Il manque GENERATED_BODY() juste après l'ouverture de la classe. Cette macro est obligatoire dans toute classe UCLASS() — sans elle, l'Unreal Header Tool ne peut pas injecter son code, et les erreurs de compilation sont cryptiques et difficiles à diagnostiquer.`, en:`Missing GENERATED_BODY() right after the class opening. This macro is mandatory in any UCLASS() class — without it, the Unreal Header Tool can't inject its code, and compilation errors are cryptic and hard to diagnose.` }
-      },
-      {
-        id:'e07_4', type:'engine', xp:40,
-        label:{ fr:'Dans Unity + Unreal', en:'In Unity + Unreal' },
-        task:{ fr:`1. Dans Unity : ouvre un MonoBehaviour et liste ses méthodes de cycle de vie (Start, Update, OnTriggerEnter, OnDestroy, etc.) dans un fichier texte. 2. Dans Unreal : ouvre un AActor C++ généré et liste ses équivalents (BeginPlay, Tick, NotifyActorBeginOverlap, EndPlay, etc.). 3. Fais une table de correspondance à deux colonnes. 4. Trouve au moins un cycle de vie présent dans Unreal mais sans équivalent direct en Unity.`, en:`1. In Unity: open a MonoBehaviour and list its lifecycle methods (Start, Update, OnTriggerEnter, OnDestroy, etc.) in a text file. 2. In Unreal: open a generated C++ AActor and list its equivalents (BeginPlay, Tick, NotifyActorBeginOverlap, EndPlay, etc.). 3. Make a two-column correspondence table. 4. Find at least one lifecycle event in Unreal with no direct Unity equivalent.` },
-        note:{ fr:`Cette table sera utile pour les sessions suivantes.`, en:`This table will be useful for upcoming sessions.` }
-      },
-    ],
+    demoSteps:[],
+    discussion:[],
+    activities:[],
+    compare:{ std:``, cpp:`` },
   },
 
   homework:{
     core:[
-      {diff:'easy', fr:'Crée une classe Point avec x et y, un constructeur avec liste d\'initialisation, et une méthode print() const. Instancie-la dans main().', en:'Create a Point class with x and y, a constructor with initializer list, and a const print() method. Instantiate it in main().'},
-      {diff:'medium', fr:'Ajoute une méthode distanceTo(const Point& other) const à ta classe Point. Utilise sqrt() de <cmath>. Teste avec deux points connus.', en:'Add a distanceTo(const Point& other) const method to your Point class. Use sqrt() from <cmath>. Test with two known points.'},
-      {diff:'hard', fr:'Crée une classe Shape abstraite avec virtual float area() const = 0. Dérive Circle et Rectangle. Stocke-les dans un vector<Shape*> et appelle area() sur chacun. N\'oublie pas les destructeurs virtuels.', en:'Create an abstract Shape class with virtual float area() const = 0. Derive Circle and Rectangle. Store them in a vector<Shape*> and call area() on each. Don\'t forget virtual destructors.'},
+      {diff:'easy', fr:'Écris une struct Point3D avec trois float (x, y, z), un constructeur, et une méthode distanceTo(Point3D other) const qui retourne la distance euclidienne. Teste avec deux points.', en:'Write a struct Point3D with three floats (x, y, z), a constructor, and a distanceTo(Point3D other) const method that returns the Euclidean distance. Test with two points.'},
+      {diff:'medium', fr:'Refactorise Point3D en class avec x, y, z privés, getters const, et un setter qui valide que les coordonnées sont finies (std::isfinite). Explique dans ton README pourquoi tu ferais ce choix.', en:'Refactor Point3D into a class with private x, y, z, const getters, and a setter that validates coordinates are finite (std::isfinite). Explain in your README why you would make this choice.'},
+      {diff:'hard', fr:'Ajoute à ta classe Point3D une méthode normalize() qui retourne un nouveau Point3D dont la longueur est 1.0. Gère le cas dégénéré (vecteur zéro). Ajoute une surcharge de operator+ pour additionner deux points.', en:'Add to your Point3D class a normalize() method that returns a new Point3D with length 1.0. Handle the degenerate case (zero vector). Add an operator+ overload to add two points.'},
     ],
     ide:[
-      {diff:'medium', fr:'Sépare ta classe Shape en shape.h/shape.cpp, circle.h/circle.cpp, rectangle.h/rectangle.cpp. Écris le Makefile ou la commande g++ pour compiler tous ces fichiers ensemble.', en:'Separate your Shape class into shape.h/shape.cpp, circle.h/circle.cpp, rectangle.h/rectangle.cpp. Write the Makefile or g++ command to compile all these files together.'},
+      {diff:'medium', fr:'Écris une classe Stack<int> (sans templates pour l\'instant) qui stocke jusqu\'à 10 entiers dans un tableau, avec push(int), pop(), top() const, et isEmpty() const. Teste avec 5 push et 3 pop.', en:'Write a Stack<int> class (no templates yet) that stores up to 10 ints in an array, with push(int), pop(), top() const, and isEmpty() const. Test with 5 push and 3 pop.'},
     ],
-    engine:[
-      {diff:'medium', fr:'Crée un Actor C++ vide dans Unreal. Identifie dans le .h généré : UCLASS(), GENERATED_BODY(), BeginPlay(), Tick(). À quoi correspond chacun en Unity ?', en:'Create an empty C++ Actor in Unreal. Identify in the generated .h: UCLASS(), GENERATED_BODY(), BeginPlay(), Tick(). What does each correspond to in Unity?'},
-    ],
+    engine:[],
   },
 };
 document.addEventListener('DOMContentLoaded',()=>{});

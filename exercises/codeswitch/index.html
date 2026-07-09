@@ -341,8 +341,8 @@ int main() {
 
 const BLOCS = [
   { id:'b1', fr:'Fondations',             en:'Foundations',         sessions:['s01','s02','s03'],          color:'#685ef7' },
-  { id:'b2', fr:'Ce qui change vraiment', en:'What Really Changes', sessions:['s04','s05','s06'],          color:'#f2f537' },
-  { id:'b3', fr:'Unreal Engine C++',      en:'Unreal Engine C++',   sessions:['s07','s08','s09','s10'],    color:'#00587c' },
+  { id:'b2', fr:'Ce qui change vraiment', en:'What Really Changes', sessions:['s04','s05','s06','s07'],    color:'#f2f537' },
+  { id:'b3', fr:'Unreal Engine C++',      en:'Unreal Engine C++',   sessions:['s08','s09','s10'],          color:'#00587c' },
   { id:'b4', fr:'Patterns de jeu',        en:'Game Patterns',       sessions:['s11','s12','s13'],          color:'#fe6c06' },
   { id:'b5', fr:'Consolidation',          en:'Consolidation',       sessions:['s14','s15'],                color:'#9cf6d4' },
 ];
@@ -356,8 +356,8 @@ const MANIFEST = {
   s04:{ num:4,  fr:'Pointeurs & Références',         en:'Pointers & References',          sub:{fr:'Le concept qui fait peur — démystifié',en:'The scary concept — demystified'},        ideActs:4, engActs:4, xp:110 },
   s05:{ num:5,  fr:'Headers .h / .cpp',              en:'Headers .h / .cpp',              sub:{fr:'Déclaration vs implémentation',en:'Declaration vs implementation'},                  ideActs:4, engActs:4, xp:100 },
   s06:{ num:6,  fr:'Mémoire & Ownership',            en:'Memory & Ownership',             sub:{fr:'Stack, heap, et le GC Unreal',en:'Stack, heap, and Unreal GC'},                     ideActs:4, engActs:4, xp:110 },
-  s07:{ num:7,  fr:'AActor & UObject',               en:'AActor & UObject',               sub:{fr:"L'équivalent de MonoBehaviour",en:'The MonoBehaviour equivalent'},                  ideActs:4, engActs:4, xp:120 },
-  s08:{ num:8,  fr:'UPROPERTY & UFUNCTION',          en:'UPROPERTY & UFUNCTION',          sub:{fr:'[SerializeField] version Unreal',en:'[SerializeField] Unreal edition'},             ideActs:4, engActs:4, xp:120 },
+  s07:{ num:7,  fr:'Structs & Classes',              en:'Structs & Classes',              sub:{fr:'struct, class, membres, constructeurs, encapsulation',en:'struct, class, members, constructors, encapsulation'}, ideActs:4, engActs:0, xp:120 },
+  s08:{ num:8,  fr:'Le système de classes Unreal',   en:'The Unreal Class System',         sub:{fr:'UObject, AActor, UPROPERTY, UFUNCTION',en:'UObject, AActor, UPROPERTY, UFUNCTION'}, ideActs:4, engActs:6, xp:130 },
   s09:{ num:9,  fr:'BeginPlay & Tick',               en:'BeginPlay & Tick',               sub:{fr:'Start() et Update() — version Unreal',en:'Start() and Update() — Unreal edition'},  ideActs:4, engActs:4, xp:110 },
   s10:{ num:10, fr:'Composants & Héritage',          en:'Components & Inheritance',       sub:{fr:'GetComponent vs FindComponentByClass',en:'GetComponent vs FindComponentByClass'},   ideActs:4, engActs:4, xp:120 },
   s11:{ num:11, fr:'Input & Mouvement',              en:'Input & Movement',               sub:{fr:'Enhanced Input System',en:'Enhanced Input System'},                                 ideActs:4, engActs:3, xp:130 },
@@ -365,6 +365,7 @@ const MANIFEST = {
   s13:{ num:13, fr:'Blueprint ↔ C++',               en:'Blueprint ↔ C++',               sub:{fr:'Quand utiliser quoi',en:'When to use which'},                                        ideActs:4, engActs:3, xp:130 },
   s14:{ num:14, fr:'Débogage & Erreurs',             en:'Debugging & Errors',             sub:{fr:'Lire les logs Unreal, survivre aux crashes',en:'Reading Unreal logs, surviving crashes'}, ideActs:4, engActs:4, xp:140 },
   s15:{ num:15, fr:'Mini-Projet',                    en:'Mini-Project',                   sub:{fr:'Un collectible C++ complet',en:'A complete C++ collectible'},                        ideActs:3, engActs:3, xp:200 },
+  s16:{ num:16, fr:'Mini-Projet',                    en:'Mini-Project',                   sub:{fr:'Un collectible C++ complet',en:'A complete C++ collectible'},                        ideActs:3, engActs:3, xp:200 },
 };
 
 // ── Setup section strings ──────────────────────────────────────
