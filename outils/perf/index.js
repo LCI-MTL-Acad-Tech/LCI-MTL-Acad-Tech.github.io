@@ -11,16 +11,15 @@ const CATEGORY_OPTIONS = [
 ];
 
 const FORMAT_OPTIONS = [
-  {v:"seminaire", l:"Séminaire"},
-  {v:"colloque", l:"Colloque"},
-  {v:"congres", l:"Congrès"},
-  {v:"conference", l:"Conférence"},
-  {v:"stage", l:"Stage en milieu industriel"},
-  {v:"cours_non_credite", l:"Cours non crédité"},
-  {v:"cours_credite", l:"Cours crédité"},
-  {v:"atelier", l:"Atelier"},
-  {v:"mentorat", l:"Mentorat / formation entre pairs"},
-  {v:"autre", l:"Autre"},
+  {v:"seminaire", l:"Séminaire", d:"Rencontre de petit groupe, participative, pour approfondir un sujet précis avec échanges actifs entre les participants."},
+  {v:"colloque_congres", l:"Colloque ou congrès", d:"Événement scientifique ou professionnel réunissant plusieurs intervenants autour d'un thème — petite échelle (colloque) ou grande échelle, souvent annuelle et sur plusieurs jours (congrès)."},
+  {v:"conference", l:"Conférence", d:"Exposé ou présentation ponctuelle, généralement par une seule personne, sur un sujet précis."},
+  {v:"stage", l:"Stage en milieu industriel", d:"Période d'immersion pratique en entreprise ou en milieu professionnel."},
+  {v:"cours_non_credite", l:"Cours non crédité", d:"Cours suivi sans obtention de crédits académiques."},
+  {v:"cours_credite", l:"Cours crédité", d:"Cours suivi avec obtention de crédits académiques (scolarité créditée)."},
+  {v:"atelier", l:"Atelier", d:"Activité pratique et interactive, en petit groupe, axée sur le développement d'habiletés concrètes."},
+  {v:"mentorat", l:"Mentorat / formation entre pairs", d:"Accompagnement individualisé par ou avec une personne collègue d'expérience."},
+  {v:"autre", l:"Autre", d:"Format qui ne correspond à aucune des catégories ci-dessus — précisez dans les notes."},
 ];
 
 const RD_CATEGORY_OPTIONS = [
@@ -53,16 +52,25 @@ const STATUS_OPTIONS = [
    Falls back to this built-in default if the fetch fails for any reason.
 --------------------------------------------------------------------- */
 const DEFAULT_AXES_CONFIG = {
-  schemaVersion:"1.0", scaleMin:1, scaleMax:5,
-  scaleLabels:["Faible","Fragile","Correct","Bon","Excellent"],
+  schemaVersion:"1.0", scaleMin:1, scaleMax:7,
+  scaleLabels:["Très faible","Faible","Limité","Correct","Confortable","Confiant","Maîtrisé"],
+  surveyScaleLabels:["Très faible","Faible","Passable","Correct","Bon","Très bon","Excellent"],
+  surveyScaleLabelsEn:["Very poor","Poor","Fair","Correct","Good","Very good","Excellent"],
   axes:[
-    {id:"clarte", label:"Clarté des explications", description:"La capacité à expliquer les concepts de façon claire et compréhensible."},
-    {id:"organisation", label:"Organisation du cours", description:"La structure, la planification et la cohérence du déroulement du cours."},
-    {id:"engagement", label:"Engagement des étudiants", description:"La capacité à susciter l'intérêt et la participation active des étudiants."},
-    {id:"retroaction", label:"Rétroaction et évaluation", description:"La qualité, la clarté et l'utilité de la rétroaction donnée aux étudiants."},
-    {id:"disponibilite", label:"Disponibilité et soutien", description:"L'accessibilité et le soutien offerts aux étudiants en dehors des cours."},
-    {id:"gestion", label:"Gestion de classe", description:"La capacité à maintenir un environnement d'apprentissage respectueux et productif."},
-    {id:"numerique", label:"Utilisation du numérique", description:"L'intégration pertinente des technologies éducatives dans l'enseignement."}
+    {id:"clarte", label:"Clarté des explications", labelEn:"Clarity of explanations", description:"La capacité à expliquer les concepts de façon claire et compréhensible.",
+     ideas:["Utiliser des exemples concrets et des analogies tirées du quotidien","Varier les supports : tableau, schémas dessinés à la main, objets manipulables","Résumer les points clés oralement et par écrit à la fin de chaque section"]},
+    {id:"organisation", label:"Organisation du cours", labelEn:"Course organization", description:"La structure, la planification et la cohérence du déroulement du cours.",
+     ideas:["Distribuer un plan de cours papier annoté au fil des séances","Utiliser des fiches ou un cahier de suivi pour structurer chaque séance","Prévoir des repères visuels affichés en classe (échéanciers, étapes du cours)"]},
+    {id:"engagement", label:"Engagement des étudiants", labelEn:"Student engagement", description:"La capacité à susciter l'intérêt et la participation active des étudiants.",
+     ideas:["Jeux de rôle, mises en situation ou études de cas sur papier","Discussions en petits groupes avec du matériel physique (cartes, jetons, tableaux blancs)","Projets pratiques utilisant du matériel réel du domaine étudié"]},
+    {id:"retroaction", label:"Rétroaction et évaluation", labelEn:"Feedback and assessment", description:"La qualité, la clarté et l'utilité de la rétroaction donnée aux étudiants.",
+     ideas:["Rétroaction manuscrite personnalisée directement sur les copies","Grilles d'évaluation critériées partagées à l'avance, sur papier ou à l'écran","Courtes rencontres individuelles pour discuter des travaux"]},
+    {id:"disponibilite", label:"Disponibilité et soutien", labelEn:"Availability and support", description:"L'accessibilité et le soutien offerts aux étudiants en dehors des cours.",
+     ideas:["Heures de bureau fixes, en personne ou par téléphone","Bibliothèque de ressources papier en libre accès (guides, exemples annotés)","Groupes d'entraide entre étudiants avec du matériel partagé"]},
+    {id:"gestion", label:"Gestion de classe", labelEn:"Classroom management", description:"La capacité à maintenir un environnement d'apprentissage respectueux et productif.",
+     ideas:["Supports physiques pour structurer les transitions (minuteries, signaux visuels)","Aménagement de l'espace (îlots, cercles de discussion)","Routines claires affichées en classe"]},
+    {id:"numerique", label:"Diversité des outils et du matériel pédagogique", labelEn:"Diversity of tools and materials", description:"Le recours à des outils et supports variés — numériques, imprimés, manipulables ou autres — choisis selon le besoin pédagogique plutôt que par défaut.",
+     ideas:["Combiner plusieurs supports pour un même contenu (ex. démonstration physique + fiche papier + vidéo courte)","Maquettes, manipulables, matériel de laboratoire ou instruments propres à la discipline","Choisir l'outil — numérique ou non — en fonction du besoin pédagogique, pas de la nouveauté"]}
   ]
 };
 let AXES_CONFIG = JSON.parse(JSON.stringify(DEFAULT_AXES_CONFIG));
@@ -73,6 +81,19 @@ function scaleLabelFor(value){
   if(!Array.isArray(labels) || labels.length===0) return String(value);
   const idx = Math.round(value) - AXES_CONFIG.scaleMin;
   return labels[Math.max(0, Math.min(labels.length-1, idx))] || String(value);
+}
+
+function sliderColorForValue(value, min, max){
+  const t = max>min ? Math.max(0, Math.min(1, (value-min)/(max-min))) : 0;
+  const hue = Math.round(t*120); // 0 = red, 120 = green
+  return `hsl(${hue}, 72%, 40%)`;
+}
+function applySliderColor(el, value, min, max){
+  const t = max>min ? Math.max(0, Math.min(1, (value-min)/(max-min))) : 0;
+  const color = sliderColorForValue(value, min, max);
+  const pct = t*100;
+  el.style.setProperty("--slider-color", color);
+  el.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #E3E1D8 ${pct}%, #E3E1D8 100%)`;
 }
 
 /* ---------------------------------------------------------------------
@@ -89,6 +110,7 @@ function blankState(){
            planEndDate: toISODate(addYears(now,2)) },
     qualityRadar:{ targetDate:"", axesSnapshot:[], entries:[] },
     studentFeedbackHistory: [],
+    studentSurveyResponses:{ importedAt:"", fileName:"", perAxis:{} },
     domainSkills: [],
     activities: [],
     budgetPlanning:{ notes:"" },
@@ -176,6 +198,234 @@ document.getElementById("btnAddApprEntry").addEventListener("click", ()=>{
   renderAppreciationHistory();
   renderTimeline();
 });
+
+/* ---------------------------------------------------------------------
+   Student survey: bilingual Word generator, Excel results parser,
+   and a comparative radar (student-response quartiles vs. self-eval)
+--------------------------------------------------------------------- */
+function percentile(sortedArr, p){
+  if(sortedArr.length===0) return null;
+  if(sortedArr.length===1) return sortedArr[0];
+  const idx = (sortedArr.length-1)*p;
+  const lo = Math.floor(idx), hi = Math.ceil(idx);
+  if(lo===hi) return sortedArr[lo];
+  return sortedArr[lo] + (sortedArr[hi]-sortedArr[lo])*(idx-lo);
+}
+
+function docxParagraph(text, opts){
+  opts = opts || {};
+  const runProps = [];
+  if(opts.bold) runProps.push("<w:b/>");
+  if(opts.size) runProps.push(`<w:sz w:val="${opts.size}"/><w:szCs w:val="${opts.size}"/>`);
+  const rPr = runProps.length ? `<w:rPr>${runProps.join("")}</w:rPr>` : "";
+  const escaped = escapeHtml(text).replace(/\n/g,"</w:t></w:r><w:r><w:br/><w:t xml:space=\"preserve\">");
+  return `<w:p>${opts.spacingAfter!==undefined?`<w:pPr><w:spacing w:after="${opts.spacingAfter}"/></w:pPr>`:""}<w:r>${rPr}<w:t xml:space="preserve">${escaped}</w:t></w:r></w:p>`;
+}
+
+async function generateSurveyDocx(){
+  const axes = AXES_CONFIG.axes;
+  const surveyFr = AXES_CONFIG.surveyScaleLabels || AXES_CONFIG.scaleLabels;
+  const surveyEn = AXES_CONFIG.surveyScaleLabelsEn || surveyFr;
+  const teacherName = state.meta.teacherName || "";
+  const letters = "abcdefghijklmnopqrstuvwxyz";
+
+  const paras = [];
+  paras.push(docxParagraph(
+    `Sondage étudiant${teacherName ? " — " + teacherName : ""} / Student Survey${teacherName ? " — " + teacherName : ""}`,
+    {bold:true, size:32, spacingAfter:200}
+  ));
+  paras.push(docxParagraph(
+    "Ce sondage est anonyme. Merci de répondre honnêtement — vos réponses aideront à orienter le perfectionnement professionnel de la personne enseignante.\n" +
+    "This survey is anonymous. Please answer honestly — your responses will help guide this teacher's professional development.\n\n" +
+    "Note pour la personne enseignante : une fois ce sondage créé dans Microsoft Forms, ouvrez les paramètres du formulaire et désactivez l'enregistrement du nom des répondants pour garantir l'anonymat.\n" +
+    "Note for the teacher: once this survey is created in Microsoft Forms, open the form settings and turn off respondent name collection to ensure anonymity.",
+    {spacingAfter:300}
+  ));
+
+  axes.forEach((ax, i)=>{
+    const label = `${ax.label} / ${ax.labelEn || ax.label}`;
+    paras.push(docxParagraph(`${i+1}. ${label}`, {bold:true, spacingAfter:80}));
+    surveyFr.forEach((lvl, j)=>{
+      const en = surveyEn[j] || lvl;
+      paras.push(docxParagraph(`${letters[j]}. ${lvl} / ${en}`, {spacingAfter: j===surveyFr.length-1 ? 240 : 40}));
+    });
+  });
+
+  const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>`;
+
+  const rootRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`;
+
+  const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    ${paras.join("\n    ")}
+    <w:sectPr/>
+  </w:body>
+</w:document>`;
+
+  const zip = new JSZip();
+  zip.file("[Content_Types].xml", contentTypes);
+  zip.folder("_rels").file(".rels", rootRels);
+  zip.folder("word").file("document.xml", documentXml);
+
+  const blob = await zip.generateAsync({type:"blob", mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const namePart = (teacherName || "sondage").trim().replace(/[^a-z0-9\-_]+/gi,"_");
+  a.href = url; a.download = `sondage-etudiant_${namePart}.docx`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+document.getElementById("btnGenSurveyDocx").addEventListener("click", ()=>{
+  generateSurveyDocx().catch(err=>alert("Impossible de générer le sondage.\n" + err.message));
+});
+
+function normalizeForMatch(s){
+  return (s||"").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim();
+}
+
+function parseSurveyWorkbook(workbook){
+  const sheetName = workbook.SheetNames[0];
+  const sheet = workbook.Sheets[sheetName];
+  const rows = XLSX.utils.sheet_to_json(sheet, {header:1, defval:""});
+  if(rows.length < 2) throw new Error("Le fichier ne contient pas de données de réponses.");
+  const headers = rows[0].map(h => String(h||""));
+  const headersNorm = headers.map(normalizeForMatch);
+
+  const axes = AXES_CONFIG.axes;
+  const surveyFr = AXES_CONFIG.surveyScaleLabels || AXES_CONFIG.scaleLabels;
+  const surveyEn = AXES_CONFIG.surveyScaleLabelsEn || surveyFr;
+
+  const perAxis = {};
+  const colForAxis = {};
+  axes.forEach(ax=>{
+    const key = normalizeForMatch(ax.label);
+    const idx = headersNorm.findIndex(h => h.includes(key));
+    if(idx !== -1) colForAxis[ax.id] = idx;
+    perAxis[ax.id] = [];
+  });
+
+  const smin = AXES_CONFIG.scaleMin;
+
+  function matchLevel(cellValue){
+    const raw = normalizeForMatch(cellValue);
+    if(!raw) return -1;
+    // try each half of a "FR / EN" style answer as an exact match first
+    const parts = raw.split("/").map(p=>p.trim()).filter(Boolean);
+    for(const part of parts){
+      let idx = surveyFr.findIndex(l => normalizeForMatch(l)===part);
+      if(idx!==-1) return idx;
+      idx = surveyEn.findIndex(l => normalizeForMatch(l)===part);
+      if(idx!==-1) return idx;
+    }
+    // exact match on the whole cell (covers single-language answers)
+    let idx = surveyFr.findIndex(l => normalizeForMatch(l)===raw);
+    if(idx!==-1) return idx;
+    idx = surveyEn.findIndex(l => normalizeForMatch(l)===raw);
+    if(idx!==-1) return idx;
+    // last resort: substring match, but prefer the LONGEST matching label to
+    // avoid a short label (e.g. "Bon") falsely matching inside a longer one
+    // (e.g. "Très bon").
+    let best = -1, bestLen = -1;
+    [surveyFr, surveyEn].forEach(list=>{
+      list.forEach((l,i)=>{
+        const ln = normalizeForMatch(l);
+        if(ln && raw.includes(ln) && ln.length > bestLen){ best = i; bestLen = ln.length; }
+      });
+    });
+    return best;
+  }
+
+  for(let r=1; r<rows.length; r++){
+    const row = rows[r];
+    axes.forEach(ax=>{
+      const col = colForAxis[ax.id];
+      if(col===undefined) return;
+      const level = matchLevel(row[col]);
+      if(level!==-1) perAxis[ax.id].push(smin + level);
+    });
+  }
+
+  const matchedAxes = Object.keys(colForAxis).length;
+  const responseCount = rows.length - 1;
+  return { perAxis, matchedAxes, totalAxes: axes.length, responseCount };
+}
+
+document.getElementById("btnImportSurveyTrigger").addEventListener("click", ()=>document.getElementById("surveyExcelImport").click());
+document.getElementById("surveyExcelImport").addEventListener("change", (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const data = new Uint8Array(reader.result);
+      const workbook = XLSX.read(data, {type:"array"});
+      const result = parseSurveyWorkbook(workbook);
+      state.studentSurveyResponses = { importedAt:new Date().toISOString(), fileName:file.name, perAxis:result.perAxis };
+      touch();
+      const statusEl = document.getElementById("surveyImportStatus");
+      statusEl.textContent = `${result.responseCount} réponse${result.responseCount===1?"":"s"} importée${result.responseCount===1?"":"s"} — ${result.matchedAxes} axe${result.matchedAxes===1?"":"s"} sur ${result.totalAxes} reconnu${result.matchedAxes===1?"":"s"} dans le fichier.`;
+      renderSurveyComparative();
+    }catch(err){
+      alert("Impossible de lire ce fichier comme des résultats de sondage valides.\n" + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+  e.target.value = "";
+});
+
+function renderSurveyComparative(){
+  const wrap = document.getElementById("surveyComparativeWrap");
+  const perAxis = (state.studentSurveyResponses && state.studentSurveyResponses.perAxis) || {};
+  const hasAny = Object.values(perAxis).some(arr => Array.isArray(arr) && arr.length>0);
+  if(!hasAny){ wrap.style.display = "none"; return; }
+  wrap.style.display = "block";
+
+  const axes = AXES_CONFIG.axes;
+  const smin = AXES_CONFIG.scaleMin, smax = AXES_CONFIG.scaleMax;
+
+  const bandDefs = [
+    {p:1.0, fill:"#3B8C22", stroke:"#2E6D1A"},
+    {p:0.75, fill:"#97C459", stroke:"#7CA845"},
+    {p:0.5, fill:"#F4C430", stroke:"#D9AC1E"},
+    {p:0.25, fill:"#EF9F27", stroke:"#D6871A"},
+    {p:0.0, fill:"#E24B4A", stroke:"#C93534"},
+  ];
+  const bands = bandDefs.map(bd=>({
+    fill:bd.fill, stroke:bd.stroke,
+    values: axes.map(ax=>{
+      const vals = (perAxis[ax.id]||[]).slice().sort((a,b)=>a-b);
+      return vals.length ? percentile(vals, bd.p) : null;
+    })
+  }));
+
+  const selfVals = axes.map(ax=>{
+    const entry = state.qualityRadar.entries.find(e=>e.axisId===ax.id);
+    return entry && entry.current!==null && entry.current!==undefined ? Number(entry.current) : null;
+  });
+  const lines = [{ values:selfVals, stroke:"#14181F", width:4 }];
+
+  const svg = document.getElementById("surveyRadarSvg");
+  svg.innerHTML = buildRadarSVG(axes, smin, smax, bands, lines, {size:560});
+
+  document.getElementById("surveyRadarLegend").innerHTML = `
+    <span><i style="background:#E24B4A;"></i>Minimum</span>
+    <span><i style="background:#EF9F27;"></i>Q1</span>
+    <span><i style="background:#F4C430;"></i>Médiane</span>
+    <span><i style="background:#97C459;"></i>Q3</span>
+    <span><i style="background:#3B8C22;"></i>Maximum (réponses étudiantes)</span>
+    <span><svg width="18" height="10"><line x1="0" y1="5" x2="18" y2="5" stroke="#14181F" stroke-width="3"/></svg>Votre auto-positionnement</span>
+  `;
+}
 
 /* ---------------------------------------------------------------------
    Axes config loading: fetched from the co-hosted JSON file. No manual
@@ -438,19 +688,29 @@ function renderQualityRadar(){
     const card = document.createElement("div");
     card.className = "activity-card";
     card.innerHTML = `
-      <div style="font-weight:600; font-size:13.5px;">${escapeHtml(ax.label)}</div>
-      <div style="font-size:12px; color:var(--muted); margin-bottom:10px;">${escapeHtml(ax.description||"")}</div>
-      <div class="grid2">
-        <div class="field tight">
-          <label>Position actuelle: <span class="rv-cur-out">${entry.current!==null?scaleLabelFor(entry.current):"—"}</span></label>
-          <input type="range" class="rv-current" min="${smin}" max="${smax}" step="1" value="${entry.current ?? smin}">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
+        <div>
+          <div style="font-weight:600; font-size:13.5px;">${escapeHtml(ax.label)}</div>
+          <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">${escapeHtml(ax.description||"")}</div>
         </div>
-        <div class="field tight">
-          <label>Objectif: <span class="rv-goal-out">${entry.goal!==null?scaleLabelFor(entry.goal):"—"}</span></label>
-          <input type="range" class="rv-goal" min="${smin}" max="${smax}" step="1" value="${entry.goal ?? smin}">
-        </div>
+        ${(ax.ideas && ax.ideas.length) ? `<button type="button" class="small ax-ideas-toggle" style="white-space:nowrap;">Idées et pistes</button>` : ""}
       </div>
-      <div class="grid2" style="margin-top:10px;">
+      ${(ax.ideas && ax.ideas.length) ? `
+      <div class="ax-ideas-panel info-box" style="display:none; margin-bottom:10px;">
+        <strong>Pistes et bonnes pratiques (pas seulement numériques)</strong>
+        <ul style="margin:6px 0 0; padding-left:18px;">
+          ${ax.ideas.map(i=>`<li style="margin-bottom:3px;">${escapeHtml(i)}</li>`).join("")}
+        </ul>
+      </div>` : ""}
+      <div class="field tight">
+        <label>Position actuelle : <span class="rv-cur-out">${entry.current!==null?scaleLabelFor(entry.current):"—"}</span></label>
+        <input type="range" class="rv-slider rv-current" min="${smin}" max="${smax}" step="1" value="${entry.current ?? smin}">
+      </div>
+      <div class="field tight" style="margin-top:14px;">
+        <label>Objectif : <span class="rv-goal-out">${entry.goal!==null?scaleLabelFor(entry.goal):"—"}</span></label>
+        <input type="range" class="rv-slider rv-goal" min="${smin}" max="${smax}" step="1" value="${entry.goal ?? smin}">
+      </div>
+      <div class="grid2" style="margin-top:14px;">
         <div class="field tight">
           <label>Notes — état actuel (optionnel)</label>
           <textarea class="rv-note-current" style="min-height:44px;" placeholder="Ex. ce qui explique cette position...">${escapeHtml(entry.noteCurrent)}</textarea>
@@ -463,14 +723,40 @@ function renderQualityRadar(){
     `;
     wrap.appendChild(card);
 
-    card.querySelector(".rv-current").addEventListener("input", e=>{
+    const ideasBtn = card.querySelector(".ax-ideas-toggle");
+    if(ideasBtn){
+      ideasBtn.addEventListener("click", ()=>{
+        const panel = card.querySelector(".ax-ideas-panel");
+        const open = panel.style.display !== "none";
+        panel.style.display = open ? "none" : "block";
+        ideasBtn.textContent = open ? "Idées et pistes" : "Masquer les idées";
+      });
+    }
+
+    const curSlider = card.querySelector(".rv-current");
+    const goalSlider = card.querySelector(".rv-goal");
+    applySliderColor(curSlider, entry.current ?? smin, smin, smax);
+    applySliderColor(goalSlider, entry.goal ?? smin, smin, smax);
+
+    curSlider.addEventListener("input", e=>{
       entry.current = Number(e.target.value);
       card.querySelector(".rv-cur-out").textContent = scaleLabelFor(entry.current);
-      touch(); renderRadarPreview(); renderPortrait();
+      applySliderColor(curSlider, entry.current, smin, smax);
+      // l'objectif ne peut pas être inférieur à la position actuelle
+      if(entry.goal === null || entry.goal < entry.current){
+        entry.goal = entry.current;
+        goalSlider.value = entry.goal;
+        card.querySelector(".rv-goal-out").textContent = scaleLabelFor(entry.goal);
+        applySliderColor(goalSlider, entry.goal, smin, smax);
+      }
+      touch(); renderRadarPreview(); renderPortrait(); renderSurveyComparative();
     });
-    card.querySelector(".rv-goal").addEventListener("input", e=>{
-      entry.goal = Number(e.target.value);
+    goalSlider.addEventListener("input", e=>{
+      let v = Number(e.target.value);
+      if(entry.current !== null && v < entry.current){ v = entry.current; e.target.value = v; }
+      entry.goal = v;
       card.querySelector(".rv-goal-out").textContent = scaleLabelFor(entry.goal);
+      applySliderColor(goalSlider, entry.goal, smin, smax);
       touch(); renderRadarPreview(); renderPortrait();
     });
     card.querySelector(".rv-note-current").addEventListener("input", e=>{ entry.noteCurrent = e.target.value; touch(); });
@@ -593,7 +879,7 @@ function renderActivities(){
         <div class="field tight">
           <label>Format</label>
           <select class="a-format" data-idx="${idx}">
-            ${FORMAT_OPTIONS.map(o=>`<option value="${o.v}" ${a.format===o.v?"selected":""}>${o.l}</option>`).join("")}
+            ${FORMAT_OPTIONS.map(o=>`<option value="${o.v}" title="${escapeAttr(o.d||"")}" ${a.format===o.v?"selected":""}>${o.l}</option>`).join("")}
           </select>
         </div>
         <div class="field tight">
@@ -603,7 +889,12 @@ function renderActivities(){
           </select>
         </div>
       </div>
+      <div class="a-format-help" style="font-size:11.5px;color:var(--muted);margin-top:-4px;margin-bottom:2px;">${escapeHtml((FORMAT_OPTIONS.find(o=>o.v===a.format)||{}).d||"")}</div>
       <div class="grid3" style="margin-top:12px;">
+        <div class="field tight">
+          <label>Année académique</label>
+          <input type="text" class="a-year" data-idx="${idx}" value="${escapeAttr(a.academicYear)}" placeholder="Ex. 2026-2027">
+        </div>
         <div class="field tight">
           <label>Session / période visée</label>
           <input type="text" class="a-session" data-idx="${idx}" value="${escapeAttr(a.session)}" placeholder="Ex. Session Automne 2026">
@@ -612,6 +903,8 @@ function renderActivities(){
           <label>Coût estimé (CAD)</label>
           <input type="number" min="0" step="1" class="a-cost" data-idx="${idx}" value="${a.estimatedCost ?? ""}">
         </div>
+      </div>
+      <div class="grid3" style="margin-top:12px;">
         <div class="field tight">
           <label class="chip" style="width:fit-content;">
             <input type="checkbox" class="a-rd" data-idx="${idx}" ${a.proposedRD?"checked":""}> Proposée en R&D
@@ -675,8 +968,15 @@ function renderActivities(){
   // bind field events
   list.querySelectorAll(".a-title").forEach(el=>el.addEventListener("input", e=>{ state.activities[e.target.dataset.idx].title = e.target.value; touch(); renderBudget(); }));
   list.querySelectorAll(".a-category").forEach(el=>el.addEventListener("change", e=>{ state.activities[e.target.dataset.idx].category = e.target.value; touch(); renderBudget(); }));
-  list.querySelectorAll(".a-format").forEach(el=>el.addEventListener("change", e=>{ state.activities[e.target.dataset.idx].format = e.target.value; touch(); }));
+  list.querySelectorAll(".a-format").forEach(el=>el.addEventListener("change", e=>{
+    const idx = e.target.dataset.idx;
+    state.activities[idx].format = e.target.value; touch();
+    const opt = FORMAT_OPTIONS.find(o=>o.v===e.target.value);
+    const helpEl = e.target.closest(".activity-card").querySelector(".a-format-help");
+    if(helpEl) helpEl.textContent = (opt && opt.d) || "";
+  }));
   list.querySelectorAll(".a-status").forEach(el=>el.addEventListener("change", e=>{ state.activities[e.target.dataset.idx].status = e.target.value; touch(); }));
+  list.querySelectorAll(".a-year").forEach(el=>el.addEventListener("input", e=>{ state.activities[e.target.dataset.idx].academicYear = e.target.value; touch(); renderBudget(); }));
   list.querySelectorAll(".a-session").forEach(el=>el.addEventListener("input", e=>{ state.activities[e.target.dataset.idx].session = e.target.value; touch(); }));
   list.querySelectorAll(".a-cost").forEach(el=>el.addEventListener("input", e=>{
     state.activities[e.target.dataset.idx].estimatedCost = e.target.value===""?null:Number(e.target.value); touch(); renderBudget();
@@ -708,10 +1008,16 @@ function renderActivities(){
   }));
 }
 
+function defaultAcademicYear(){
+  const d = new Date();
+  const y = d.getFullYear();
+  return d.getMonth() >= 7 ? `${y}-${y+1}` : `${y-1}-${y}`;
+}
+
 document.getElementById("btnAddActivity").addEventListener("click", ()=>{
   state.activities.push({
     id:uid("act"), title:"", category:"formation_individuelle", domains:[], format:"atelier",
-    session:"", startDate:"", endDate:"", estimatedCost:null, proposedRD:false, rdCategory:"",
+    session:"", startDate:"", endDate:"", academicYear:defaultAcademicYear(), estimatedCost:null, proposedRD:false, rdCategory:"",
     rdApprovalStatus:"en_attente", rdApprovedBy:"", rdApprovalDate:"", status:"planned", notes:""
   });
   touch(); renderActivities(); renderBudget();
@@ -734,19 +1040,46 @@ function rdMessageHtml(a){
 function renderBudget(){
   const rows = document.getElementById("budgetRows");
   rows.innerHTML = "";
-  let total = 0;
   const catLabel = v => (CATEGORY_OPTIONS.find(o=>o.v===v)||{}).l || v;
-  state.activities.forEach(a=>{
-    const cost = a.estimatedCost || 0;
-    total += cost;
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${escapeHtml(a.title || "(sans titre)")}</td><td>${escapeHtml(catLabel(a.category))}</td><td style="text-align:right;">${cost ? cost.toLocaleString("fr-CA") + " $" : "—"}</td>`;
-    rows.appendChild(tr);
-  });
+
   if(state.activities.length===0){
-    rows.innerHTML = `<tr><td colspan="3" class="empty-note">Aucune activité à afficher.</td></tr>`;
+    rows.innerHTML = `<tr><td colspan="4" class="empty-note">Aucune activité à afficher.</td></tr>`;
+    document.getElementById("budgetTotal").textContent = "0 $";
+    return;
   }
-  document.getElementById("budgetTotal").textContent = total.toLocaleString("fr-CA") + " $";
+
+  // group by academic year, preserving first-seen order; blanks grouped last
+  const groups = [];
+  const groupIndex = {};
+  state.activities.forEach(a=>{
+    const yr = (a.academicYear||"").trim() || "Année non précisée";
+    if(!(yr in groupIndex)){ groupIndex[yr] = groups.length; groups.push({year:yr, items:[], subtotal:0}); }
+    const g = groups[groupIndex[yr]];
+    const cost = a.estimatedCost || 0;
+    g.items.push(a);
+    g.subtotal += cost;
+  });
+  groups.sort((a,b)=>{
+    if(a.year==="Année non précisée") return 1;
+    if(b.year==="Année non précisée") return -1;
+    return a.year.localeCompare(b.year);
+  });
+
+  let grandTotal = 0;
+  groups.forEach(g=>{
+    g.items.forEach((a,i)=>{
+      const cost = a.estimatedCost || 0;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${i===0 ? escapeHtml(g.year) : ""}</td><td>${escapeHtml(a.title || "(sans titre)")}</td><td>${escapeHtml(catLabel(a.category))}</td><td style="text-align:right;">${cost ? cost.toLocaleString("fr-CA") + " $" : "—"}</td>`;
+      rows.appendChild(tr);
+    });
+    const subtr = document.createElement("tr");
+    subtr.innerHTML = `<td colspan="3" style="font-weight:600;border-top:1px solid var(--border);">Sous-total — ${escapeHtml(g.year)}</td><td style="text-align:right;font-weight:600;border-top:1px solid var(--border);">${g.subtotal.toLocaleString("fr-CA")} $</td>`;
+    rows.appendChild(subtr);
+    grandTotal += g.subtotal;
+  });
+
+  document.getElementById("budgetTotal").textContent = grandTotal.toLocaleString("fr-CA") + " $";
 }
 
 document.getElementById("budget-notes").addEventListener("input", e=>{ state.budgetPlanning.notes = e.target.value; touch(); });
@@ -850,6 +1183,7 @@ function fullRender(){
   updateAxesSourceNote();
   renderQualityRadar();
   renderAppreciationHistory();
+  renderSurveyComparative();
   renderDomainSkills();
   renderActivities();
   renderBudget();
@@ -892,6 +1226,8 @@ document.getElementById("fileImport").addEventListener("change", (e)=>{
       if(!Array.isArray(state.qualityRadar.entries)) state.qualityRadar.entries = [];
       if(!Array.isArray(state.qualityRadar.axesSnapshot)) state.qualityRadar.axesSnapshot = [];
       if(!Array.isArray(state.studentFeedbackHistory)) state.studentFeedbackHistory = [];
+      if(!state.studentSurveyResponses || typeof state.studentSurveyResponses !== "object") state.studentSurveyResponses = { importedAt:"", fileName:"", perAxis:{} };
+      if(!state.studentSurveyResponses.perAxis || typeof state.studentSurveyResponses.perAxis !== "object") state.studentSurveyResponses.perAxis = {};
       if(!Array.isArray(state.domainSkills)) state.domainSkills = [];
       state.domainSkills.forEach(sk=>{
         if(sk.kind === undefined) sk.kind = "nouvelle";
@@ -905,6 +1241,8 @@ document.getElementById("fileImport").addEventListener("change", (e)=>{
         if(a.rdApprovalStatus === undefined) a.rdApprovalStatus = a.rdApprovalObtained ? "approuvee" : "en_attente";
         if(a.rdApprovedBy === undefined) a.rdApprovedBy = "";
         if(a.rdApprovalDate === undefined) a.rdApprovalDate = "";
+        if(a.academicYear === undefined) a.academicYear = "";
+        if(a.format === "colloque" || a.format === "congres") a.format = "colloque_congres";
         delete a.rdApprovalObtained;
       });
       fullRender();

@@ -7,7 +7,7 @@ const CATEGORY_LABELS = {
   recyclage:"Recyclage", autre:"Autre"
 };
 const FORMAT_LABELS = {
-  seminaire:"Séminaire", colloque:"Colloque", congres:"Congrès", conference:"Conférence",
+  seminaire:"Séminaire", colloque:"Colloque ou congrès", congres:"Colloque ou congrès", colloque_congres:"Colloque ou congrès", conference:"Conférence",
   stage:"Stage en milieu industriel", cours_non_credite:"Cours non crédité", cours_credite:"Cours crédité",
   atelier:"Atelier", mentorat:"Mentorat / formation entre pairs", autre:"Autre"
 };
@@ -22,7 +22,8 @@ const PLAN_STATUS_LABELS = { expired:"Expiré", soon:"Bientôt à réviser", ok:
 const REVIEW_STATUS_LABELS = { new:"Nouveau — non revu", updated:"Mis à jour depuis la revue", reviewed:"Revu" };
 
 const DEFAULT_AXES_CONFIG = {
-  schemaVersion:"1.0", scaleMin:1, scaleMax:5,
+  schemaVersion:"1.0", scaleMin:1, scaleMax:7,
+  scaleLabels:["Très faible","Faible","Limité","Correct","Confortable","Confiant","Maîtrisé"],
   axes:[
     {id:"clarte", label:"Clarté des explications", description:"La capacité à expliquer les concepts de façon claire et compréhensible."},
     {id:"organisation", label:"Organisation du cours", description:"La structure, la planification et la cohérence du déroulement du cours."},
@@ -30,7 +31,7 @@ const DEFAULT_AXES_CONFIG = {
     {id:"retroaction", label:"Rétroaction et évaluation", description:"La qualité, la clarté et l'utilité de la rétroaction donnée aux étudiants."},
     {id:"disponibilite", label:"Disponibilité et soutien", description:"L'accessibilité et le soutien offerts aux étudiants en dehors des cours."},
     {id:"gestion", label:"Gestion de classe", description:"La capacité à maintenir un environnement d'apprentissage respectueux et productif."},
-    {id:"numerique", label:"Utilisation du numérique", description:"L'intégration pertinente des technologies éducatives dans l'enseignement."}
+    {id:"numerique", label:"Diversité des outils et du matériel pédagogique", description:"Le recours à des outils et supports variés — numériques, imprimés, manipulables ou autres — choisis selon le besoin pédagogique plutôt que par défaut."}
   ]
 };
 let AXES_CONFIG = JSON.parse(JSON.stringify(DEFAULT_AXES_CONFIG));

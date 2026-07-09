@@ -1,43 +1,111 @@
 {
   "schemaVersion": "1.0",
   "scaleMin": 1,
-  "scaleMax": 5,
-  "scaleLabels": ["Faible", "Fragile", "Correct", "Bon", "Excellent"],
+  "scaleMax": 7,
+  "scaleLabels": [
+    "Très faible",
+    "Faible",
+    "Limité",
+    "Correct",
+    "Confortable",
+    "Confiant",
+    "Maîtrisé"
+  ],
   "axes": [
     {
       "id": "clarte",
       "label": "Clarté des explications",
-      "description": "La capacité à expliquer les concepts de façon claire et compréhensible."
+      "description": "La capacité à expliquer les concepts de façon claire et compréhensible.",
+      "ideas": [
+        "Utiliser des exemples concrets et des analogies tirées du quotidien",
+        "Varier les supports : tableau, schémas dessinés à la main, objets manipulables",
+        "Résumer les points clés oralement et par écrit à la fin de chaque section"
+      ],
+      "labelEn": "Clarity of explanations"
     },
     {
       "id": "organisation",
       "label": "Organisation du cours",
-      "description": "La structure, la planification et la cohérence du déroulement du cours."
+      "description": "La structure, la planification et la cohérence du déroulement du cours.",
+      "ideas": [
+        "Distribuer un plan de cours papier annoté au fil des séances",
+        "Utiliser des fiches ou un cahier de suivi pour structurer chaque séance",
+        "Prévoir des repères visuels affichés en classe (échéanciers, étapes du cours)"
+      ],
+      "labelEn": "Course organization"
     },
     {
       "id": "engagement",
       "label": "Engagement des étudiants",
-      "description": "La capacité à susciter l'intérêt et la participation active des étudiants."
+      "description": "La capacité à susciter l'intérêt et la participation active des étudiants.",
+      "ideas": [
+        "Jeux de rôle, mises en situation ou études de cas sur papier",
+        "Discussions en petits groupes avec du matériel physique (cartes, jetons, tableaux blancs)",
+        "Projets pratiques utilisant du matériel réel du domaine étudié"
+      ],
+      "labelEn": "Student engagement"
     },
     {
       "id": "retroaction",
       "label": "Rétroaction et évaluation",
-      "description": "La qualité, la clarté et l'utilité de la rétroaction donnée aux étudiants."
+      "description": "La qualité, la clarté et l'utilité de la rétroaction donnée aux étudiants.",
+      "ideas": [
+        "Rétroaction manuscrite personnalisée directement sur les copies",
+        "Grilles d'évaluation critériées partagées à l'avance, sur papier ou à l'écran",
+        "Courtes rencontres individuelles pour discuter des travaux"
+      ],
+      "labelEn": "Feedback and assessment"
     },
     {
       "id": "disponibilite",
       "label": "Disponibilité et soutien",
-      "description": "L'accessibilité et le soutien offerts aux étudiants en dehors des cours."
+      "description": "L'accessibilité et le soutien offerts aux étudiants en dehors des cours.",
+      "ideas": [
+        "Heures de bureau fixes, en personne ou par téléphone",
+        "Bibliothèque de ressources papier en libre accès (guides, exemples annotés)",
+        "Groupes d'entraide entre étudiants avec du matériel partagé"
+      ],
+      "labelEn": "Availability and support"
     },
     {
       "id": "gestion",
       "label": "Gestion de classe",
-      "description": "La capacité à maintenir un environnement d'apprentissage respectueux et productif."
+      "description": "La capacité à maintenir un environnement d'apprentissage respectueux et productif.",
+      "ideas": [
+        "Supports physiques pour structurer les transitions (minuteries, signaux visuels)",
+        "Aménagement de l'espace (îlots, cercles de discussion)",
+        "Routines claires affichées en classe"
+      ],
+      "labelEn": "Classroom management"
     },
     {
       "id": "numerique",
-      "label": "Utilisation du numérique",
-      "description": "L'intégration pertinente des technologies éducatives dans l'enseignement."
+      "label": "Diversité des outils et du matériel pédagogique",
+      "description": "Le recours à des outils et supports variés — numériques, imprimés, manipulables ou autres — choisis selon le besoin pédagogique plutôt que par défaut.",
+      "ideas": [
+        "Combiner plusieurs supports pour un même contenu (ex. démonstration physique + fiche papier + vidéo courte)",
+        "Maquettes, manipulables, matériel de laboratoire ou instruments propres à la discipline",
+        "Choisir l'outil — numérique ou non — en fonction du besoin pédagogique, pas de la nouveauté"
+      ],
+      "labelEn": "Diversity of tools and materials"
     }
+  ],
+  "surveyScaleLabels": [
+    "Très faible",
+    "Faible",
+    "Passable",
+    "Correct",
+    "Bon",
+    "Très bon",
+    "Excellent"
+  ],
+  "surveyScaleLabelsEn": [
+    "Very poor",
+    "Poor",
+    "Fair",
+    "Correct",
+    "Good",
+    "Very good",
+    "Excellent"
   ]
 }

@@ -29,7 +29,7 @@
     <a href="#axes-anchor">Auto-positionnement</a>
     <a href="#sec-feedback">Appréciation étudiante</a>
     <a href="#sec-domain-skills">Compétences disciplinaires</a>
-    <a href="#sec-activities">Activités et R&D</a>
+    <a href="#sec-activities">Activités de perfectionnement</a>
     <a href="#sec-budget">Budget de perfectionnement</a>
     <a href="#sec-leave">Congé sans solde</a>
   </nav>
@@ -124,7 +124,7 @@
 
     <section class="card" id="sec-feedback">
       <h2>3. Auto-positionnement — axes de qualité d'enseignement</h2>
-      <p class="hint" id="axes-anchor">Pour chaque axe, indiquez où vous vous situez actuellement et l'objectif visé. Les notes écrites sont optionnelles.
+      <p class="hint" id="axes-anchor">Déplacez le curseur pour indiquer votre position, de « très faible » à « maîtrisé ». Pour chaque axe, indiquez où vous vous situez actuellement et l'objectif visé — l'objectif ne peut pas être inférieur à la position actuelle. Les notes écrites sont optionnelles.
         <span id="axesSourceNote" style="display:block;margin-top:4px;color:var(--muted);"></span>
       </p>
       <div class="field" style="max-width:320px;">
@@ -148,6 +148,28 @@
       </div>
       <button class="small" id="btnAddApprEntry">+ Ajouter à l'historique</button>
       <div id="apprHistory" style="margin-top:14px;"></div>
+
+      <div style="border-top:1px solid var(--border); margin:22px 0 18px;"></div>
+      <h3 style="font-size:14.5px; margin:0 0 4px;">Sondage étudiant</h3>
+      <p class="hint">Générez un sondage bilingue (français/anglais) à importer dans Microsoft Forms, puis importez les résultats pour les comparer à votre auto-positionnement.</p>
+      <div class="warn-box">
+        <strong>Anonymat</strong>
+        Une fois le sondage créé dans Microsoft Forms, ouvrez les paramètres du formulaire (icône « ... » ou « Paramètres ») et désactivez l'option qui enregistre le nom des répondants (habituellement « Enregistrer le nom » / « Record name »), afin que les réponses demeurent anonymes.
+      </div>
+      <div class="info-box">
+        L'importation Word de Microsoft Forms («&nbsp;Importation rapide&nbsp;») ne convertit fiablement que les questions à choix unique — après l'importation, cliquez sur « Vérifier » et confirmez que chaque question a bien été reconnue comme un choix unique avant de publier le sondage.
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+        <button class="primary" id="btnGenSurveyDocx">Générer le sondage (Word, bilingue)</button>
+        <button class="small" id="btnImportSurveyTrigger">Importer les résultats (Excel)</button>
+        <input type="file" id="surveyExcelImport" accept=".xlsx,.xls">
+      </div>
+      <div id="surveyImportStatus" style="font-size:12.5px; color:var(--muted); margin-top:8px;"></div>
+
+      <div id="surveyComparativeWrap" style="display:none; margin-top:18px;">
+        <div style="max-width:560px; margin:0 auto;"><svg id="surveyRadarSvg" viewBox="0 0 560 560" xmlns="http://www.w3.org/2000/svg"></svg></div>
+        <div class="legend" id="surveyRadarLegend" style="justify-content:center;"></div>
+      </div>
     </section>
 
     <section class="card" id="sec-domain-skills">
@@ -158,8 +180,8 @@
     </section>
 
     <section class="card" id="sec-activities">
-      <h2>5. Activités de formation, recyclage et perfectionnement</h2>
-      <p class="hint">Ajoutez une carte par activité prévue ou réalisée. Utilisez les listes déroulantes pour permettre l'analyse statistique par le responsable de programmes.</p>
+      <h2>5. Activités de perfectionnement</h2>
+      <p class="hint">Ce plan est une proposition. Les approbations correspondantes (budget, R&D, reconnaissance) doivent être obtenues séparément, par les voies et processus institutionnels établis à cette fin. Ajoutez une carte par activité prévue ou réalisée — les listes déroulantes permettent l'analyse statistique par le responsable de programmes.</p>
       <div class="warn-box">
         <strong>Reconnaissance en R&D</strong>
         Ce plan n'accorde aucune approbation. Une activité cochée « proposée en R&D » n'est reconnue comme telle qu'après approbation écrite préalable de la Direction des études — une fois obtenue, indiquez qui l'a approuvée et à quelle date. Si elle est refusée, révisez le plan en conséquence.
@@ -170,11 +192,11 @@
 
     <section class="card" id="sec-budget">
       <h2>6. Planification du budget de perfectionnement</h2>
-      <p class="hint">Planification seulement — le traitement financier réel (approbation, remboursement) est géré séparément, selon la convention collective ou les politiques internes en vigueur (selon le cas). Ce tableau reprend simplement le coût estimé des activités ci-dessus.</p>
+      <p class="hint">Planification seulement — le traitement financier réel (approbation, remboursement) est géré séparément, selon la convention collective ou les politiques internes en vigueur (selon le cas). Ce tableau reprend le coût estimé des activités ci-dessus, regroupé par année académique puisqu'il est appelé à s'accumuler d'année en année.</p>
       <table id="budgetTable">
-        <thead><tr><th>Activité</th><th>Catégorie</th><th style="text-align:right;">Coût estimé (CAD)</th></tr></thead>
+        <thead><tr><th>Année académique</th><th>Activité</th><th>Catégorie</th><th style="text-align:right;">Coût estimé (CAD)</th></tr></thead>
         <tbody id="budgetRows"></tbody>
-        <tfoot><tr><td colspan="2">Total estimé</td><td style="text-align:right;" id="budgetTotal">0 $</td></tr></tfoot>
+        <tfoot><tr><td colspan="3">Total estimé (toutes années)</td><td style="text-align:right;" id="budgetTotal">0 $</td></tr></tfoot>
       </table>
       <div class="info-box">Rappel : consultez la convention collective ou les politiques internes en vigueur (selon le cas) pour le montant exact et les modalités du budget individuel de perfectionnement (généralement non cumulatif et non transférable d'une année à l'autre).</div>
       <div class="field" style="margin-top:14px;">
@@ -200,6 +222,8 @@
 
 <footer class="appfoot">Plan personnel de perfectionnement — outil de planification interne. Ne remplace aucune disposition de la convention collective ou des politiques internes en vigueur (selon le cas).</footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="index.js"></script>
 </body>
 </html>
