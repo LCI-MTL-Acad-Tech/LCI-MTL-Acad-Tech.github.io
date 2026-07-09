@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "1.0",
+  "scaleMin": 1,
+  "scaleMax": 5,
+  "scaleLabels": ["Faible", "Fragile", "Correct", "Bon", "Excellent"],
+  "axes": [
+    {
+      "id": "clarte",
+      "label": "Clarté des explications",
+      "description": "La capacité à expliquer les concepts de façon claire et compréhensible."
+    },
+    {
+      "id": "organisation",
+      "label": "Organisation du cours",
+      "description": "La structure, la planification et la cohérence du déroulement du cours."
+    },
+    {
+      "id": "engagement",
+      "label": "Engagement des étudiants",
+      "description": "La capacité à susciter l'intérêt et la participation active des étudiants."
+    },
+    {
+      "id": "retroaction",
+      "label": "Rétroaction et évaluation",
+      "description": "La qualité, la clarté et l'utilité de la rétroaction donnée aux étudiants."
+    },
+    {
+      "id": "disponibilite",
+      "label": "Disponibilité et soutien",
+      "description": "L'accessibilité et le soutien offerts aux étudiants en dehors des cours."
+    },
+    {
+      "id": "gestion",
+      "label": "Gestion de classe",
+      "description": "La capacité à maintenir un environnement d'apprentissage respectueux et productif."
+    },
+    {
+      "id": "numerique",
+      "label": "Utilisation du numérique",
+      "description": "L'intégration pertinente des technologies éducatives dans l'enseignement."
+    }
+  ]
+}
