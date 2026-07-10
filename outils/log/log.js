@@ -132,7 +132,7 @@ function renderHeader() {
   if (picker) {
     picker.value = currentLog.date;
     picker.min   = logData?.context?.start_date || "";
-    picker.max   = logData?.context?.scheduled_end_date || "";
+    picker.max   = ""; // no upper limit — students can log past their scheduled end date
   }
 
   if (currentLog.time_start) {
@@ -519,11 +519,11 @@ function switchToDate(dateStr) {
   if (!dateStr || !logData) return;
   toggleDatePicker(false);
 
-  // Clamp to internship bounds if defined
+  // Clamp to internship start if defined — no upper limit, students may log past their end date
   const start = logData.context?.start_date;
   const end   = logData.context?.scheduled_end_date;
   if (start && dateStr < start) dateStr = start;
-  if (end   && dateStr > end)   dateStr = end;
+  // end date is intentionally not enforced here
 
   updateLog(); // save current log first
 
@@ -546,7 +546,7 @@ function goToRealToday() {
   const start = logData?.context?.start_date;
   const end   = logData?.context?.scheduled_end_date;
   if (start && realToday < start) realToday = start;
-  if (end   && realToday > end)   realToday = end;
+  // end date not enforced — students can log past their scheduled end
   switchToDate(realToday);
 }
 
