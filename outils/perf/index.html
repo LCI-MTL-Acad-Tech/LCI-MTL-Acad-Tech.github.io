@@ -3,35 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plan personnel de perfectionnement</title>
+<title data-i18n="docTitle">Plan personnel de perfectionnement</title>
 <link rel="stylesheet" href="index.css">
 </head>
 <body>
 
 <header class="app-header">
   <div>
-    <h1>Plan personnel de perfectionnement</h1>
-    <div class="sub">Outil de planification — perfectionnement et développement professionnel</div>
+    <h1 data-i18n="docTitle">Plan personnel de perfectionnement</h1>
+    <div class="sub" data-i18n="appSubtitle">Outil de planification — perfectionnement et développement professionnel</div>
   </div>
   <div class="header-actions">
-    <button class="ghost" id="btnNew">Nouveau plan</button>
-    <button class="ghost" id="btnImportTrigger">Charger un plan (JSON)</button>
+    <div class="lang-toggle">
+      <button id="btnLangFr" class="active" data-lang="fr">FR</button>
+      <button id="btnLangEn" data-lang="en">EN</button>
+    </div>
+    <button class="ghost" id="btnThemeToggle">Mode sombre</button>
+    <div class="divider"></div>
+    <button class="ghost" id="btnNew" data-i18n="btnNew">Nouveau plan</button>
+    <button class="ghost" id="btnImportTrigger" data-i18n="btnImportPlan">Charger un plan (JSON)</button>
     <input type="file" id="fileImport" accept="application/json">
-    <button class="primary" id="btnExport">Exporter en JSON</button>
+    <button class="primary" id="btnExport" data-i18n="btnExportPlan">Exporter en JSON</button>
   </div>
 </header>
 
 <div class="layout">
   <nav class="toc">
-    <div class="toc-title">Sections</div>
-    <a href="#sec-meta">Identification</a>
-    <a href="#sec-timeline">Échéancier</a>
-    <a href="#axes-anchor">Auto-positionnement</a>
-    <a href="#sec-feedback">Appréciation étudiante</a>
-    <a href="#sec-domain-skills">Compétences disciplinaires</a>
-    <a href="#sec-activities">Activités de perfectionnement</a>
-    <a href="#sec-budget">Budget de perfectionnement</a>
-    <a href="#sec-leave">Congé sans solde</a>
+    <div class="toc-title" data-i18n="tocSectionsTitle">Sections</div>
+    <a href="#sec-meta" data-i18n="tocIdent">Identification</a>
+    <a href="#sec-timeline" data-i18n="tocTimeline">Échéancier</a>
+    <a href="#axes-anchor" data-i18n="tocSelfPos">Auto-positionnement</a>
+    <a href="#sec-feedback" data-i18n="tocAppr">Appréciation étudiante</a>
+    <a href="#sec-domain-skills" data-i18n="tocSkills">Compétences disciplinaires</a>
+    <a href="#sec-activities" data-i18n="tocActivities">Activités de perfectionnement</a>
+    <a href="#sec-budget" data-i18n="tocBudget">Budget de perfectionnement</a>
+    <a href="#sec-leave" data-i18n="tocLeave">Congé sans solde</a>
   </nav>
 
   <main>
@@ -41,9 +47,9 @@
         <div style="display:grid; grid-template-columns:220px 1fr; gap:24px; align-items:center;">
           <div style="position:relative; height:200px;"><svg id="teaserSvg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"></svg></div>
           <div>
-            <h2 style="margin:0 0 6px;">Votre portrait de perfectionnement</h2>
-            <p class="hint" style="margin:0 0 14px;">Une fois vos axes de qualité d'enseignement remplis, votre portrait apparaîtra ici : qui vous êtes aujourd'hui, et vers quoi vous évoluez.</p>
-            <button class="primary" id="btnGoToAxes">Remplir mes axes de qualité</button>
+            <h2 style="margin:0 0 6px;" data-i18n="portraitTitle">Votre portrait de perfectionnement</h2>
+            <p class="hint" style="margin:0 0 14px;" data-i18n="portraitTeaserHint">Une fois vos axes de qualité d'enseignement remplis, votre portrait apparaîtra ici : qui vous êtes aujourd'hui, et vers quoi vous évoluez.</p>
+            <button class="primary" id="btnGoToAxes" data-i18n="btnGoToAxes">Remplir mes axes de qualité</button>
           </div>
         </div>
       </div>
@@ -53,18 +59,18 @@
           <div id="portraitAvatar" style="width:44px; height:44px; border-radius:50%; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:var(--accent-dark);">—</div>
           <div>
             <div id="portraitName" style="font-weight:700; font-size:15px;">—</div>
-            <div style="font-size:12.5px; color:var(--muted);">Portrait de perfectionnement</div>
+            <div style="font-size:12.5px; color:var(--muted);" data-i18n="portraitSubtitle">Portrait de perfectionnement</div>
           </div>
         </div>
         <div style="display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:24px; align-items:center;">
           <div style="position:relative; height:280px;"><svg id="portraitRadarSvg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"></svg></div>
           <div style="display:flex; flex-direction:column; gap:14px;">
             <div>
-              <p style="font-size:11.5px; color:var(--muted); margin:0 0 4px; text-transform:uppercase; letter-spacing:.04em;">Aujourd'hui</p>
+              <p style="font-size:11.5px; color:var(--muted); margin:0 0 4px; text-transform:uppercase; letter-spacing:.04em;" data-i18n="labelToday">Aujourd'hui</p>
               <p id="portraitStrongLine" style="font-size:14.5px; line-height:1.5; margin:0;">—</p>
             </div>
             <div>
-              <p style="font-size:11.5px; color:var(--muted); margin:0 0 4px; text-transform:uppercase; letter-spacing:.04em;">Vers quoi vous évoluez</p>
+              <p style="font-size:11.5px; color:var(--muted); margin:0 0 4px; text-transform:uppercase; letter-spacing:.04em;" data-i18n="labelEvolving">Vers quoi vous évoluez</p>
               <p id="portraitGrowLine" style="font-size:14.5px; line-height:1.5; margin:0 0 8px;">—</p>
               <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 <span id="portraitGrowingPill" class="badge" style="display:inline-block; font-size:11.5px; padding:3px 10px; border-radius:10px; background:var(--accent-soft); color:var(--accent-dark);"></span>
@@ -78,90 +84,90 @@
     </section>
 
     <section class="card" id="sec-meta">
-      <h2>1. Identification</h2>
-      <p class="hint">Renseignements de base sur la personne enseignante. La création et les modifications sont horodatées automatiquement.</p>
+      <h2 data-i18n="h2Ident">1. Identification</h2>
+      <p class="hint" data-i18n="identHint">Renseignements de base sur la personne enseignante. La création et les modifications sont horodatées automatiquement.</p>
       <div class="grid3">
         <div class="field">
-          <label for="m-name">Nom de la personne enseignante</label>
-          <input type="text" id="m-name" placeholder="Prénom Nom">
+          <label for="m-name" data-i18n="labelName">Nom de la personne enseignante</label>
+          <input type="text" id="m-name" placeholder="Prénom Nom" data-i18n-placeholder="phName">
         </div>
         <div class="field">
-          <label for="m-email">Courriel institutionnel</label>
+          <label for="m-email" data-i18n="labelEmail">Courriel institutionnel</label>
           <input type="text" id="m-email" placeholder="prenom.nom@exemple.education">
         </div>
         <div class="field">
-          <label for="m-employee">Numéro d'employé</label>
-          <input type="text" id="m-employee" placeholder="Ex. 012345">
+          <label for="m-employee" data-i18n="labelEmployee">Numéro d'employé</label>
+          <input type="text" id="m-employee" placeholder="Ex. 012345" data-i18n-placeholder="phEmployee">
         </div>
       </div>
       <div class="grid3">
         <div class="field tight">
-          <label>Créé le</label>
+          <label data-i18n="labelCreated">Créé le</label>
           <div id="m-created-display" style="font-size:13.5px; padding:8px 0; color:var(--ink);">—</div>
         </div>
         <div class="field tight">
-          <label>Dernière modification</label>
+          <label data-i18n="labelUpdated">Dernière modification</label>
           <div id="m-updated-display" style="font-size:13.5px; padding:8px 0; color:var(--ink);">—</div>
         </div>
         <div class="field tight">
-          <label for="m-end-date">Date de fin visée du plan</label>
+          <label for="m-end-date" data-i18n="labelEndDate">Date de fin visée du plan</label>
           <input type="date" id="m-end-date">
         </div>
       </div>
-      <p class="hint" style="margin-top:-6px;">Par défaut, deux ans après la création. Vous pouvez la raccourcir; à chaque modification, vous pouvez la prolonger jusqu'à deux ans à partir d'aujourd'hui.</p>
+      <p class="hint" style="margin-top:-6px;" data-i18n="endDateHint">Par défaut, deux ans après la création. Vous pouvez la raccourcir; à chaque modification, vous pouvez la prolonger jusqu'à deux ans à partir d'aujourd'hui.</p>
     </section>
 
     <section class="card" id="sec-timeline">
-      <h2>2. Échéancier</h2>
-      <p class="hint">Calculé à partir de la date de création et de la date de fin visée. Vous montre ce qui est prévu à la convention collective, s'il y a lieu — pas des obligations ajoutées par cet outil.</p>
+      <h2 data-i18n="h2Timeline">2. Échéancier</h2>
+      <p class="hint" data-i18n="timelineHint">Calculé à partir de la date de création et de la date de fin visée. Vous montre ce qui est prévu à la convention collective, s'il y a lieu — pas des obligations ajoutées par cet outil.</p>
       <div id="timelineWrap"><svg id="timelineSvg" viewBox="0 0 900 190" xmlns="http://www.w3.org/2000/svg"></svg></div>
       <div class="legend">
-        <span><i style="background:#2F6F6B"></i> Cycle du plan</span>
-        <span><i style="background:#A6673A"></i> Appréciation étudiante reçue</span>
-        <span><i style="background:#8A8F98"></i> Rappels annuels — budget individuel</span>
+        <span><i style="background:#2F6F6B"></i> <span data-i18n="legendCycle">Cycle du plan</span></span>
+        <span><i style="background:#A6673A"></i> <span data-i18n="legendApprReceived">Appréciation étudiante reçue</span></span>
+        <span><i style="background:#8A8F98"></i> <span data-i18n="legendBudgetReminders">Rappels annuels — budget individuel</span></span>
       </div>
     </section>
 
     <section class="card" id="sec-feedback">
-      <h2>3. Auto-positionnement — axes de qualité d'enseignement</h2>
+      <h2 data-i18n="h2SelfPos">3. Auto-positionnement — axes de qualité d'enseignement</h2>
       <p class="hint" id="axes-anchor">Déplacez le curseur pour indiquer votre position, de « très faible » à « maîtrisé ». Pour chaque axe, indiquez où vous vous situez actuellement et l'objectif visé — l'objectif ne peut pas être inférieur à la position actuelle. Les notes écrites sont optionnelles.
         <span id="axesSourceNote" style="display:block;margin-top:4px;color:var(--muted);"></span>
       </p>
       <div class="field" style="max-width:320px;">
-        <label for="radar-target-date">Échéance visée pour l'atteinte de ces objectifs (optionnel)</label>
+        <label for="radar-target-date" data-i18n="targetDateLabel">Échéance visée pour l'atteinte de ces objectifs (optionnel)</label>
         <input type="date" id="radar-target-date">
       </div>
       <div id="axesRows"></div>
       <div style="margin-top:18px;">
         <div id="radarPreviewWrap" style="max-width:460px;"><svg id="radarPreviewSvg" viewBox="0 0 460 460" xmlns="http://www.w3.org/2000/svg"></svg></div>
         <div class="legend">
-          <span><i style="background:var(--accent-soft);border:1px solid var(--accent);"></i> Position actuelle</span>
-          <span><i style="background:none;border:2px dashed var(--ink);"></i> Objectif</span>
+          <span><i style="background:var(--accent-soft);border:1px solid var(--accent);"></i> <span data-i18n="legendCurrent">Position actuelle</span></span>
+          <span><i style="background:none;border:2px dashed var(--ink);"></i> <span data-i18n="legendGoal">Objectif</span></span>
         </div>
       </div>
 
       <div style="border-top:1px solid var(--border); margin:22px 0 18px;"></div>
-      <h3 style="font-size:14.5px; margin:0 0 4px;">Appréciation étudiante</h3>
-      <p class="hint">Un champ libre, optionnel, pour y déposer et résumer une appréciation étudiante formelle lorsque vous la recevez. Chaque entrée est conservée — rien n'est remplacé, l'historique s'accumule au fil des cycles.</p>
+      <h3 style="font-size:14.5px; margin:0 0 4px;" data-i18n="h3Appr">Appréciation étudiante</h3>
+      <p class="hint" data-i18n="apprHint">Un champ libre, optionnel, pour y déposer et résumer une appréciation étudiante formelle lorsque vous la recevez. Chaque entrée est conservée — rien n'est remplacé, l'historique s'accumule au fil des cycles.</p>
       <div class="field">
-        <textarea id="appr-new-entry" placeholder="Ex. résumé, tendances observées, extraits pertinents..."></textarea>
+        <textarea id="appr-new-entry" placeholder="Ex. résumé, tendances observées, extraits pertinents..." data-i18n-placeholder="apprPlaceholder"></textarea>
       </div>
-      <button class="small" id="btnAddApprEntry">+ Ajouter à l'historique</button>
+      <button class="small" id="btnAddApprEntry" data-i18n="btnAddAppr">+ Ajouter à l'historique</button>
       <div id="apprHistory" style="margin-top:14px;"></div>
 
       <div style="border-top:1px solid var(--border); margin:22px 0 18px;"></div>
-      <h3 style="font-size:14.5px; margin:0 0 4px;">Sondage étudiant</h3>
-      <p class="hint">Générez un sondage bilingue (français/anglais) à importer dans Microsoft Forms, puis importez les résultats pour les comparer à votre auto-positionnement.</p>
+      <h3 style="font-size:14.5px; margin:0 0 4px;" data-i18n="h3Survey">Sondage étudiant</h3>
+      <p class="hint" data-i18n="surveyHint">Générez un sondage bilingue (français/anglais) à importer dans Microsoft Forms, puis importez les résultats pour les comparer à votre auto-positionnement.</p>
       <div class="warn-box">
-        <strong>Anonymat</strong>
-        Une fois le sondage créé dans Microsoft Forms, ouvrez les paramètres du formulaire (icône « ... » ou « Paramètres ») et désactivez l'option qui enregistre le nom des répondants (habituellement « Enregistrer le nom » / « Record name »), afin que les réponses demeurent anonymes.
+        <strong data-i18n="anonymityTitle">Anonymat</strong>
+        <span data-i18n="anonymityText">Une fois le sondage créé dans Microsoft Forms, ouvrez les paramètres du formulaire (icône « ... » ou « Paramètres ») et désactivez l'option qui enregistre le nom des répondants (habituellement « Enregistrer le nom » / « Record name »), afin que les réponses demeurent anonymes.</span>
       </div>
       <div class="info-box">
-        L'importation Word de Microsoft Forms («&nbsp;Importation rapide&nbsp;») ne convertit fiablement que les questions à choix unique — après l'importation, cliquez sur « Vérifier » et confirmez que chaque question a bien été reconnue comme un choix unique avant de publier le sondage.
+        <span data-i18n="quickImportNote">L'importation Word de Microsoft Forms («&nbsp;Importation rapide&nbsp;») ne convertit fiablement que les questions à choix unique — après l'importation, cliquez sur « Vérifier » et confirmez que chaque question a bien été reconnue comme un choix unique avant de publier le sondage.</span>
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
-        <button class="primary" id="btnGenSurveyDocx">Générer le sondage (Word, bilingue)</button>
-        <button class="small" id="btnImportSurveyTrigger">Importer les résultats (Excel)</button>
+        <button class="primary" id="btnGenSurveyDocx" data-i18n="btnGenDocx">Générer le sondage (Word, bilingue)</button>
+        <button class="small" id="btnImportSurveyTrigger" data-i18n="btnImportResults">Importer les résultats (Excel)</button>
         <input type="file" id="surveyExcelImport" accept=".xlsx,.xls">
       </div>
       <div id="surveyImportStatus" style="font-size:12.5px; color:var(--muted); margin-top:8px;"></div>
@@ -173,54 +179,54 @@
     </section>
 
     <section class="card" id="sec-domain-skills">
-      <h2>4. Compétences disciplinaires</h2>
-      <p class="hint">Propre à votre discipline ou champ d'expertise — distinct des axes généraux de qualité d'enseignement ci-dessus. Ajoutez une carte par compétence : une nouvelle à développer, ou une expertise existante à maintenir ou actualiser.</p>
+      <h2 data-i18n="h2Skills">4. Compétences disciplinaires</h2>
+      <p class="hint" data-i18n="skillsHint">Propre à votre discipline ou champ d'expertise — distinct des axes généraux de qualité d'enseignement ci-dessus. Ajoutez une carte par compétence : une nouvelle à développer, ou une expertise existante à maintenir ou actualiser.</p>
       <div id="domainSkillsList" style="margin-top:12px;"></div>
-      <button class="primary" id="btnAddDomainSkill">+ Ajouter une compétence</button>
+      <button class="primary" id="btnAddDomainSkill" data-i18n="btnAddSkill">+ Ajouter une compétence</button>
     </section>
 
     <section class="card" id="sec-activities">
-      <h2>5. Activités de perfectionnement</h2>
-      <p class="hint">Ce plan est une proposition. Les approbations correspondantes (budget, R&D, reconnaissance) doivent être obtenues séparément, par les voies et processus institutionnels établis à cette fin. Ajoutez une carte par activité prévue ou réalisée — les listes déroulantes permettent l'analyse statistique par le responsable de programmes.</p>
+      <h2 data-i18n="h2Activities">5. Activités de perfectionnement</h2>
+      <p class="hint" data-i18n="activitiesHint">Ce plan est une proposition. Les approbations correspondantes (budget, R&D, reconnaissance) doivent être obtenues séparément, par les voies et processus institutionnels établis à cette fin. Ajoutez une carte par activité prévue ou réalisée — les listes déroulantes permettent l'analyse statistique par le responsable de programmes.</p>
       <div class="warn-box">
-        <strong>Reconnaissance en R&D</strong>
-        Ce plan n'accorde aucune approbation. Une activité cochée « proposée en R&D » n'est reconnue comme telle qu'après approbation écrite préalable de la Direction des études — une fois obtenue, indiquez qui l'a approuvée et à quelle date. Si elle est refusée, révisez le plan en conséquence.
+        <strong data-i18n="rdTitle">Reconnaissance en R&D</strong>
+        <span data-i18n="rdWarnText">Ce plan n'accorde aucune approbation. Une activité cochée « proposée en R&D » n'est reconnue comme telle qu'après approbation écrite préalable de la Direction des études — une fois obtenue, indiquez qui l'a approuvée et à quelle date. Si elle est refusée, révisez le plan en conséquence.</span>
       </div>
       <div id="activitiesList" style="margin-top:16px;"></div>
-      <button class="primary" id="btnAddActivity">+ Ajouter une activité</button>
+      <button class="primary" id="btnAddActivity" data-i18n="btnAddActivity">+ Ajouter une activité</button>
     </section>
 
     <section class="card" id="sec-budget">
-      <h2>6. Planification du budget de perfectionnement</h2>
-      <p class="hint">Planification seulement — le traitement financier réel (approbation, remboursement) est géré séparément, selon la convention collective ou les politiques internes en vigueur (selon le cas). Ce tableau reprend le coût estimé des activités ci-dessus, regroupé par année académique puisqu'il est appelé à s'accumuler d'année en année.</p>
+      <h2 data-i18n="h2Budget">6. Planification du budget de perfectionnement</h2>
+      <p class="hint" data-i18n="budgetHint">Planification seulement — le traitement financier réel (approbation, remboursement) est géré séparément, selon la convention collective ou les politiques internes en vigueur (selon le cas). Ce tableau reprend le coût estimé des activités ci-dessus, regroupé par année académique puisqu'il est appelé à s'accumuler d'année en année.</p>
       <table id="budgetTable">
-        <thead><tr><th>Année académique</th><th>Activité</th><th>Catégorie</th><th style="text-align:right;">Coût estimé (CAD)</th></tr></thead>
+        <thead><tr><th data-i18n="thYear">Année académique</th><th data-i18n="thActivity">Activité</th><th data-i18n="thCategory">Catégorie</th><th style="text-align:right;" data-i18n="thCost">Coût estimé (CAD)</th></tr></thead>
         <tbody id="budgetRows"></tbody>
-        <tfoot><tr><td colspan="3">Total estimé (toutes années)</td><td style="text-align:right;" id="budgetTotal">0 $</td></tr></tfoot>
+        <tfoot><tr><td colspan="3" data-i18n="totalLabel">Total estimé (toutes années)</td><td style="text-align:right;" id="budgetTotal">0 $</td></tr></tfoot>
       </table>
-      <div class="info-box">Rappel : consultez la convention collective ou les politiques internes en vigueur (selon le cas) pour le montant exact et les modalités du budget individuel de perfectionnement (généralement non cumulatif et non transférable d'une année à l'autre).</div>
+      <div class="info-box" data-i18n="budgetReminder">Rappel : consultez la convention collective ou les politiques internes en vigueur (selon le cas) pour le montant exact et les modalités du budget individuel de perfectionnement (généralement non cumulatif et non transférable d'une année à l'autre).</div>
       <div class="field" style="margin-top:14px;">
-        <label for="budget-notes">Notes de planification (optionnel)</label>
-        <textarea id="budget-notes" placeholder="Ex. priorisation si le budget ne couvre pas toutes les activités..."></textarea>
+        <label for="budget-notes" data-i18n="budgetNotesLabel">Notes de planification (optionnel)</label>
+        <textarea id="budget-notes" placeholder="Ex. priorisation si le budget ne couvre pas toutes les activités..." data-i18n-placeholder="budgetNotesPlaceholder"></textarea>
       </div>
     </section>
 
     <section class="card" id="sec-leave">
-      <h2>7. Congé sans solde (perfectionnement ou affaires professionnelles)</h2>
-      <p class="hint">Champ optionnel. Décrivez votre projet si vous envisagez un tel congé, et le moment où vous souhaiteriez le prendre — ceci n'est pas une demande formelle.</p>
+      <h2 data-i18n="h2Leave">7. Congé sans solde (perfectionnement ou affaires professionnelles)</h2>
+      <p class="hint" data-i18n="leaveHint">Champ optionnel. Décrivez votre projet si vous envisagez un tel congé, et le moment où vous souhaiteriez le prendre — ceci n'est pas une demande formelle.</p>
       <div class="field">
-        <label for="sabbatical-description">Description (optionnel)</label>
-        <textarea id="sabbatical-description" placeholder="Ex. projet envisagé, moment souhaité, durée approximative..."></textarea>
+        <label for="sabbatical-description" data-i18n="sabDescLabel">Description (optionnel)</label>
+        <textarea id="sabbatical-description" placeholder="Ex. projet envisagé, moment souhaité, durée approximative..." data-i18n-placeholder="sabPlaceholder"></textarea>
       </div>
       <div class="info-box">
-        Consultez la convention collective ou les politiques internes en vigueur (selon le cas) pour les critères d'admissibilité, les modalités, les délais de demande et de prolongation, ainsi que les effets sur l'ancienneté et l'affichage du poste. Cette section n'enclenche aucune démarche formelle.
+        <span data-i18n="leaveInfoText">Consultez la convention collective ou les politiques internes en vigueur (selon le cas) pour les critères d'admissibilité, les modalités, les délais de demande et de prolongation, ainsi que les effets sur l'ancienneté et l'affichage du poste. Cette section n'enclenche aucune démarche formelle.</span>
       </div>
     </section>
 
   </main>
 </div>
 
-<footer class="appfoot">Plan personnel de perfectionnement — outil de planification interne. Ne remplace aucune disposition de la convention collective ou des politiques internes en vigueur (selon le cas).</footer>
+<footer class="appfoot" data-i18n="footerText">Plan personnel de perfectionnement — outil de planification interne. Ne remplace aucune disposition de la convention collective ou des politiques internes en vigueur (selon le cas).</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>

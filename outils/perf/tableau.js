@@ -1,37 +1,201 @@
 /* ---------------------------------------------------------------------
+   i18n: language dictionary + apply/toggle logic
+--------------------------------------------------------------------- */
+let currentLang = "fr";
+
+const TRANSLATIONS = {
+  fr: {
+    docTitle:"Tableau de bord des plans de perfectionnement",
+    appSubtitle:"Vue de la personne responsable de programmes académiques",
+    themeDark:"Mode sombre", themeLight:"Mode clair",
+    btnLoadPlans:"Charger des plans (JSON)", btnClearPlans:"Vider les plans",
+    btnLoadNotes:"Charger mes notes", btnExportNotes:"Exporter mes notes", btnLoadAxes:"Charger les axes (JSON)",
+    tabList:"Liste des plans", tabRadar:"Radar qualité", tabStats:"Statistiques",
+    h2PlansLoaded:"Plans chargés",
+    listHint:"Chargez les fichiers JSON exportés par les personnes enseignantes. Rien n'est envoyé en ligne — tout reste dans cette session de navigateur, sauf ce que vous exportez vous-même.",
+    dropzoneText:"Glissez-déposez des fichiers .json ici, ou utilisez « Charger des plans » ci-dessus.",
+    searchPlaceholder:"Rechercher par nom, courriel, numéro d'employé, titre d'activité, note...",
+    filterPlanAll:"Statut du plan — tous", statusExpired:"Expiré", statusSoon:"Bientôt à réviser", statusOk:"À jour", statusUnknown:"Date manquante",
+    filterReviewAll:"Statut de revue — tous", reviewNew:"Nouveau — non revu", reviewUpdated:"Mis à jour depuis la revue", reviewReviewed:"Revu",
+    thresholdLabel:"Seuil « bientôt »", thresholdSuffix:"jours",
+    thName:"Nom", thEmail:"Courriel institutionnel", thEmployee:"N° employé", thCreated:"Créé le", thEndDate:"Fin visée",
+    thPlanStatus:"Statut du plan", thReviewStatus:"Statut de revue", thActivities:"Activités", thRdCount:"R&D proposées", thSabbatical:"Sabbatique",
+    h2Radar:"Radar qualité d'enseignement",
+    radarHint:"Les bandes montrent la répartition (minimum, quartiles, maximum) des positions actuelles auto-évaluées, pour les plans correspondant au filtre courant. Un enseignant peut être superposé en ligne, par-dessus les bandes.",
+    overlayLabel:"Superposer un enseignant", overlayNone:"Aucun",
+    minGroupLabel:"Taille minimale du groupe pour afficher",
+    h2Stats:"Analyse des besoins de formation et perfectionnement",
+    statsHint:"Agrégation de tous les plans actuellement chargés dans cette session.",
+    h3ChartCategory:"Catégorie d'activité", h3ChartFormat:"Format d'activité", h3ChartRD:"Catégorie R&D proposée",
+    h3Skills:"Compétences disciplinaires signalées", h3Sabbaticals:"Sabbatiques envisagées",
+    btnExportCsv:"Exporter les statistiques (CSV)", btnClose:"Fermer ✕",
+    emptyNoRows:"Aucun plan chargé, ou aucun résultat pour ces filtres.",
+    chipExpired:"Plans expirés", chipSoon:"Bientôt à réviser", chipUnreviewed:"Non revus (nouveaux ou mis à jour)", chipAll:"Total des plans chargés",
+    confirmClearPlans:"Retirer tous les plans chargés de cette session ? (vos notes privées ne sont pas affectées)",
+    confirmClearNotes:"Retirer tous les plans chargés de cette session ?",
+    noDataEmpty:"Aucune donnée.",
+    noneNoted:"Aucun congé envisagé signalé.", noSkillsNoted:"Aucune compétence disciplinaire signalée.",
+    colPerson:"Personne", colDescription:"Description", colSkill:"Compétence", colType:"Type", colWhen:"Quand", colNewCourses:"Nouveaux cours",
+    plansLoadedCard:"Plans chargés", activitiesPlannedCard:"Activités planifiées", rdActivitiesCard:"Activités proposées en R&D",
+    rdApprovedSuffix:"approuvées", sabbaticalsCard:"Congés sans solde envisagés",
+    detailNoAppr:"", noActivities:"Aucune activité.",
+    kvEmail:"Courriel institutionnel", kvEmployee:"N° employé", kvCreated:"Créé le", kvEndDate:"Fin visée", kvLastMod:"Dernière modif.",
+    sectionApprHistory:"Appréciation étudiante — historique", sectionActivities:"Activités", sectionSabbatical:"Congé sans solde envisagé",
+    sectionBudgetNotes:"Notes de planification budgétaire", sectionSkills:"Compétences disciplinaires",
+    btnGoToRadarLabel:"Voir le radar qualité de cette personne",
+    reviewHistoryTitle:"Historique des revues avec cette personne", reviewNoneYet:"Aucune revue enregistrée.",
+    reviewDateLabel:"Date de la revue", reviewNoteLabel:"Note sur cette revue (optionnel)", btnAddReview:"+ Enregistrer cette revue",
+    privateNotesTitle:"Notes privées générales (non partagées avec la personne enseignante)",
+    privateNotesHint:"Ces notes restent uniquement dans votre session, à moins que vous ne les exportiez via « Exporter mes notes ».",
+    legendMin:"Minimum", legendQ1:"Q1", legendMedian:"Médiane", legendQ3:"Q3", legendMax:"Maximum", legendCurrent:"Position actuelle", legendGoal:"Objectif",
+    axesAutoNote:"Axes chargés automatiquement depuis axes.json.", axesDefaultNote:"Axes par défaut utilisés (fichier de configuration non disponible).", axesManualNote:"Axes chargés manuellement.",
+    errAxesConfig:"Impossible de lire ce fichier comme une configuration d'axes valide.",
+    errPlanRead:"", notesLoadedAlert:"Notes chargées.", errNotesRead:"Impossible de lire ce fichier comme des notes valides.",
+    guardMessage:"Pas assez de plans avec auto-position pour préserver l'anonymat (minimum {N}; {C} disponible{CS} selon le filtre courant).",
+  },
+  en: {
+    docTitle:"Professional Development Plans Dashboard",
+    appSubtitle:"Program coordinator view",
+    themeDark:"Dark mode", themeLight:"Light mode",
+    btnLoadPlans:"Load plans (JSON)", btnClearPlans:"Clear plans",
+    btnLoadNotes:"Load my notes", btnExportNotes:"Export my notes", btnLoadAxes:"Load axes (JSON)",
+    tabList:"Plan list", tabRadar:"Quality radar", tabStats:"Statistics",
+    h2PlansLoaded:"Plans loaded",
+    listHint:"Load the JSON files exported by teachers. Nothing is sent online — everything stays in this browser session, except what you export yourself.",
+    dropzoneText:"Drag and drop .json files here, or use \"Load plans\" above.",
+    searchPlaceholder:"Search by name, email, employee number, activity title, note...",
+    filterPlanAll:"Plan status — all", statusExpired:"Expired", statusSoon:"Due soon", statusOk:"Up to date", statusUnknown:"Missing date",
+    filterReviewAll:"Review status — all", reviewNew:"New — not reviewed", reviewUpdated:"Updated since review", reviewReviewed:"Reviewed",
+    thresholdLabel:"\"Due soon\" threshold", thresholdSuffix:"days",
+    thName:"Name", thEmail:"Institutional email", thEmployee:"Employee #", thCreated:"Created on", thEndDate:"Target end",
+    thPlanStatus:"Plan status", thReviewStatus:"Review status", thActivities:"Activities", thRdCount:"R&D proposed", thSabbatical:"Sabbatical",
+    h2Radar:"Quality of instruction radar",
+    radarHint:"The bands show the spread (minimum, quartiles, maximum) of self-assessed current positions, for plans matching the current filter. One teacher can be overlaid as a line on top of the bands.",
+    overlayLabel:"Overlay a teacher", overlayNone:"None",
+    minGroupLabel:"Minimum group size to display",
+    h2Stats:"Analysis of training and development needs",
+    statsHint:"Aggregation of all plans currently loaded in this session.",
+    h3ChartCategory:"Activity category", h3ChartFormat:"Activity format", h3ChartRD:"Proposed R&D category",
+    h3Skills:"Reported subject-matter skills", h3Sabbaticals:"Sabbaticals under consideration",
+    btnExportCsv:"Export statistics (CSV)", btnClose:"Close ✕",
+    emptyNoRows:"No plans loaded, or no results for these filters.",
+    chipExpired:"Expired plans", chipSoon:"Due soon", chipUnreviewed:"Not reviewed (new or updated)", chipAll:"Total plans loaded",
+    confirmClearPlans:"Remove all plans loaded in this session? (your private notes are not affected)",
+    confirmClearNotes:"Remove all plans loaded in this session?",
+    noDataEmpty:"No data.",
+    noneNoted:"No leave under consideration reported.", noSkillsNoted:"No subject-matter skill reported.",
+    colPerson:"Person", colDescription:"Description", colSkill:"Skill", colType:"Type", colWhen:"When", colNewCourses:"New courses",
+    plansLoadedCard:"Plans loaded", activitiesPlannedCard:"Activities planned", rdActivitiesCard:"Activities proposed as R&D",
+    rdApprovedSuffix:"approved", sabbaticalsCard:"Unpaid leaves under consideration",
+    detailNoAppr:"", noActivities:"No activities.",
+    kvEmail:"Institutional email", kvEmployee:"Employee #", kvCreated:"Created on", kvEndDate:"Target end", kvLastMod:"Last modified",
+    sectionApprHistory:"Student feedback — history", sectionActivities:"Activities", sectionSabbatical:"Unpaid leave under consideration",
+    sectionBudgetNotes:"Budget planning notes", sectionSkills:"Subject-matter skills",
+    btnGoToRadarLabel:"View this person's quality radar",
+    reviewHistoryTitle:"Review history with this person", reviewNoneYet:"No review recorded yet.",
+    reviewDateLabel:"Review date", reviewNoteLabel:"Note on this review (optional)", btnAddReview:"+ Save this review",
+    privateNotesTitle:"General private notes (not shared with the teacher)",
+    privateNotesHint:"These notes remain only in your session unless you export them via \"Export my notes\".",
+    legendMin:"Minimum", legendQ1:"Q1", legendMedian:"Median", legendQ3:"Q3", legendMax:"Maximum", legendCurrent:"Current position", legendGoal:"Goal",
+    axesAutoNote:"Axes loaded automatically from axes.json.", axesDefaultNote:"Default axes in use (configuration file unavailable).", axesManualNote:"Axes loaded manually.",
+    errAxesConfig:"Could not read this file as a valid axes configuration.",
+    errPlanRead:"", notesLoadedAlert:"Notes loaded.", errNotesRead:"Could not read this file as valid notes.",
+    guardMessage:"Not enough plans with self-positioning data to preserve anonymity (minimum {N}; {C} available under the current filter).",
+  }
+};
+
+function t(key){
+  const dict = TRANSLATIONS[currentLang] || TRANSLATIONS.fr;
+  return (key in dict) ? dict[key] : ((key in TRANSLATIONS.fr) ? TRANSLATIONS.fr[key] : key);
+}
+
+function applyStaticI18n(){
+  document.querySelectorAll("[data-i18n]").forEach(el=>{ el.textContent = t(el.getAttribute("data-i18n")); });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{ el.placeholder = t(el.getAttribute("data-i18n-placeholder")); });
+  document.documentElement.lang = currentLang;
+}
+
+function isDarkTheme(){ return document.documentElement.getAttribute("data-theme") === "dark"; }
+function themeC(light, dark){ return isDarkTheme() ? dark : light; }
+function axLabel(ax){ return currentLang==="en" && ax.labelEn ? ax.labelEn : ax.label; }
+
+function initTheme(){
+  const saved = localStorage.getItem("plan-perfectionnement-theme");
+  const theme = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  document.documentElement.setAttribute("data-theme", theme);
+  updateThemeButton();
+}
+function updateThemeButton(){
+  const btn = document.getElementById("btnThemeToggle");
+  if(!btn) return;
+  btn.textContent = isDarkTheme() ? t("themeLight") : t("themeDark");
+}
+document.getElementById("btnThemeToggle").addEventListener("click", ()=>{
+  const next = isDarkTheme() ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  localStorage.setItem("plan-perfectionnement-theme", next);
+  updateThemeButton();
+  renderAll();
+});
+
+function applyLanguage(lang){
+  currentLang = lang;
+  localStorage.setItem("plan-perfectionnement-lang", lang);
+  applyStaticI18n();
+  document.getElementById("btnLangFr").classList.toggle("active", lang==="fr");
+  document.getElementById("btnLangEn").classList.toggle("active", lang==="en");
+  updateThemeButton();
+  renderAll();
+}
+document.getElementById("btnLangFr").addEventListener("click", ()=>applyLanguage("fr"));
+document.getElementById("btnLangEn").addEventListener("click", ()=>applyLanguage("en"));
+
+/* ---------------------------------------------------------------------
    Taxonomy (must match the teacher-facing tool)
 --------------------------------------------------------------------- */
-const CATEGORY_LABELS = {
+function CATEGORY_LABELS(){ return currentLang==="en" ? {
+  formation_individuelle:"Individual training (short-term)",
+  perfectionnement_individuel:"Individual professional development (credited schooling)",
+  recyclage:"Retraining", autre:"Other"
+} : {
   formation_individuelle:"Formation individuelle (courte durée)",
   perfectionnement_individuel:"Perfectionnement individuel (scolarité créditée)",
   recyclage:"Recyclage", autre:"Autre"
-};
-const FORMAT_LABELS = {
+}; }
+function FORMAT_LABELS(){ return currentLang==="en" ? {
+  seminaire:"Seminar", colloque:"Colloquium or conference", congres:"Colloquium or conference", colloque_congres:"Colloquium or conference", conference:"Talk",
+  stage:"Industry placement", cours_non_credite:"Non-credited course", cours_credite:"Credited course",
+  atelier:"Workshop", mentorat:"Mentoring / peer training", autre:"Other"
+} : {
   seminaire:"Séminaire", colloque:"Colloque ou congrès", congres:"Colloque ou congrès", colloque_congres:"Colloque ou congrès", conference:"Conférence",
   stage:"Stage en milieu industriel", cours_non_credite:"Cours non crédité", cours_credite:"Cours crédité",
   atelier:"Atelier", mentorat:"Mentorat / formation entre pairs", autre:"Autre"
-};
-const RD_LABELS = {
+}; }
+function RD_LABELS(){ return currentLang==="en" ? {
+  a:"a) Teaching materials, shared course plans", b:"b) Program-level work",
+  c:"c) Promotional activities", d:"d) Student success plan", e:"e) Committee participation",
+  f:"f) Professional assistance", g:"g) Pedagogical development", h:"h) Disciplinary development"
+} : {
   a:"a) Matériel didactique, plans de cours communs", b:"b) Intervention sur les programmes",
   c:"c) Activités promotionnelles", d:"d) Plan de réussite", e:"e) Participation à un comité",
   f:"f) Assistance professionnelle", g:"g) Perfectionnement pédagogique", h:"h) Perfectionnement disciplinaire"
-};
-const RD_STATUS_LABELS = { en_attente:"En attente", approuvee:"Approuvée", refusee:"Refusée" };
-const STATUS_LABELS = { planned:"Planifiée", in_progress:"En cours", completed:"Complétée", not_pursued:"Non réalisée" };
-const PLAN_STATUS_LABELS = { expired:"Expiré", soon:"Bientôt à réviser", ok:"À jour", unknown:"Date manquante" };
-const REVIEW_STATUS_LABELS = { new:"Nouveau — non revu", updated:"Mis à jour depuis la revue", reviewed:"Revu" };
+}; }
+function RD_STATUS_LABELS(){ return currentLang==="en" ? { en_attente:"Pending", approuvee:"Approved", refusee:"Refused" } : { en_attente:"En attente", approuvee:"Approuvée", refusee:"Refusée" }; }
+function STATUS_LABELS(){ return currentLang==="en" ? { planned:"Planned", in_progress:"In progress", completed:"Completed", not_pursued:"Not pursued" } : { planned:"Planifiée", in_progress:"En cours", completed:"Complétée", not_pursued:"Non réalisée" }; }
+function PLAN_STATUS_LABELS(){ return currentLang==="en" ? { expired:"Expired", soon:"Due soon", ok:"Up to date", unknown:"Missing date" } : { expired:"Expiré", soon:"Bientôt à réviser", ok:"À jour", unknown:"Date manquante" }; }
+function REVIEW_STATUS_LABELS(){ return currentLang==="en" ? { new:"New — not reviewed", updated:"Updated since review", reviewed:"Reviewed" } : { new:"Nouveau — non revu", updated:"Mis à jour depuis la revue", reviewed:"Revu" }; }
 
 const DEFAULT_AXES_CONFIG = {
   schemaVersion:"1.0", scaleMin:1, scaleMax:7,
   scaleLabels:["Très faible","Faible","Limité","Correct","Confortable","Confiant","Maîtrisé"],
   axes:[
-    {id:"clarte", label:"Clarté des explications", description:"La capacité à expliquer les concepts de façon claire et compréhensible."},
-    {id:"organisation", label:"Organisation du cours", description:"La structure, la planification et la cohérence du déroulement du cours."},
-    {id:"engagement", label:"Engagement des étudiants", description:"La capacité à susciter l'intérêt et la participation active des étudiants."},
-    {id:"retroaction", label:"Rétroaction et évaluation", description:"La qualité, la clarté et l'utilité de la rétroaction donnée aux étudiants."},
-    {id:"disponibilite", label:"Disponibilité et soutien", description:"L'accessibilité et le soutien offerts aux étudiants en dehors des cours."},
-    {id:"gestion", label:"Gestion de classe", description:"La capacité à maintenir un environnement d'apprentissage respectueux et productif."},
-    {id:"numerique", label:"Diversité des outils et du matériel pédagogique", description:"Le recours à des outils et supports variés — numériques, imprimés, manipulables ou autres — choisis selon le besoin pédagogique plutôt que par défaut."}
+    {id:"clarte", label:"Clarté des explications", labelEn:"Clarity of explanations", description:"La capacité à expliquer les concepts de façon claire et compréhensible."},
+    {id:"organisation", label:"Organisation du cours", labelEn:"Course organization", description:"La structure, la planification et la cohérence du déroulement du cours."},
+    {id:"engagement", label:"Engagement des étudiants", labelEn:"Student engagement", description:"La capacité à susciter l'intérêt et la participation active des étudiants."},
+    {id:"retroaction", label:"Rétroaction et évaluation", labelEn:"Feedback and assessment", description:"La qualité, la clarté et l'utilité de la rétroaction donnée aux étudiants."},
+    {id:"disponibilite", label:"Disponibilité et soutien", labelEn:"Availability and support", description:"L'accessibilité et le soutien offerts aux étudiants en dehors des cours."},
+    {id:"gestion", label:"Gestion de classe", labelEn:"Classroom management", description:"La capacité à maintenir un environnement d'apprentissage respectueux et productif."},
+    {id:"numerique", label:"Diversité des outils et du matériel pédagogique", labelEn:"Diversity of tools and materials", description:"Le recours à des outils et supports variés — numériques, imprimés, manipulables ou autres — choisis selon le besoin pédagogique plutôt que par défaut."}
   ]
 };
 let AXES_CONFIG = JSON.parse(JSON.stringify(DEFAULT_AXES_CONFIG));
@@ -46,8 +210,8 @@ let sortKey = "teacherName";
 let sortDir = 1;
 
 function addYears(dateObj, n){ const d=new Date(dateObj.getTime()); d.setFullYear(d.getFullYear()+n); return d; }
-function fmtShort(d){ if(!d || isNaN(d)) return "—"; return d.toLocaleDateString("fr-CA", {year:"numeric", month:"short", day:"numeric"}); }
-function fmtDateTime(iso){ if(!iso) return "—"; const d=new Date(iso); if(isNaN(d)) return "—"; return d.toLocaleString("fr-CA", {year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}); }
+function fmtShort(d){ if(!d || isNaN(d)) return "—"; return d.toLocaleDateString(currentLang==="en"?"en-CA":"fr-CA", {year:"numeric", month:"short", day:"numeric"}); }
+function fmtDateTime(iso){ if(!iso) return "—"; const d=new Date(iso); if(isNaN(d)) return "—"; return d.toLocaleString(currentLang==="en"?"en-CA":"fr-CA", {year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}); }
 
 /* ---------------------------------------------------------------------
    Loading teacher plan files
@@ -73,7 +237,7 @@ function loadFiles(fileList){
 document.getElementById("btnLoadTrigger").addEventListener("click", ()=>document.getElementById("fileImport").click());
 document.getElementById("fileImport").addEventListener("change", e=>{ loadFiles(e.target.files); e.target.value=""; });
 document.getElementById("btnClear").addEventListener("click", ()=>{
-  if(confirm("Retirer tous les plans chargés de cette session ? (vos notes privées ne sont pas affectées)")){ plans=[]; renderAll(); }
+  if(confirm(t("confirmClearPlans"))){ plans=[]; renderAll(); }
 });
 
 const dz = document.getElementById("dropzone");
@@ -113,8 +277,8 @@ document.getElementById("notesImport").addEventListener("change", e=>{
       if(data.type !== "notes-revision-perfectionnement" || typeof data.notes !== "object") throw new Error("format non reconnu");
       reviewerNotes = Object.assign({}, reviewerNotes, data.notes);
       renderAll();
-      alert("Notes chargées.");
-    }catch(err){ alert("Impossible de lire ce fichier comme des notes valides.\\n" + err.message); }
+      alert(t("notesLoadedAlert"));
+    }catch(err){ alert(t("errNotesRead") + "\n" + err.message); }
   };
   reader.readAsText(file);
   e.target.value = "";
@@ -146,9 +310,7 @@ async function tryAutoLoadAxes(){
 function updateAxesSourceNote(){
   const el = document.getElementById("axesSourceNote");
   if(!el) return;
-  const labels = { auto:"Axes chargés automatiquement depuis axes.json.",
-                    defaut:"Fichier non chargé automatiquement — axes par défaut utilisés.",
-                    manuel:"Axes chargés manuellement." };
+  const labels = { auto:t("axesAutoNote"), defaut:t("axesDefaultNote"), manuel:t("axesManualNote") };
   el.textContent = labels[axesSource] || "";
 }
 document.getElementById("btnAxesLoadTrigger").addEventListener("click", ()=>document.getElementById("axesFileImport").click());
@@ -162,7 +324,7 @@ document.getElementById("axesFileImport").addEventListener("change", e=>{
       if(!Array.isArray(data.axes) || data.axes.length===0) throw new Error("format invalide");
       AXES_CONFIG = data; axesSource = "manuel";
       updateAxesSourceNote(); renderRadarTab();
-    }catch(err){ alert("Impossible de lire ce fichier comme une configuration d'axes valide.\\n" + err.message); }
+    }catch(err){ alert(t("errAxesConfig") + "\n" + err.message); }
   };
   reader.readAsText(file);
   e.target.value = "";
@@ -228,7 +390,7 @@ function planRowData(p){
   const planStatus = getPlanStatus(p);
   const reviewInfo = getReviewInfo(p);
   return {
-    teacherName: p.meta.teacherName || "(sans nom)",
+    teacherName: p.meta.teacherName || "—",
     email: p.meta.email || "",
     employeeNumber: p.meta.employeeNumber || "",
     createdAt: p.meta.createdAt ? new Date(p.meta.createdAt) : null,
@@ -251,11 +413,11 @@ function searchableText(p){
 
 function badgeForPlanStatus(s){
   const cls = s==="expired"?"danger":s==="soon"?"warn":s==="unknown"?"muted":"";
-  return `<span class="badge ${cls}">${PLAN_STATUS_LABELS[s]}</span>`;
+  return `<span class="badge ${cls}">${PLAN_STATUS_LABELS()[s]}</span>`;
 }
 function badgeForReviewStatus(s){
   const cls = s==="reviewed"?"":s==="updated"?"warn":"danger";
-  return `<span class="badge ${cls}">${REVIEW_STATUS_LABELS[s]}</span>`;
+  return `<span class="badge ${cls}">${REVIEW_STATUS_LABELS()[s]}</span>`;
 }
 
 function renderSummaryStrip(){
@@ -268,10 +430,10 @@ function renderSummaryStrip(){
   });
   const strip = document.getElementById("summaryStrip");
   strip.innerHTML = `
-    <div class="summary-chip danger" id="chipExpired"><b>${counts.expired}</b>Plans expirés</div>
-    <div class="summary-chip warn" id="chipSoon"><b>${counts.soon}</b>Bientôt à réviser</div>
-    <div class="summary-chip" id="chipUnreviewed"><b>${counts.notReviewed}</b>Non revus (nouveaux ou mis à jour)</div>
-    <div class="summary-chip" id="chipAll"><b>${plans.length}</b>Total des plans chargés</div>
+    <div class="summary-chip danger" id="chipExpired"><b>${counts.expired}</b>${t("chipExpired")}</div>
+    <div class="summary-chip warn" id="chipSoon"><b>${counts.soon}</b>${t("chipSoon")}</div>
+    <div class="summary-chip" id="chipUnreviewed"><b>${counts.notReviewed}</b>${t("chipUnreviewed")}</div>
+    <div class="summary-chip" id="chipAll"><b>${plans.length}</b>${t("chipAll")}</div>
   `;
   document.getElementById("chipExpired").addEventListener("click", ()=>setPillFilter("plan","expired"));
   document.getElementById("chipSoon").addEventListener("click", ()=>setPillFilter("plan","soon"));
@@ -307,7 +469,7 @@ function renderTable(){
   const tbody = document.getElementById("planRows");
   tbody.innerHTML = "";
   if(rows.length===0){
-    tbody.innerHTML = `<tr><td colspan="10" class="empty-note">Aucun plan chargé, ou aucun résultat pour ces filtres.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10" class="empty-note">${t("emptyNoRows")}</td></tr>`;
     return;
   }
   rows.forEach(({p,row})=>{
@@ -323,7 +485,7 @@ function renderTable(){
       <td>${badgeForReviewStatus(row.reviewStatus)}</td>
       <td>${row.activityCount}</td>
       <td>${row.rdCount>0 ? `<span class="badge warn">${row.rdCount}</span>` : "0"}</td>
-      <td>${row.sabbatical ? `<span class="badge">Oui</span>` : "—"}</td>
+      <td>${row.sabbatical ? `<span class="badge">${currentLang==="en"?"Yes":"Oui"}</span>` : "—"}</td>
     `;
     tr.addEventListener("click", ()=>openDetail(p));
     tbody.appendChild(tr);
@@ -337,43 +499,43 @@ function openDetail(p){
   const c = document.getElementById("detailContent");
   const domainLabel = id => {
     const ax = AXES_CONFIG.axes.find(x=>x.id===id);
-    return ax ? ax.label : id;
+    return ax ? axLabel(ax) : id;
   };
   const reviewInfo = getReviewInfo(p);
   const key = reviewInfo.key;
   const entry = ensureReviewEntry(key); // safe to create now; only persisted if exported
 
-  let html = `<h3>${escapeHtml(p.meta.teacherName || "(sans nom)")}</h3>`;
+  let html = `<h3>${escapeHtml(p.meta.teacherName || "—")}</h3>`;
   html += `<div style="margin-bottom:12px;">${badgeForPlanStatus(getPlanStatus(p))} ${badgeForReviewStatus(reviewInfo.status)}</div>`;
-  html += `<div class="kv"><b>Courriel institutionnel</b><span>${escapeHtml(p.meta.email||"—")}</span></div>`;
-  html += `<div class="kv"><b>N° employé</b><span>${escapeHtml(p.meta.employeeNumber||"—")}</span></div>`;
-  html += `<div class="kv"><b>Créé le</b><span>${fmtDateTime(p.meta.createdAt)}</span></div>`;
-  html += `<div class="kv"><b>Fin visée</b><span>${p.meta.planEndDate||"—"}</span></div>`;
-  html += `<div class="kv"><b>Dernière modif.</b><span>${fmtDateTime(p.meta.updatedAt)}</span></div>`;
+  html += `<div class="kv"><b>${t("kvEmail")}</b><span>${escapeHtml(p.meta.email||"—")}</span></div>`;
+  html += `<div class="kv"><b>${t("kvEmployee")}</b><span>${escapeHtml(p.meta.employeeNumber||"—")}</span></div>`;
+  html += `<div class="kv"><b>${t("kvCreated")}</b><span>${fmtDateTime(p.meta.createdAt)}</span></div>`;
+  html += `<div class="kv"><b>${t("kvEndDate")}</b><span>${p.meta.planEndDate||"—"}</span></div>`;
+  html += `<div class="kv"><b>${t("kvLastMod")}</b><span>${fmtDateTime(p.meta.updatedAt)}</span></div>`;
 
   // --- private review box: dated review log + ongoing private notes ---
   html += `<div class="review-box">
-    <label style="font-size:12px;color:var(--muted);font-weight:600;">Historique des revues avec cette personne</label>
+    <label style="font-size:12px;color:var(--muted);font-weight:600;">${t("reviewHistoryTitle")}</label>
     <div id="rv-history" style="margin:6px 0 10px;">${renderReviewHistory(entry)}</div>
     <div class="row" style="align-items:flex-end;">
       <div style="flex:1;">
-        <label style="font-size:11.5px;color:var(--muted);">Date de la revue</label>
+        <label style="font-size:11.5px;color:var(--muted);">${t("reviewDateLabel")}</label>
         <input type="date" id="rv-new-date" value="${new Date().toISOString().slice(0,10)}" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;">
       </div>
     </div>
-    <label style="font-size:11.5px;color:var(--muted);margin-top:8px;display:block;">Note sur cette revue (optionnel)</label>
-    <textarea id="rv-new-note" style="min-height:50px;" placeholder="Ex. ce qui a été discuté..."></textarea>
-    <button class="small" id="btnAddReview" style="margin-top:8px;">+ Enregistrer cette revue</button>
+    <label style="font-size:11.5px;color:var(--muted);margin-top:8px;display:block;">${t("reviewNoteLabel")}</label>
+    <textarea id="rv-new-note" style="min-height:50px;"></textarea>
+    <button class="small" id="btnAddReview" style="margin-top:8px;">${t("btnAddReview")}</button>
 
     <div style="border-top:1px solid var(--border); margin-top:14px; padding-top:10px;">
-      <label style="font-size:12px;color:var(--muted);font-weight:600;">Notes privées générales (non partagées avec la personne enseignante)</label>
-      <textarea id="rv-notes" placeholder="Ex. points à surveiller au fil du temps...">${escapeHtml(entry.privateNotes||"")}</textarea>
+      <label style="font-size:12px;color:var(--muted);font-weight:600;">${t("privateNotesTitle")}</label>
+      <textarea id="rv-notes">${escapeHtml(entry.privateNotes||"")}</textarea>
     </div>
-    <div class="private-note">Ces notes restent uniquement dans votre session, à moins que vous ne les exportiez via « Exporter mes notes ».</div>
+    <div class="private-note">${t("privateNotesHint")}</div>
   </div>`;
 
   if((p.studentFeedbackHistory||[]).length){
-    html += `<div class="detail-section"><h4>Appréciation étudiante — historique</h4>`;
+    html += `<div class="detail-section"><h4>${t("sectionApprHistory")}</h4>`;
     [...p.studentFeedbackHistory].reverse().forEach(e=>{
       html += `<div style="margin-bottom:8px;"><div style="font-size:11.5px;color:var(--muted);">${fmtDateTime(e.addedAt)}</div><p style="font-size:13px;margin:2px 0 0;white-space:pre-wrap;">${escapeHtml(e.text)}</p></div>`;
     });
@@ -381,49 +543,49 @@ function openDetail(p){
   }
 
   if((p.domainSkills||[]).length){
-    const SKILL_KIND_LABELS = { nouvelle:"Nouvelle compétence", maintien:"Maintien / actualisation" };
-    html += `<div class="detail-section"><h4>Compétences disciplinaires (${p.domainSkills.length})</h4>`;
+    const SKILL_KIND_LABELS = currentLang==="en" ? { nouvelle:"New skill", maintien:"Maintain / update" } : { nouvelle:"Nouvelle compétence", maintien:"Maintien / actualisation" };
+    html += `<div class="detail-section"><h4>${t("sectionSkills")} (${p.domainSkills.length})</h4>`;
     p.domainSkills.forEach(sk=>{
       html += `<div style="margin-bottom:10px;padding-bottom:8px;border-bottom:1px dashed var(--border);">
-        <b>${escapeHtml(sk.name||"(sans nom)")}</b> <span class="tag">${SKILL_KIND_LABELS[sk.kind]||sk.kind}</span>
-        ${sk.newCourses ? `<span class="tag badge">Nouveaux cours envisagés${sk.newCoursesDetails ? " — "+escapeHtml(sk.newCoursesDetails) : ""}</span>` : ""}
-        ${sk.when ? `<div style="font-size:12.5px;color:var(--muted);margin-top:2px;">Quand : ${escapeHtml(sk.when)}</div>` : ""}
-        ${sk.plan ? `<div style="font-size:12.5px;color:var(--muted);margin-top:2px;">Comment : ${escapeHtml(sk.plan)}</div>` : ""}
+        <b>${escapeHtml(sk.name||"—")}</b> <span class="tag">${SKILL_KIND_LABELS[sk.kind]||sk.kind}</span>
+        ${sk.newCourses ? `<span class="tag badge">${t("colNewCourses")}${sk.newCoursesDetails ? " — "+escapeHtml(sk.newCoursesDetails) : ""}</span>` : ""}
+        ${sk.when ? `<div style="font-size:12.5px;color:var(--muted);margin-top:2px;">${t("colWhen")} : ${escapeHtml(sk.when)}</div>` : ""}
+        ${sk.plan ? `<div style="font-size:12.5px;color:var(--muted);margin-top:2px;">${currentLang==="en"?"How":"Comment"} : ${escapeHtml(sk.plan)}</div>` : ""}
       </div>`;
     });
     html += `</div>`;
   }
 
-  html += `<div class="detail-section"><h4>Activités (${(p.activities||[]).length})</h4>`;
+  html += `<div class="detail-section"><h4>${t("sectionActivities")} (${(p.activities||[]).length})</h4>`;
   (p.activities||[]).forEach(a=>{
     let rdTag = "";
     if(a.proposedRD){
-      const stLabel = RD_STATUS_LABELS[a.rdApprovalStatus||"en_attente"];
+      const stLabel = RD_STATUS_LABELS()[a.rdApprovalStatus||"en_attente"];
       const stCls = a.rdApprovalStatus==="approuvee" ? "" : a.rdApprovalStatus==="refusee" ? "danger" : "warn";
       rdTag = `<span class="tag badge ${stCls}" style="display:inline;">R&D — ${stLabel}${a.rdApprovedBy?" ("+escapeHtml(a.rdApprovedBy)+(a.rdApprovalDate?", "+a.rdApprovalDate:"")+")":""}</span>`;
     }
     html += `<div style="margin-bottom:10px;padding-bottom:8px;border-bottom:1px dashed var(--border);">
-      <b>${escapeHtml(a.title||"(sans titre)")}</b> ${rdTag}<br>
-      <span style="font-size:12.5px;color:var(--muted);">${CATEGORY_LABELS[a.category]||a.category} · ${FORMAT_LABELS[a.format]||a.format} · ${STATUS_LABELS[a.status]||a.status}${a.session?" · "+escapeHtml(a.session):""}${a.estimatedCost?" · "+Number(a.estimatedCost).toLocaleString("fr-CA")+" $":""}</span>
+      <b>${escapeHtml(a.title||"—")}</b> ${rdTag}<br>
+      <span style="font-size:12.5px;color:var(--muted);">${CATEGORY_LABELS()[a.category]||a.category} · ${FORMAT_LABELS()[a.format]||a.format} · ${STATUS_LABELS()[a.status]||a.status}${a.session?" · "+escapeHtml(a.session):""}${a.estimatedCost?" · "+Number(a.estimatedCost).toLocaleString("fr-CA")+" $":""}</span>
       ${(a.domains||[]).length ? `<div>${a.domains.map(id=>`<span class="tag">${escapeHtml(domainLabel(id))}</span>`).join("")}</div>` : ""}
     </div>`;
   });
-  if((p.activities||[]).length===0) html += `<p class="empty-note">Aucune activité.</p>`;
+  if((p.activities||[]).length===0) html += `<p class="empty-note">${t("noActivities")}</p>`;
   html += `</div>`;
 
   if(p.sabbatical && p.sabbatical.description && p.sabbatical.description.trim()){
-    html += `<div class="detail-section"><h4>Congé sans solde envisagé</h4>
+    html += `<div class="detail-section"><h4>${t("sectionSabbatical")}</h4>
       <p style="font-size:13px;white-space:pre-wrap;">${escapeHtml(p.sabbatical.description)}</p>
     </div>`;
   }
 
   if(p.budgetPlanning && p.budgetPlanning.notes){
-    html += `<div class="detail-section"><h4>Notes de planification budgétaire</h4><p style="font-size:13px;">${escapeHtml(p.budgetPlanning.notes)}</p></div>`;
+    html += `<div class="detail-section"><h4>${t("sectionBudgetNotes")}</h4><p style="font-size:13px;">${escapeHtml(p.budgetPlanning.notes)}</p></div>`;
   }
 
   const hasRadar = p.qualityRadar && Array.isArray(p.qualityRadar.entries) && p.qualityRadar.entries.some(e=>e.current!==null && e.current!==undefined);
   if(hasRadar){
-    html += `<button class="small" id="btnGoToRadar" style="margin-top:4px;">Voir le radar qualité de cette personne</button>`;
+    html += `<button class="small" id="btnGoToRadar" style="margin-top:4px;">${t("btnGoToRadarLabel")}</button>`;
   }
 
   c.innerHTML = html;
@@ -561,11 +723,11 @@ function buildRadarSVG(axesList, scaleMin, scaleMax, bands, lines, opts){
   for(let ring=1; ring<=ringCount; ring++){
     const val = scaleMin + (scaleMax-scaleMin)*(ring/ringCount);
     const pts = axesList.map((ax,i)=>radarPoint(cx,cy,R,angleFor(i),val,scaleMin,scaleMax));
-    els.push(`<polygon points="${ptsStr(pts)}" fill="none" stroke="rgba(20,20,20,0.55)" stroke-width="1.75"/>`);
+    els.push(`<polygon points="${ptsStr(pts)}" fill="none" stroke="${themeC('rgba(20,20,20,0.55)','rgba(255,255,255,0.5)')}" stroke-width="1.75"/>`);
   }
   for(let i=0;i<n;i++){
     const p = radarPoint(cx,cy,R,angleFor(i),scaleMax,scaleMin,scaleMax);
-    els.push(`<line x1="${cx}" y1="${cy}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}" stroke="rgba(20,20,20,0.55)" stroke-width="1.75"/>`);
+    els.push(`<line x1="${cx}" y1="${cy}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}" stroke="${themeC('rgba(20,20,20,0.55)','rgba(255,255,255,0.5)')}" stroke-width="1.75"/>`);
   }
 
   axesList.forEach((ax,i)=>{
@@ -573,7 +735,7 @@ function buildRadarSVG(axesList, scaleMin, scaleMax, bands, lines, opts){
     const p = radarPoint(cx,cy,R+labelGap,angle,scaleMax,scaleMin,scaleMax);
     const cosA = Math.cos(angle);
     const anchor = cosA > 0.3 ? "start" : cosA < -0.3 ? "end" : "middle";
-    els.push(`<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="#3a3a38" text-anchor="${anchor}" dominant-baseline="middle">${escapeHtml(ax.label)}</text>`);
+    els.push(`<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${themeC('#3a3a38','#ECECE7')}" text-anchor="${anchor}" dominant-baseline="middle">${escapeHtml(ax.label)}</text>`);
   });
 
   return `<g>${els.join("")}</g>`;
@@ -592,13 +754,13 @@ function renderRadarTab(){
 
   const select = document.getElementById("radarTeacherSelect");
   const prevSelection = select.value;
-  select.innerHTML = `<option value="">Aucun</option>` + withRadar.map(p=>`<option value="${escapeHtml(p.meta.teacherName||"")}">${escapeHtml(p.meta.teacherName||"(sans nom)")}</option>`).join("");
+  select.innerHTML = `<option value="">${t("overlayNone")}</option>` + withRadar.map(p=>`<option value="${escapeHtml(p.meta.teacherName||"")}">${escapeHtml(p.meta.teacherName||"—")}</option>`).join("");
   if(withRadar.some(p=>p.meta.teacherName===prevSelection)) select.value = prevSelection;
 
   const minN = Number(document.getElementById("radarMinN").value) || 1;
   if(withRadar.length < minN){
     guard.style.display = "block";
-    guard.textContent = `Pas assez de plans avec auto-position pour préserver l'anonymat (minimum ${minN}; ${withRadar.length} disponible${withRadar.length===1?"":"s"} selon le filtre courant).`;
+    guard.textContent = t("guardMessage").replace("{N}", minN).replace("{C}", withRadar.length).replace("{CS}", withRadar.length===1?"":"s");
     svg.innerHTML = "";
     document.getElementById("radarLegend").innerHTML = "";
     document.getElementById("radarTeacherNotes").innerHTML = "";
@@ -634,37 +796,37 @@ function renderRadarTab(){
     if(selectedPlan){
       const curVals = axes.map(ax=>{ const en = selectedPlan.qualityRadar.entries.find(e=>e.axisId===ax.id); return en && en.current!==null && en.current!==undefined ? Number(en.current) : null; });
       const goalVals = axes.map(ax=>{ const en = selectedPlan.qualityRadar.entries.find(e=>e.axisId===ax.id); return en && en.goal!==null && en.goal!==undefined ? Number(en.goal) : null; });
-      lines.push({ values:curVals, stroke:"#14181F", width:4 });
-      lines.push({ values:goalVals, stroke:"#14181F", width:4, dash:"6,4", pointFill:"#FAF9F6" });
+      lines.push({ values:curVals, stroke:themeC("#14181F","#ECECE7"), width:4 });
+      lines.push({ values:goalVals, stroke:themeC("#14181F","#ECECE7"), width:4, dash:"6,4", pointFill:themeC("#FAF9F6","#1F2226") });
     }
   }
 
   svg.innerHTML = buildRadarSVG(axes, smin, smax, bands, lines, {size:560});
 
   document.getElementById("radarLegend").innerHTML = `
-    <span><i style="background:#E24B4A;"></i>Minimum</span>
-    <span><i style="background:#EF9F27;"></i>Q1</span>
-    <span><i style="background:#F4C430;"></i>Médiane</span>
-    <span><i style="background:#97C459;"></i>Q3</span>
-    <span><i style="background:#3B8C22;"></i>Maximum</span>
-    ${selectedPlan ? `<span><svg width="18" height="10"><line x1="0" y1="5" x2="18" y2="5" stroke="#14181F" stroke-width="3"/></svg>Position actuelle</span>
-    <span><svg width="18" height="10"><line x1="0" y1="5" x2="18" y2="5" stroke="#14181F" stroke-width="3" stroke-dasharray="4,3"/></svg>Objectif</span>` : ""}
+    <span><i style="background:#E24B4A;"></i>${t("legendMin")}</span>
+    <span><i style="background:#EF9F27;"></i>${t("legendQ1")}</span>
+    <span><i style="background:#F4C430;"></i>${t("legendMedian")}</span>
+    <span><i style="background:#97C459;"></i>${t("legendQ3")}</span>
+    <span><i style="background:#3B8C22;"></i>${t("legendMax")}</span>
+    ${selectedPlan ? `<span><svg width="18" height="10"><line x1="0" y1="5" x2="18" y2="5" stroke="${themeC('#14181F','#ECECE7')}" stroke-width="3"/></svg>${t("legendCurrent")}</span>
+    <span><svg width="18" height="10"><line x1="0" y1="5" x2="18" y2="5" stroke="${themeC('#14181F','#ECECE7')}" stroke-width="3" stroke-dasharray="4,3"/></svg>${t("legendGoal")}</span>` : ""}
   `;
 
   const notesEl = document.getElementById("radarTeacherNotes");
   if(!selectedPlan){ notesEl.innerHTML = ""; return; }
-  let notesHtml = `<h3 style="font-size:14px; margin:0 0 10px;">Notes écrites — ${escapeHtml(selectedPlan.meta.teacherName||"")}</h3>`;
+  let notesHtml = `<h3 style="font-size:14px; margin:0 0 10px;">${currentLang==="en"?"Written notes":"Notes écrites"} — ${escapeHtml(selectedPlan.meta.teacherName||"")}</h3>`;
   let any = false;
   axes.forEach(ax=>{
     const en = selectedPlan.qualityRadar.entries.find(e=>e.axisId===ax.id);
     if(!en || (!en.noteCurrent && !en.noteGoal)) return;
     any = true;
-    notesHtml += `<div style="margin-bottom:10px;"><b style="font-size:13px;">${escapeHtml(ax.label)}</b>`;
-    if(en.noteCurrent) notesHtml += `<div style="font-size:12.5px;color:var(--muted);">État actuel : ${escapeHtml(en.noteCurrent)}</div>`;
-    if(en.noteGoal) notesHtml += `<div style="font-size:12.5px;color:var(--muted);">Amélioration prévue : ${escapeHtml(en.noteGoal)}</div>`;
+    notesHtml += `<div style="margin-bottom:10px;"><b style="font-size:13px;">${escapeHtml(axLabel(ax))}</b>`;
+    if(en.noteCurrent) notesHtml += `<div style="font-size:12.5px;color:var(--muted);">${currentLang==="en"?"Current state":"État actuel"} : ${escapeHtml(en.noteCurrent)}</div>`;
+    if(en.noteGoal) notesHtml += `<div style="font-size:12.5px;color:var(--muted);">${currentLang==="en"?"Planned improvement":"Amélioration prévue"} : ${escapeHtml(en.noteGoal)}</div>`;
     notesHtml += `</div>`;
   });
-  if(selectedPlan.qualityRadar.targetDate) notesHtml += `<div style="font-size:12.5px;color:var(--muted);margin-top:6px;">Échéance visée : ${selectedPlan.qualityRadar.targetDate}</div>`;
+  if(selectedPlan.qualityRadar.targetDate) notesHtml += `<div style="font-size:12.5px;color:var(--muted);margin-top:6px;">${currentLang==="en"?"Target date":"Échéance visée"} : ${selectedPlan.qualityRadar.targetDate}</div>`;
   notesEl.innerHTML = any || selectedPlan.qualityRadar.targetDate ? notesHtml : "";
 }
 
@@ -672,7 +834,7 @@ function renderRadarTab(){
 function renderBarChart(containerId, countsMap, labelMap, opts={}){
   const el = document.getElementById(containerId);
   const entries = Object.entries(countsMap).sort((a,b)=>b[1]-a[1]);
-  if(entries.length===0){ el.innerHTML = `<div class="empty-note">Aucune donnée.</div>`; return; }
+  if(entries.length===0){ el.innerHTML = `<div class="empty-note">${t("noDataEmpty")}</div>`; return; }
   const max = entries[0][1];
   el.innerHTML = entries.map(([k,v])=>{
     const label = (labelMap && labelMap[k]) || k;
@@ -703,45 +865,46 @@ function renderStats(){
     });
     if(p.sabbatical && p.sabbatical.description && p.sabbatical.description.trim()){
       sabbaticalCount++;
-      sabbaticalEntries.push({name:p.meta.teacherName||"(sans nom)", description:p.sabbatical.description});
+      sabbaticalEntries.push({name:p.meta.teacherName||"—", description:p.sabbatical.description});
     }
     (p.domainSkills||[]).forEach(sk=>{
       if(!sk.name) return;
+      const kindLabels = currentLang==="en" ? { maintien:"Maintain / update", nouvelle:"New skill" } : { maintien:"Maintien / actualisation", nouvelle:"Nouvelle compétence" };
       skillEntries.push({
-        name:p.meta.teacherName||"(sans nom)",
+        name:p.meta.teacherName||"—",
         skill:sk.name,
-        kind: sk.kind==="maintien" ? "Maintien / actualisation" : "Nouvelle compétence",
+        kind: kindLabels[sk.kind] || kindLabels.nouvelle,
         when: sk.when||"—",
-        newCourses: sk.newCourses ? "Oui" : "—"
+        newCourses: sk.newCourses ? (currentLang==="en"?"Yes":"Oui") : "—"
       });
     });
   });
 
   document.getElementById("summaryCards").innerHTML = `
-    <div class="summary-card"><div class="num">${plans.length}</div><div class="lbl">Plans chargés</div></div>
-    <div class="summary-card"><div class="num">${plans.reduce((s,p)=>s+(p.activities||[]).length,0)}</div><div class="lbl">Activités planifiées</div></div>
-    <div class="summary-card"><div class="num">${rdTotal}</div><div class="lbl">Activités proposées en R&D (${rdApproved} approuvées)</div></div>
-    <div class="summary-card"><div class="num">${sabbaticalCount}</div><div class="lbl">Congés sans solde envisagés</div></div>
+    <div class="summary-card"><div class="num">${plans.length}</div><div class="lbl">${t("plansLoadedCard")}</div></div>
+    <div class="summary-card"><div class="num">${plans.reduce((s,p)=>s+(p.activities||[]).length,0)}</div><div class="lbl">${t("activitiesPlannedCard")}</div></div>
+    <div class="summary-card"><div class="num">${rdTotal}</div><div class="lbl">${t("rdActivitiesCard")} (${rdApproved} ${t("rdApprovedSuffix")})</div></div>
+    <div class="summary-card"><div class="num">${sabbaticalCount}</div><div class="lbl">${t("sabbaticalsCard")}</div></div>
   `;
 
-  renderBarChart("chartCategory", categoryCounts, CATEGORY_LABELS);
-  renderBarChart("chartFormat", formatCounts, FORMAT_LABELS);
-  renderBarChart("chartRD", rdCounts, RD_LABELS, {warn:true});
+  renderBarChart("chartCategory", categoryCounts, CATEGORY_LABELS());
+  renderBarChart("chartFormat", formatCounts, FORMAT_LABELS());
+  renderBarChart("chartRD", rdCounts, RD_LABELS(), {warn:true});
 
   const skillList = document.getElementById("skillList");
   if(skillList){
-    if(skillEntries.length===0){ skillList.innerHTML = `<div class="empty-note">Aucune compétence disciplinaire signalée.</div>`; }
+    if(skillEntries.length===0){ skillList.innerHTML = `<div class="empty-note">${t("noSkillsNoted")}</div>`; }
     else{
-      skillList.innerHTML = "<table class='data'><thead><tr><th>Personne</th><th>Compétence</th><th>Type</th><th>Quand</th><th>Nouveaux cours</th></tr></thead><tbody>" +
+      skillList.innerHTML = `<table class='data'><thead><tr><th>${t("colPerson")}</th><th>${t("colSkill")}</th><th>${t("colType")}</th><th>${t("colWhen")}</th><th>${t("colNewCourses")}</th></tr></thead><tbody>` +
         skillEntries.map(e=>`<tr><td>${escapeHtml(e.name)}</td><td>${escapeHtml(e.skill)}</td><td>${escapeHtml(e.kind)}</td><td>${escapeHtml(e.when)}</td><td>${escapeHtml(e.newCourses)}</td></tr>`).join("") +
         "</tbody></table>";
     }
   }
 
   const leaveList = document.getElementById("leaveList");
-  if(sabbaticalEntries.length===0){ leaveList.innerHTML = `<div class="empty-note">Aucun congé envisagé signalé.</div>`; }
+  if(sabbaticalEntries.length===0){ leaveList.innerHTML = `<div class="empty-note">${t("noneNoted")}</div>`; }
   else{
-    leaveList.innerHTML = "<table class='data'><thead><tr><th>Personne</th><th>Description</th></tr></thead><tbody>" +
+    leaveList.innerHTML = `<table class='data'><thead><tr><th>${t("colPerson")}</th><th>${t("colDescription")}</th></tr></thead><tbody>` +
       sabbaticalEntries.map(e=>`<tr><td>${escapeHtml(e.name)}</td><td>${escapeHtml(e.description)}</td></tr>`).join("") +
       "</tbody></table>";
   }
@@ -777,5 +940,10 @@ function renderAll(){
   if(document.getElementById("tab-stats").style.display!=="none") renderStats();
   if(document.getElementById("tab-radar").style.display!=="none") renderRadarTab();
 }
+initTheme();
+currentLang = localStorage.getItem("plan-perfectionnement-lang") || "fr";
+applyStaticI18n();
+document.getElementById("btnLangFr").classList.toggle("active", currentLang==="fr");
+document.getElementById("btnLangEn").classList.toggle("active", currentLang==="en");
 renderAll();
 tryAutoLoadAxes();

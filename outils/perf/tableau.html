@@ -3,26 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tableau de bord — Plans de perfectionnement</title>
+<title data-i18n="docTitle">Tableau de bord — Plans de perfectionnement</title>
 <link rel="stylesheet" href="tableau.css">
 </head>
 <body>
 
 <header class="app-header">
   <div>
-    <h1>Tableau de bord des plans de perfectionnement</h1>
-    <div class="sub">Vue de la personne responsable de programmes académiques</div>
+    <h1 data-i18n="docTitle">Tableau de bord des plans de perfectionnement</h1>
+    <div class="sub" data-i18n="appSubtitle">Vue de la personne responsable de programmes académiques</div>
   </div>
   <div class="header-actions">
-    <button class="ghost" id="btnLoadTrigger">Charger des plans (JSON)</button>
+    <div class="lang-toggle">
+      <button id="btnLangFr" class="active" data-lang="fr">FR</button>
+      <button id="btnLangEn" data-lang="en">EN</button>
+    </div>
+    <button class="ghost" id="btnThemeToggle">Mode sombre</button>
+    <div class="divider"></div>
+    <button class="ghost" id="btnLoadTrigger" data-i18n="btnLoadPlans">Charger des plans (JSON)</button>
     <input type="file" id="fileImport" accept="application/json" multiple>
-    <button class="ghost" id="btnClear">Vider les plans</button>
+    <button class="ghost" id="btnClear" data-i18n="btnClearPlans">Vider les plans</button>
     <div class="divider"></div>
-    <button class="ghost" id="btnNotesImportTrigger">Charger mes notes</button>
+    <button class="ghost" id="btnNotesImportTrigger" data-i18n="btnLoadNotes">Charger mes notes</button>
     <input type="file" id="notesImport" accept="application/json">
-    <button class="ghost" id="btnNotesExport">Exporter mes notes</button>
+    <button class="ghost" id="btnNotesExport" data-i18n="btnExportNotes">Exporter mes notes</button>
     <div class="divider"></div>
-    <button class="ghost" id="btnAxesLoadTrigger">Charger les axes (JSON)</button>
+    <button class="ghost" id="btnAxesLoadTrigger" data-i18n="btnLoadAxes">Charger les axes (JSON)</button>
     <input type="file" id="axesFileImport" accept="application/json">
   </div>
 </header>
@@ -31,52 +37,52 @@
 </div>
 
 <nav class="tabs">
-  <button class="tab-btn active" data-tab="list">Liste des plans</button>
-  <button class="tab-btn" data-tab="radar">Radar qualité</button>
-  <button class="tab-btn" data-tab="stats">Statistiques</button>
+  <button class="tab-btn active" data-tab="list" data-i18n="tabList">Liste des plans</button>
+  <button class="tab-btn" data-tab="radar" data-i18n="tabRadar">Radar qualité</button>
+  <button class="tab-btn" data-tab="stats" data-i18n="tabStats">Statistiques</button>
 </nav>
 
 <main>
   <section class="card" id="tab-list">
-    <h2>Plans chargés</h2>
-    <p class="hint">Chargez les fichiers JSON exportés par les personnes enseignantes. Rien n'est envoyé en ligne — tout reste dans cette session de navigateur, sauf ce que vous exportez vous-même.</p>
+    <h2 data-i18n="h2PlansLoaded">Plans chargés</h2>
+    <p class="hint" data-i18n="listHint">Chargez les fichiers JSON exportés par les personnes enseignantes. Rien n'est envoyé en ligne — tout reste dans cette session de navigateur, sauf ce que vous exportez vous-même.</p>
 
-    <div id="dropzone" class="dropzone">Glissez-déposez des fichiers .json ici, ou utilisez « Charger des plans » ci-dessus.</div>
+    <div id="dropzone" class="dropzone" data-i18n="dropzoneText">Glissez-déposez des fichiers .json ici, ou utilisez « Charger des plans » ci-dessus.</div>
 
     <div class="summary-strip" id="summaryStrip"></div>
 
     <div class="toolbar">
-      <input type="text" id="searchBox" placeholder="Rechercher par nom, courriel, numéro d'employé, titre d'activité, note...">
+      <input type="text" id="searchBox" placeholder="Rechercher par nom, courriel, numéro d'employé, titre d'activité, note..." data-i18n-placeholder="searchPlaceholder">
       <select id="filterPlanStatus">
-        <option value="all">Statut du plan — tous</option>
-        <option value="expired">Expiré</option>
-        <option value="soon">Bientôt à réviser</option>
-        <option value="ok">À jour</option>
-        <option value="unknown">Date manquante</option>
+        <option value="all" data-i18n="filterPlanAll">Statut du plan — tous</option>
+        <option value="expired" data-i18n="statusExpired">Expiré</option>
+        <option value="soon" data-i18n="statusSoon">Bientôt à réviser</option>
+        <option value="ok" data-i18n="statusOk">À jour</option>
+        <option value="unknown" data-i18n="statusUnknown">Date manquante</option>
       </select>
       <select id="filterReviewStatus">
-        <option value="all">Statut de revue — tous</option>
-        <option value="new">Nouveau — non revu</option>
-        <option value="updated">Mis à jour depuis la revue</option>
-        <option value="reviewed">Revu</option>
+        <option value="all" data-i18n="filterReviewAll">Statut de revue — tous</option>
+        <option value="new" data-i18n="reviewNew">Nouveau — non revu</option>
+        <option value="updated" data-i18n="reviewUpdated">Mis à jour depuis la revue</option>
+        <option value="reviewed" data-i18n="reviewReviewed">Revu</option>
       </select>
-      <label class="inline">Seuil « bientôt » <input type="number" id="thresholdDays" value="60" min="0"> jours</label>
+      <label class="inline"><span data-i18n="thresholdLabel">Seuil « bientôt »</span> <input type="number" id="thresholdDays" value="60" min="0"> <span data-i18n="thresholdSuffix">jours</span></label>
     </div>
 
     <div class="table-scroll">
     <table class="data" id="planTable">
       <thead>
         <tr>
-          <th data-key="teacherName">Nom</th>
-          <th data-key="email">Courriel institutionnel</th>
-          <th data-key="employeeNumber">N° employé</th>
-          <th data-key="createdAt">Créé le</th>
-          <th data-key="planEndDate">Fin visée</th>
-          <th data-key="planStatus">Statut du plan</th>
-          <th data-key="reviewStatus">Statut de revue</th>
-          <th data-key="activityCount">Activités</th>
-          <th data-key="rdCount">R&D proposées</th>
-          <th data-key="sabbatical">Sabbatique</th>
+          <th data-key="teacherName" data-i18n="thName">Nom</th>
+          <th data-key="email" data-i18n="thEmail">Courriel institutionnel</th>
+          <th data-key="employeeNumber" data-i18n="thEmployee">N° employé</th>
+          <th data-key="createdAt" data-i18n="thCreated">Créé le</th>
+          <th data-key="planEndDate" data-i18n="thEndDate">Fin visée</th>
+          <th data-key="planStatus" data-i18n="thPlanStatus">Statut du plan</th>
+          <th data-key="reviewStatus" data-i18n="thReviewStatus">Statut de revue</th>
+          <th data-key="activityCount" data-i18n="thActivities">Activités</th>
+          <th data-key="rdCount" data-i18n="thRdCount">R&D proposées</th>
+          <th data-key="sabbatical" data-i18n="thSabbatical">Sabbatique</th>
         </tr>
       </thead>
       <tbody id="planRows"></tbody>
@@ -85,14 +91,14 @@
   </section>
 
   <section class="card" id="tab-radar" style="display:none;">
-    <h2>Radar qualité d'enseignement</h2>
-    <p class="hint">Les bandes montrent la répartition (minimum, quartiles, maximum) des positions actuelles auto-évaluées, pour les plans correspondant au filtre courant. Un enseignant peut être superposé en ligne, par-dessus les bandes.</p>
+    <h2 data-i18n="h2Radar">Radar qualité d'enseignement</h2>
+    <p class="hint" data-i18n="radarHint">Les bandes montrent la répartition (minimum, quartiles, maximum) des positions actuelles auto-évaluées, pour les plans correspondant au filtre courant. Un enseignant peut être superposé en ligne, par-dessus les bandes.</p>
 
     <div class="toolbar">
-      <label class="inline">Superposer un enseignant
-        <select id="radarTeacherSelect" style="margin-left:6px;"><option value="">Aucun</option></select>
+      <label class="inline"><span data-i18n="overlayLabel">Superposer un enseignant</span>
+        <select id="radarTeacherSelect" style="margin-left:6px;"><option value="" data-i18n="overlayNone">Aucun</option></select>
       </label>
-      <label class="inline">Taille minimale du groupe pour afficher <input type="number" id="radarMinN" value="5" min="1" style="width:50px;"></label>
+      <label class="inline"><span data-i18n="minGroupLabel">Taille minimale du groupe pour afficher</span> <input type="number" id="radarMinN" value="5" min="1" style="width:50px;"></label>
     </div>
 
     <div id="radarGuardMessage" class="empty-note" style="display:none;"></div>
@@ -103,39 +109,39 @@
   </section>
 
   <section class="card" id="tab-stats" style="display:none;">
-    <h2>Analyse des besoins de formation et perfectionnement</h2>
-    <p class="hint">Agrégation de tous les plans actuellement chargés dans cette session.</p>
+    <h2 data-i18n="h2Stats">Analyse des besoins de formation et perfectionnement</h2>
+    <p class="hint" data-i18n="statsHint">Agrégation de tous les plans actuellement chargés dans cette session.</p>
 
     <div class="summary-cards" id="summaryCards"></div>
 
     <div class="stat-block">
-      <h3>Catégorie d'activité</h3>
+      <h3 data-i18n="h3ChartCategory">Catégorie d'activité</h3>
       <div id="chartCategory"></div>
     </div>
     <div class="stat-block">
-      <h3>Format d'activité</h3>
+      <h3 data-i18n="h3ChartFormat">Format d'activité</h3>
       <div id="chartFormat"></div>
     </div>
     <div class="stat-block">
-      <h3>Catégorie R&D proposée</h3>
+      <h3 data-i18n="h3ChartRD">Catégorie R&D proposée</h3>
       <div id="chartRD"></div>
     </div>
     <div class="stat-block">
-      <h3>Compétences disciplinaires signalées</h3>
+      <h3 data-i18n="h3Skills">Compétences disciplinaires signalées</h3>
       <div id="skillList"></div>
     </div>
     <div class="stat-block">
-      <h3>Sabbatiques envisagées</h3>
+      <h3 data-i18n="h3Sabbaticals">Sabbatiques envisagées</h3>
       <div id="leaveList"></div>
     </div>
 
-    <button class="primary" id="btnExportCsv">Exporter les statistiques (CSV)</button>
+    <button class="primary" id="btnExportCsv" data-i18n="btnExportCsv">Exporter les statistiques (CSV)</button>
   </section>
 </main>
 
 <div class="overlay" id="overlay"></div>
 <div class="detail-panel" id="detailPanel">
-  <button class="small close" id="btnCloseDetail">Fermer ✕</button>
+  <button class="small close" id="btnCloseDetail" data-i18n="btnClose">Fermer ✕</button>
   <div id="detailContent"></div>
 </div>
 

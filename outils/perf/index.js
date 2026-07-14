@@ -3,48 +3,320 @@
 --------------------------------------------------------------------- */
 const SCHEMA_VERSION = "2.0";
 
+/* ---------------------------------------------------------------------
+   i18n: language dictionary + apply/toggle logic
+--------------------------------------------------------------------- */
+let currentLang = "fr";
+
+const TRANSLATIONS = {
+  fr: {
+    docTitle:"Plan personnel de perfectionnement",
+    appSubtitle:"Outil de planification — perfectionnement et développement professionnel",
+    btnNew:"Nouveau plan", btnImportPlan:"Charger un plan (JSON)", btnExportPlan:"Exporter en JSON",
+    themeDark:"Mode sombre", themeLight:"Mode clair",
+    tocSectionsTitle:"Sections", tocIdent:"Identification", tocTimeline:"Échéancier", tocSelfPos:"Auto-positionnement",
+    tocAppr:"Appréciation étudiante", tocSkills:"Compétences disciplinaires", tocActivities:"Activités de perfectionnement",
+    tocBudget:"Budget de perfectionnement", tocLeave:"Congé sans solde",
+    portraitTitle:"Votre portrait de perfectionnement",
+    portraitTeaserHint:"Une fois vos axes de qualité d'enseignement remplis, votre portrait apparaîtra ici : qui vous êtes aujourd'hui, et vers quoi vous évoluez.",
+    btnGoToAxes:"Remplir mes axes de qualité", portraitSubtitle:"Portrait de perfectionnement",
+    labelToday:"Aujourd'hui", labelEvolving:"Vers quoi vous évoluez",
+    h2Ident:"1. Identification",
+    identHint:"Renseignements de base sur la personne enseignante. La création et les modifications sont horodatées automatiquement.",
+    labelName:"Nom de la personne enseignante", phName:"Prénom Nom",
+    labelEmail:"Courriel institutionnel", labelEmployee:"Numéro d'employé", phEmployee:"Ex. 012345",
+    labelCreated:"Créé le", labelUpdated:"Dernière modification", labelEndDate:"Date de fin visée du plan",
+    endDateHint:"Par défaut, deux ans après la création. Vous pouvez la raccourcir; à chaque modification, vous pouvez la prolonger jusqu'à deux ans à partir d'aujourd'hui.",
+    h2Timeline:"2. Échéancier",
+    timelineHint:"Calculé à partir de la date de création et de la date de fin visée. Vous montre ce qui est prévu à la convention collective, s'il y a lieu — pas des obligations ajoutées par cet outil.",
+    legendCycle:"Cycle du plan", legendApprReceived:"Appréciation étudiante reçue", legendBudgetReminders:"Rappels annuels — budget individuel",
+    h2SelfPos:"3. Auto-positionnement — axes de qualité d'enseignement",
+    targetDateLabel:"Échéance visée pour l'atteinte de ces objectifs (optionnel)",
+    legendCurrent:"Position actuelle", legendGoal:"Objectif",
+    h3Appr:"Appréciation étudiante",
+    apprHint:"Un champ libre, optionnel, pour y déposer et résumer une appréciation étudiante formelle lorsque vous la recevez. Chaque entrée est conservée — rien n'est remplacé, l'historique s'accumule au fil des cycles.",
+    apprPlaceholder:"Ex. résumé, tendances observées, extraits pertinents...",
+    btnAddAppr:"+ Ajouter à l'historique",
+    h3Survey:"Sondage étudiant",
+    surveyHint:"Générez un sondage bilingue (français/anglais) à importer dans Microsoft Forms, puis importez les résultats pour les comparer à votre auto-positionnement.",
+    anonymityTitle:"Anonymat",
+    anonymityText:"Une fois le sondage créé dans Microsoft Forms, ouvrez les paramètres du formulaire (icône « ... » ou « Paramètres ») et désactivez l'option qui enregistre le nom des répondants (habituellement « Enregistrer le nom » / « Record name »), afin que les réponses demeurent anonymes.",
+    quickImportNote:"L'importation Word de Microsoft Forms («\u00a0Importation rapide\u00a0») ne convertit fiablement que les questions à choix unique — après l'importation, cliquez sur « Vérifier » et confirmez que chaque question a bien été reconnue comme un choix unique avant de publier le sondage.",
+    btnGenDocx:"Générer le sondage (Word, bilingue)", btnImportResults:"Importer les résultats (Excel)",
+    h2Skills:"4. Compétences disciplinaires",
+    skillsHint:"Propre à votre discipline ou champ d'expertise — distinct des axes généraux de qualité d'enseignement ci-dessus. Ajoutez une carte par compétence : une nouvelle à développer, ou une expertise existante à maintenir ou actualiser.",
+    btnAddSkill:"+ Ajouter une compétence",
+    h2Activities:"5. Activités de perfectionnement",
+    activitiesHint:"Ce plan est une proposition. Les approbations correspondantes (budget, R&D, reconnaissance) doivent être obtenues séparément, par les voies et processus institutionnels établis à cette fin. Ajoutez une carte par activité prévue ou réalisée — les listes déroulantes permettent l'analyse statistique par le responsable de programmes.",
+    rdTitle:"Reconnaissance en R&D",
+    rdWarnText:"Ce plan n'accorde aucune approbation. Une activité cochée « proposée en R&D » n'est reconnue comme telle qu'après approbation écrite préalable de la Direction des études — une fois obtenue, indiquez qui l'a approuvée et à quelle date. Si elle est refusée, révisez le plan en conséquence.",
+    btnAddActivity:"+ Ajouter une activité",
+    h2Budget:"6. Planification du budget de perfectionnement",
+    budgetHint:"Planification seulement — le traitement financier réel (approbation, remboursement) est géré séparément, selon la convention collective ou les politiques internes en vigueur (selon le cas). Ce tableau reprend le coût estimé des activités ci-dessus, regroupé par année académique puisqu'il est appelé à s'accumuler d'année en année.",
+    thYear:"Année académique", thActivity:"Activité", thCategory:"Catégorie", thCost:"Coût estimé (CAD)",
+    totalLabel:"Total estimé (toutes années)",
+    budgetReminder:"Rappel : consultez la convention collective ou les politiques internes en vigueur (selon le cas) pour le montant exact et les modalités du budget individuel de perfectionnement (généralement non cumulatif et non transférable d'une année à l'autre).",
+    budgetNotesLabel:"Notes de planification (optionnel)", budgetNotesPlaceholder:"Ex. priorisation si le budget ne couvre pas toutes les activités...",
+    h2Leave:"7. Congé sans solde (perfectionnement ou affaires professionnelles)",
+    leaveHint:"Champ optionnel. Décrivez votre projet si vous envisagez un tel congé, et le moment où vous souhaiteriez le prendre — ceci n'est pas une demande formelle.",
+    sabDescLabel:"Description (optionnel)", sabPlaceholder:"Ex. projet envisagé, moment souhaité, durée approximative...",
+    leaveInfoText:"Consultez la convention collective ou les politiques internes en vigueur (selon le cas) pour les critères d'admissibilité, les modalités, les délais de demande et de prolongation, ainsi que les effets sur l'ancienneté et l'affichage du poste. Cette section n'enclenche aucune démarche formelle.",
+    footerText:"Plan personnel de perfectionnement — outil de planification interne. Ne remplace aucune disposition de la convention collective ou des politiques internes en vigueur (selon le cas).",
+
+    // dynamic content
+    emptyNoteAxis:"Aucune entrée pour le moment.",
+    labelDomainCurrent:"Position actuelle", labelDomainGoal:"Objectif",
+    ideasBtn:"Idées et pistes", ideasBtnHide:"Masquer les idées", ideasBoxTitle:"Pistes et bonnes pratiques (pas seulement numériques)",
+    labelNoteCurrent:"Notes — état actuel (optionnel)", labelNoteGoal:"Notes — amélioration prévue (optionnel)",
+    phNoteCurrent:"Ex. ce qui explique cette position...", phNoteGoal:"Ex. moyens envisagés pour progresser...",
+    emptyNoteAppr:"Aucune entrée pour le moment.",
+    surveyImportedStatus:"{N} réponse{S} importée{S} — {M} axe{MS} sur {T} reconnu{MS} dans le fichier.",
+    legendMin:"Minimum", legendQ1:"Q1", legendMedian:"Médiane", legendQ3:"Q3", legendMax:"Maximum (réponses étudiantes)", legendSelfEval:"Votre auto-positionnement",
+    emptyNoteSkill:"Aucune compétence ajoutée pour le moment.",
+    labelSkillName:"Compétence ou expertise", phSkillName:"Ex. Analyse de données avec Python",
+    labelSkillType:"Type", labelSkillHow:"Comment (moyen envisagé)", phSkillHow:"Ex. autoformation, mentorat, cours crédité...",
+    labelSkillWhen:"Quand", phSkillWhen:"Ex. Session Hiver 2027",
+    labelSkillNewCourses:"Souhaite enseigner de nouveaux cours une fois cette compétence acquise",
+    labelSkillNewCoursesDetails:"Lesquels (optionnel)", phSkillNewCoursesDetails:"Ex. cours d'introduction à la science des données",
+    btnRemove:"Retirer",
+    emptyNoteActivity:"Aucune activité ajoutée pour le moment.",
+    labelActivityTitle:"Titre de l'activité", phActivityTitle:"Ex. Colloque en pédagogie collégiale",
+    labelCategory:"Catégorie", labelFormat:"Format", labelStatus:"Statut",
+    labelAcademicYear:"Année académique", phAcademicYear:"Ex. 2026-2027",
+    labelSession:"Session / période visée", phSession:"Ex. Session Automne 2026",
+    labelCost:"Coût estimé (CAD)", labelProposedRD:"Proposée en R&D",
+    labelDomains:"Domaine(s) visé(s)",
+    labelRdCategory:"Catégorie R&D", labelRdStatus:"État de l'approbation", labelRdDate:"Date de la décision",
+    labelRdBy:"Décidée par (nom et fonction, Direction des études)", phRdBy:"Ex. Jordan Léveillé, directeur des études",
+    labelNotes:"Notes (optionnel)",
+    rdMsgPending:"Rappel Cette activité n'est pas encore reconnue en R&D. Elle ne compte comme telle qu'une fois l'approbation écrite obtenue de la Direction des études — indiquez alors qui a approuvé et à quelle date.",
+    rdMsgApproved:"Approuvée{BY}{DATE}. Conservez la confirmation écrite pour vos dossiers.",
+    rdMsgRefused:"Refusée{BY}{DATE}. Cette activité ne compte pas comme temps de R&D. Révisez ce plan en conséquence — retirez la désignation R&D ou ajustez l'activité pour qu'il reflète la réalité.",
+    emptyNoteBudget:"Aucune activité à afficher.",
+    subtotalLabel:"Sous-total — {Y}",
+    yearUnspecified:"Année non précisée",
+    plusOneYear:"an", plusYears:"ans",
+    portraitStrongOne:"Votre force la plus marquée est {A}.",
+    portraitStrongTwo:"Vos forces les plus marquées sont {A} et {B}.",
+    portraitGrowLine:"Votre plus grand pas prévu se situe en {A}, de {C} à {G}.",
+    portraitNoGrow:"Aucun objectif de progression n'est encore défini au-delà de votre position actuelle.",
+    portraitGrowingPill:"{N} {AXIS} en croissance", portraitStablePill:"{N} {AXIS} stable{S}",
+    portraitFooterFilled:"D'après {F} axe{FS} sur {T} rempli{FS} jusqu'à présent.",
+    portraitFooterTarget:"Échéance visée : {D}.",
+    portraitNoName:"Portrait sans nom",
+    confirmNewPlan:"Créer un nouveau plan vide ? Les données non exportées seront perdues.",
+    errImportPlan:"Impossible de lire ce fichier comme un plan valide.",
+    errAxesConfig:"Impossible de lire ce fichier comme une configuration d'axes valide.",
+    errSurveyDocx:"Impossible de générer le sondage.",
+    errSurveyExcel:"Impossible de lire ce fichier comme des résultats de sondage valides.",
+    axesAutoNote:"", axesDefaultNote:"Axes par défaut utilisés (fichier de configuration non disponible).",
+    planEstablished:"Plan établi", planEndVisee:"Fin visée du plan",
+    reviewDueMonospace:"Relevé budget (15 nov.)", reviewDueMonospace2:"Relevé budget (15 mai)",
+
+    cat_formation_individuelle:"Formation individuelle (courte durée)",
+    cat_perfectionnement_individuel:"Perfectionnement individuel (scolarité créditée)",
+    cat_recyclage:"Recyclage", cat_autre:"Autre",
+    fmt_seminaire:"Séminaire", fmt_seminaire_d:"Rencontre de petit groupe, participative, pour approfondir un sujet précis avec échanges actifs entre les participants.",
+    fmt_colloque_congres:"Colloque ou congrès", fmt_colloque_congres_d:"Événement scientifique ou professionnel réunissant plusieurs intervenants autour d'un thème — petite échelle (colloque) ou grande échelle, souvent annuelle et sur plusieurs jours (congrès).",
+    fmt_conference:"Conférence", fmt_conference_d:"Exposé ou présentation ponctuelle, généralement par une seule personne, sur un sujet précis.",
+    fmt_stage:"Stage en milieu industriel", fmt_stage_d:"Période d'immersion pratique en entreprise ou en milieu professionnel.",
+    fmt_cours_non_credite:"Cours non crédité", fmt_cours_non_credite_d:"Cours suivi sans obtention de crédits académiques.",
+    fmt_cours_credite:"Cours crédité", fmt_cours_credite_d:"Cours suivi avec obtention de crédits académiques (scolarité créditée).",
+    fmt_atelier:"Atelier", fmt_atelier_d:"Activité pratique et interactive, en petit groupe, axée sur le développement d'habiletés concrètes.",
+    fmt_mentorat:"Mentorat / formation entre pairs", fmt_mentorat_d:"Accompagnement individualisé par ou avec une personne collègue d'expérience.",
+    fmt_autre:"Autre", fmt_autre_d:"Format qui ne correspond à aucune des catégories ci-dessus — précisez dans les notes.",
+    rdcat_a:"a) Matériel didactique, plans de cours communs", rdcat_b:"b) Intervention sur les programmes",
+    rdcat_c:"c) Activités promotionnelles", rdcat_d:"d) Plan de réussite", rdcat_e:"e) Participation à un comité",
+    rdcat_f:"f) Assistance professionnelle (mentorat, formation entre pairs)", rdcat_g:"g) Perfectionnement pédagogique (stages, colloques, ateliers)",
+    rdcat_h:"h) Séance de perfectionnement disciplinaire (personne chargée de cours)",
+    rdstatus_en_attente:"En attente d'approbation", rdstatus_approuvee:"Approuvée", rdstatus_refusee:"Refusée",
+    status_planned:"Planifiée", status_in_progress:"En cours", status_completed:"Complétée", status_not_pursued:"Non réalisée",
+    skillkind_nouvelle:"Nouvelle compétence à développer", skillkind_maintien:"Expertise existante à maintenir ou actualiser",
+  },
+  en: {
+    docTitle:"Personal Professional Development Plan",
+    appSubtitle:"Planning tool — professional development",
+    btnNew:"New plan", btnImportPlan:"Load a plan (JSON)", btnExportPlan:"Export as JSON",
+    themeDark:"Dark mode", themeLight:"Light mode",
+    tocSectionsTitle:"Sections", tocIdent:"Identification", tocTimeline:"Timeline", tocSelfPos:"Self-positioning",
+    tocAppr:"Student feedback", tocSkills:"Subject-matter skills", tocActivities:"Professional development activities",
+    tocBudget:"Professional development budget", tocLeave:"Unpaid leave",
+    portraitTitle:"Your professional development portrait",
+    portraitTeaserHint:"Once your quality-of-instruction axes are filled in, your portrait will appear here: who you are today, and where you're heading.",
+    btnGoToAxes:"Fill in my quality axes", portraitSubtitle:"Professional development portrait",
+    labelToday:"Today", labelEvolving:"Where you're heading",
+    h2Ident:"1. Identification",
+    identHint:"Basic information about the teacher. Creation and edits are timestamped automatically.",
+    labelName:"Teacher's name", phName:"First Last",
+    labelEmail:"Institutional email", labelEmployee:"Employee number", phEmployee:"E.g. 012345",
+    labelCreated:"Created on", labelUpdated:"Last modified", labelEndDate:"Target end date of the plan",
+    endDateHint:"Defaults to two years after creation. You may shorten it; with each edit, you may extend it up to two years from today.",
+    h2Timeline:"2. Timeline",
+    timelineHint:"Computed from the creation date and the target end date. Shows what's provided for under the collective agreement, if applicable — not obligations added by this tool.",
+    legendCycle:"Plan cycle", legendApprReceived:"Student feedback received", legendBudgetReminders:"Annual reminders — individual budget",
+    h2SelfPos:"3. Self-positioning — quality of instruction axes",
+    targetDateLabel:"Target date for reaching these goals (optional)",
+    legendCurrent:"Current position", legendGoal:"Goal",
+    h3Appr:"Student feedback",
+    apprHint:"A free, optional field to log and summarize formal student feedback whenever you receive it. Each entry is kept — nothing is replaced, the history accumulates across cycles.",
+    apprPlaceholder:"E.g. summary, trends observed, relevant excerpts...",
+    btnAddAppr:"+ Add to history",
+    h3Survey:"Student survey",
+    surveyHint:"Generate a bilingual (French/English) survey to import into Microsoft Forms, then import the results to compare against your self-assessment.",
+    anonymityTitle:"Anonymity",
+    anonymityText:"Once the survey is created in Microsoft Forms, open the form settings (the \"...\" icon or \"Settings\") and turn off the option that records respondent names (usually \"Record name\"), so responses stay anonymous.",
+    quickImportNote:"Microsoft Forms' Word import (\u201cQuick Import\u201d) only reliably converts single-choice questions — after importing, click \"Review\" and confirm each question was recognized as single-choice before publishing the survey.",
+    btnGenDocx:"Generate the survey (Word, bilingual)", btnImportResults:"Import results (Excel)",
+    h2Skills:"4. Subject-matter skills",
+    skillsHint:"Specific to your discipline or area of expertise — distinct from the general quality-of-instruction axes above. Add one card per skill: a new one to develop, or existing expertise to maintain or update.",
+    btnAddSkill:"+ Add a skill",
+    h2Activities:"5. Professional development activities",
+    activitiesHint:"This plan is a proposal. Corresponding approvals (budget, R&D, recognition) must be obtained separately, through the institutional channels and processes established for that purpose. Add one card per planned or completed activity — the dropdowns enable statistical analysis by the program coordinator.",
+    rdTitle:"R&D recognition",
+    rdWarnText:"This plan grants no approval. An activity checked \"proposed as R&D\" is only recognized as such after prior written approval from the Direction of Studies — once obtained, indicate who approved it and on what date. If refused, revise the plan accordingly.",
+    btnAddActivity:"+ Add an activity",
+    h2Budget:"6. Professional development budget planning",
+    budgetHint:"Planning only — the actual financial process (approval, reimbursement) is handled separately, per the collective agreement or internal policies in effect (as applicable). This table simply reflects the estimated cost of the activities above, grouped by academic year since it's meant to accumulate year over year.",
+    thYear:"Academic year", thActivity:"Activity", thCategory:"Category", thCost:"Estimated cost (CAD)",
+    totalLabel:"Estimated total (all years)",
+    budgetReminder:"Reminder: check the collective agreement or internal policies in effect (as applicable) for the exact amount and terms of the individual professional development budget (generally non-cumulative and non-transferable from year to year).",
+    budgetNotesLabel:"Planning notes (optional)", budgetNotesPlaceholder:"E.g. prioritization if the budget doesn't cover all activities...",
+    h2Leave:"7. Unpaid leave (professional development or professional business)",
+    leaveHint:"Optional field. Describe your project if you're considering such a leave, and when you'd like to take it — this is not a formal request.",
+    sabDescLabel:"Description (optional)", sabPlaceholder:"E.g. planned project, desired timing, approximate duration...",
+    leaveInfoText:"Check the collective agreement or internal policies in effect (as applicable) for eligibility criteria, terms, request and extension deadlines, and the effects on seniority and position posting. This section does not trigger any formal process.",
+    footerText:"Personal professional development plan — internal planning tool. Does not replace any provision of the collective agreement or internal policies in effect (as applicable).",
+
+    emptyNoteAxis:"No entry yet.",
+    labelDomainCurrent:"Current position", labelDomainGoal:"Goal",
+    ideasBtn:"Ideas and pointers", ideasBtnHide:"Hide ideas", ideasBoxTitle:"Pointers and good practices (not just digital)",
+    labelNoteCurrent:"Notes — current state (optional)", labelNoteGoal:"Notes — planned improvement (optional)",
+    phNoteCurrent:"E.g. what explains this position...", phNoteGoal:"E.g. means envisioned to progress...",
+    emptyNoteAppr:"No entry yet.",
+    surveyImportedStatus:"{N} response{S} imported — {M} axis{MS} out of {T} recognized in the file.",
+    legendMin:"Minimum", legendQ1:"Q1", legendMedian:"Median", legendQ3:"Q3", legendMax:"Maximum (student responses)", legendSelfEval:"Your self-assessment",
+    emptyNoteSkill:"No skill added yet.",
+    labelSkillName:"Skill or expertise", phSkillName:"E.g. Data analysis with Python",
+    labelSkillType:"Type", labelSkillHow:"How (envisioned method)", phSkillHow:"E.g. self-study, mentoring, credited course...",
+    labelSkillWhen:"When", phSkillWhen:"E.g. Winter 2027 session",
+    labelSkillNewCourses:"Would like to teach new courses once this skill is acquired",
+    labelSkillNewCoursesDetails:"Which ones (optional)", phSkillNewCoursesDetails:"E.g. introductory data science course",
+    btnRemove:"Remove",
+    emptyNoteActivity:"No activity added yet.",
+    labelActivityTitle:"Activity title", phActivityTitle:"E.g. Conference on college pedagogy",
+    labelCategory:"Category", labelFormat:"Format", labelStatus:"Status",
+    labelAcademicYear:"Academic year", phAcademicYear:"E.g. 2026-2027",
+    labelSession:"Session / target period", phSession:"E.g. Fall 2026 session",
+    labelCost:"Estimated cost (CAD)", labelProposedRD:"Proposed as R&D",
+    labelDomains:"Target domain(s)",
+    labelRdCategory:"R&D category", labelRdStatus:"Approval status", labelRdDate:"Decision date",
+    labelRdBy:"Decided by (name and role, Direction of Studies)", phRdBy:"E.g. Jordan Léveillé, director of studies",
+    labelNotes:"Notes (optional)",
+    rdMsgPending:"Reminder: this activity is not yet recognized as R&D. It only counts as such once written approval is obtained from the Direction of Studies — then indicate who approved it and on what date.",
+    rdMsgApproved:"Approved{BY}{DATE}. Keep the written confirmation for your records.",
+    rdMsgRefused:"Refused{BY}{DATE}. This activity does not count as R&D time. Revise this plan accordingly — remove the R&D designation or adjust the activity to reflect reality.",
+    emptyNoteBudget:"No activity to display.",
+    subtotalLabel:"Subtotal — {Y}",
+    yearUnspecified:"Year not specified",
+    plusOneYear:"yr", plusYears:"yrs",
+    portraitStrongOne:"Your strongest area right now is {A}.",
+    portraitStrongTwo:"Your strongest areas right now are {A} and {B}.",
+    portraitGrowLine:"Your biggest planned step is in {A}, from {C} to {G}.",
+    portraitNoGrow:"No growth goal is set yet beyond your current position.",
+    portraitGrowingPill:"{N} {AXIS} growing", portraitStablePill:"{N} {AXIS} stable",
+    portraitFooterFilled:"Based on {F} out of {T} axes filled in so far.",
+    portraitFooterTarget:"Target date: {D}.",
+    portraitNoName:"Untitled portrait",
+    confirmNewPlan:"Create a new, empty plan? Unexported data will be lost.",
+    errImportPlan:"Could not read this file as a valid plan.",
+    errAxesConfig:"Could not read this file as a valid axes configuration.",
+    errSurveyDocx:"Could not generate the survey.",
+    errSurveyExcel:"Could not read this file as valid survey results.",
+    axesAutoNote:"", axesDefaultNote:"Default axes in use (configuration file unavailable).",
+    planEstablished:"Plan established", planEndVisee:"Plan target end",
+    reviewDueMonospace:"Budget statement (Nov. 15)", reviewDueMonospace2:"Budget statement (May 15)",
+
+    cat_formation_individuelle:"Individual training (short-term)",
+    cat_perfectionnement_individuel:"Individual professional development (credited schooling)",
+    cat_recyclage:"Retraining", cat_autre:"Other",
+    fmt_seminaire:"Seminar", fmt_seminaire_d:"Small-group, participatory gathering to explore a specific topic in depth with active exchange among participants.",
+    fmt_colloque_congres:"Colloquium or conference", fmt_colloque_congres_d:"Scientific or professional event bringing together several speakers around a theme — small scale (colloquium) or large scale, often annual and multi-day (conference/congress).",
+    fmt_conference:"Talk", fmt_conference_d:"A one-off talk or presentation, generally by a single person, on a specific topic.",
+    fmt_stage:"Industry placement", fmt_stage_d:"A period of hands-on immersion in a company or professional setting.",
+    fmt_cours_non_credite:"Non-credited course", fmt_cours_non_credite_d:"A course taken without earning academic credits.",
+    fmt_cours_credite:"Credited course", fmt_cours_credite_d:"A course taken while earning academic credits (credited schooling).",
+    fmt_atelier:"Workshop", fmt_atelier_d:"A practical, interactive, small-group activity focused on developing concrete skills.",
+    fmt_mentorat:"Mentoring / peer training", fmt_mentorat_d:"Individualized support by or with an experienced colleague.",
+    fmt_autre:"Other", fmt_autre_d:"A format that doesn't fit any of the categories above — specify in the notes.",
+    rdcat_a:"a) Teaching materials, shared course plans", rdcat_b:"b) Program-level work",
+    rdcat_c:"c) Promotional activities", rdcat_d:"d) Student success plan", rdcat_e:"e) Committee participation",
+    rdcat_f:"f) Professional assistance (mentoring, peer training)", rdcat_g:"g) Pedagogical development (placements, colloquia, workshops)",
+    rdcat_h:"h) Disciplinary development session (part-time instructor)",
+    rdstatus_en_attente:"Awaiting approval", rdstatus_approuvee:"Approved", rdstatus_refusee:"Refused",
+    status_planned:"Planned", status_in_progress:"In progress", status_completed:"Completed", status_not_pursued:"Not pursued",
+    skillkind_nouvelle:"New skill to develop", skillkind_maintien:"Existing expertise to maintain or update",
+  }
+};
+
+function t(key){
+  const dict = TRANSLATIONS[currentLang] || TRANSLATIONS.fr;
+  return (key in dict) ? dict[key] : ((key in TRANSLATIONS.fr) ? TRANSLATIONS.fr[key] : key);
+}
+
+function applyStaticI18n(){
+  document.querySelectorAll("[data-i18n]").forEach(el=>{ el.textContent = t(el.getAttribute("data-i18n")); });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{ el.placeholder = t(el.getAttribute("data-i18n-placeholder")); });
+  document.documentElement.lang = currentLang;
+}
+
+function applyLanguage(lang){
+  currentLang = lang;
+  localStorage.setItem("plan-perfectionnement-lang", lang);
+  applyStaticI18n();
+  document.getElementById("btnLangFr").classList.toggle("active", lang==="fr");
+  document.getElementById("btnLangEn").classList.toggle("active", lang==="en");
+  updateThemeButton();
+  fullRender();
+}
+document.getElementById("btnLangFr").addEventListener("click", ()=>applyLanguage("fr"));
+document.getElementById("btnLangEn").addEventListener("click", ()=>applyLanguage("en"));
+
 const CATEGORY_OPTIONS = [
-  {v:"formation_individuelle", l:"Formation individuelle (courte durée)"},
-  {v:"perfectionnement_individuel", l:"Perfectionnement individuel (scolarité créditée)"},
-  {v:"recyclage", l:"Recyclage"},
-  {v:"autre", l:"Autre"},
+  {v:"formation_individuelle", k:"cat_formation_individuelle"},
+  {v:"perfectionnement_individuel", k:"cat_perfectionnement_individuel"},
+  {v:"recyclage", k:"cat_recyclage"},
+  {v:"autre", k:"cat_autre"},
 ];
 
 const FORMAT_OPTIONS = [
-  {v:"seminaire", l:"Séminaire", d:"Rencontre de petit groupe, participative, pour approfondir un sujet précis avec échanges actifs entre les participants."},
-  {v:"colloque_congres", l:"Colloque ou congrès", d:"Événement scientifique ou professionnel réunissant plusieurs intervenants autour d'un thème — petite échelle (colloque) ou grande échelle, souvent annuelle et sur plusieurs jours (congrès)."},
-  {v:"conference", l:"Conférence", d:"Exposé ou présentation ponctuelle, généralement par une seule personne, sur un sujet précis."},
-  {v:"stage", l:"Stage en milieu industriel", d:"Période d'immersion pratique en entreprise ou en milieu professionnel."},
-  {v:"cours_non_credite", l:"Cours non crédité", d:"Cours suivi sans obtention de crédits académiques."},
-  {v:"cours_credite", l:"Cours crédité", d:"Cours suivi avec obtention de crédits académiques (scolarité créditée)."},
-  {v:"atelier", l:"Atelier", d:"Activité pratique et interactive, en petit groupe, axée sur le développement d'habiletés concrètes."},
-  {v:"mentorat", l:"Mentorat / formation entre pairs", d:"Accompagnement individualisé par ou avec une personne collègue d'expérience."},
-  {v:"autre", l:"Autre", d:"Format qui ne correspond à aucune des catégories ci-dessus — précisez dans les notes."},
+  {v:"seminaire", k:"fmt_seminaire", dk:"fmt_seminaire_d"},
+  {v:"colloque_congres", k:"fmt_colloque_congres", dk:"fmt_colloque_congres_d"},
+  {v:"conference", k:"fmt_conference", dk:"fmt_conference_d"},
+  {v:"stage", k:"fmt_stage", dk:"fmt_stage_d"},
+  {v:"cours_non_credite", k:"fmt_cours_non_credite", dk:"fmt_cours_non_credite_d"},
+  {v:"cours_credite", k:"fmt_cours_credite", dk:"fmt_cours_credite_d"},
+  {v:"atelier", k:"fmt_atelier", dk:"fmt_atelier_d"},
+  {v:"mentorat", k:"fmt_mentorat", dk:"fmt_mentorat_d"},
+  {v:"autre", k:"fmt_autre", dk:"fmt_autre_d"},
 ];
 
 const RD_CATEGORY_OPTIONS = [
-  {v:"a", l:"a) Matériel didactique, plans de cours communs"},
-  {v:"b", l:"b) Intervention sur les programmes"},
-  {v:"c", l:"c) Activités promotionnelles"},
-  {v:"d", l:"d) Plan de réussite"},
-  {v:"e", l:"e) Participation à un comité"},
-  {v:"f", l:"f) Assistance professionnelle (mentorat, formation entre pairs)"},
-  {v:"g", l:"g) Perfectionnement pédagogique (stages, colloques, ateliers)"},
-  {v:"h", l:"h) Séance de perfectionnement disciplinaire (personne chargée de cours)"},
+  {v:"a", k:"rdcat_a"}, {v:"b", k:"rdcat_b"}, {v:"c", k:"rdcat_c"}, {v:"d", k:"rdcat_d"},
+  {v:"e", k:"rdcat_e"}, {v:"f", k:"rdcat_f"}, {v:"g", k:"rdcat_g"}, {v:"h", k:"rdcat_h"},
 ];
 
 const RD_STATUS_OPTIONS = [
-  {v:"en_attente", l:"En attente d'approbation"},
-  {v:"approuvee", l:"Approuvée"},
-  {v:"refusee", l:"Refusée"},
+  {v:"en_attente", k:"rdstatus_en_attente"}, {v:"approuvee", k:"rdstatus_approuvee"}, {v:"refusee", k:"rdstatus_refusee"},
 ];
 
 const STATUS_OPTIONS = [
-  {v:"planned", l:"Planifiée"},
-  {v:"in_progress", l:"En cours"},
-  {v:"completed", l:"Complétée"},
-  {v:"not_pursued", l:"Non réalisée"},
+  {v:"planned", k:"status_planned"}, {v:"in_progress", k:"status_in_progress"},
+  {v:"completed", k:"status_completed"}, {v:"not_pursued", k:"status_not_pursued"},
 ];
+
+function optLabel(opt){ return t(opt.k); }
+function optDesc(opt){ return opt.dk ? t(opt.dk) : ""; }
+function optByValue(list, v){ return list.find(o=>o.v===v); }
 
 /* ---------------------------------------------------------------------
    Quality-of-instruction axes: loaded from an external, editable JSON
@@ -57,24 +329,67 @@ const DEFAULT_AXES_CONFIG = {
   surveyScaleLabels:["Très faible","Faible","Passable","Correct","Bon","Très bon","Excellent"],
   surveyScaleLabelsEn:["Very poor","Poor","Fair","Correct","Good","Very good","Excellent"],
   axes:[
-    {id:"clarte", label:"Clarté des explications", labelEn:"Clarity of explanations", description:"La capacité à expliquer les concepts de façon claire et compréhensible.",
-     ideas:["Utiliser des exemples concrets et des analogies tirées du quotidien","Varier les supports : tableau, schémas dessinés à la main, objets manipulables","Résumer les points clés oralement et par écrit à la fin de chaque section"]},
-    {id:"organisation", label:"Organisation du cours", labelEn:"Course organization", description:"La structure, la planification et la cohérence du déroulement du cours.",
-     ideas:["Distribuer un plan de cours papier annoté au fil des séances","Utiliser des fiches ou un cahier de suivi pour structurer chaque séance","Prévoir des repères visuels affichés en classe (échéanciers, étapes du cours)"]},
-    {id:"engagement", label:"Engagement des étudiants", labelEn:"Student engagement", description:"La capacité à susciter l'intérêt et la participation active des étudiants.",
-     ideas:["Jeux de rôle, mises en situation ou études de cas sur papier","Discussions en petits groupes avec du matériel physique (cartes, jetons, tableaux blancs)","Projets pratiques utilisant du matériel réel du domaine étudié"]},
-    {id:"retroaction", label:"Rétroaction et évaluation", labelEn:"Feedback and assessment", description:"La qualité, la clarté et l'utilité de la rétroaction donnée aux étudiants.",
-     ideas:["Rétroaction manuscrite personnalisée directement sur les copies","Grilles d'évaluation critériées partagées à l'avance, sur papier ou à l'écran","Courtes rencontres individuelles pour discuter des travaux"]},
-    {id:"disponibilite", label:"Disponibilité et soutien", labelEn:"Availability and support", description:"L'accessibilité et le soutien offerts aux étudiants en dehors des cours.",
-     ideas:["Heures de bureau fixes, en personne ou par téléphone","Bibliothèque de ressources papier en libre accès (guides, exemples annotés)","Groupes d'entraide entre étudiants avec du matériel partagé"]},
-    {id:"gestion", label:"Gestion de classe", labelEn:"Classroom management", description:"La capacité à maintenir un environnement d'apprentissage respectueux et productif.",
-     ideas:["Supports physiques pour structurer les transitions (minuteries, signaux visuels)","Aménagement de l'espace (îlots, cercles de discussion)","Routines claires affichées en classe"]},
-    {id:"numerique", label:"Diversité des outils et du matériel pédagogique", labelEn:"Diversity of tools and materials", description:"Le recours à des outils et supports variés — numériques, imprimés, manipulables ou autres — choisis selon le besoin pédagogique plutôt que par défaut.",
-     ideas:["Combiner plusieurs supports pour un même contenu (ex. démonstration physique + fiche papier + vidéo courte)","Maquettes, manipulables, matériel de laboratoire ou instruments propres à la discipline","Choisir l'outil — numérique ou non — en fonction du besoin pédagogique, pas de la nouveauté"]}
+    {id:"clarte", label:"Clarté des explications", labelEn:"Clarity of explanations", description:"La capacité à expliquer les concepts de façon claire et compréhensible.", descriptionEn:"The ability to explain concepts clearly and understandably.",
+     ideas:["Utiliser des exemples concrets et des analogies tirées du quotidien","Varier les supports : tableau, schémas dessinés à la main, objets manipulables","Résumer les points clés oralement et par écrit à la fin de chaque section"],
+     ideasEn:["Use concrete examples and everyday analogies","Vary the media used: whiteboard, hand-drawn diagrams, manipulable objects","Summarize key points both orally and in writing at the end of each section"]},
+    {id:"organisation", label:"Organisation du cours", labelEn:"Course organization", description:"La structure, la planification et la cohérence du déroulement du cours.", descriptionEn:"The structure, planning, and coherence of how the course unfolds.",
+     ideas:["Distribuer un plan de cours papier annoté au fil des séances","Utiliser des fiches ou un cahier de suivi pour structurer chaque séance","Prévoir des repères visuels affichés en classe (échéanciers, étapes du cours)"],
+     ideasEn:["Hand out an annotated paper course outline as sessions progress","Use index cards or a tracking notebook to structure each session","Provide visual landmarks posted in class (timelines, course stages)"]},
+    {id:"engagement", label:"Engagement des étudiants", labelEn:"Student engagement", description:"La capacité à susciter l'intérêt et la participation active des étudiants.", descriptionEn:"The ability to spark students' interest and active participation.",
+     ideas:["Jeux de rôle, mises en situation ou études de cas sur papier","Discussions en petits groupes avec du matériel physique (cartes, jetons, tableaux blancs)","Projets pratiques utilisant du matériel réel du domaine étudié"],
+     ideasEn:["Role-play, simulations, or paper-based case studies","Small-group discussions using physical materials (cards, tokens, whiteboards)","Practical projects using real materials from the field of study"]},
+    {id:"retroaction", label:"Rétroaction et évaluation", labelEn:"Feedback and assessment", description:"La qualité, la clarté et l'utilité de la rétroaction donnée aux étudiants.", descriptionEn:"The quality, clarity, and usefulness of feedback given to students.",
+     ideas:["Rétroaction manuscrite personnalisée directement sur les copies","Grilles d'évaluation critériées partagées à l'avance, sur papier ou à l'écran","Courtes rencontres individuelles pour discuter des travaux"],
+     ideasEn:["Personalized handwritten feedback directly on assignments","Criteria-based grading rubrics shared in advance, on paper or on screen","Short one-on-one meetings to discuss assignments"]},
+    {id:"disponibilite", label:"Disponibilité et soutien", labelEn:"Availability and support", description:"L'accessibilité et le soutien offerts aux étudiants en dehors des cours.", descriptionEn:"Accessibility and support offered to students outside of class.",
+     ideas:["Heures de bureau fixes, en personne ou par téléphone","Bibliothèque de ressources papier en libre accès (guides, exemples annotés)","Groupes d'entraide entre étudiants avec du matériel partagé"],
+     ideasEn:["Fixed office hours, in person or by phone","A freely accessible library of paper resources (guides, annotated examples)","Peer support groups among students with shared materials"]},
+    {id:"gestion", label:"Gestion de classe", labelEn:"Classroom management", description:"La capacité à maintenir un environnement d'apprentissage respectueux et productif.", descriptionEn:"The ability to maintain a respectful, productive learning environment.",
+     ideas:["Supports physiques pour structurer les transitions (minuteries, signaux visuels)","Aménagement de l'espace (îlots, cercles de discussion)","Routines claires affichées en classe"],
+     ideasEn:["Physical aids to structure transitions (timers, visual signals)","Room layout (islands, discussion circles)","Clear routines posted in the classroom"]},
+    {id:"numerique", label:"Diversité des outils et du matériel pédagogique", labelEn:"Diversity of tools and materials", description:"Le recours à des outils et supports variés — numériques, imprimés, manipulables ou autres — choisis selon le besoin pédagogique plutôt que par défaut.", descriptionEn:"The use of varied tools and materials — digital, printed, hands-on, or otherwise — chosen based on pedagogical need rather than by default.",
+     ideas:["Combiner plusieurs supports pour un même contenu (ex. démonstration physique + fiche papier + vidéo courte)","Maquettes, manipulables, matériel de laboratoire ou instruments propres à la discipline","Choisir l'outil — numérique ou non — en fonction du besoin pédagogique, pas de la nouveauté"],
+     ideasEn:["Combine several media for the same content (e.g. physical demo + paper handout + short video)","Models, manipulables, lab equipment, or instruments specific to the discipline","Choose the tool — digital or not — based on pedagogical need, not novelty"]}
   ]
 };
 let AXES_CONFIG = JSON.parse(JSON.stringify(DEFAULT_AXES_CONFIG));
 let axesSource = "defaut";
+
+function isDarkTheme(){ return document.documentElement.getAttribute("data-theme") === "dark"; }
+function themeC(light, dark){ return isDarkTheme() ? dark : light; }
+
+function initTheme(){
+  const saved = localStorage.getItem("plan-perfectionnement-theme");
+  const theme = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  document.documentElement.setAttribute("data-theme", theme);
+  updateThemeButton();
+}
+function updateThemeButton(){
+  const btn = document.getElementById("btnThemeToggle");
+  if(!btn) return;
+  btn.textContent = isDarkTheme() ? t("themeLight") : t("themeDark");
+}
+document.getElementById("btnThemeToggle").addEventListener("click", ()=>{
+  const next = isDarkTheme() ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  localStorage.setItem("plan-perfectionnement-theme", next);
+  updateThemeButton();
+  reRenderThemedVisuals();
+});
+function reRenderThemedVisuals(){
+  renderRadarPreview();
+  renderPortrait();
+  renderSurveyComparative();
+  renderTimeline();
+  renderQualityRadar();
+}
+
+function axisWord(count){
+  if(currentLang==="en") return count===1 ? "axis" : "axes";
+  return count===1 ? "axe" : "axes";
+}
+function axLabel(ax){ return currentLang==="en" && ax.labelEn ? ax.labelEn : ax.label; }function axDesc(ax){ return currentLang==="en" && ax.descriptionEn ? ax.descriptionEn : (ax.description||""); }
+function axIdeas(ax){ return currentLang==="en" && Array.isArray(ax.ideasEn) && ax.ideasEn.length ? ax.ideasEn : (ax.ideas||[]); }
 
 function scaleLabelFor(value){
   const labels = AXES_CONFIG.scaleLabels;
@@ -93,7 +408,7 @@ function applySliderColor(el, value, min, max){
   const color = sliderColorForValue(value, min, max);
   const pct = t*100;
   el.style.setProperty("--slider-color", color);
-  el.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #E3E1D8 ${pct}%, #E3E1D8 100%)`;
+  el.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, ${themeC("#E3E1D8","#3A3D42")} ${pct}%, ${themeC("#E3E1D8","#3A3D42")} 100%)`;
 }
 
 /* ---------------------------------------------------------------------
@@ -145,7 +460,7 @@ function fmtDateTimeShort(iso){
   if(!iso) return "—";
   const d = new Date(iso);
   if(isNaN(d)) return "—";
-  return d.toLocaleDateString("fr-CA", {year:"numeric", month:"short", day:"numeric"});
+  return d.toLocaleDateString(currentLang==="en"?"en-CA":"fr-CA", {year:"numeric", month:"short", day:"numeric"});
 }
 
 function refreshPlanEndDateBounds(){
@@ -174,7 +489,7 @@ function renderAppreciationHistory(){
   const wrap = document.getElementById("apprHistory");
   wrap.innerHTML = "";
   if(state.studentFeedbackHistory.length===0){
-    wrap.innerHTML = `<div class="empty-note">Aucune entrée pour le moment.</div>`;
+    wrap.innerHTML = `<div class="empty-note">${t("emptyNoteAppr")}</div>`;
     return;
   }
   [...state.studentFeedbackHistory].reverse().forEach(entry=>{
@@ -286,7 +601,7 @@ async function generateSurveyDocx(){
 }
 
 document.getElementById("btnGenSurveyDocx").addEventListener("click", ()=>{
-  generateSurveyDocx().catch(err=>alert("Impossible de générer le sondage.\n" + err.message));
+  generateSurveyDocx().catch(err=>alert(t("errSurveyDocx") + "\n" + err.message));
 });
 
 function normalizeForMatch(s){
@@ -373,10 +688,15 @@ document.getElementById("surveyExcelImport").addEventListener("change", (e)=>{
       state.studentSurveyResponses = { importedAt:new Date().toISOString(), fileName:file.name, perAxis:result.perAxis };
       touch();
       const statusEl = document.getElementById("surveyImportStatus");
-      statusEl.textContent = `${result.responseCount} réponse${result.responseCount===1?"":"s"} importée${result.responseCount===1?"":"s"} — ${result.matchedAxes} axe${result.matchedAxes===1?"":"s"} sur ${result.totalAxes} reconnu${result.matchedAxes===1?"":"s"} dans le fichier.`;
+      statusEl.textContent = t("surveyImportedStatus")
+        .replace("{N}", result.responseCount)
+        .replace(/{S}/g, result.responseCount===1 ? "" : "s")
+        .replace("{M}", result.matchedAxes)
+        .replace(/{MS}/g, result.matchedAxes===1 ? "" : "s")
+        .replace("{T}", result.totalAxes);
       renderSurveyComparative();
     }catch(err){
-      alert("Impossible de lire ce fichier comme des résultats de sondage valides.\n" + err.message);
+      alert(t("errSurveyExcel") + "\n" + err.message);
     }
   };
   reader.readAsArrayBuffer(file);
@@ -412,18 +732,18 @@ function renderSurveyComparative(){
     const entry = state.qualityRadar.entries.find(e=>e.axisId===ax.id);
     return entry && entry.current!==null && entry.current!==undefined ? Number(entry.current) : null;
   });
-  const lines = [{ values:selfVals, stroke:"#14181F", width:4 }];
+  const lines = [{ values:selfVals, stroke:themeC("#14181F","#ECECE7"), width:4 }];
 
   const svg = document.getElementById("surveyRadarSvg");
   svg.innerHTML = buildRadarSVG(axes, smin, smax, bands, lines, {size:560});
 
   document.getElementById("surveyRadarLegend").innerHTML = `
-    <span><i style="background:#E24B4A;"></i>Minimum</span>
-    <span><i style="background:#EF9F27;"></i>Q1</span>
-    <span><i style="background:#F4C430;"></i>Médiane</span>
-    <span><i style="background:#97C459;"></i>Q3</span>
-    <span><i style="background:#3B8C22;"></i>Maximum (réponses étudiantes)</span>
-    <span><svg width="18" height="10"><line x1="0" y1="5" x2="18" y2="5" stroke="#14181F" stroke-width="3"/></svg>Votre auto-positionnement</span>
+    <span><i style="background:#E24B4A;"></i>${t("legendMin")}</span>
+    <span><i style="background:#EF9F27;"></i>${t("legendQ1")}</span>
+    <span><i style="background:#F4C430;"></i>${t("legendMedian")}</span>
+    <span><i style="background:#97C459;"></i>${t("legendQ3")}</span>
+    <span><i style="background:#3B8C22;"></i>${t("legendMax")}</span>
+    <span><svg width="18" height="10"><line x1="0" y1="5" x2="18" y2="5" stroke="${themeC('#14181F','#ECECE7')}" stroke-width="3"/></svg>${t("legendSelfEval")}</span>
   `;
 }
 
@@ -444,7 +764,7 @@ async function tryAutoLoadAxes(){
 function updateAxesSourceNote(){
   const el = document.getElementById("axesSourceNote");
   if(!el) return;
-  const labels = { auto:"", defaut:"Axes par défaut utilisés (fichier de configuration non disponible)." };
+  const labels = { auto:t("axesAutoNote"), defaut:t("axesDefaultNote") };
   el.textContent = labels[axesSource] || "";
 }
 
@@ -498,7 +818,7 @@ function buildRadarSVG(axesList, scaleMin, scaleMax, bands, lines, opts){
   const size = opts.size || 460;
   const cx = size/2, cy = size/2;
   const n = axesList.length;
-  if(n < 3){ return `<text x="20" y="30" font-size="13" fill="#5B6472">Au moins 3 axes sont requis.</text>`; }
+  if(n < 3){ return `<text x="20" y="30" font-size="13" fill="${themeC('#5B6472','#9CA1A8')}">Au moins 3 axes sont requis.</text>`; }
   const angleFor = i => -Math.PI/2 + i*(2*Math.PI/n);
   const fontSize = 11;
   const labelGap = 18;
@@ -511,7 +831,7 @@ function buildRadarSVG(axesList, scaleMin, scaleMax, bands, lines, opts){
     if(opts.showLabels !== false){
       axesList.forEach((ax,i)=>{
         const angle = angleFor(i);
-        const w = textWidth(ax.label||"", fontSize);
+        const w = textWidth(axLabel(ax)||"", fontSize);
         const h = fontSize * 1.3;
         R = Math.min(R, maxRadiusForLabel(cx, cy, angle, w, h, labelGap, size));
       });
@@ -549,11 +869,11 @@ function buildRadarSVG(axesList, scaleMin, scaleMax, bands, lines, opts){
   for(let ring=1; ring<=ringCount; ring++){
     const val = scaleMin + (scaleMax-scaleMin)*(ring/ringCount);
     const pts = axesList.map((ax,i)=>radarPoint(cx,cy,R,angleFor(i),val,scaleMin,scaleMax));
-    els.push(`<polygon points="${ptsStr(pts)}" fill="none" stroke="rgba(20,20,20,0.35)" stroke-width="1.5"/>`);
+    els.push(`<polygon points="${ptsStr(pts)}" fill="none" stroke="${themeC('rgba(20,20,20,0.35)','rgba(255,255,255,0.35)')}" stroke-width="1.5"/>`);
   }
   for(let i=0;i<n;i++){
     const p = radarPoint(cx,cy,R,angleFor(i),scaleMax,scaleMin,scaleMax);
-    els.push(`<line x1="${cx}" y1="${cy}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}" stroke="rgba(20,20,20,0.35)" stroke-width="1.5"/>`);
+    els.push(`<line x1="${cx}" y1="${cy}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}" stroke="${themeC('rgba(20,20,20,0.35)','rgba(255,255,255,0.35)')}" stroke-width="1.5"/>`);
   }
 
   // axis labels, topmost
@@ -563,7 +883,7 @@ function buildRadarSVG(axesList, scaleMin, scaleMax, bands, lines, opts){
       const p = radarPoint(cx,cy,R+labelGap,angle,scaleMax,scaleMin,scaleMax);
       const cosA = Math.cos(angle);
       const anchor = cosA > 0.3 ? "start" : cosA < -0.3 ? "end" : "middle";
-      els.push(`<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="#3a3a38" text-anchor="${anchor}" dominant-baseline="middle">${escapeHtml(ax.label)}</text>`);
+      els.push(`<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${themeC('#3a3a38','#ECECE7')}" text-anchor="${anchor}" dominant-baseline="middle">${escapeHtml(axLabel(ax))}</text>`);
     });
   }
 
@@ -578,8 +898,8 @@ function renderRadarPreview(){
   const currentVals = axes.map(ax=>{ const en = state.qualityRadar.entries.find(e=>e.axisId===ax.id); return en && en.current!==null && en.current!==undefined ? Number(en.current) : null; });
   const goalVals = axes.map(ax=>{ const en = state.qualityRadar.entries.find(e=>e.axisId===ax.id); return en && en.goal!==null && en.goal!==undefined ? Number(en.goal) : null; });
   const lines = [
-    { values:currentVals, stroke:"#2F6F6B", width:3, fill:"#2F6F6B", fillOpacity:0.18, pointFill:"#2F6F6B" },
-    { values:goalVals, stroke:"#1B2430", width:3, dash:"6,4", pointFill:"#FAF9F6" }
+    { values:currentVals, stroke:themeC("#2F6F6B","#4FB3AC"), width:3, fill:themeC("#2F6F6B","#4FB3AC"), fillOpacity:0.18, pointFill:themeC("#2F6F6B","#4FB3AC") },
+    { values:goalVals, stroke:themeC("#1B2430","#ECECE7"), width:3, dash:"6,4", pointFill:themeC("#FAF9F6","#1F2226") }
   ];
   svg.innerHTML = buildRadarSVG(axes, smin, smax, [], lines, {size:460});
 }
@@ -619,9 +939,9 @@ function computeNarrative(){
   const second = sortedByCurrent[1];
   let strongLine;
   if(second && (top.current - second.current) <= 0.5){
-    strongLine = `Vos forces les plus marquées sont ${top.ax.label.toLowerCase()} et ${second.ax.label.toLowerCase()}.`;
+    strongLine = t("portraitStrongTwo").replace("{A}", axLabel(top.ax).toLowerCase()).replace("{B}", axLabel(second.ax).toLowerCase());
   } else {
-    strongLine = `Votre force la plus marquée est ${top.ax.label.toLowerCase()}.`;
+    strongLine = t("portraitStrongOne").replace("{A}", axLabel(top.ax).toLowerCase());
   }
 
   const withGap = withCurrent.filter(e=>e.goal!==null && e.goal>e.current)
@@ -633,9 +953,9 @@ function computeNarrative(){
   let growLine;
   if(withGap.length>0){
     const g = withGap[0];
-    growLine = `Votre plus grand pas prévu se situe en ${g.ax.label.toLowerCase()}, de ${g.current} à ${g.goal}.`;
+    growLine = t("portraitGrowLine").replace("{A}", axLabel(g.ax).toLowerCase()).replace("{C}", g.current).replace("{G}", g.goal);
   } else {
-    growLine = "Aucun objectif de progression n'est encore défini au-delà de votre position actuelle.";
+    growLine = t("portraitNoGrow");
   }
 
   return { strongLine, growLine, growingCount, stableCount, filledCount, totalCount };
@@ -651,15 +971,15 @@ function renderPortrait(){
   const name = state.meta.teacherName || "";
   const initials = name.trim().split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase() || "—";
   document.getElementById("portraitAvatar").textContent = initials;
-  document.getElementById("portraitName").textContent = name || "Portrait sans nom";
+  document.getElementById("portraitName").textContent = name || t("portraitNoName");
   document.getElementById("portraitStrongLine").textContent = narrative.strongLine;
   document.getElementById("portraitGrowLine").textContent = narrative.growLine;
-  document.getElementById("portraitGrowingPill").textContent = `${narrative.growingCount} axe${narrative.growingCount===1?"":"s"} en croissance`;
-  document.getElementById("portraitStablePill").textContent = `${narrative.stableCount} axe${narrative.stableCount===1?"":"s"} stable${narrative.stableCount===1?"":"s"}`;
+  document.getElementById("portraitGrowingPill").textContent = t("portraitGrowingPill").replace("{N}", narrative.growingCount).replace("{AXIS}", axisWord(narrative.growingCount)).replace(/{S}/g, narrative.growingCount===1?"":"s");
+  document.getElementById("portraitStablePill").textContent = t("portraitStablePill").replace("{N}", narrative.stableCount).replace("{AXIS}", axisWord(narrative.stableCount)).replace(/{S}/g, narrative.stableCount===1?"":"s");
 
   const notes = [];
-  if(narrative.filledCount < narrative.totalCount) notes.push(`D'après ${narrative.filledCount} axe${narrative.filledCount===1?"":"s"} sur ${narrative.totalCount} rempli${narrative.filledCount===1?"":"s"} jusqu'à présent.`);
-  if(state.qualityRadar.targetDate) notes.push(`Échéance visée : ${state.qualityRadar.targetDate}.`);
+  if(narrative.filledCount < narrative.totalCount) notes.push(t("portraitFooterFilled").replace(/{F}/g, narrative.filledCount).replace(/{FS}/g, narrative.filledCount===1?"":"s").replace("{T}", narrative.totalCount));
+  if(state.qualityRadar.targetDate) notes.push(t("portraitFooterTarget").replace("{D}", state.qualityRadar.targetDate));
   document.getElementById("portraitFooterNote").textContent = notes.join(" ");
 
   const svg = document.getElementById("portraitRadarSvg");
@@ -668,8 +988,8 @@ function renderPortrait(){
   const currentVals = axes.map(ax=>{ const en = state.qualityRadar.entries.find(e=>e.axisId===ax.id); return en && en.current!==null && en.current!==undefined ? Number(en.current) : null; });
   const goalVals = axes.map(ax=>{ const en = state.qualityRadar.entries.find(e=>e.axisId===ax.id); return en && en.goal!==null && en.goal!==undefined ? Number(en.goal) : null; });
   const lines = [
-    { values:currentVals, stroke:"#2F6F6B", width:3, fill:"#2F6F6B", fillOpacity:0.18, pointFill:"#2F6F6B" },
-    { values:goalVals, stroke:"#1B2430", width:3, dash:"6,4", pointFill:"#FAF9F6" }
+    { values:currentVals, stroke:themeC("#2F6F6B","#4FB3AC"), width:3, fill:themeC("#2F6F6B","#4FB3AC"), fillOpacity:0.18, pointFill:themeC("#2F6F6B","#4FB3AC") },
+    { values:goalVals, stroke:themeC("#1B2430","#ECECE7"), width:3, dash:"6,4", pointFill:themeC("#FAF9F6","#1F2226") }
   ];
   svg.innerHTML = buildRadarSVG(axes, smin, smax, [], lines, {size:400});
 }
@@ -690,34 +1010,34 @@ function renderQualityRadar(){
     card.innerHTML = `
       <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
         <div>
-          <div style="font-weight:600; font-size:13.5px;">${escapeHtml(ax.label)}</div>
-          <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">${escapeHtml(ax.description||"")}</div>
+          <div style="font-weight:600; font-size:13.5px;">${escapeHtml(axLabel(ax))}</div>
+          <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">${escapeHtml(axDesc(ax))}</div>
         </div>
-        ${(ax.ideas && ax.ideas.length) ? `<button type="button" class="small ax-ideas-toggle" style="white-space:nowrap;">Idées et pistes</button>` : ""}
+        ${(axIdeas(ax).length) ? `<button type="button" class="small ax-ideas-toggle" style="white-space:nowrap;">${t("ideasBtn")}</button>` : ""}
       </div>
-      ${(ax.ideas && ax.ideas.length) ? `
+      ${(axIdeas(ax).length) ? `
       <div class="ax-ideas-panel info-box" style="display:none; margin-bottom:10px;">
-        <strong>Pistes et bonnes pratiques (pas seulement numériques)</strong>
+        <strong>${t("ideasBoxTitle")}</strong>
         <ul style="margin:6px 0 0; padding-left:18px;">
-          ${ax.ideas.map(i=>`<li style="margin-bottom:3px;">${escapeHtml(i)}</li>`).join("")}
+          ${axIdeas(ax).map(i=>`<li style="margin-bottom:3px;">${escapeHtml(i)}</li>`).join("")}
         </ul>
       </div>` : ""}
       <div class="field tight">
-        <label>Position actuelle : <span class="rv-cur-out">${entry.current!==null?scaleLabelFor(entry.current):"—"}</span></label>
+        <label>${t("legendCurrent")} : <span class="rv-cur-out">${entry.current!==null?scaleLabelFor(entry.current):"—"}</span></label>
         <input type="range" class="rv-slider rv-current" min="${smin}" max="${smax}" step="1" value="${entry.current ?? smin}">
       </div>
       <div class="field tight" style="margin-top:14px;">
-        <label>Objectif : <span class="rv-goal-out">${entry.goal!==null?scaleLabelFor(entry.goal):"—"}</span></label>
+        <label>${t("legendGoal")} : <span class="rv-goal-out">${entry.goal!==null?scaleLabelFor(entry.goal):"—"}</span></label>
         <input type="range" class="rv-slider rv-goal" min="${smin}" max="${smax}" step="1" value="${entry.goal ?? smin}">
       </div>
       <div class="grid2" style="margin-top:14px;">
         <div class="field tight">
-          <label>Notes — état actuel (optionnel)</label>
-          <textarea class="rv-note-current" style="min-height:44px;" placeholder="Ex. ce qui explique cette position...">${escapeHtml(entry.noteCurrent)}</textarea>
+          <label>${t("labelNoteCurrent")}</label>
+          <textarea class="rv-note-current" style="min-height:44px;" placeholder="${escapeAttr(t("phNoteCurrent"))}">${escapeHtml(entry.noteCurrent)}</textarea>
         </div>
         <div class="field tight">
-          <label>Notes — amélioration prévue (optionnel)</label>
-          <textarea class="rv-note-goal" style="min-height:44px;" placeholder="Ex. moyens envisagés pour progresser...">${escapeHtml(entry.noteGoal)}</textarea>
+          <label>${t("labelNoteGoal")}</label>
+          <textarea class="rv-note-goal" style="min-height:44px;" placeholder="${escapeAttr(t("phNoteGoal"))}">${escapeHtml(entry.noteGoal)}</textarea>
         </div>
       </div>
     `;
@@ -729,7 +1049,7 @@ function renderQualityRadar(){
         const panel = card.querySelector(".ax-ideas-panel");
         const open = panel.style.display !== "none";
         panel.style.display = open ? "none" : "block";
-        ideasBtn.textContent = open ? "Idées et pistes" : "Masquer les idées";
+        ideasBtn.textContent = open ? t("ideasBtn") : t("ideasBtnHide");
       });
     }
 
@@ -778,15 +1098,15 @@ function toggleInArray(arr, val, on){
    Rendering: Domain-specific skills
 --------------------------------------------------------------------- */
 const SKILL_KIND_OPTIONS = [
-  {v:"nouvelle", l:"Nouvelle compétence à développer"},
-  {v:"maintien", l:"Expertise existante à maintenir ou actualiser"},
+  {v:"nouvelle", k:"skillkind_nouvelle"},
+  {v:"maintien", k:"skillkind_maintien"},
 ];
 
 function renderDomainSkills(){
   const list = document.getElementById("domainSkillsList");
   list.innerHTML = "";
   if(state.domainSkills.length===0){
-    list.innerHTML = `<div class="empty-note">Aucune compétence ajoutée pour le moment.</div>`;
+    list.innerHTML = `<div class="empty-note">${t("emptyNoteSkill")}</div>`;
   }
   state.domainSkills.forEach((sk, idx)=>{
     const card = document.createElement("div");
@@ -794,35 +1114,35 @@ function renderDomainSkills(){
     card.innerHTML = `
       <div class="row-top">
         <div class="field tight" style="flex:1;">
-          <label>Compétence ou expertise</label>
-          <input type="text" class="sk-name" data-idx="${idx}" value="${escapeAttr(sk.name)}" placeholder="Ex. Analyse de données avec Python">
+          <label>${t("labelSkillName")}</label>
+          <input type="text" class="sk-name" data-idx="${idx}" value="${escapeAttr(sk.name)}" placeholder="${escapeAttr(t("phSkillName"))}">
         </div>
-        <button class="small danger-outline sk-remove" data-idx="${idx}" style="margin-top:18px;">Retirer</button>
+        <button class="small danger-outline sk-remove" data-idx="${idx}" style="margin-top:18px;">${t("btnRemove")}</button>
       </div>
       <div class="field tight" style="margin-top:10px;">
-        <label>Type</label>
+        <label>${t("labelSkillType")}</label>
         <select class="sk-kind" data-idx="${idx}">
-          ${SKILL_KIND_OPTIONS.map(o=>`<option value="${o.v}" ${sk.kind===o.v?"selected":""}>${o.l}</option>`).join("")}
+          ${SKILL_KIND_OPTIONS.map(o=>`<option value="${o.v}" ${sk.kind===o.v?"selected":""}>${optLabel(o)}</option>`).join("")}
         </select>
       </div>
       <div class="grid2" style="margin-top:10px;">
         <div class="field tight">
-          <label>Comment (moyen envisagé)</label>
-          <textarea class="sk-plan" style="min-height:44px;" placeholder="Ex. autoformation, mentorat, cours crédité...">${escapeHtml(sk.plan)}</textarea>
+          <label>${t("labelSkillHow")}</label>
+          <textarea class="sk-plan" style="min-height:44px;" placeholder="${escapeAttr(t("phSkillHow"))}">${escapeHtml(sk.plan)}</textarea>
         </div>
         <div class="field tight">
-          <label>Quand</label>
-          <input type="text" class="sk-when" data-idx="${idx}" value="${escapeAttr(sk.when)}" placeholder="Ex. Session Hiver 2027">
+          <label>${t("labelSkillWhen")}</label>
+          <input type="text" class="sk-when" data-idx="${idx}" value="${escapeAttr(sk.when)}" placeholder="${escapeAttr(t("phSkillWhen"))}">
         </div>
       </div>
       <div class="field tight" style="margin-top:10px;">
         <label class="chip" style="width:fit-content;">
-          <input type="checkbox" class="sk-newcourses" data-idx="${idx}" ${sk.newCourses?"checked":""}> Souhaite enseigner de nouveaux cours une fois cette compétence acquise
+          <input type="checkbox" class="sk-newcourses" data-idx="${idx}" ${sk.newCourses?"checked":""}> ${t("labelSkillNewCourses")}
         </label>
       </div>
       <div class="field tight sk-newcourses-details" data-idx="${idx}" style="margin-top:10px; display:${sk.newCourses?"block":"none"};">
-        <label>Lesquels (optionnel)</label>
-        <input type="text" class="sk-newcourses-text" data-idx="${idx}" value="${escapeAttr(sk.newCoursesDetails)}" placeholder="Ex. cours d'introduction à la science des données">
+        <label>${t("labelSkillNewCoursesDetails")}</label>
+        <input type="text" class="sk-newcourses-text" data-idx="${idx}" value="${escapeAttr(sk.newCoursesDetails)}" placeholder="${escapeAttr(t("phSkillNewCoursesDetails"))}">
       </div>
     `;
     list.appendChild(card);
@@ -856,7 +1176,7 @@ function renderActivities(){
   const list = document.getElementById("activitiesList");
   list.innerHTML = "";
   if(state.activities.length===0){
-    list.innerHTML = `<div class="empty-note">Aucune activité ajoutée pour le moment.</div>`;
+    list.innerHTML = `<div class="empty-note">${t("emptyNoteActivity")}</div>`;
   }
   state.activities.forEach((a, idx)=>{
     const card = document.createElement("div");
@@ -864,85 +1184,85 @@ function renderActivities(){
     card.innerHTML = `
       <div class="row-top">
         <div class="field tight" style="flex:1;">
-          <label>Titre de l'activité</label>
-          <input type="text" class="a-title" data-idx="${idx}" value="${escapeAttr(a.title)}" placeholder="Ex. Colloque en pédagogie collégiale">
+          <label>${t("labelActivityTitle")}</label>
+          <input type="text" class="a-title" data-idx="${idx}" value="${escapeAttr(a.title)}" placeholder="${escapeAttr(t("phActivityTitle"))}">
         </div>
-        <button class="small danger-outline a-remove" data-idx="${idx}" style="margin-top:18px;">Retirer</button>
+        <button class="small danger-outline a-remove" data-idx="${idx}" style="margin-top:18px;">${t("btnRemove")}</button>
       </div>
       <div class="grid3" style="margin-top:12px;">
         <div class="field tight">
-          <label>Catégorie</label>
+          <label>${t("labelCategory")}</label>
           <select class="a-category" data-idx="${idx}">
-            ${CATEGORY_OPTIONS.map(o=>`<option value="${o.v}" ${a.category===o.v?"selected":""}>${o.l}</option>`).join("")}
+            ${CATEGORY_OPTIONS.map(o=>`<option value="${o.v}" ${a.category===o.v?"selected":""}>${optLabel(o)}</option>`).join("")}
           </select>
         </div>
         <div class="field tight">
-          <label>Format</label>
+          <label>${t("labelFormat")}</label>
           <select class="a-format" data-idx="${idx}">
-            ${FORMAT_OPTIONS.map(o=>`<option value="${o.v}" title="${escapeAttr(o.d||"")}" ${a.format===o.v?"selected":""}>${o.l}</option>`).join("")}
+            ${FORMAT_OPTIONS.map(o=>`<option value="${o.v}" title="${escapeAttr(optDesc(o))}" ${a.format===o.v?"selected":""}>${optLabel(o)}</option>`).join("")}
           </select>
         </div>
         <div class="field tight">
-          <label>Statut</label>
+          <label>${t("labelStatus")}</label>
           <select class="a-status" data-idx="${idx}">
-            ${STATUS_OPTIONS.map(o=>`<option value="${o.v}" ${a.status===o.v?"selected":""}>${o.l}</option>`).join("")}
+            ${STATUS_OPTIONS.map(o=>`<option value="${o.v}" ${a.status===o.v?"selected":""}>${optLabel(o)}</option>`).join("")}
           </select>
         </div>
       </div>
-      <div class="a-format-help" style="font-size:11.5px;color:var(--muted);margin-top:-4px;margin-bottom:2px;">${escapeHtml((FORMAT_OPTIONS.find(o=>o.v===a.format)||{}).d||"")}</div>
+      <div class="a-format-help" style="font-size:11.5px;color:var(--muted);margin-top:-4px;margin-bottom:2px;">${escapeHtml(optDesc(optByValue(FORMAT_OPTIONS, a.format)||{}))}</div>
       <div class="grid3" style="margin-top:12px;">
         <div class="field tight">
-          <label>Année académique</label>
-          <input type="text" class="a-year" data-idx="${idx}" value="${escapeAttr(a.academicYear)}" placeholder="Ex. 2026-2027">
+          <label>${t("labelAcademicYear")}</label>
+          <input type="text" class="a-year" data-idx="${idx}" value="${escapeAttr(a.academicYear)}" placeholder="${escapeAttr(t("phAcademicYear"))}">
         </div>
         <div class="field tight">
-          <label>Session / période visée</label>
-          <input type="text" class="a-session" data-idx="${idx}" value="${escapeAttr(a.session)}" placeholder="Ex. Session Automne 2026">
+          <label>${t("labelSession")}</label>
+          <input type="text" class="a-session" data-idx="${idx}" value="${escapeAttr(a.session)}" placeholder="${escapeAttr(t("phSession"))}">
         </div>
         <div class="field tight">
-          <label>Coût estimé (CAD)</label>
+          <label>${t("labelCost")}</label>
           <input type="number" min="0" step="1" class="a-cost" data-idx="${idx}" value="${a.estimatedCost ?? ""}">
         </div>
       </div>
       <div class="grid3" style="margin-top:12px;">
         <div class="field tight">
           <label class="chip" style="width:fit-content;">
-            <input type="checkbox" class="a-rd" data-idx="${idx}" ${a.proposedRD?"checked":""}> Proposée en R&D
+            <input type="checkbox" class="a-rd" data-idx="${idx}" ${a.proposedRD?"checked":""}> ${t("labelProposedRD")}
           </label>
         </div>
       </div>
       <div class="field" style="margin-top:12px;">
-        <label>Domaine(s) visé(s)</label>
+        <label>${t("labelDomains")}</label>
         <div class="chip-group a-domains" data-idx="${idx}"></div>
       </div>
       <div class="a-rd-block" data-idx="${idx}" style="display:${a.proposedRD?"block":"none"};">
         <div class="grid3" style="margin-top:8px;">
           <div class="field tight">
-            <label>Catégorie R&D</label>
+            <label>${t("labelRdCategory")}</label>
             <select class="a-rdcat" data-idx="${idx}">
-              <option value="">— à sélectionner —</option>
-              ${RD_CATEGORY_OPTIONS.map(o=>`<option value="${o.v}" ${a.rdCategory===o.v?"selected":""}>${o.l}</option>`).join("")}
+              <option value="">— </option>
+              ${RD_CATEGORY_OPTIONS.map(o=>`<option value="${o.v}" ${a.rdCategory===o.v?"selected":""}>${optLabel(o)}</option>`).join("")}
             </select>
           </div>
           <div class="field tight">
-            <label>État de l'approbation</label>
+            <label>${t("labelRdStatus")}</label>
             <select class="a-rdstatus" data-idx="${idx}">
-              ${RD_STATUS_OPTIONS.map(o=>`<option value="${o.v}" ${(a.rdApprovalStatus||"en_attente")===o.v?"selected":""}>${o.l}</option>`).join("")}
+              ${RD_STATUS_OPTIONS.map(o=>`<option value="${o.v}" ${(a.rdApprovalStatus||"en_attente")===o.v?"selected":""}>${optLabel(o)}</option>`).join("")}
             </select>
           </div>
           <div class="field tight">
-            <label>Date de la décision</label>
+            <label>${t("labelRdDate")}</label>
             <input type="date" class="a-rddate" data-idx="${idx}" value="${escapeAttr(a.rdApprovalDate)}">
           </div>
         </div>
         <div class="field tight" style="margin-top:10px;">
-          <label>Décidée par (nom et fonction, Direction des études)</label>
-          <input type="text" class="a-rdby" data-idx="${idx}" value="${escapeAttr(a.rdApprovedBy)}" placeholder="Ex. Jordan Léveillé, directeur des études">
+          <label>${t("labelRdBy")}</label>
+          <input type="text" class="a-rdby" data-idx="${idx}" value="${escapeAttr(a.rdApprovedBy)}" placeholder="${escapeAttr(t("phRdBy"))}">
         </div>
         <div class="rd-message" data-idx="${idx}">${rdMessageHtml(a)}</div>
       </div>
       <div class="field" style="margin-top:12px;">
-        <label>Notes (optionnel)</label>
+        <label>${t("labelNotes")}</label>
         <textarea class="a-notes" data-idx="${idx}">${escapeHtml(a.notes)}</textarea>
       </div>
     `;
@@ -973,7 +1293,7 @@ function renderActivities(){
     state.activities[idx].format = e.target.value; touch();
     const opt = FORMAT_OPTIONS.find(o=>o.v===e.target.value);
     const helpEl = e.target.closest(".activity-card").querySelector(".a-format-help");
-    if(helpEl) helpEl.textContent = (opt && opt.d) || "";
+    if(helpEl) helpEl.textContent = opt ? optDesc(opt) : "";
   }));
   list.querySelectorAll(".a-status").forEach(el=>el.addEventListener("change", e=>{ state.activities[e.target.dataset.idx].status = e.target.value; touch(); }));
   list.querySelectorAll(".a-year").forEach(el=>el.addEventListener("input", e=>{ state.activities[e.target.dataset.idx].academicYear = e.target.value; touch(); renderBudget(); }));
@@ -1025,13 +1345,17 @@ document.getElementById("btnAddActivity").addEventListener("click", ()=>{
 
 function rdMessageHtml(a){
   const status = a.rdApprovalStatus || "en_attente";
+  const byPart = a.rdApprovedBy ? (currentLang==="en" ? " by "+escapeHtml(a.rdApprovedBy) : " par "+escapeHtml(a.rdApprovedBy)) : "";
+  const datePart = a.rdApprovalDate ? (currentLang==="en" ? " on "+a.rdApprovalDate : ", le "+a.rdApprovalDate) : "";
   if(status === "approuvee"){
-    return `<div class="info-box"><strong>Approuvée</strong>${a.rdApprovedBy?" par "+escapeHtml(a.rdApprovedBy):""}${a.rdApprovalDate?", le "+a.rdApprovalDate:""}. Conservez la confirmation écrite pour vos dossiers.</div>`;
+    const msg = t("rdMsgApproved").replace("{BY}", byPart).replace("{DATE}", datePart);
+    return `<div class="info-box"><strong>${optLabel(optByValue(RD_STATUS_OPTIONS,"approuvee"))}</strong> ${msg}</div>`;
   }
   if(status === "refusee"){
-    return `<div class="warn-box"><strong>Refusée</strong>${a.rdApprovedBy?" par "+escapeHtml(a.rdApprovedBy):""}${a.rdApprovalDate?", le "+a.rdApprovalDate:""}. Cette activité ne compte pas comme temps de R&D. Révisez ce plan en conséquence — retirez la désignation R&D ou ajustez l'activité pour qu'il reflète la réalité.</div>`;
+    const msg = t("rdMsgRefused").replace("{BY}", byPart).replace("{DATE}", datePart);
+    return `<div class="warn-box"><strong>${optLabel(optByValue(RD_STATUS_OPTIONS,"refusee"))}</strong> ${msg}</div>`;
   }
-  return `<div class="warn-box"><strong>Rappel</strong> Cette activité n'est pas encore reconnue en R&D. Elle ne compte comme telle qu'une fois l'approbation écrite obtenue de la Direction des études — indiquez alors qui a approuvé et à quelle date.</div>`;
+  return `<div class="warn-box">${t("rdMsgPending")}</div>`;
 }
 
 /* ---------------------------------------------------------------------
@@ -1040,19 +1364,20 @@ function rdMessageHtml(a){
 function renderBudget(){
   const rows = document.getElementById("budgetRows");
   rows.innerHTML = "";
-  const catLabel = v => (CATEGORY_OPTIONS.find(o=>o.v===v)||{}).l || v;
+  const catLabel = v => { const o = optByValue(CATEGORY_OPTIONS, v); return o ? optLabel(o) : v; };
 
   if(state.activities.length===0){
-    rows.innerHTML = `<tr><td colspan="4" class="empty-note">Aucune activité à afficher.</td></tr>`;
+    rows.innerHTML = `<tr><td colspan="4" class="empty-note">${t("emptyNoteBudget")}</td></tr>`;
     document.getElementById("budgetTotal").textContent = "0 $";
     return;
   }
 
   // group by academic year, preserving first-seen order; blanks grouped last
+  const UNSPEC = "\u0000unspecified";
   const groups = [];
   const groupIndex = {};
   state.activities.forEach(a=>{
-    const yr = (a.academicYear||"").trim() || "Année non précisée";
+    const yr = (a.academicYear||"").trim() || UNSPEC;
     if(!(yr in groupIndex)){ groupIndex[yr] = groups.length; groups.push({year:yr, items:[], subtotal:0}); }
     const g = groups[groupIndex[yr]];
     const cost = a.estimatedCost || 0;
@@ -1060,21 +1385,22 @@ function renderBudget(){
     g.subtotal += cost;
   });
   groups.sort((a,b)=>{
-    if(a.year==="Année non précisée") return 1;
-    if(b.year==="Année non précisée") return -1;
+    if(a.year===UNSPEC) return 1;
+    if(b.year===UNSPEC) return -1;
     return a.year.localeCompare(b.year);
   });
 
   let grandTotal = 0;
   groups.forEach(g=>{
+    const yearDisplay = g.year===UNSPEC ? t("yearUnspecified") : g.year;
     g.items.forEach((a,i)=>{
       const cost = a.estimatedCost || 0;
       const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${i===0 ? escapeHtml(g.year) : ""}</td><td>${escapeHtml(a.title || "(sans titre)")}</td><td>${escapeHtml(catLabel(a.category))}</td><td style="text-align:right;">${cost ? cost.toLocaleString("fr-CA") + " $" : "—"}</td>`;
+      tr.innerHTML = `<td>${i===0 ? escapeHtml(yearDisplay) : ""}</td><td>${escapeHtml(a.title || "—")}</td><td>${escapeHtml(catLabel(a.category))}</td><td style="text-align:right;">${cost ? cost.toLocaleString("fr-CA") + " $" : "—"}</td>`;
       rows.appendChild(tr);
     });
     const subtr = document.createElement("tr");
-    subtr.innerHTML = `<td colspan="3" style="font-weight:600;border-top:1px solid var(--border);">Sous-total — ${escapeHtml(g.year)}</td><td style="text-align:right;font-weight:600;border-top:1px solid var(--border);">${g.subtotal.toLocaleString("fr-CA")} $</td>`;
+    subtr.innerHTML = `<td colspan="3" style="font-weight:600;border-top:1px solid var(--border);">${escapeHtml(t("subtotalLabel").replace("{Y}", yearDisplay))}</td><td style="text-align:right;font-weight:600;border-top:1px solid var(--border);">${g.subtotal.toLocaleString("fr-CA")} $</td>`;
     rows.appendChild(subtr);
     grandTotal += g.subtotal;
   });
@@ -1093,7 +1419,7 @@ function addYears(dateObj, n){
   return d;
 }
 function fmtShort(d){
-  return d.toLocaleDateString("fr-CA", {year:"numeric", month:"short", day:"numeric"});
+  return d.toLocaleDateString(currentLang==="en"?"en-CA":"fr-CA", {year:"numeric", month:"short", day:"numeric"});
 }
 function annualDateInYear(year, month, day){ return new Date(year, month, day); }
 
@@ -1112,38 +1438,38 @@ function renderTimeline(){
 
   const els = [];
   // axis
-  els.push(`<line x1="${marginX}" y1="90" x2="${W-marginX}" y2="90" stroke="#D8DCE1" stroke-width="2"/>`);
+  els.push(`<line x1="${marginX}" y1="90" x2="${W-marginX}" y2="90" stroke="${themeC('#D8DCE1','#34383D')}" stroke-width="2"/>`);
 
   // year ticks
   for(let y=0;y<=totalYears;y++){
     const d = addYears(start, y);
     if(d>span) break;
     const x = xFor(d);
-    els.push(`<line x1="${x}" y1="82" x2="${x}" y2="98" stroke="#B9BEC6" stroke-width="1"/>`);
-    els.push(`<text x="${x}" y="112" font-size="10.5" fill="#8A8F98" text-anchor="middle" font-family="Consolas,monospace">+${y} an${y>1?"s":""}</text>`);
+    els.push(`<line x1="${x}" y1="82" x2="${x}" y2="98" stroke="${themeC('#B9BEC6','#4A4E54')}" stroke-width="1"/>`);
+    els.push(`<text x="${x}" y="112" font-size="10.5" fill="${themeC('#8A8F98','#9CA1A8')}" text-anchor="middle" font-family="Consolas,monospace">+${y} ${y>1?t("plusYears"):t("plusOneYear")}</text>`);
   }
 
   // annual recurring reminders (Nov 15 balance stmt, May 15 balance stmt)
   const recurring = [
-    {month:10, day:15, label:"Relevé budget (15 nov.)"},
-    {month:4, day:15, label:"Relevé budget (15 mai)"},
+    {month:10, day:15, label:t("reviewDueMonospace")},
+    {month:4, day:15, label:t("reviewDueMonospace2")},
   ];
   for(let y=start.getFullYear(); y<=span.getFullYear()+1; y++){
     recurring.forEach(r=>{
       const d = annualDateInYear(y, r.month, r.day);
       if(d>=start && d<=span){
         const x = xFor(d);
-        els.push(`<circle cx="${x}" cy="90" r="4" fill="#8A8F98"/>`);
-        els.push(`<text x="${x}" y="72" font-size="9.5" fill="#5B6472" text-anchor="middle">${fmtShort(d)}</text>`);
+        els.push(`<circle cx="${x}" cy="90" r="4" fill="${themeC('#8A8F98','#9CA1A8')}"/>`);
+        els.push(`<text x="${x}" y="72" font-size="9.5" fill="${themeC('#5B6472','#9CA1A8')}" text-anchor="middle">${fmtShort(d)}</text>`);
       }
     });
   }
 
   // plan established
-  els.push(markerAt(xFor(start), "Plan établi", fmtShort(start), "#2F6F6B", true));
+  els.push(markerAt(xFor(start), t("planEstablished"), fmtShort(start), themeC("#2F6F6B","#4FB3AC"), true));
 
   // plan end / review due
-  els.push(markerAt(xFor(end), "Fin visée du plan", fmtShort(end), "#2F6F6B", false));
+  els.push(markerAt(xFor(end), t("planEndVisee"), fmtShort(end), themeC("#2F6F6B","#4FB3AC"), false));
 
   // appréciation étudiante reçue : on ne peut ni prévoir ni garantir quand elle
   // survient, donc on trace uniquement les entrées réellement reçues à ce jour.
@@ -1167,7 +1493,7 @@ function markerAt(x, title, dateLabel, color, above){
     <line x1="${x}" y1="90" x2="${x}" y2="${y1}" stroke="${color}" stroke-width="1.5" stroke-dasharray="3,2"/>
     <circle cx="${x}" cy="90" r="5" fill="${color}"/>
     <text x="${x}" y="${ty}" font-size="11" fill="${color}" text-anchor="middle" font-weight="600">${title}</text>
-    <text x="${x}" y="${ty + (above?14:14)}" font-size="9.5" fill="#5B6472" text-anchor="middle" font-family="Consolas,monospace">${dateLabel}</text>
+    <text x="${x}" y="${ty + (above?14:14)}" font-size="9.5" fill="${themeC('#5B6472','#9CA1A8')}" text-anchor="middle" font-family="Consolas,monospace">${dateLabel}</text>
   `;
 }
 
@@ -1248,7 +1574,7 @@ document.getElementById("fileImport").addEventListener("change", (e)=>{
       fullRender();
       renderPortrait();
     }catch(err){
-      alert("Impossible de lire ce fichier comme un plan valide.\n" + err.message);
+      alert(t("errImportPlan") + "\n" + err.message);
     }
   };
   reader.readAsText(file);
@@ -1256,7 +1582,7 @@ document.getElementById("fileImport").addEventListener("change", (e)=>{
 });
 
 document.getElementById("btnNew").addEventListener("click", ()=>{
-  if(confirm("Créer un nouveau plan vide ? Les données non exportées seront perdues.")){
+  if(confirm(t("confirmNewPlan"))){
     state = blankState();
     fullRender();
     renderPortrait();
@@ -1270,6 +1596,11 @@ function escapeHtml(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":
 function escapeAttr(s){ return escapeHtml(s); }
 
 /* Init */
+initTheme();
+currentLang = localStorage.getItem("plan-perfectionnement-lang") || "fr";
+applyStaticI18n();
+document.getElementById("btnLangFr").classList.toggle("active", currentLang==="fr");
+document.getElementById("btnLangEn").classList.toggle("active", currentLang==="en");
 fullRender();
 renderPortrait();
 tryAutoLoadAxes();
