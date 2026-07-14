@@ -62,6 +62,11 @@ const TRANSLATIONS = {
     sabDescLabel:"Description (optionnel)", sabPlaceholder:"Ex. projet envisagé, moment souhaité, durée approximative...",
     leaveInfoText:"Consultez la convention collective ou les politiques internes en vigueur (selon le cas) pour les critères d'admissibilité, les modalités, les délais de demande et de prolongation, ainsi que les effets sur l'ancienneté et l'affichage du poste. Cette section n'enclenche aucune démarche formelle.",
     footerText:"Plan personnel de perfectionnement — outil de planification interne. Ne remplace aucune disposition de la convention collective ou des politiques internes en vigueur (selon le cas).",
+    aiAttribTitle:"Comment cet outil a été créé",
+    aiAttribP1:"Cet outil a été construit par une collaboration itérative entre Elisa Schaeffer, Doyenne de la Technologie et du Design au Collège LaSalle Montréal, et Claude (Anthropic), un assistant IA. Le contenu pédagogique, la structure, les fonctionnalités, les priorités et les choix éditoriaux ont été définis, questionnés et affinés par Elisa à chaque étape. Claude a généré le code, proposé des formulations et signalé les incohérences — mais chaque décision substantielle a été prise par un être humain.",
+    aiAttribP2:"Ce n'est pas du contenu IA généré en une seule fois. C'est le résultat d'un dialogue de révision prolongé : chaque session a été lue, critiquée et corrigée. L'outil évolue.",
+    aiAttribP3Strong:"Utilisation réfléchie de l'IA",
+    aiAttribP3Rest:"L'IA générative est un outil de travail, non un substitut au jugement professionnel. Ce projet illustre une approche où l'humain reste l'auteur·rice : l'IA amplifie la capacité de production, mais la responsabilité éditoriale, pédagogique et éthique reste entièrement humaine. Dernière mise à jour : juillet 2026.",
 
     // dynamic content
     emptyNoteAxis:"Aucune entrée pour le moment.",
@@ -186,6 +191,11 @@ const TRANSLATIONS = {
     sabDescLabel:"Description (optional)", sabPlaceholder:"E.g. planned project, desired timing, approximate duration...",
     leaveInfoText:"Check the collective agreement or internal policies in effect (as applicable) for eligibility criteria, terms, request and extension deadlines, and the effects on seniority and position posting. This section does not trigger any formal process.",
     footerText:"Personal professional development plan — internal planning tool. Does not replace any provision of the collective agreement or internal policies in effect (as applicable).",
+    aiAttribTitle:"How this tool was made",
+    aiAttribP1:"This tool was built through an iterative collaboration between Elisa Schaeffer, Dean of Technology and Design at Collège LaSalle Montréal, and Claude (Anthropic), an AI assistant. The pedagogical content, structure, features, priorities, and editorial choices were defined, questioned, and refined by Elisa at every step. Claude generated the code, proposed wording, and flagged inconsistencies — but every substantive decision was made by a human.",
+    aiAttribP2:"This is not one-shot AI-generated content. It is the result of an extended review dialogue: each session was read, critiqued, and corrected. The tool continues to evolve.",
+    aiAttribP3Strong:"Thoughtful use of AI",
+    aiAttribP3Rest:"Generative AI is a working tool, not a substitute for professional judgment. This project illustrates an approach where the human remains the author: AI amplifies production capacity, but editorial, pedagogical, and ethical responsibility remains entirely human. Last updated: July 2026.",
 
     emptyNoteAxis:"No entry yet.",
     labelDomainCurrent:"Current position", labelDomainGoal:"Goal",

@@ -52,6 +52,11 @@ const TRANSLATIONS = {
     errAxesConfig:"Impossible de lire ce fichier comme une configuration d'axes valide.",
     errPlanRead:"", notesLoadedAlert:"Notes chargées.", errNotesRead:"Impossible de lire ce fichier comme des notes valides.",
     guardMessage:"Pas assez de plans avec auto-position pour préserver l'anonymat (minimum {N}; {C} disponible{CS} selon le filtre courant).",
+    aiAttribTitle:"Comment cet outil a été créé",
+    aiAttribP1:"Cet outil a été construit par une collaboration itérative entre Elisa Schaeffer, Doyenne de la Technologie et du Design au Collège LaSalle Montréal, et Claude (Anthropic), un assistant IA. Le contenu pédagogique, la structure, les fonctionnalités, les priorités et les choix éditoriaux ont été définis, questionnés et affinés par Elisa à chaque étape. Claude a généré le code, proposé des formulations et signalé les incohérences — mais chaque décision substantielle a été prise par un être humain.",
+    aiAttribP2:"Ce n'est pas du contenu IA généré en une seule fois. C'est le résultat d'un dialogue de révision prolongé : chaque session a été lue, critiquée et corrigée. L'outil évolue.",
+    aiAttribP3Strong:"Utilisation réfléchie de l'IA",
+    aiAttribP3Rest:"L'IA générative est un outil de travail, non un substitut au jugement professionnel. Ce projet illustre une approche où l'humain reste l'auteur·rice : l'IA amplifie la capacité de production, mais la responsabilité éditoriale, pédagogique et éthique reste entièrement humaine. Dernière mise à jour : juillet 2026.",
   },
   en: {
     docTitle:"Professional Development Plans Dashboard",
@@ -101,6 +106,11 @@ const TRANSLATIONS = {
     errAxesConfig:"Could not read this file as a valid axes configuration.",
     errPlanRead:"", notesLoadedAlert:"Notes loaded.", errNotesRead:"Could not read this file as valid notes.",
     guardMessage:"Not enough plans with self-positioning data to preserve anonymity (minimum {N}; {C} available under the current filter).",
+    aiAttribTitle:"How this tool was made",
+    aiAttribP1:"This tool was built through an iterative collaboration between Elisa Schaeffer, Dean of Technology and Design at Collège LaSalle Montréal, and Claude (Anthropic), an AI assistant. The pedagogical content, structure, features, priorities, and editorial choices were defined, questioned, and refined by Elisa at every step. Claude generated the code, proposed wording, and flagged inconsistencies — but every substantive decision was made by a human.",
+    aiAttribP2:"This is not one-shot AI-generated content. It is the result of an extended review dialogue: each session was read, critiqued, and corrected. The tool continues to evolve.",
+    aiAttribP3Strong:"Thoughtful use of AI",
+    aiAttribP3Rest:"Generative AI is a working tool, not a substitute for professional judgment. This project illustrates an approach where the human remains the author: AI amplifies production capacity, but editorial, pedagogical, and ethical responsibility remains entirely human. Last updated: July 2026.",
   }
 };
 
