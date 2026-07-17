@@ -30,6 +30,13 @@ const TRANSLATIONS = {
     h2Timeline:"2. Échéancier",
     timelineHint:"Calculé à partir de la date de création et de la date de fin visée. Vous montre ce qui est prévu à la convention collective, s'il y a lieu — pas des obligations ajoutées par cet outil.",
     legendCycle:"Cycle du plan", legendApprReceived:"Appréciation étudiante reçue", legendBudgetReminders:"Rappels annuels — budget individuel",
+    legendMilestonePlanned:"Jalon planifié", legendMilestoneDone:"Jalon complété",
+    h3Milestones:"Jalons du plan",
+    milestonesHint:"Ajoutez les formations que vous prévoyez suivre, les sondages que vous prévoyez mener, ou tout autre jalon — ils apparaîtront sur l'échéancier ci-dessus. Modifiez, supprimez ou marquez-les comme complétés au fil du temps.",
+    btnAddMilestone:"+ Ajouter un jalon", emptyNoteMilestone:"Aucun jalon ajouté pour le moment.",
+    labelMilestoneTitle:"Titre du jalon", phMilestoneTitle:"Ex. Compléter la formation en pédagogie numérique",
+    labelMilestoneType:"Type", labelMilestoneDate:"Date visée", labelMilestoneCompleted:"Complété",
+    milestone_formation:"Formation", milestone_sondage:"Sondage", milestone_autre:"Autre",
     h2SelfPos:"3. Auto-positionnement — axes de qualité d'enseignement",
     targetDateLabel:"Échéance visée pour l'atteinte de ces objectifs (optionnel)",
     legendCurrent:"Position actuelle", legendGoal:"Objectif",
@@ -39,10 +46,19 @@ const TRANSLATIONS = {
     btnAddAppr:"+ Ajouter à l'historique",
     h3Survey:"Sondage étudiant",
     surveyHint:"Générez un sondage bilingue (français/anglais) à importer dans Microsoft Forms, puis importez les résultats pour les comparer à votre auto-positionnement.",
-    anonymityTitle:"Anonymat",
-    anonymityText:"Une fois le sondage créé dans Microsoft Forms, ouvrez les paramètres du formulaire (icône « ... » ou « Paramètres ») et désactivez l'option qui enregistre le nom des répondants (habituellement « Enregistrer le nom » / « Record name »), afin que les réponses demeurent anonymes.",
-    quickImportNote:"L'importation Word de Microsoft Forms («\u00a0Importation rapide\u00a0») ne convertit fiablement que les questions à choix unique — après l'importation, cliquez sur « Vérifier » et confirmez que chaque question a bien été reconnue comme un choix unique avant de publier le sondage.",
     btnGenDocx:"Générer le sondage (Word, bilingue)", btnImportResults:"Importer les résultats (Excel)",
+    btnShowInstructions:"Comment importer ce sondage ?",
+    instrTitle:"Comment importer et configurer ce sondage",
+    instrStep1:"Cliquez sur « Générer le sondage » pour télécharger le fichier Word.",
+    instrStep2:"Rendez-vous sur <strong>forms.office.com</strong>.",
+    instrStep3:"Cliquez sur <strong>« Importation rapide »</strong> — pas sur « Nouveau formulaire » ni « Nouveau questionnaire ».",
+    instrStep4:"Sélectionnez le fichier Word que vous venez de télécharger.",
+    instrStep5:"Dans la fenêtre « Importer mon fichier en tant que », choisissez impérativement <strong>« Formulaire »</strong> — pas « Questionnaire ». Le mode Questionnaire active la notation automatique, ce qui n'a pas de sens pour un sondage de rétroaction.",
+    instrStep6:"Une fois l'importation terminée, cliquez sur « Vérifier » et confirmez que chaque question a bien été reconnue comme un choix unique (et non comme du texte libre).",
+    instrStep7:"<strong>Anonymat :</strong> ouvrez les paramètres du formulaire (icône « ... » ou « Paramètres ») et désactivez l'option qui enregistre le nom des répondants (habituellement « Enregistrer le nom »).",
+    instrStep8:"Publiez le formulaire et partagez le lien avec vos étudiants.",
+    instrStep9:"Une fois les réponses recueillies, exportez-les vers Excel depuis Microsoft Forms, puis revenez ici et cliquez sur « Importer les résultats (Excel) ».",
+    instrWhyNote:"Ces réglages (Formulaire plutôt que Questionnaire, anonymat désactivé) ne sont pas inclus dans le fichier Word lui-même — s'ils l'étaient, ils apparaîtraient comme du contenu dans le sondage que vos étudiants verraient, et vous risqueriez d'oublier de les retirer avant de publier.",
     h2Skills:"4. Compétences disciplinaires",
     skillsHint:"Propre à votre discipline ou champ d'expertise — distinct des axes généraux de qualité d'enseignement ci-dessus. Ajoutez une carte par compétence : une nouvelle à développer, ou une expertise existante à maintenir ou actualiser.",
     btnAddSkill:"+ Ajouter une compétence",
@@ -159,6 +175,13 @@ const TRANSLATIONS = {
     h2Timeline:"2. Timeline",
     timelineHint:"Computed from the creation date and the target end date. Shows what's provided for under the collective agreement, if applicable — not obligations added by this tool.",
     legendCycle:"Plan cycle", legendApprReceived:"Student feedback received", legendBudgetReminders:"Annual reminders — individual budget",
+    legendMilestonePlanned:"Planned milestone", legendMilestoneDone:"Completed milestone",
+    h3Milestones:"Plan milestones",
+    milestonesHint:"Add trainings you plan to complete, surveys you plan to conduct, or any other milestone — they'll appear on the timeline above. Edit, delete, or mark them complete as time goes on.",
+    btnAddMilestone:"+ Add a milestone", emptyNoteMilestone:"No milestone added yet.",
+    labelMilestoneTitle:"Milestone title", phMilestoneTitle:"E.g. Complete the digital pedagogy training",
+    labelMilestoneType:"Type", labelMilestoneDate:"Target date", labelMilestoneCompleted:"Completed",
+    milestone_formation:"Training", milestone_sondage:"Survey", milestone_autre:"Other",
     h2SelfPos:"3. Self-positioning — quality of instruction axes",
     targetDateLabel:"Target date for reaching these goals (optional)",
     legendCurrent:"Current position", legendGoal:"Goal",
@@ -168,10 +191,19 @@ const TRANSLATIONS = {
     btnAddAppr:"+ Add to history",
     h3Survey:"Student survey",
     surveyHint:"Generate a bilingual (French/English) survey to import into Microsoft Forms, then import the results to compare against your self-assessment.",
-    anonymityTitle:"Anonymity",
-    anonymityText:"Once the survey is created in Microsoft Forms, open the form settings (the \"...\" icon or \"Settings\") and turn off the option that records respondent names (usually \"Record name\"), so responses stay anonymous.",
-    quickImportNote:"Microsoft Forms' Word import (\u201cQuick Import\u201d) only reliably converts single-choice questions — after importing, click \"Review\" and confirm each question was recognized as single-choice before publishing the survey.",
     btnGenDocx:"Generate the survey (Word, bilingual)", btnImportResults:"Import results (Excel)",
+    btnShowInstructions:"How do I import this survey?",
+    instrTitle:"How to import and configure this survey",
+    instrStep1:"Click \"Generate the survey\" to download the Word file.",
+    instrStep2:"Go to <strong>forms.office.com</strong>.",
+    instrStep3:"Click <strong>\"Quick Import\"</strong> — not \"New Form\" or \"New Quiz\".",
+    instrStep4:"Select the Word file you just downloaded.",
+    instrStep5:"In the \"Import my file as\" window, you must choose <strong>\"Form\"</strong> — not \"Quiz\". Quiz mode turns on automatic grading, which doesn't make sense for a feedback survey.",
+    instrStep6:"Once the import finishes, click \"Review\" and confirm every question was recognized as single-choice (not as free text).",
+    instrStep7:"<strong>Anonymity:</strong> open the form settings (the \"...\" icon or \"Settings\") and turn off the option that records respondent names (usually \"Record name\").",
+    instrStep8:"Publish the form and share the link with your students.",
+    instrStep9:"Once responses are in, export them to Excel from Microsoft Forms, then come back here and click \"Import results (Excel)\".",
+    instrWhyNote:"These settings (Form rather than Quiz, anonymity turned off) aren't included in the Word file itself — if they were, they'd show up as content in the survey your students see, and you could easily forget to remove them before publishing.",
     h2Skills:"4. Subject-matter skills",
     skillsHint:"Specific to your discipline or area of expertise — distinct from the general quality-of-instruction axes above. Add one card per skill: a new one to develop, or existing expertise to maintain or update.",
     btnAddSkill:"+ Add a skill",
@@ -275,6 +307,7 @@ function t(key){
 
 function applyStaticI18n(){
   document.querySelectorAll("[data-i18n]").forEach(el=>{ el.textContent = t(el.getAttribute("data-i18n")); });
+  document.querySelectorAll("[data-i18n-html]").forEach(el=>{ el.innerHTML = t(el.getAttribute("data-i18n-html")); });
   document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{ el.placeholder = t(el.getAttribute("data-i18n-placeholder")); });
   document.documentElement.lang = currentLang;
 }
@@ -339,25 +372,25 @@ const DEFAULT_AXES_CONFIG = {
   surveyScaleLabels:["Très faible","Faible","Passable","Correct","Bon","Très bon","Excellent"],
   surveyScaleLabelsEn:["Very poor","Poor","Fair","Correct","Good","Very good","Excellent"],
   axes:[
-    {id:"clarte", label:"Clarté des explications", labelEn:"Clarity of explanations", description:"La capacité à expliquer les concepts de façon claire et compréhensible.", descriptionEn:"The ability to explain concepts clearly and understandably.",
+    {id:"clarte", label:"Clarté des explications", labelEn:"Clarity of explanations", icon:"💡", description:"La capacité à expliquer les concepts de façon claire et compréhensible.", descriptionEn:"The ability to explain concepts clearly and understandably.",
      ideas:["Utiliser des exemples concrets et des analogies tirées du quotidien","Varier les supports : tableau, schémas dessinés à la main, objets manipulables","Résumer les points clés oralement et par écrit à la fin de chaque section"],
      ideasEn:["Use concrete examples and everyday analogies","Vary the media used: whiteboard, hand-drawn diagrams, manipulable objects","Summarize key points both orally and in writing at the end of each section"]},
-    {id:"organisation", label:"Organisation du cours", labelEn:"Course organization", description:"La structure, la planification et la cohérence du déroulement du cours.", descriptionEn:"The structure, planning, and coherence of how the course unfolds.",
+    {id:"organisation", label:"Organisation du cours", labelEn:"Course organization", icon:"🗂", description:"La structure, la planification et la cohérence du déroulement du cours.", descriptionEn:"The structure, planning, and coherence of how the course unfolds.",
      ideas:["Distribuer un plan de cours papier annoté au fil des séances","Utiliser des fiches ou un cahier de suivi pour structurer chaque séance","Prévoir des repères visuels affichés en classe (échéanciers, étapes du cours)"],
      ideasEn:["Hand out an annotated paper course outline as sessions progress","Use index cards or a tracking notebook to structure each session","Provide visual landmarks posted in class (timelines, course stages)"]},
-    {id:"engagement", label:"Engagement des étudiants", labelEn:"Student engagement", description:"La capacité à susciter l'intérêt et la participation active des étudiants.", descriptionEn:"The ability to spark students' interest and active participation.",
+    {id:"engagement", label:"Engagement des étudiants", labelEn:"Student engagement", icon:"🎯", description:"La capacité à susciter l'intérêt et la participation active des étudiants.", descriptionEn:"The ability to spark students' interest and active participation.",
      ideas:["Jeux de rôle, mises en situation ou études de cas sur papier","Discussions en petits groupes avec du matériel physique (cartes, jetons, tableaux blancs)","Projets pratiques utilisant du matériel réel du domaine étudié"],
      ideasEn:["Role-play, simulations, or paper-based case studies","Small-group discussions using physical materials (cards, tokens, whiteboards)","Practical projects using real materials from the field of study"]},
-    {id:"retroaction", label:"Rétroaction et évaluation", labelEn:"Feedback and assessment", description:"La qualité, la clarté et l'utilité de la rétroaction donnée aux étudiants.", descriptionEn:"The quality, clarity, and usefulness of feedback given to students.",
+    {id:"retroaction", label:"Rétroaction et évaluation", labelEn:"Feedback and assessment", icon:"💬", description:"La qualité, la clarté et l'utilité de la rétroaction donnée aux étudiants.", descriptionEn:"The quality, clarity, and usefulness of feedback given to students.",
      ideas:["Rétroaction manuscrite personnalisée directement sur les copies","Grilles d'évaluation critériées partagées à l'avance, sur papier ou à l'écran","Courtes rencontres individuelles pour discuter des travaux"],
      ideasEn:["Personalized handwritten feedback directly on assignments","Criteria-based grading rubrics shared in advance, on paper or on screen","Short one-on-one meetings to discuss assignments"]},
-    {id:"disponibilite", label:"Disponibilité et soutien", labelEn:"Availability and support", description:"L'accessibilité et le soutien offerts aux étudiants en dehors des cours.", descriptionEn:"Accessibility and support offered to students outside of class.",
+    {id:"disponibilite", label:"Disponibilité et soutien", labelEn:"Availability and support", icon:"🤝", description:"L'accessibilité et le soutien offerts aux étudiants en dehors des cours.", descriptionEn:"Accessibility and support offered to students outside of class.",
      ideas:["Heures de bureau fixes, en personne ou par téléphone","Bibliothèque de ressources papier en libre accès (guides, exemples annotés)","Groupes d'entraide entre étudiants avec du matériel partagé"],
      ideasEn:["Fixed office hours, in person or by phone","A freely accessible library of paper resources (guides, annotated examples)","Peer support groups among students with shared materials"]},
-    {id:"gestion", label:"Gestion de classe", labelEn:"Classroom management", description:"La capacité à maintenir un environnement d'apprentissage respectueux et productif.", descriptionEn:"The ability to maintain a respectful, productive learning environment.",
+    {id:"gestion", label:"Gestion de classe", labelEn:"Classroom management", icon:"🧭", description:"La capacité à maintenir un environnement d'apprentissage respectueux et productif.", descriptionEn:"The ability to maintain a respectful, productive learning environment.",
      ideas:["Supports physiques pour structurer les transitions (minuteries, signaux visuels)","Aménagement de l'espace (îlots, cercles de discussion)","Routines claires affichées en classe"],
      ideasEn:["Physical aids to structure transitions (timers, visual signals)","Room layout (islands, discussion circles)","Clear routines posted in the classroom"]},
-    {id:"numerique", label:"Diversité des outils et du matériel pédagogique", labelEn:"Diversity of tools and materials", description:"Le recours à des outils et supports variés — numériques, imprimés, manipulables ou autres — choisis selon le besoin pédagogique plutôt que par défaut.", descriptionEn:"The use of varied tools and materials — digital, printed, hands-on, or otherwise — chosen based on pedagogical need rather than by default.",
+    {id:"numerique", label:"Diversité des outils et du matériel pédagogique", labelEn:"Diversity of tools and materials", icon:"🧰", description:"Le recours à des outils et supports variés — numériques, imprimés, manipulables ou autres — choisis selon le besoin pédagogique plutôt que par défaut.", descriptionEn:"The use of varied tools and materials — digital, printed, hands-on, or otherwise — chosen based on pedagogical need rather than by default.",
      ideas:["Combiner plusieurs supports pour un même contenu (ex. démonstration physique + fiche papier + vidéo courte)","Maquettes, manipulables, matériel de laboratoire ou instruments propres à la discipline","Choisir l'outil — numérique ou non — en fonction du besoin pédagogique, pas de la nouveauté"],
      ideasEn:["Combine several media for the same content (e.g. physical demo + paper handout + short video)","Models, manipulables, lab equipment, or instruments specific to the discipline","Choose the tool — digital or not — based on pedagogical need, not novelty"]}
   ]
@@ -437,6 +470,7 @@ function blankState(){
     studentFeedbackHistory: [],
     studentSurveyResponses:{ importedAt:"", fileName:"", perAxis:{} },
     domainSkills: [],
+    milestones: [],
     activities: [],
     budgetPlanning:{ notes:"" },
     // schema note: activity R&D approval fields are rdApprovalStatus ("en_attente"|"approuvee"|"refusee"),
@@ -561,9 +595,7 @@ async function generateSurveyDocx(){
   ));
   paras.push(docxParagraph(
     "Ce sondage est anonyme. Merci de répondre honnêtement — vos réponses aideront à orienter le perfectionnement professionnel de la personne enseignante.\n" +
-    "This survey is anonymous. Please answer honestly — your responses will help guide this teacher's professional development.\n\n" +
-    "Note pour la personne enseignante : une fois ce sondage créé dans Microsoft Forms, ouvrez les paramètres du formulaire et désactivez l'enregistrement du nom des répondants pour garantir l'anonymat.\n" +
-    "Note for the teacher: once this survey is created in Microsoft Forms, open the form settings and turn off respondent name collection to ensure anonymity.",
+    "This survey is anonymous. Please answer honestly — your responses will help guide this teacher's professional development.",
     {spacingAfter:300}
   ));
 
@@ -611,8 +643,22 @@ async function generateSurveyDocx(){
 }
 
 document.getElementById("btnGenSurveyDocx").addEventListener("click", ()=>{
-  generateSurveyDocx().catch(err=>alert(t("errSurveyDocx") + "\n" + err.message));
+  generateSurveyDocx()
+    .then(()=>openImportInstructions())
+    .catch(err=>alert(t("errSurveyDocx") + "\n" + err.message));
 });
+
+function openImportInstructions(){
+  document.getElementById("importInstructionsOverlay").classList.add("show");
+  document.getElementById("importInstructionsModal").classList.add("open");
+}
+function closeImportInstructions(){
+  document.getElementById("importInstructionsOverlay").classList.remove("show");
+  document.getElementById("importInstructionsModal").classList.remove("open");
+}
+document.getElementById("btnShowImportInstructions").addEventListener("click", openImportInstructions);
+document.getElementById("btnCloseImportInstructions").addEventListener("click", closeImportInstructions);
+document.getElementById("importInstructionsOverlay").addEventListener("click", closeImportInstructions);
 
 function normalizeForMatch(s){
   return (s||"").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim();
@@ -830,18 +876,20 @@ function buildRadarSVG(axesList, scaleMin, scaleMax, bands, lines, opts){
   const n = axesList.length;
   if(n < 3){ return `<text x="20" y="30" font-size="13" fill="${themeC('#5B6472','#9CA1A8')}">Au moins 3 axes sont requis.</text>`; }
   const angleFor = i => -Math.PI/2 + i*(2*Math.PI/n);
-  const fontSize = 11;
-  const labelGap = 18;
+  const fontSize = opts.showLabels === false ? 11 : 17;
+  const labelGap = 16;
 
-  // Compute a radius that leaves enough room for every axis label, measured
-  // for real (via canvas text metrics), so long labels never get clipped.
+  const markerFor = (ax,i) => `${i+1} ${ax.icon||""}`.trim();
+
+  // Compact icon+number markers need far less room than full text, so the
+  // radar can use nearly the full available width.
   let R = opts.radius;
   if(R === undefined){
-    R = size/2; // upper bound before shrinking for labels
+    R = size/2;
     if(opts.showLabels !== false){
       axesList.forEach((ax,i)=>{
         const angle = angleFor(i);
-        const w = textWidth(axLabel(ax)||"", fontSize);
+        const w = textWidth(markerFor(ax,i), fontSize);
         const h = fontSize * 1.3;
         R = Math.min(R, maxRadiusForLabel(cx, cy, angle, w, h, labelGap, size));
       });
@@ -886,14 +934,14 @@ function buildRadarSVG(axesList, scaleMin, scaleMax, bands, lines, opts){
     els.push(`<line x1="${cx}" y1="${cy}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}" stroke="${themeC('rgba(20,20,20,0.35)','rgba(255,255,255,0.35)')}" stroke-width="1.5"/>`);
   }
 
-  // axis labels, topmost
+  // axis markers (number + icon), topmost — full label available via native hover tooltip
   if(opts.showLabels !== false){
     axesList.forEach((ax,i)=>{
       const angle = angleFor(i);
       const p = radarPoint(cx,cy,R+labelGap,angle,scaleMax,scaleMin,scaleMax);
       const cosA = Math.cos(angle);
       const anchor = cosA > 0.3 ? "start" : cosA < -0.3 ? "end" : "middle";
-      els.push(`<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${themeC('#3a3a38','#ECECE7')}" text-anchor="${anchor}" dominant-baseline="middle">${escapeHtml(axLabel(ax))}</text>`);
+      els.push(`<g style="cursor:help;"><title>${escapeHtml(axLabel(ax))}</title><text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${themeC('#3a3a38','#ECECE7')}" text-anchor="${anchor}" dominant-baseline="middle">${escapeHtml(markerFor(ax,i))}</text></g>`);
     });
   }
 
@@ -1013,14 +1061,14 @@ function renderQualityRadar(){
   wrap.innerHTML = "";
   const smin = AXES_CONFIG.scaleMin, smax = AXES_CONFIG.scaleMax;
   document.getElementById("radar-target-date").value = state.qualityRadar.targetDate || "";
-  AXES_CONFIG.axes.forEach(ax=>{
+  AXES_CONFIG.axes.forEach((ax,i)=>{
     const entry = state.qualityRadar.entries.find(e=>e.axisId===ax.id);
     const card = document.createElement("div");
     card.className = "activity-card";
     card.innerHTML = `
       <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
         <div>
-          <div style="font-weight:600; font-size:13.5px;">${escapeHtml(axLabel(ax))}</div>
+          <div style="font-weight:600; font-size:13.5px;">${i+1}. ${ax.icon||""} ${escapeHtml(axLabel(ax))}</div>
           <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">${escapeHtml(axDesc(ax))}</div>
         </div>
         ${(axIdeas(ax).length) ? `<button type="button" class="small ax-ideas-toggle" style="white-space:nowrap;">${t("ideasBtn")}</button>` : ""}
@@ -1034,11 +1082,11 @@ function renderQualityRadar(){
       </div>` : ""}
       <div class="field tight">
         <label>${t("legendCurrent")} : <span class="rv-cur-out">${entry.current!==null?scaleLabelFor(entry.current):"—"}</span></label>
-        <input type="range" class="rv-slider rv-current" min="${smin}" max="${smax}" step="1" value="${entry.current ?? smin}">
+        <input type="range" class="rv-slider rv-current" min="${smin}" max="${smax}" step="0.1" value="${entry.current ?? smin}">
       </div>
       <div class="field tight" style="margin-top:14px;">
         <label>${t("legendGoal")} : <span class="rv-goal-out">${entry.goal!==null?scaleLabelFor(entry.goal):"—"}</span></label>
-        <input type="range" class="rv-slider rv-goal" min="${smin}" max="${smax}" step="1" value="${entry.goal ?? smin}">
+        <input type="range" class="rv-slider rv-goal" min="${smin}" max="${smax}" step="0.1" value="${entry.goal ?? smin}">
       </div>
       <div class="grid2" style="margin-top:14px;">
         <div class="field tight">
@@ -1103,6 +1151,81 @@ function toggleInArray(arr, val, on){
   if(on && i===-1) arr.push(val);
   if(!on && i!==-1) arr.splice(i,1);
 }
+
+/* ---------------------------------------------------------------------
+   Rendering: Timeline milestones (jalons)
+--------------------------------------------------------------------- */
+const MILESTONE_TYPE_OPTIONS = [
+  {v:"formation", k:"milestone_formation"},
+  {v:"sondage", k:"milestone_sondage"},
+  {v:"autre", k:"milestone_autre"},
+];
+
+function renderMilestones(){
+  const list = document.getElementById("milestonesList");
+  list.innerHTML = "";
+  if(state.milestones.length===0){
+    list.innerHTML = `<div class="empty-note">${t("emptyNoteMilestone")}</div>`;
+  }
+  const sorted = [...state.milestones].sort((a,b)=>(a.targetDate||"").localeCompare(b.targetDate||""));
+  sorted.forEach(m=>{
+    const idx = state.milestones.indexOf(m);
+    const card = document.createElement("div");
+    card.className = "activity-card";
+    card.style.opacity = m.completed ? "0.7" : "1";
+    card.innerHTML = `
+      <div class="row-top">
+        <div class="field tight" style="flex:1;">
+          <label>${t("labelMilestoneTitle")}</label>
+          <input type="text" class="ms-title" data-idx="${idx}" value="${escapeAttr(m.title)}" placeholder="${escapeAttr(t("phMilestoneTitle"))}" style="${m.completed?'text-decoration:line-through;':''}">
+        </div>
+        <button class="small danger-outline ms-remove" data-idx="${idx}" style="margin-top:18px;">${t("btnRemove")}</button>
+      </div>
+      <div class="grid3" style="margin-top:12px;">
+        <div class="field tight">
+          <label>${t("labelMilestoneType")}</label>
+          <select class="ms-type" data-idx="${idx}">
+            ${MILESTONE_TYPE_OPTIONS.map(o=>`<option value="${o.v}" ${m.type===o.v?"selected":""}>${optLabel(o)}</option>`).join("")}
+          </select>
+        </div>
+        <div class="field tight">
+          <label>${t("labelMilestoneDate")}</label>
+          <input type="date" class="ms-date" data-idx="${idx}" value="${escapeAttr(m.targetDate)}">
+        </div>
+        <div class="field tight" style="display:flex; align-items:flex-end;">
+          <label class="chip" style="width:fit-content; margin:0;">
+            <input type="checkbox" class="ms-completed" data-idx="${idx}" ${m.completed?"checked":""}> ${t("labelMilestoneCompleted")}
+          </label>
+        </div>
+      </div>
+      <div class="field tight" style="margin-top:10px;">
+        <label>${t("labelNotes")}</label>
+        <textarea class="ms-notes" data-idx="${idx}" style="min-height:44px;">${escapeHtml(m.notes)}</textarea>
+      </div>
+    `;
+    list.appendChild(card);
+
+    card.querySelector(".ms-title").addEventListener("input", e=>{ state.milestones[idx].title = e.target.value; touch(); renderTimeline(); });
+    card.querySelector(".ms-type").addEventListener("change", e=>{ state.milestones[idx].type = e.target.value; touch(); renderTimeline(); });
+    card.querySelector(".ms-date").addEventListener("input", e=>{ state.milestones[idx].targetDate = e.target.value; touch(); renderTimeline(); renderMilestones(); });
+    card.querySelector(".ms-completed").addEventListener("change", e=>{
+      state.milestones[idx].completed = e.target.checked;
+      state.milestones[idx].completedAt = e.target.checked ? new Date().toISOString() : null;
+      touch(); renderMilestones(); renderTimeline();
+    });
+    card.querySelector(".ms-notes").addEventListener("input", e=>{ state.milestones[idx].notes = e.target.value; touch(); });
+    card.querySelector(".ms-remove").addEventListener("click", ()=>{
+      state.milestones.splice(idx,1); touch(); renderMilestones(); renderTimeline();
+    });
+  });
+}
+
+document.getElementById("btnAddMilestone").addEventListener("click", ()=>{
+  state.milestones.push({
+    id: uid("ms"), title:"", type:"formation", targetDate: toISODate(new Date()), completed:false, completedAt:null, notes:""
+  });
+  touch(); renderMilestones(); renderTimeline();
+});
 
 /* ---------------------------------------------------------------------
    Rendering: Domain-specific skills
@@ -1492,6 +1615,22 @@ function renderTimeline(){
     }
   });
 
+  // jalons du plan (formations, sondages, etc. ajoutés par la personne enseignante)
+  const milestonesInRange = state.milestones
+    .filter(m=>m.targetDate)
+    .map(m=>({m, d:new Date(m.targetDate+"T00:00:00")}))
+    .filter(({d})=>d>=start && d<=span)
+    .sort((a,b)=>a.d-b.d);
+  milestonesInRange.forEach(({m,d}, i)=>{
+    const x = xFor(d);
+    const color = m.completed ? "#3B8C22" : "#7B5EA7";
+    const yBand = 130 + (i%2)*22;
+    const label = (m.title || t("labelMilestoneTitle")) + (m.completed ? " \u2713" : "");
+    els.push(`<line x1="${x}" y1="90" x2="${x}" y2="${yBand-8}" stroke="${color}" stroke-width="1.25" stroke-dasharray="2,2"/>`);
+    els.push(`<circle cx="${x}" cy="90" r="4" fill="${color}"/>`);
+    els.push(`<text x="${x}" y="${yBand}" font-size="9" fill="${color}" text-anchor="middle">${escapeHtml(label)}</text>`);
+  });
+
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   svg.innerHTML = els.join("");
 }
@@ -1523,6 +1662,7 @@ function fullRender(){
   renderDomainSkills();
   renderActivities();
   renderBudget();
+  renderMilestones();
   renderTimeline();
 }
 
@@ -1565,6 +1705,13 @@ document.getElementById("fileImport").addEventListener("change", (e)=>{
       if(!state.studentSurveyResponses || typeof state.studentSurveyResponses !== "object") state.studentSurveyResponses = { importedAt:"", fileName:"", perAxis:{} };
       if(!state.studentSurveyResponses.perAxis || typeof state.studentSurveyResponses.perAxis !== "object") state.studentSurveyResponses.perAxis = {};
       if(!Array.isArray(state.domainSkills)) state.domainSkills = [];
+      if(!Array.isArray(state.milestones)) state.milestones = [];
+      state.milestones.forEach(m=>{
+        if(m.type === undefined) m.type = "formation";
+        if(m.completed === undefined) m.completed = false;
+        if(m.completedAt === undefined) m.completedAt = null;
+        if(m.notes === undefined) m.notes = "";
+      });
       state.domainSkills.forEach(sk=>{
         if(sk.kind === undefined) sk.kind = "nouvelle";
         if(sk.plan === undefined) sk.plan = "";

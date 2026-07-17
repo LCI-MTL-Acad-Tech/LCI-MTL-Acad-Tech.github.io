@@ -199,13 +199,13 @@ const DEFAULT_AXES_CONFIG = {
   schemaVersion:"1.0", scaleMin:1, scaleMax:7,
   scaleLabels:["Très faible","Faible","Limité","Correct","Confortable","Confiant","Maîtrisé"],
   axes:[
-    {id:"clarte", label:"Clarté des explications", labelEn:"Clarity of explanations", description:"La capacité à expliquer les concepts de façon claire et compréhensible."},
-    {id:"organisation", label:"Organisation du cours", labelEn:"Course organization", description:"La structure, la planification et la cohérence du déroulement du cours."},
-    {id:"engagement", label:"Engagement des étudiants", labelEn:"Student engagement", description:"La capacité à susciter l'intérêt et la participation active des étudiants."},
-    {id:"retroaction", label:"Rétroaction et évaluation", labelEn:"Feedback and assessment", description:"La qualité, la clarté et l'utilité de la rétroaction donnée aux étudiants."},
-    {id:"disponibilite", label:"Disponibilité et soutien", labelEn:"Availability and support", description:"L'accessibilité et le soutien offerts aux étudiants en dehors des cours."},
-    {id:"gestion", label:"Gestion de classe", labelEn:"Classroom management", description:"La capacité à maintenir un environnement d'apprentissage respectueux et productif."},
-    {id:"numerique", label:"Diversité des outils et du matériel pédagogique", labelEn:"Diversity of tools and materials", description:"Le recours à des outils et supports variés — numériques, imprimés, manipulables ou autres — choisis selon le besoin pédagogique plutôt que par défaut."}
+    {id:"clarte", label:"Clarté des explications", labelEn:"Clarity of explanations", icon:"\u{1F4A1}", description:"La capacité à expliquer les concepts de façon claire et compréhensible."},
+    {id:"organisation", label:"Organisation du cours", labelEn:"Course organization", icon:"\u{1F5C2}", description:"La structure, la planification et la cohérence du déroulement du cours."},
+    {id:"engagement", label:"Engagement des étudiants", labelEn:"Student engagement", icon:"\u{1F3AF}", description:"La capacité à susciter l'intérêt et la participation active des étudiants."},
+    {id:"retroaction", label:"Rétroaction et évaluation", labelEn:"Feedback and assessment", icon:"\u{1F4AC}", description:"La qualité, la clarté et l'utilité de la rétroaction donnée aux étudiants."},
+    {id:"disponibilite", label:"Disponibilité et soutien", labelEn:"Availability and support", icon:"\u{1F91D}", description:"L'accessibilité et le soutien offerts aux étudiants en dehors des cours."},
+    {id:"gestion", label:"Gestion de classe", labelEn:"Classroom management", icon:"\u{1F9ED}", description:"La capacité à maintenir un environnement d'apprentissage respectueux et productif."},
+    {id:"numerique", label:"Diversité des outils et du matériel pédagogique", labelEn:"Diversity of tools and materials", icon:"\u{1F9F0}", description:"Le recours à des outils et supports variés — numériques, imprimés, manipulables ou autres — choisis selon le besoin pédagogique plutôt que par défaut."}
   ]
 };
 let AXES_CONFIG = JSON.parse(JSON.stringify(DEFAULT_AXES_CONFIG));
@@ -694,15 +694,16 @@ function buildRadarSVG(axesList, scaleMin, scaleMax, bands, lines, opts){
   const n = axesList.length;
   if(n < 3) return `<text x="20" y="30" font-size="13" fill="#5B6472">Au moins 3 axes sont requis.</text>`;
   const angleFor = i => -Math.PI/2 + i*(2*Math.PI/n);
-  const fontSize = 11.5;
-  const labelGap = 20;
+  const fontSize = 17;
+  const labelGap = 16;
+  const markerFor = (ax,i) => `${i+1} ${ax.icon||""}`.trim();
 
   let R = opts.radius;
   if(R === undefined){
     R = size/2;
     axesList.forEach((ax,i)=>{
       const angle = angleFor(i);
-      const w = textWidth(ax.label||"", fontSize);
+      const w = textWidth(markerFor(ax,i), fontSize);
       const h = fontSize * 1.3;
       R = Math.min(R, maxRadiusForLabel(cx, cy, angle, w, h, labelGap, size));
     });
@@ -745,7 +746,7 @@ function buildRadarSVG(axesList, scaleMin, scaleMax, bands, lines, opts){
     const p = radarPoint(cx,cy,R+labelGap,angle,scaleMax,scaleMin,scaleMax);
     const cosA = Math.cos(angle);
     const anchor = cosA > 0.3 ? "start" : cosA < -0.3 ? "end" : "middle";
-    els.push(`<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${themeC('#3a3a38','#ECECE7')}" text-anchor="${anchor}" dominant-baseline="middle">${escapeHtml(ax.label)}</text>`);
+    els.push(`<g style="cursor:help;"><title>${escapeHtml(axLabel(ax))}</title><text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${themeC('#3a3a38','#ECECE7')}" text-anchor="${anchor}" dominant-baseline="middle">${escapeHtml(markerFor(ax,i))}</text></g>`);
   });
 
   return `<g>${els.join("")}</g>`;
@@ -822,6 +823,10 @@ function renderRadarTab(){
     ${selectedPlan ? `<span><svg width="18" height="10"><line x1="0" y1="5" x2="18" y2="5" stroke="${themeC('#14181F','#ECECE7')}" stroke-width="3"/></svg>${t("legendCurrent")}</span>
     <span><svg width="18" height="10"><line x1="0" y1="5" x2="18" y2="5" stroke="${themeC('#14181F','#ECECE7')}" stroke-width="3" stroke-dasharray="4,3"/></svg>${t("legendGoal")}</span>` : ""}
   `;
+
+  document.getElementById("radarAxisKey").innerHTML = axes.map((ax,i)=>
+    `<span>${i+1} ${ax.icon||""} ${escapeHtml(axLabel(ax))}</span>`
+  ).join("");
 
   const notesEl = document.getElementById("radarTeacherNotes");
   if(!selectedPlan){ notesEl.innerHTML = ""; return; }

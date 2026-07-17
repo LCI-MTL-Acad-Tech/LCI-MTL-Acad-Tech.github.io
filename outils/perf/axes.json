@@ -27,7 +27,8 @@
         "Use concrete examples and everyday analogies",
         "Vary the media used: whiteboard, hand-drawn diagrams, manipulable objects",
         "Summarize key points both orally and in writing at the end of each section"
-      ]
+      ],
+      "icon": "💡"
     },
     {
       "id": "organisation",
@@ -44,7 +45,8 @@
         "Hand out an annotated paper course outline as sessions progress",
         "Use index cards or a tracking notebook to structure each session",
         "Provide visual landmarks posted in class (timelines, course stages)"
-      ]
+      ],
+      "icon": "🗂"
     },
     {
       "id": "engagement",
@@ -61,7 +63,8 @@
         "Role-play, simulations, or paper-based case studies",
         "Small-group discussions using physical materials (cards, tokens, whiteboards)",
         "Practical projects using real materials from the field of study"
-      ]
+      ],
+      "icon": "🎯"
     },
     {
       "id": "retroaction",
@@ -78,7 +81,8 @@
         "Personalized handwritten feedback directly on assignments",
         "Criteria-based grading rubrics shared in advance, on paper or on screen",
         "Short one-on-one meetings to discuss assignments"
-      ]
+      ],
+      "icon": "💬"
     },
     {
       "id": "disponibilite",
@@ -95,7 +99,8 @@
         "Fixed office hours, in person or by phone",
         "A freely accessible library of paper resources (guides, annotated examples)",
         "Peer support groups among students with shared materials"
-      ]
+      ],
+      "icon": "🤝"
     },
     {
       "id": "gestion",
@@ -112,7 +117,8 @@
         "Physical aids to structure transitions (timers, visual signals)",
         "Room layout (islands, discussion circles)",
         "Clear routines posted in the classroom"
-      ]
+      ],
+      "icon": "🧭"
     },
     {
       "id": "numerique",
@@ -129,7 +135,8 @@
         "Combine several media for the same content (e.g. physical demo + paper handout + short video)",
         "Models, manipulables, lab equipment, or instruments specific to the discipline",
         "Choose the tool — digital or not — based on pedagogical need, not novelty"
-      ]
+      ],
+      "icon": "🧰"
     }
   ],
   "surveyScaleLabels": [

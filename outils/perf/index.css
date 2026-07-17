@@ -164,3 +164,16 @@
     nav.toc{ display:none; }
     .grid2, .grid3{ grid-template-columns:1fr; }
   }
+
+  .overlay{ position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:40; display:none; }
+  .overlay.show{ display:block; }
+  .modal-panel{
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:min(600px,90vw); max-height:85vh; overflow-y:auto;
+    background:var(--panel); border:1px solid var(--border); border-radius:10px;
+    box-shadow:0 12px 40px rgba(0,0,0,.25); padding:26px 28px; z-index:50; display:none;
+  }
+  .modal-panel.open{ display:block; }
+  .modal-panel .close{ position:absolute; top:14px; right:16px; }
+  .instr-list{ margin:14px 0; padding-left:22px; }
+  .instr-list li{ margin-bottom:10px; font-size:13.5px; line-height:1.5; }

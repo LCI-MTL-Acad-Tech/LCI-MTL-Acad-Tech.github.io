@@ -125,7 +125,15 @@
         <span><i style="background:#2F6F6B"></i> <span data-i18n="legendCycle">Cycle du plan</span></span>
         <span><i style="background:#A6673A"></i> <span data-i18n="legendApprReceived">Appréciation étudiante reçue</span></span>
         <span><i style="background:#8A8F98"></i> <span data-i18n="legendBudgetReminders">Rappels annuels — budget individuel</span></span>
+        <span><i style="background:#7B5EA7"></i> <span data-i18n="legendMilestonePlanned">Jalon planifié</span></span>
+        <span><i style="background:#3B8C22"></i> <span data-i18n="legendMilestoneDone">Jalon complété</span></span>
       </div>
+
+      <div style="border-top:1px solid var(--border); margin:22px 0 18px;"></div>
+      <h3 style="font-size:14.5px; margin:0 0 4px;" data-i18n="h3Milestones">Jalons du plan</h3>
+      <p class="hint" data-i18n="milestonesHint">Ajoutez les formations que vous prévoyez suivre, les sondages que vous prévoyez mener, ou tout autre jalon — ils apparaîtront sur l'échéancier ci-dessus. Modifiez, supprimez ou marquez-les comme complétés au fil du temps.</p>
+      <div id="milestonesList" style="margin-top:12px;"></div>
+      <button class="primary" id="btnAddMilestone" data-i18n="btnAddMilestone">+ Ajouter un jalon</button>
     </section>
 
     <section class="card" id="sec-feedback">
@@ -158,17 +166,11 @@
       <div style="border-top:1px solid var(--border); margin:22px 0 18px;"></div>
       <h3 style="font-size:14.5px; margin:0 0 4px;" data-i18n="h3Survey">Sondage étudiant</h3>
       <p class="hint" data-i18n="surveyHint">Générez un sondage bilingue (français/anglais) à importer dans Microsoft Forms, puis importez les résultats pour les comparer à votre auto-positionnement.</p>
-      <div class="warn-box">
-        <strong data-i18n="anonymityTitle">Anonymat</strong>
-        <span data-i18n="anonymityText">Une fois le sondage créé dans Microsoft Forms, ouvrez les paramètres du formulaire (icône « ... » ou « Paramètres ») et désactivez l'option qui enregistre le nom des répondants (habituellement « Enregistrer le nom » / « Record name »), afin que les réponses demeurent anonymes.</span>
-      </div>
-      <div class="info-box">
-        <span data-i18n="quickImportNote">L'importation Word de Microsoft Forms («&nbsp;Importation rapide&nbsp;») ne convertit fiablement que les questions à choix unique — après l'importation, cliquez sur « Vérifier » et confirmez que chaque question a bien été reconnue comme un choix unique avant de publier le sondage.</span>
-      </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
         <button class="primary" id="btnGenSurveyDocx" data-i18n="btnGenDocx">Générer le sondage (Word, bilingue)</button>
         <button class="small" id="btnImportSurveyTrigger" data-i18n="btnImportResults">Importer les résultats (Excel)</button>
         <input type="file" id="surveyExcelImport" accept=".xlsx,.xls">
+        <button class="ghost" id="btnShowImportInstructions" style="border-color:var(--border); color:var(--accent-dark);" data-i18n="btnShowInstructions">Comment importer ce sondage ?</button>
       </div>
       <div id="surveyImportStatus" style="font-size:12.5px; color:var(--muted); margin-top:8px;"></div>
 
@@ -177,6 +179,24 @@
         <div class="legend" id="surveyRadarLegend" style="justify-content:center;"></div>
       </div>
     </section>
+
+    <div class="overlay" id="importInstructionsOverlay"></div>
+    <div class="modal-panel" id="importInstructionsModal">
+      <button class="small close" id="btnCloseImportInstructions" data-i18n="btnClose">Fermer ✕</button>
+      <h3 data-i18n="instrTitle" style="margin-top:0;">Comment importer et configurer ce sondage</h3>
+      <ol class="instr-list">
+        <li data-i18n="instrStep1">Cliquez sur « Générer le sondage » pour télécharger le fichier Word.</li>
+        <li data-i18n-html="instrStep2">Rendez-vous sur <strong>forms.office.com</strong>.</li>
+        <li data-i18n-html="instrStep3">Cliquez sur <strong>« Importation rapide »</strong> — pas sur « Nouveau formulaire » ni « Nouveau questionnaire ».</li>
+        <li data-i18n="instrStep4">Sélectionnez le fichier Word que vous venez de télécharger.</li>
+        <li data-i18n-html="instrStep5">Dans la fenêtre « Importer mon fichier en tant que », choisissez impérativement <strong>« Formulaire »</strong> — pas « Questionnaire ». Le mode Questionnaire active la notation automatique, ce qui n'a pas de sens pour un sondage de rétroaction.</li>
+        <li data-i18n="instrStep6">Une fois l'importation terminée, cliquez sur « Vérifier » et confirmez que chaque question a bien été reconnue comme un choix unique (et non comme du texte libre).</li>
+        <li data-i18n-html="instrStep7"><strong>Anonymat :</strong> ouvrez les paramètres du formulaire (icône « ... » ou « Paramètres ») et désactivez l'option qui enregistre le nom des répondants (habituellement « Enregistrer le nom »).</li>
+        <li data-i18n="instrStep8">Publiez le formulaire et partagez le lien avec vos étudiants.</li>
+        <li data-i18n="instrStep9">Une fois les réponses recueillies, exportez-les vers Excel depuis Microsoft Forms, puis revenez ici et cliquez sur « Importer les résultats (Excel) ».</li>
+      </ol>
+      <div class="info-box" data-i18n="instrWhyNote">Ces réglages (Formulaire plutôt que Questionnaire, anonymat désactivé) ne sont pas inclus dans le fichier Word lui-même — s'ils l'étaient, ils apparaîtraient comme du contenu dans le sondage que vos étudiants verraient, et vous risqueriez d'oublier de les retirer avant de publier.</div>
+    </div>
 
     <section class="card" id="sec-domain-skills">
       <h2 data-i18n="h2Skills">4. Compétences disciplinaires</h2>
