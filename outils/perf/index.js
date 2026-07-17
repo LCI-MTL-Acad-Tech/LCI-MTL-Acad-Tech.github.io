@@ -18,7 +18,7 @@ const TRANSLATIONS = {
     tocAppr:"Appréciation étudiante", tocSkills:"Compétences disciplinaires", tocActivities:"Activités de perfectionnement",
     tocBudget:"Budget de perfectionnement", tocLeave:"Congé sans solde",
     portraitTitle:"Votre portrait de perfectionnement",
-    portraitTeaserHint:"Une fois vos axes de qualité d'enseignement remplis, votre portrait apparaîtra ici : qui vous êtes aujourd'hui, et vers quoi vous évoluez.",
+    portraitTeaserHint:"Une fois vos axes de qualité d'enseignement remplis, votre portrait apparaîtra ici : qui vous êtes aujourd'hui, et vers quoi vous évoluez. Votre radar est visible en tout temps dans la barre latérale, à gauche.",
     btnGoToAxes:"Remplir mes axes de qualité", portraitSubtitle:"Portrait de perfectionnement",
     labelToday:"Aujourd'hui", labelEvolving:"Vers quoi vous évoluez",
     h2Ident:"1. Identification",
@@ -40,6 +40,7 @@ const TRANSLATIONS = {
     h2SelfPos:"3. Auto-positionnement — axes de qualité d'enseignement",
     targetDateLabel:"Échéance visée pour l'atteinte de ces objectifs (optionnel)",
     legendCurrent:"Position actuelle", legendGoal:"Objectif",
+    radarSidebarHint:"Votre radar se met à jour en direct dans la barre latérale, à gauche.",
     h3Appr:"Appréciation étudiante",
     apprHint:"Un champ libre, optionnel, pour y déposer et résumer une appréciation étudiante formelle lorsque vous la recevez. Chaque entrée est conservée — rien n'est remplacé, l'historique s'accumule au fil des cycles.",
     apprPlaceholder:"Ex. résumé, tendances observées, extraits pertinents...",
@@ -163,7 +164,7 @@ const TRANSLATIONS = {
     tocAppr:"Student feedback", tocSkills:"Subject-matter skills", tocActivities:"Professional development activities",
     tocBudget:"Professional development budget", tocLeave:"Unpaid leave",
     portraitTitle:"Your professional development portrait",
-    portraitTeaserHint:"Once your quality-of-instruction axes are filled in, your portrait will appear here: who you are today, and where you're heading.",
+    portraitTeaserHint:"Once your quality-of-instruction axes are filled in, your portrait will appear here: who you are today, and where you're heading. Your radar is visible at all times in the sidebar, on the left.",
     btnGoToAxes:"Fill in my quality axes", portraitSubtitle:"Professional development portrait",
     labelToday:"Today", labelEvolving:"Where you're heading",
     h2Ident:"1. Identification",
@@ -185,6 +186,7 @@ const TRANSLATIONS = {
     h2SelfPos:"3. Self-positioning — quality of instruction axes",
     targetDateLabel:"Target date for reaching these goals (optional)",
     legendCurrent:"Current position", legendGoal:"Goal",
+    radarSidebarHint:"Your radar updates live in the sidebar, on the left.",
     h3Appr:"Student feedback",
     apprHint:"A free, optional field to log and summarize formal student feedback whenever you receive it. Each entry is kept — nothing is replaced, the history accumulates across cycles.",
     apprPlaceholder:"E.g. summary, trends observed, relevant excerpts...",
@@ -420,7 +422,7 @@ document.getElementById("btnThemeToggle").addEventListener("click", ()=>{
   reRenderThemedVisuals();
 });
 function reRenderThemedVisuals(){
-  renderRadarPreview();
+  renderSidebarRadar();
   renderPortrait();
   renderSurveyComparative();
   renderTimeline();
@@ -948,18 +950,24 @@ function buildRadarSVG(axesList, scaleMin, scaleMax, bands, lines, opts){
   return `<g>${els.join("")}</g>`;
 }
 
-function renderRadarPreview(){
-  const svg = document.getElementById("radarPreviewSvg");
+function renderSidebarRadar(){
+  const svg = document.getElementById("sidebarRadarSvg");
   if(!svg) return;
   const axes = AXES_CONFIG.axes;
   const smin = AXES_CONFIG.scaleMin, smax = AXES_CONFIG.scaleMax;
+  if(!hasAnyRadarData()){
+    const midVals = axes.map(()=> (smin+smax)/2 );
+    const lines = [{ values:midVals, stroke:themeC("rgba(27,36,48,0.28)","rgba(236,236,231,0.3)"), width:2, dash:"4,4", points:false }];
+    svg.innerHTML = buildRadarSVG(axes, smin, smax, [], lines, {size:400, showLabels:false});
+    return;
+  }
   const currentVals = axes.map(ax=>{ const en = state.qualityRadar.entries.find(e=>e.axisId===ax.id); return en && en.current!==null && en.current!==undefined ? Number(en.current) : null; });
   const goalVals = axes.map(ax=>{ const en = state.qualityRadar.entries.find(e=>e.axisId===ax.id); return en && en.goal!==null && en.goal!==undefined ? Number(en.goal) : null; });
   const lines = [
     { values:currentVals, stroke:themeC("#2F6F6B","#4FB3AC"), width:3, fill:themeC("#2F6F6B","#4FB3AC"), fillOpacity:0.18, pointFill:themeC("#2F6F6B","#4FB3AC") },
     { values:goalVals, stroke:themeC("#1B2430","#ECECE7"), width:3, dash:"6,4", pointFill:themeC("#FAF9F6","#1F2226") }
   ];
-  svg.innerHTML = buildRadarSVG(axes, smin, smax, [], lines, {size:460});
+  svg.innerHTML = buildRadarSVG(axes, smin, smax, [], lines, {size:400});
 }
 
 /* ---------------------------------------------------------------------
@@ -967,16 +975,6 @@ function renderRadarPreview(){
 --------------------------------------------------------------------- */
 function hasAnyRadarData(){
   return state.qualityRadar.entries.some(e=>e.current!==null && e.current!==undefined);
-}
-
-function renderTeaserGhost(){
-  const svg = document.getElementById("teaserSvg");
-  if(!svg) return;
-  const axes = AXES_CONFIG.axes;
-  const n = axes.length;
-  const midVals = axes.map(()=> (AXES_CONFIG.scaleMin+AXES_CONFIG.scaleMax)/2 );
-  const lines = [{ values:midVals, stroke:"rgba(27,36,48,0.28)", width:2, dash:"4,4", points:false }];
-  svg.innerHTML = buildRadarSVG(axes, AXES_CONFIG.scaleMin, AXES_CONFIG.scaleMax, [], lines, {size:200, radius:70, showLabels:false});
 }
 
 function computeNarrative(){
@@ -1023,7 +1021,7 @@ function renderPortrait(){
   const hasData = hasAnyRadarData();
   document.getElementById("portraitTeaser").style.display = hasData ? "none" : "block";
   document.getElementById("portraitCard").style.display = hasData ? "block" : "none";
-  if(!hasData){ renderTeaserGhost(); return; }
+  if(!hasData){ return; }
 
   const narrative = computeNarrative();
   const name = state.meta.teacherName || "";
@@ -1039,17 +1037,6 @@ function renderPortrait(){
   if(narrative.filledCount < narrative.totalCount) notes.push(t("portraitFooterFilled").replace(/{F}/g, narrative.filledCount).replace(/{FS}/g, narrative.filledCount===1?"":"s").replace("{T}", narrative.totalCount));
   if(state.qualityRadar.targetDate) notes.push(t("portraitFooterTarget").replace("{D}", state.qualityRadar.targetDate));
   document.getElementById("portraitFooterNote").textContent = notes.join(" ");
-
-  const svg = document.getElementById("portraitRadarSvg");
-  const axes = AXES_CONFIG.axes;
-  const smin = AXES_CONFIG.scaleMin, smax = AXES_CONFIG.scaleMax;
-  const currentVals = axes.map(ax=>{ const en = state.qualityRadar.entries.find(e=>e.axisId===ax.id); return en && en.current!==null && en.current!==undefined ? Number(en.current) : null; });
-  const goalVals = axes.map(ax=>{ const en = state.qualityRadar.entries.find(e=>e.axisId===ax.id); return en && en.goal!==null && en.goal!==undefined ? Number(en.goal) : null; });
-  const lines = [
-    { values:currentVals, stroke:themeC("#2F6F6B","#4FB3AC"), width:3, fill:themeC("#2F6F6B","#4FB3AC"), fillOpacity:0.18, pointFill:themeC("#2F6F6B","#4FB3AC") },
-    { values:goalVals, stroke:themeC("#1B2430","#ECECE7"), width:3, dash:"6,4", pointFill:themeC("#FAF9F6","#1F2226") }
-  ];
-  svg.innerHTML = buildRadarSVG(axes, smin, smax, [], lines, {size:400});
 }
 
 document.getElementById("btnGoToAxes").addEventListener("click", ()=>{
@@ -1127,7 +1114,7 @@ function renderQualityRadar(){
         card.querySelector(".rv-goal-out").textContent = scaleLabelFor(entry.goal);
         applySliderColor(goalSlider, entry.goal, smin, smax);
       }
-      touch(); renderRadarPreview(); renderPortrait(); renderSurveyComparative();
+      touch(); renderSidebarRadar(); renderPortrait(); renderSurveyComparative();
     });
     goalSlider.addEventListener("input", e=>{
       let v = Number(e.target.value);
@@ -1135,12 +1122,12 @@ function renderQualityRadar(){
       entry.goal = v;
       card.querySelector(".rv-goal-out").textContent = scaleLabelFor(entry.goal);
       applySliderColor(goalSlider, entry.goal, smin, smax);
-      touch(); renderRadarPreview(); renderPortrait();
+      touch(); renderSidebarRadar(); renderPortrait();
     });
     card.querySelector(".rv-note-current").addEventListener("input", e=>{ entry.noteCurrent = e.target.value; touch(); });
     card.querySelector(".rv-note-goal").addEventListener("input", e=>{ entry.noteGoal = e.target.value; touch(); });
   });
-  renderRadarPreview();
+  renderSidebarRadar();
   renderPortrait();
 }
 document.getElementById("radar-target-date").addEventListener("input", e=>{ state.qualityRadar.targetDate = e.target.value; touch(); renderPortrait(); });

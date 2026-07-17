@@ -72,7 +72,13 @@
   nav.toc{
     padding:24px 14px; position:sticky; top:0; align-self:start; height:100vh; overflow:auto;
     border-right:1px solid var(--border);
+    display:flex; flex-direction:column;
   }
+  .toc-links{ flex:0 0 auto; }
+  .sidebar-radar{
+    margin-top:auto; padding-top:18px; flex:0 0 auto;
+  }
+  .sidebar-radar svg{ width:100%; height:auto; display:block; }
   nav.toc a{
     display:block; padding:7px 10px; font-size:13px; color:var(--muted); text-decoration:none;
     border-radius:var(--radius); margin-bottom:2px;

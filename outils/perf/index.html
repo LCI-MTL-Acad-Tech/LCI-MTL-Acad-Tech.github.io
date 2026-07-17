@@ -29,29 +29,29 @@
 
 <div class="layout">
   <nav class="toc">
-    <div class="toc-title" data-i18n="tocSectionsTitle">Sections</div>
-    <a href="#sec-meta" data-i18n="tocIdent">Identification</a>
-    <a href="#sec-timeline" data-i18n="tocTimeline">Échéancier</a>
-    <a href="#axes-anchor" data-i18n="tocSelfPos">Auto-positionnement</a>
-    <a href="#sec-feedback" data-i18n="tocAppr">Appréciation étudiante</a>
-    <a href="#sec-domain-skills" data-i18n="tocSkills">Compétences disciplinaires</a>
-    <a href="#sec-activities" data-i18n="tocActivities">Activités de perfectionnement</a>
-    <a href="#sec-budget" data-i18n="tocBudget">Budget de perfectionnement</a>
-    <a href="#sec-leave" data-i18n="tocLeave">Congé sans solde</a>
+    <div class="toc-links">
+      <div class="toc-title" data-i18n="tocSectionsTitle">Sections</div>
+      <a href="#sec-meta" data-i18n="tocIdent">Identification</a>
+      <a href="#sec-timeline" data-i18n="tocTimeline">Échéancier</a>
+      <a href="#axes-anchor" data-i18n="tocSelfPos">Auto-positionnement</a>
+      <a href="#sec-feedback" data-i18n="tocAppr">Appréciation étudiante</a>
+      <a href="#sec-domain-skills" data-i18n="tocSkills">Compétences disciplinaires</a>
+      <a href="#sec-activities" data-i18n="tocActivities">Activités de perfectionnement</a>
+      <a href="#sec-budget" data-i18n="tocBudget">Budget de perfectionnement</a>
+      <a href="#sec-leave" data-i18n="tocLeave">Congé sans solde</a>
+    </div>
+    <div id="sidebarRadarWrap" class="sidebar-radar">
+      <svg id="sidebarRadarSvg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
   </nav>
 
   <main>
 
     <section class="card" id="portrait-zone" style="padding:22px 24px;">
       <div id="portraitTeaser">
-        <div style="display:grid; grid-template-columns:220px 1fr; gap:24px; align-items:center;">
-          <div style="position:relative; height:200px;"><svg id="teaserSvg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"></svg></div>
-          <div>
-            <h2 style="margin:0 0 6px;" data-i18n="portraitTitle">Votre portrait de perfectionnement</h2>
-            <p class="hint" style="margin:0 0 14px;" data-i18n="portraitTeaserHint">Une fois vos axes de qualité d'enseignement remplis, votre portrait apparaîtra ici : qui vous êtes aujourd'hui, et vers quoi vous évoluez.</p>
-            <button class="primary" id="btnGoToAxes" data-i18n="btnGoToAxes">Remplir mes axes de qualité</button>
-          </div>
-        </div>
+        <h2 style="margin:0 0 6px;" data-i18n="portraitTitle">Votre portrait de perfectionnement</h2>
+        <p class="hint" style="margin:0 0 14px;" data-i18n="portraitTeaserHint">Une fois vos axes de qualité d'enseignement remplis, votre portrait apparaîtra ici : qui vous êtes aujourd'hui, et vers quoi vous évoluez. Votre radar est visible en tout temps dans la barre latérale, à gauche.</p>
+        <button class="primary" id="btnGoToAxes" data-i18n="btnGoToAxes">Remplir mes axes de qualité</button>
       </div>
 
       <div id="portraitCard" style="display:none;">
@@ -62,20 +62,17 @@
             <div style="font-size:12.5px; color:var(--muted);" data-i18n="portraitSubtitle">Portrait de perfectionnement</div>
           </div>
         </div>
-        <div style="display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:24px; align-items:center;">
-          <div style="position:relative; height:280px;"><svg id="portraitRadarSvg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"></svg></div>
-          <div style="display:flex; flex-direction:column; gap:14px;">
-            <div>
-              <p style="font-size:11.5px; color:var(--muted); margin:0 0 4px; text-transform:uppercase; letter-spacing:.04em;" data-i18n="labelToday">Aujourd'hui</p>
-              <p id="portraitStrongLine" style="font-size:14.5px; line-height:1.5; margin:0;">—</p>
-            </div>
-            <div>
-              <p style="font-size:11.5px; color:var(--muted); margin:0 0 4px; text-transform:uppercase; letter-spacing:.04em;" data-i18n="labelEvolving">Vers quoi vous évoluez</p>
-              <p id="portraitGrowLine" style="font-size:14.5px; line-height:1.5; margin:0 0 8px;">—</p>
-              <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <span id="portraitGrowingPill" class="badge" style="display:inline-block; font-size:11.5px; padding:3px 10px; border-radius:10px; background:var(--accent-soft); color:var(--accent-dark);"></span>
-                <span id="portraitStablePill" class="badge" style="display:inline-block; font-size:11.5px; padding:3px 10px; border-radius:10px; background:#EFEFEC; color:var(--muted);"></span>
-              </div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div>
+            <p style="font-size:11.5px; color:var(--muted); margin:0 0 4px; text-transform:uppercase; letter-spacing:.04em;" data-i18n="labelToday">Aujourd'hui</p>
+            <p id="portraitStrongLine" style="font-size:14.5px; line-height:1.5; margin:0;">—</p>
+          </div>
+          <div>
+            <p style="font-size:11.5px; color:var(--muted); margin:0 0 4px; text-transform:uppercase; letter-spacing:.04em;" data-i18n="labelEvolving">Vers quoi vous évoluez</p>
+            <p id="portraitGrowLine" style="font-size:14.5px; line-height:1.5; margin:0 0 8px;">—</p>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <span id="portraitGrowingPill" class="badge" style="display:inline-block; font-size:11.5px; padding:3px 10px; border-radius:10px; background:var(--accent-soft); color:var(--accent-dark);"></span>
+              <span id="portraitStablePill" class="badge" style="display:inline-block; font-size:11.5px; padding:3px 10px; border-radius:10px; background:#EFEFEC; color:var(--muted);"></span>
             </div>
           </div>
         </div>
@@ -146,13 +143,11 @@
         <input type="date" id="radar-target-date">
       </div>
       <div id="axesRows"></div>
-      <div style="margin-top:18px;">
-        <div id="radarPreviewWrap" style="max-width:460px;"><svg id="radarPreviewSvg" viewBox="0 0 460 460" xmlns="http://www.w3.org/2000/svg"></svg></div>
-        <div class="legend">
-          <span><i style="background:var(--accent-soft);border:1px solid var(--accent);"></i> <span data-i18n="legendCurrent">Position actuelle</span></span>
-          <span><i style="background:none;border:2px dashed var(--ink);"></i> <span data-i18n="legendGoal">Objectif</span></span>
-        </div>
+      <div class="legend" style="margin-top:10px;">
+        <span><i style="background:var(--accent-soft);border:1px solid var(--accent);"></i> <span data-i18n="legendCurrent">Position actuelle</span></span>
+        <span><i style="background:none;border:2px dashed var(--ink);"></i> <span data-i18n="legendGoal">Objectif</span></span>
       </div>
+      <p class="hint" data-i18n="radarSidebarHint" style="margin-top:4px;">Votre radar se met à jour en direct dans la barre latérale, à gauche.</p>
 
       <div style="border-top:1px solid var(--border); margin:22px 0 18px;"></div>
       <h3 style="font-size:14.5px; margin:0 0 4px;" data-i18n="h3Appr">Appréciation étudiante</h3>
