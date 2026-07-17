@@ -32,10 +32,10 @@
     <div class="toc-links">
       <div class="toc-title" data-i18n="tocSectionsTitle">Sections</div>
       <a href="#sec-meta" data-i18n="tocIdent">Identification</a>
-      <a href="#sec-timeline" data-i18n="tocTimeline">Échéancier</a>
       <a href="#axes-anchor" data-i18n="tocSelfPos">Auto-positionnement</a>
       <a href="#sec-feedback" data-i18n="tocAppr">Appréciation étudiante</a>
-      <a href="#sec-domain-skills" data-i18n="tocSkills">Compétences disciplinaires</a>
+      <a href="#sec-domain-skills" data-i18n="tocSkills">Compétences</a>
+      <a href="#sec-timeline" data-i18n="tocTimeline">Échéancier</a>
       <a href="#sec-activities" data-i18n="tocActivities">Activités de perfectionnement</a>
       <a href="#sec-budget" data-i18n="tocBudget">Budget de perfectionnement</a>
       <a href="#sec-leave" data-i18n="tocLeave">Congé sans solde</a>
@@ -115,27 +115,8 @@
       <p class="hint" style="margin-top:-6px;" data-i18n="endDateHint">Par défaut, deux ans après la création. Vous pouvez la raccourcir; à chaque modification, vous pouvez la prolonger jusqu'à deux ans à partir d'aujourd'hui.</p>
     </section>
 
-    <section class="card" id="sec-timeline">
-      <h2 data-i18n="h2Timeline">2. Échéancier</h2>
-      <p class="hint" data-i18n="timelineHint">Calculé à partir de la date de création et de la date de fin visée. Vous montre ce qui est prévu à la convention collective, s'il y a lieu — pas des obligations ajoutées par cet outil.</p>
-      <div id="timelineWrap"><svg id="timelineSvg" viewBox="0 0 900 190" xmlns="http://www.w3.org/2000/svg"></svg></div>
-      <div class="legend">
-        <span><i style="background:#2F6F6B"></i> <span data-i18n="legendCycle">Cycle du plan</span></span>
-        <span><i style="background:#A6673A"></i> <span data-i18n="legendApprReceived">Appréciation étudiante reçue</span></span>
-        <span><i style="background:#8A8F98"></i> <span data-i18n="legendBudgetReminders">Rappels annuels — budget individuel</span></span>
-        <span><i style="background:#7B5EA7"></i> <span data-i18n="legendMilestonePlanned">Jalon planifié</span></span>
-        <span><i style="background:#3B8C22"></i> <span data-i18n="legendMilestoneDone">Jalon complété</span></span>
-      </div>
-
-      <div style="border-top:1px solid var(--border); margin:22px 0 18px;"></div>
-      <h3 style="font-size:14.5px; margin:0 0 4px;" data-i18n="h3Milestones">Jalons du plan</h3>
-      <p class="hint" data-i18n="milestonesHint">Ajoutez les formations que vous prévoyez suivre, les sondages que vous prévoyez mener, ou tout autre jalon — ils apparaîtront sur l'échéancier ci-dessus. Modifiez, supprimez ou marquez-les comme complétés au fil du temps.</p>
-      <div id="milestonesList" style="margin-top:12px;"></div>
-      <button class="primary" id="btnAddMilestone" data-i18n="btnAddMilestone">+ Ajouter un jalon</button>
-    </section>
-
     <section class="card" id="sec-feedback">
-      <h2 data-i18n="h2SelfPos">3. Auto-positionnement — axes de qualité d'enseignement</h2>
+      <h2 data-i18n="h2SelfPos">2. Auto-positionnement — axes de qualité d'enseignement</h2>
       <p class="hint" id="axes-anchor">Déplacez le curseur pour indiquer votre position, de « très faible » à « maîtrisé ». Pour chaque axe, indiquez où vous vous situez actuellement et l'objectif visé — l'objectif ne peut pas être inférieur à la position actuelle. Les notes écrites sont optionnelles.
         <span id="axesSourceNote" style="display:block;margin-top:4px;color:var(--muted);"></span>
       </p>
@@ -209,11 +190,31 @@
     </div>
 
     <section class="card" id="sec-domain-skills">
-      <h2 data-i18n="h2Skills">4. Compétences disciplinaires</h2>
-      <p class="hint" data-i18n="skillsHint">Propre à votre discipline ou champ d'expertise — distinct des axes généraux de qualité d'enseignement ci-dessus. Ajoutez une carte par compétence : une nouvelle à développer, ou une expertise existante à maintenir ou actualiser.</p>
+      <h2 data-i18n="h2Skills">3. Compétences</h2>
+      <p class="hint" data-i18n="skillsHint">Disciplinaires, pédagogiques ou transversales (communication, rédaction, organisation, leadership, etc.). Ajoutez une carte par compétence : une nouvelle à développer, ou une expertise existante à maintenir ou actualiser.</p>
       <div id="domainSkillsList" style="margin-top:12px;"></div>
       <button class="primary" id="btnAddDomainSkill" data-i18n="btnAddSkill">+ Ajouter une compétence</button>
     </section>
+
+    <section class="card" id="sec-timeline">
+      <h2 data-i18n="h2Timeline">4. Échéancier</h2>
+      <p class="hint" data-i18n="timelineHint">Calculé à partir de la date de création et de la date de fin visée. Vous montre ce qui est prévu à la convention collective, s'il y a lieu — pas des obligations ajoutées par cet outil.</p>
+      <div id="timelineWrap"><svg id="timelineSvg" viewBox="0 0 900 190" xmlns="http://www.w3.org/2000/svg"></svg></div>
+      <div class="legend">
+        <span><i style="background:#2F6F6B"></i> <span data-i18n="legendCycle">Cycle du plan</span></span>
+        <span><i style="background:#A6673A"></i> <span data-i18n="legendApprReceived">Appréciation étudiante reçue</span></span>
+        <span><i style="background:#8A8F98"></i> <span data-i18n="legendBudgetReminders">Rappels annuels — budget individuel</span></span>
+        <span><i style="background:#7B5EA7"></i> <span data-i18n="legendMilestonePlanned">Jalon planifié</span></span>
+        <span><i style="background:#3B8C22"></i> <span data-i18n="legendMilestoneDone">Jalon complété</span></span>
+      </div>
+
+      <div style="border-top:1px solid var(--border); margin:22px 0 18px;"></div>
+      <h3 style="font-size:14.5px; margin:0 0 4px;" data-i18n="h3Milestones">Jalons du plan</h3>
+      <p class="hint" data-i18n="milestonesHint">Ajoutez les formations que vous prévoyez suivre, les sondages que vous prévoyez mener, ou tout autre jalon — ils apparaîtront sur l'échéancier ci-dessus. Modifiez, supprimez ou marquez-les comme complétés au fil du temps.</p>
+      <div id="milestonesList" style="margin-top:12px;"></div>
+      <button class="primary" id="btnAddMilestone" data-i18n="btnAddMilestone">+ Ajouter un jalon</button>
+    </section>
+
 
     <section class="card" id="sec-activities">
       <h2 data-i18n="h2Activities">5. Activités de perfectionnement</h2>

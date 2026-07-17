@@ -15,7 +15,7 @@ const TRANSLATIONS = {
     btnNew:"Nouveau plan", btnImportPlan:"Charger un plan (JSON)", btnExportPlan:"Exporter en JSON",
     themeDark:"Mode sombre", themeLight:"Mode clair",
     tocSectionsTitle:"Sections", tocIdent:"Identification", tocTimeline:"Échéancier", tocSelfPos:"Auto-positionnement",
-    tocAppr:"Appréciation étudiante", tocSkills:"Compétences disciplinaires", tocActivities:"Activités de perfectionnement",
+    tocAppr:"Appréciation étudiante", tocSkills:"Compétences", tocActivities:"Activités de perfectionnement",
     tocBudget:"Budget de perfectionnement", tocLeave:"Congé sans solde",
     portraitTitle:"Votre portrait de perfectionnement",
     portraitTeaserHint:"Une fois vos axes de qualité d'enseignement remplis, votre portrait apparaîtra ici : qui vous êtes aujourd'hui, et vers quoi vous évoluez. Votre radar est visible en tout temps dans la barre latérale, à gauche.",
@@ -27,7 +27,7 @@ const TRANSLATIONS = {
     labelEmail:"Courriel institutionnel", labelEmployee:"Numéro d'employé", phEmployee:"Ex. 012345",
     labelCreated:"Créé le", labelUpdated:"Dernière modification", labelEndDate:"Date de fin visée du plan",
     endDateHint:"Par défaut, deux ans après la création. Vous pouvez la raccourcir; à chaque modification, vous pouvez la prolonger jusqu'à deux ans à partir d'aujourd'hui.",
-    h2Timeline:"2. Échéancier",
+    h2Timeline:"4. Échéancier",
     timelineHint:"Calculé à partir de la date de création et de la date de fin visée. Vous montre ce qui est prévu à la convention collective, s'il y a lieu — pas des obligations ajoutées par cet outil.",
     legendCycle:"Cycle du plan", legendApprReceived:"Appréciation étudiante reçue", legendBudgetReminders:"Rappels annuels — budget individuel",
     legendMilestonePlanned:"Jalon planifié", legendMilestoneDone:"Jalon complété",
@@ -36,8 +36,9 @@ const TRANSLATIONS = {
     btnAddMilestone:"+ Ajouter un jalon", emptyNoteMilestone:"Aucun jalon ajouté pour le moment.",
     labelMilestoneTitle:"Titre du jalon", phMilestoneTitle:"Ex. Compléter la formation en pédagogie numérique",
     labelMilestoneType:"Type", labelMilestoneDate:"Date visée", labelMilestoneCompleted:"Complété",
+    labelMilestoneSkills:"Compétence(s) associée(s) (optionnel)", noSkillsYet:"Aucune compétence définie pour le moment — ajoutez-en dans la section Compétences ci-dessus.",
     milestone_formation:"Formation", milestone_sondage:"Sondage", milestone_autre:"Autre",
-    h2SelfPos:"3. Auto-positionnement — axes de qualité d'enseignement",
+    h2SelfPos:"2. Auto-positionnement — axes de qualité d'enseignement",
     targetDateLabel:"Échéance visée pour l'atteinte de ces objectifs (optionnel)",
     legendCurrent:"Position actuelle", legendGoal:"Objectif",
     btnZoomRadar:"Agrandir le radar", radarZoomTitle:"Votre radar — vue agrandie",
@@ -62,8 +63,8 @@ const TRANSLATIONS = {
     instrStep8:"Publiez le formulaire et partagez le lien avec vos étudiants.",
     instrStep9:"Une fois les réponses recueillies, exportez-les vers Excel depuis Microsoft Forms, puis revenez ici et cliquez sur « Importer les résultats (Excel) ».",
     instrWhyNote:"Ces réglages (Formulaire plutôt que Questionnaire, anonymat désactivé) ne sont pas inclus dans le fichier Word lui-même — s'ils l'étaient, ils apparaîtraient comme du contenu dans le sondage que vos étudiants verraient, et vous risqueriez d'oublier de les retirer avant de publier.",
-    h2Skills:"4. Compétences disciplinaires",
-    skillsHint:"Propre à votre discipline ou champ d'expertise — distinct des axes généraux de qualité d'enseignement ci-dessus. Ajoutez une carte par compétence : une nouvelle à développer, ou une expertise existante à maintenir ou actualiser.",
+    h2Skills:"3. Compétences",
+    skillsHint:"Disciplinaires, pédagogiques ou transversales (communication, rédaction, organisation, leadership, etc.). Ajoutez une carte par compétence : une nouvelle à développer, ou une expertise existante à maintenir ou actualiser.",
     btnAddSkill:"+ Ajouter une compétence",
     h2Activities:"5. Activités de perfectionnement",
     activitiesHint:"Ce plan est une proposition. Les approbations correspondantes (budget, R&D, reconnaissance) doivent être obtenues séparément, par les voies et processus institutionnels établis à cette fin. Ajoutez une carte par activité prévue ou réalisée — les listes déroulantes permettent l'analyse statistique par le responsable de programmes.",
@@ -97,8 +98,9 @@ const TRANSLATIONS = {
     surveyImportedStatus:"{N} réponse{S} importée{S} — {M} axe{MS} sur {T} reconnu{MS} dans le fichier.",
     legendMin:"Minimum", legendQ1:"Q1", legendMedian:"Médiane", legendQ3:"Q3", legendMax:"Maximum (réponses étudiantes)", legendSelfEval:"Votre auto-positionnement",
     emptyNoteSkill:"Aucune compétence ajoutée pour le moment.",
-    labelSkillName:"Compétence ou expertise", phSkillName:"Ex. Analyse de données avec Python",
-    labelSkillType:"Type", labelSkillHow:"Comment (moyen envisagé)", phSkillHow:"Ex. autoformation, mentorat, cours crédité...",
+    labelSkillName:"Compétence ou expertise", phSkillName:"Ex. Analyse de données avec Python, Communication interpersonnelle, Gestion du temps...",
+    labelSkillCategory:"Catégorie", labelSkillType:"Type", labelSkillHow:"Comment (moyen envisagé)", phSkillHow:"Ex. autoformation, mentorat, cours crédité...",
+    skillcat_subject:"Disciplinaire", skillcat_teaching:"Pédagogique (enseignement)", skillcat_soft:"Transversale (savoir-être)",
     labelSkillWhen:"Quand", phSkillWhen:"Ex. Session Hiver 2027",
     labelSkillNewCourses:"Souhaite enseigner de nouveaux cours une fois cette compétence acquise",
     labelSkillNewCoursesDetails:"Lesquels (optionnel)", phSkillNewCoursesDetails:"Ex. cours d'introduction à la science des données",
@@ -163,7 +165,7 @@ const TRANSLATIONS = {
     btnNew:"New plan", btnImportPlan:"Load a plan (JSON)", btnExportPlan:"Export as JSON",
     themeDark:"Dark mode", themeLight:"Light mode",
     tocSectionsTitle:"Sections", tocIdent:"Identification", tocTimeline:"Timeline", tocSelfPos:"Self-positioning",
-    tocAppr:"Student feedback", tocSkills:"Subject-matter skills", tocActivities:"Professional development activities",
+    tocAppr:"Student feedback", tocSkills:"Skills", tocActivities:"Professional development activities",
     tocBudget:"Professional development budget", tocLeave:"Unpaid leave",
     portraitTitle:"Your professional development portrait",
     portraitTeaserHint:"Once your quality-of-instruction axes are filled in, your portrait will appear here: who you are today, and where you're heading. Your radar is visible at all times in the sidebar, on the left.",
@@ -175,7 +177,7 @@ const TRANSLATIONS = {
     labelEmail:"Institutional email", labelEmployee:"Employee number", phEmployee:"E.g. 012345",
     labelCreated:"Created on", labelUpdated:"Last modified", labelEndDate:"Target end date of the plan",
     endDateHint:"Defaults to two years after creation. You may shorten it; with each edit, you may extend it up to two years from today.",
-    h2Timeline:"2. Timeline",
+    h2Timeline:"4. Timeline",
     timelineHint:"Computed from the creation date and the target end date. Shows what's provided for under the collective agreement, if applicable — not obligations added by this tool.",
     legendCycle:"Plan cycle", legendApprReceived:"Student feedback received", legendBudgetReminders:"Annual reminders — individual budget",
     legendMilestonePlanned:"Planned milestone", legendMilestoneDone:"Completed milestone",
@@ -184,8 +186,9 @@ const TRANSLATIONS = {
     btnAddMilestone:"+ Add a milestone", emptyNoteMilestone:"No milestone added yet.",
     labelMilestoneTitle:"Milestone title", phMilestoneTitle:"E.g. Complete the digital pedagogy training",
     labelMilestoneType:"Type", labelMilestoneDate:"Target date", labelMilestoneCompleted:"Completed",
+    labelMilestoneSkills:"Associated skill(s) (optional)", noSkillsYet:"No skill defined yet — add one in the Skills section above.",
     milestone_formation:"Training", milestone_sondage:"Survey", milestone_autre:"Other",
-    h2SelfPos:"3. Self-positioning — quality of instruction axes",
+    h2SelfPos:"2. Self-positioning — quality of instruction axes",
     targetDateLabel:"Target date for reaching these goals (optional)",
     legendCurrent:"Current position", legendGoal:"Goal",
     btnZoomRadar:"Enlarge the radar", radarZoomTitle:"Your radar — enlarged view",
@@ -210,8 +213,8 @@ const TRANSLATIONS = {
     instrStep8:"Publish the form and share the link with your students.",
     instrStep9:"Once responses are in, export them to Excel from Microsoft Forms, then come back here and click \"Import results (Excel)\".",
     instrWhyNote:"These settings (Form rather than Quiz, anonymity turned off) aren't included in the Word file itself — if they were, they'd show up as content in the survey your students see, and you could easily forget to remove them before publishing.",
-    h2Skills:"4. Subject-matter skills",
-    skillsHint:"Specific to your discipline or area of expertise — distinct from the general quality-of-instruction axes above. Add one card per skill: a new one to develop, or existing expertise to maintain or update.",
+    h2Skills:"3. Skills",
+    skillsHint:"Subject-matter, teaching, or soft skills (communication, writing, organization, leadership, etc.). Add one card per skill: a new one to develop, or existing expertise to maintain or update.",
     btnAddSkill:"+ Add a skill",
     h2Activities:"5. Professional development activities",
     activitiesHint:"This plan is a proposal. Corresponding approvals (budget, R&D, recognition) must be obtained separately, through the institutional channels and processes established for that purpose. Add one card per planned or completed activity — the dropdowns enable statistical analysis by the program coordinator.",
@@ -244,8 +247,9 @@ const TRANSLATIONS = {
     surveyImportedStatus:"{N} response{S} imported — {M} axis{MS} out of {T} recognized in the file.",
     legendMin:"Minimum", legendQ1:"Q1", legendMedian:"Median", legendQ3:"Q3", legendMax:"Maximum (student responses)", legendSelfEval:"Your self-assessment",
     emptyNoteSkill:"No skill added yet.",
-    labelSkillName:"Skill or expertise", phSkillName:"E.g. Data analysis with Python",
-    labelSkillType:"Type", labelSkillHow:"How (envisioned method)", phSkillHow:"E.g. self-study, mentoring, credited course...",
+    labelSkillName:"Skill or expertise", phSkillName:"E.g. Data analysis with Python, Interpersonal communication, Time management...",
+    labelSkillCategory:"Category", labelSkillType:"Type", labelSkillHow:"How (envisioned method)", phSkillHow:"E.g. self-study, mentoring, credited course...",
+    skillcat_subject:"Subject-matter", skillcat_teaching:"Teaching (pedagogical)", skillcat_soft:"Soft skill",
     labelSkillWhen:"When", phSkillWhen:"E.g. Winter 2027 session",
     labelSkillNewCourses:"Would like to teach new courses once this skill is acquired",
     labelSkillNewCoursesDetails:"Which ones (optional)", phSkillNewCoursesDetails:"E.g. introductory data science course",
@@ -1317,8 +1321,32 @@ function renderMilestones(){
         <label>${t("labelNotes")}</label>
         <textarea class="ms-notes" data-idx="${idx}" style="min-height:44px;">${escapeHtml(m.notes)}</textarea>
       </div>
+      <div class="field tight" style="margin-top:10px;">
+        <label>${t("labelMilestoneSkills")}</label>
+        <div class="chip-group ms-skills" data-idx="${idx}"></div>
+      </div>
     `;
     list.appendChild(card);
+
+    const skillsContainer = card.querySelector(".ms-skills");
+    if(state.domainSkills.length===0){
+      skillsContainer.innerHTML = `<span class="empty-note" style="font-size:12px;">${t("noSkillsYet")}</span>`;
+    } else {
+      if(!Array.isArray(m.skillIds)) m.skillIds = [];
+      state.domainSkills.forEach(sk=>{
+        if(!sk.name) return;
+        const active = m.skillIds.includes(sk.id);
+        const chip = document.createElement("label");
+        chip.className = "chip" + (active?" active":"");
+        chip.innerHTML = `<input type="checkbox" ${active?"checked":""}> ${escapeHtml(sk.name)}`;
+        chip.querySelector("input").addEventListener("change", e=>{
+          toggleInArray(m.skillIds, sk.id, e.target.checked);
+          chip.classList.toggle("active", e.target.checked);
+          touch();
+        });
+        skillsContainer.appendChild(chip);
+      });
+    }
 
     card.querySelector(".ms-title").addEventListener("input", e=>{ state.milestones[idx].title = e.target.value; touch(); renderTimeline(); });
     card.querySelector(".ms-type").addEventListener("change", e=>{ state.milestones[idx].type = e.target.value; touch(); renderTimeline(); });
@@ -1337,7 +1365,7 @@ function renderMilestones(){
 
 document.getElementById("btnAddMilestone").addEventListener("click", ()=>{
   state.milestones.push({
-    id: uid("ms"), title:"", type:"formation", targetDate: toISODate(new Date()), completed:false, completedAt:null, notes:""
+    id: uid("ms"), title:"", type:"formation", targetDate: toISODate(new Date()), completed:false, completedAt:null, notes:"", skillIds:[]
   });
   touch(); renderMilestones(); renderTimeline();
 });
@@ -1348,6 +1376,12 @@ document.getElementById("btnAddMilestone").addEventListener("click", ()=>{
 const SKILL_KIND_OPTIONS = [
   {v:"nouvelle", k:"skillkind_nouvelle"},
   {v:"maintien", k:"skillkind_maintien"},
+];
+
+const SKILL_CATEGORY_OPTIONS = [
+  {v:"subject_matter", k:"skillcat_subject"},
+  {v:"teaching", k:"skillcat_teaching"},
+  {v:"soft_skill", k:"skillcat_soft"},
 ];
 
 function renderDomainSkills(){
@@ -1367,11 +1401,19 @@ function renderDomainSkills(){
         </div>
         <button class="small danger-outline sk-remove" data-idx="${idx}" style="margin-top:18px;">${t("btnRemove")}</button>
       </div>
-      <div class="field tight" style="margin-top:10px;">
-        <label>${t("labelSkillType")}</label>
-        <select class="sk-kind" data-idx="${idx}">
-          ${SKILL_KIND_OPTIONS.map(o=>`<option value="${o.v}" ${sk.kind===o.v?"selected":""}>${optLabel(o)}</option>`).join("")}
-        </select>
+      <div class="grid2" style="margin-top:10px;">
+        <div class="field tight">
+          <label>${t("labelSkillCategory")}</label>
+          <select class="sk-category" data-idx="${idx}">
+            ${SKILL_CATEGORY_OPTIONS.map(o=>`<option value="${o.v}" ${sk.category===o.v?"selected":""}>${optLabel(o)}</option>`).join("")}
+          </select>
+        </div>
+        <div class="field tight">
+          <label>${t("labelSkillType")}</label>
+          <select class="sk-kind" data-idx="${idx}">
+            ${SKILL_KIND_OPTIONS.map(o=>`<option value="${o.v}" ${sk.kind===o.v?"selected":""}>${optLabel(o)}</option>`).join("")}
+          </select>
+        </div>
       </div>
       <div class="grid2" style="margin-top:10px;">
         <div class="field tight">
@@ -1395,7 +1437,8 @@ function renderDomainSkills(){
     `;
     list.appendChild(card);
 
-    card.querySelector(".sk-name").addEventListener("input", e=>{ sk.name = e.target.value; touch(); });
+    card.querySelector(".sk-name").addEventListener("input", e=>{ sk.name = e.target.value; touch(); renderMilestones(); });
+    card.querySelector(".sk-category").addEventListener("change", e=>{ sk.category = e.target.value; touch(); });
     card.querySelector(".sk-kind").addEventListener("change", e=>{ sk.kind = e.target.value; touch(); });
     card.querySelector(".sk-plan").addEventListener("input", e=>{ sk.plan = e.target.value; touch(); });
     card.querySelector(".sk-when").addEventListener("input", e=>{ sk.when = e.target.value; touch(); });
@@ -1405,16 +1448,19 @@ function renderDomainSkills(){
     });
     card.querySelector(".sk-newcourses-text").addEventListener("input", e=>{ sk.newCoursesDetails = e.target.value; touch(); });
     card.querySelector(".sk-remove").addEventListener("click", ()=>{
-      state.domainSkills.splice(idx,1); touch(); renderDomainSkills();
+      const removedId = sk.id;
+      state.domainSkills.splice(idx,1);
+      state.milestones.forEach(m=>{ if(Array.isArray(m.skillIds)) toggleInArray(m.skillIds, removedId, false); });
+      touch(); renderDomainSkills(); renderMilestones();
     });
   });
 }
 
 document.getElementById("btnAddDomainSkill").addEventListener("click", ()=>{
   state.domainSkills.push({
-    id: uid("skill"), kind:"nouvelle", name:"", plan:"", when:"", newCourses:false, newCoursesDetails:""
+    id: uid("skill"), category:"subject_matter", kind:"nouvelle", name:"", plan:"", when:"", newCourses:false, newCoursesDetails:""
   });
-  touch(); renderDomainSkills();
+  touch(); renderDomainSkills(); renderMilestones();
 });
 
 /* ---------------------------------------------------------------------
@@ -1826,8 +1872,10 @@ document.getElementById("fileImport").addEventListener("change", (e)=>{
         if(m.completed === undefined) m.completed = false;
         if(m.completedAt === undefined) m.completedAt = null;
         if(m.notes === undefined) m.notes = "";
+        if(!Array.isArray(m.skillIds)) m.skillIds = [];
       });
       state.domainSkills.forEach(sk=>{
+        if(sk.category === undefined) sk.category = "subject_matter";
         if(sk.kind === undefined) sk.kind = "nouvelle";
         if(sk.plan === undefined) sk.plan = "";
         if(sk.when === undefined) sk.when = "";
