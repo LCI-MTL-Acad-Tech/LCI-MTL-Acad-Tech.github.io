@@ -41,6 +41,7 @@
       <a href="#sec-leave" data-i18n="tocLeave">Congé sans solde</a>
     </div>
     <div id="sidebarRadarWrap" class="sidebar-radar">
+      <button type="button" class="radar-zoom-btn" id="btnZoomRadar" data-i18n-title="btnZoomRadar" title="Agrandir">⛶</button>
       <svg id="sidebarRadarSvg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"></svg>
     </div>
   </nav>
@@ -191,6 +192,20 @@
         <li data-i18n="instrStep9">Une fois les réponses recueillies, exportez-les vers Excel depuis Microsoft Forms, puis revenez ici et cliquez sur « Importer les résultats (Excel) ».</li>
       </ol>
       <div class="info-box" data-i18n="instrWhyNote">Ces réglages (Formulaire plutôt que Questionnaire, anonymat désactivé) ne sont pas inclus dans le fichier Word lui-même — s'ils l'étaient, ils apparaîtraient comme du contenu dans le sondage que vos étudiants verraient, et vous risqueriez d'oublier de les retirer avant de publier.</div>
+    </div>
+
+    <div class="overlay" id="radarZoomOverlay"></div>
+    <div class="modal-panel radar-zoom-modal" id="radarZoomModal">
+      <button class="small close" id="btnCloseRadarZoom" data-i18n="btnClose">Fermer ✕</button>
+      <h3 data-i18n="radarZoomTitle" style="margin-top:0;">Votre radar — vue agrandie</h3>
+      <p class="hint" data-i18n="radarZoomHint">Faites glisser un point pour ajuster votre position actuelle ou votre objectif directement sur le graphique — les curseurs se mettent à jour en même temps.</p>
+      <div style="max-width:640px; margin:0 auto;">
+        <svg id="radarZoomSvg" viewBox="0 0 640 640" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div class="legend" style="justify-content:center;">
+        <span><i style="background:var(--accent-soft);border:1px solid var(--accent);"></i> <span data-i18n="legendCurrent">Position actuelle</span></span>
+        <span><i style="background:none;border:2px dashed var(--ink);"></i> <span data-i18n="legendGoal">Objectif</span></span>
+      </div>
     </div>
 
     <section class="card" id="sec-domain-skills">

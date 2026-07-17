@@ -40,6 +40,8 @@ const TRANSLATIONS = {
     h2SelfPos:"3. Auto-positionnement — axes de qualité d'enseignement",
     targetDateLabel:"Échéance visée pour l'atteinte de ces objectifs (optionnel)",
     legendCurrent:"Position actuelle", legendGoal:"Objectif",
+    btnZoomRadar:"Agrandir le radar", radarZoomTitle:"Votre radar — vue agrandie",
+    radarZoomHint:"Faites glisser un point pour ajuster votre position actuelle ou votre objectif directement sur le graphique — les curseurs se mettent à jour en même temps.",
     radarSidebarHint:"Votre radar se met à jour en direct dans la barre latérale, à gauche.",
     h3Appr:"Appréciation étudiante",
     apprHint:"Un champ libre, optionnel, pour y déposer et résumer une appréciation étudiante formelle lorsque vous la recevez. Chaque entrée est conservée — rien n'est remplacé, l'historique s'accumule au fil des cycles.",
@@ -186,6 +188,8 @@ const TRANSLATIONS = {
     h2SelfPos:"3. Self-positioning — quality of instruction axes",
     targetDateLabel:"Target date for reaching these goals (optional)",
     legendCurrent:"Current position", legendGoal:"Goal",
+    btnZoomRadar:"Enlarge the radar", radarZoomTitle:"Your radar — enlarged view",
+    radarZoomHint:"Drag a point to adjust your current position or your goal directly on the chart — the sliders update at the same time.",
     radarSidebarHint:"Your radar updates live in the sidebar, on the left.",
     h3Appr:"Student feedback",
     apprHint:"A free, optional field to log and summarize formal student feedback whenever you receive it. Each entry is kept — nothing is replaced, the history accumulates across cycles.",
@@ -311,6 +315,7 @@ function applyStaticI18n(){
   document.querySelectorAll("[data-i18n]").forEach(el=>{ el.textContent = t(el.getAttribute("data-i18n")); });
   document.querySelectorAll("[data-i18n-html]").forEach(el=>{ el.innerHTML = t(el.getAttribute("data-i18n-html")); });
   document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{ el.placeholder = t(el.getAttribute("data-i18n-placeholder")); });
+  document.querySelectorAll("[data-i18n-title]").forEach(el=>{ el.title = t(el.getAttribute("data-i18n-title")); });
   document.documentElement.lang = currentLang;
 }
 
@@ -423,6 +428,7 @@ document.getElementById("btnThemeToggle").addEventListener("click", ()=>{
 });
 function reRenderThemedVisuals(){
   renderSidebarRadar();
+  renderRadarZoom();
   renderPortrait();
   renderSurveyComparative();
   renderTimeline();
@@ -871,20 +877,15 @@ function maxRadiusForLabel(cx, cy, angle, w, h, gap, size){
   return lo;
 }
 
-function buildRadarSVG(axesList, scaleMin, scaleMax, bands, lines, opts){
+function computeRadarGeometry(axesList, size, opts){
   opts = opts || {};
-  const size = opts.size || 460;
   const cx = size/2, cy = size/2;
   const n = axesList.length;
-  if(n < 3){ return `<text x="20" y="30" font-size="13" fill="${themeC('#5B6472','#9CA1A8')}">Au moins 3 axes sont requis.</text>`; }
   const angleFor = i => -Math.PI/2 + i*(2*Math.PI/n);
   const fontSize = opts.showLabels === false ? 11 : 17;
   const labelGap = 16;
-
   const markerFor = (ax,i) => `${i+1} ${ax.icon||""}`.trim();
 
-  // Compact icon+number markers need far less room than full text, so the
-  // radar can use nearly the full available width.
   let R = opts.radius;
   if(R === undefined){
     R = size/2;
@@ -898,6 +899,15 @@ function buildRadarSVG(axesList, scaleMin, scaleMax, bands, lines, opts){
     }
     R = Math.max(R, size*0.08);
   }
+  return { cx, cy, R, angleFor, fontSize, labelGap, markerFor };
+}
+
+function buildRadarSVG(axesList, scaleMin, scaleMax, bands, lines, opts){
+  opts = opts || {};
+  const size = opts.size || 460;
+  const n = axesList.length;
+  if(n < 3){ return `<text x="20" y="30" font-size="13" fill="${themeC('#5B6472','#9CA1A8')}">Au moins 3 axes sont requis.</text>`; }
+  const { cx, cy, R, angleFor, fontSize, labelGap, markerFor } = computeRadarGeometry(axesList, size, opts);
 
   const els = [];
 
@@ -920,7 +930,14 @@ function buildRadarSVG(axesList, scaleMin, scaleMax, bands, lines, opts){
     const dash = line.dash ? `stroke-dasharray="${line.dash}"` : "";
     els.push(`<polygon points="${ptsStr(pts)}" fill="none" stroke="${line.stroke}" stroke-width="${line.width||3}" ${dash}/>`);
     if(line.points!==false){
-      pts.forEach(p=>{ els.push(`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="${line.pointFill||line.stroke}" stroke="${line.stroke}" stroke-width="1.5"/>`); });
+      if(opts.interactive && line.role){
+        pts.forEach((p,i)=>{
+          els.push(`<circle class="drag-handle" data-axis-idx="${i}" data-role="${line.role}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="15" fill="transparent" stroke="none"/>`);
+          els.push(`<circle class="drag-handle" data-axis-idx="${i}" data-role="${line.role}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="7" fill="${line.pointFill||line.stroke}" stroke="${themeC('#fff','#15171A')}" stroke-width="2"/>`);
+        });
+      } else {
+        pts.forEach(p=>{ els.push(`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="${line.pointFill||line.stroke}" stroke="${line.stroke}" stroke-width="1.5"/>`); });
+      }
     }
   });
 
@@ -1043,6 +1060,132 @@ document.getElementById("btnGoToAxes").addEventListener("click", ()=>{
   document.getElementById("axes-anchor").scrollIntoView({behavior:"smooth", block:"start"});
 });
 
+/* ---------------------------------------------------------------------
+   Shared axis-value setter: used by both the sliders and the draggable
+   points on the zoomed radar, so both stay in sync no matter which one
+   the person actually touches.
+--------------------------------------------------------------------- */
+function setAxisValueFromInteraction(axisIndex, role, rawValue){
+  const ax = AXES_CONFIG.axes[axisIndex];
+  if(!ax) return;
+  const entry = state.qualityRadar.entries.find(e=>e.axisId===ax.id);
+  if(!entry) return;
+  const smin = AXES_CONFIG.scaleMin, smax = AXES_CONFIG.scaleMax;
+  let v = Math.round(rawValue*10)/10;
+  v = Math.max(smin, Math.min(smax, v));
+
+  if(role === "current"){
+    entry.current = v;
+    if(entry.goal === null || entry.goal < entry.current) entry.goal = entry.current;
+  } else {
+    if(entry.current !== null && v < entry.current) v = entry.current;
+    entry.goal = v;
+  }
+
+  const card = document.querySelectorAll("#axesRows .activity-card")[axisIndex];
+  if(card){
+    const curSlider = card.querySelector(".rv-current");
+    const goalSlider = card.querySelector(".rv-goal");
+    if(curSlider && Number(curSlider.value) !== entry.current){
+      curSlider.value = entry.current;
+      card.querySelector(".rv-cur-out").textContent = scaleLabelFor(entry.current);
+      applySliderColor(curSlider, entry.current, smin, smax);
+    }
+    if(goalSlider && Number(goalSlider.value) !== entry.goal){
+      goalSlider.value = entry.goal;
+      card.querySelector(".rv-goal-out").textContent = scaleLabelFor(entry.goal);
+      applySliderColor(goalSlider, entry.goal, smin, smax);
+    }
+  }
+
+  touch();
+  renderSidebarRadar();
+  renderRadarZoom();
+  renderPortrait();
+  renderSurveyComparative();
+}
+
+function renderRadarZoom(){
+  const svg = document.getElementById("radarZoomSvg");
+  const modal = document.getElementById("radarZoomModal");
+  if(!svg || !modal || !modal.classList.contains("open")) return;
+  const axes = AXES_CONFIG.axes;
+  const smin = AXES_CONFIG.scaleMin, smax = AXES_CONFIG.scaleMax;
+  const currentVals = axes.map(ax=>{ const en = state.qualityRadar.entries.find(e=>e.axisId===ax.id); return en && en.current!==null && en.current!==undefined ? Number(en.current) : null; });
+  const goalVals = axes.map(ax=>{ const en = state.qualityRadar.entries.find(e=>e.axisId===ax.id); return en && en.goal!==null && en.goal!==undefined ? Number(en.goal) : null; });
+  const lines = [
+    { values:currentVals, role:"current", stroke:themeC("#2F6F6B","#4FB3AC"), width:3, fill:themeC("#2F6F6B","#4FB3AC"), fillOpacity:0.18, pointFill:themeC("#2F6F6B","#4FB3AC") },
+    { values:goalVals, role:"goal", stroke:themeC("#1B2430","#ECECE7"), width:3, dash:"6,4", pointFill:themeC("#FAF9F6","#1F2226") }
+  ];
+  svg.innerHTML = buildRadarSVG(axes, smin, smax, [], lines, {size:640, interactive:true});
+}
+
+document.getElementById("btnZoomRadar").addEventListener("click", ()=>{
+  document.getElementById("radarZoomOverlay").classList.add("show");
+  document.getElementById("radarZoomModal").classList.add("open");
+  renderRadarZoom();
+});
+function closeRadarZoom(){
+  document.getElementById("radarZoomOverlay").classList.remove("show");
+  document.getElementById("radarZoomModal").classList.remove("open");
+}
+document.getElementById("btnCloseRadarZoom").addEventListener("click", closeRadarZoom);
+document.getElementById("radarZoomOverlay").addEventListener("click", closeRadarZoom);
+
+// Drag interaction on the zoomed radar: project the pointer onto the axis's
+// own spoke direction so dragging feels like sliding along that axis, then
+// route through the same setter the sliders use, rAF-throttled for smoothness.
+(function initRadarDrag(){
+  const svg = document.getElementById("radarZoomSvg");
+  let dragging = null; // { axisIndex, role }
+  let pendingUpdate = null;
+  let rafScheduled = false;
+
+  function svgUserPoint(clientX, clientY){
+    const pt = svg.createSVGPoint();
+    pt.x = clientX; pt.y = clientY;
+    const ctm = svg.getScreenCTM();
+    if(!ctm) return {x:0,y:0};
+    const p = pt.matrixTransform(ctm.inverse());
+    return {x:p.x, y:p.y};
+  }
+
+  function flushPending(){
+    rafScheduled = false;
+    if(!pendingUpdate) return;
+    const { axisIndex, role, value } = pendingUpdate;
+    pendingUpdate = null;
+    setAxisValueFromInteraction(axisIndex, role, value);
+  }
+
+  svg.addEventListener("pointerdown", e=>{
+    const handle = e.target.closest(".drag-handle");
+    if(!handle) return;
+    dragging = { axisIndex: Number(handle.getAttribute("data-axis-idx")), role: handle.getAttribute("data-role") };
+    e.preventDefault();
+  });
+
+  window.addEventListener("pointermove", e=>{
+    if(!dragging) return;
+    const axes = AXES_CONFIG.axes;
+    const smin = AXES_CONFIG.scaleMin, smax = AXES_CONFIG.scaleMax;
+    const size = 640;
+    const geo = computeRadarGeometry(axes, size, {});
+    const angle = geo.angleFor(dragging.axisIndex);
+    const p = svgUserPoint(e.clientX, e.clientY);
+    const dx = p.x - geo.cx, dy = p.y - geo.cy;
+    let r = dx*Math.cos(angle) + dy*Math.sin(angle);
+    r = Math.max(0, Math.min(geo.R, r));
+    const frac = geo.R>0 ? r/geo.R : 0;
+    const value = smin + frac*(smax-smin);
+    pendingUpdate = { axisIndex: dragging.axisIndex, role: dragging.role, value };
+    if(!rafScheduled){ rafScheduled = true; requestAnimationFrame(flushPending); }
+  });
+
+  window.addEventListener("pointerup", ()=>{ dragging = null; });
+  window.addEventListener("pointercancel", ()=>{ dragging = null; });
+})();
+
 function renderQualityRadar(){
   const wrap = document.getElementById("axesRows");
   wrap.innerHTML = "";
@@ -1104,25 +1247,10 @@ function renderQualityRadar(){
     applySliderColor(goalSlider, entry.goal ?? smin, smin, smax);
 
     curSlider.addEventListener("input", e=>{
-      entry.current = Number(e.target.value);
-      card.querySelector(".rv-cur-out").textContent = scaleLabelFor(entry.current);
-      applySliderColor(curSlider, entry.current, smin, smax);
-      // l'objectif ne peut pas être inférieur à la position actuelle
-      if(entry.goal === null || entry.goal < entry.current){
-        entry.goal = entry.current;
-        goalSlider.value = entry.goal;
-        card.querySelector(".rv-goal-out").textContent = scaleLabelFor(entry.goal);
-        applySliderColor(goalSlider, entry.goal, smin, smax);
-      }
-      touch(); renderSidebarRadar(); renderPortrait(); renderSurveyComparative();
+      setAxisValueFromInteraction(i, "current", Number(e.target.value));
     });
     goalSlider.addEventListener("input", e=>{
-      let v = Number(e.target.value);
-      if(entry.current !== null && v < entry.current){ v = entry.current; e.target.value = v; }
-      entry.goal = v;
-      card.querySelector(".rv-goal-out").textContent = scaleLabelFor(entry.goal);
-      applySliderColor(goalSlider, entry.goal, smin, smax);
-      touch(); renderSidebarRadar(); renderPortrait();
+      setAxisValueFromInteraction(i, "goal", Number(e.target.value));
     });
     card.querySelector(".rv-note-current").addEventListener("input", e=>{ entry.noteCurrent = e.target.value; touch(); });
     card.querySelector(".rv-note-goal").addEventListener("input", e=>{ entry.noteGoal = e.target.value; touch(); });
