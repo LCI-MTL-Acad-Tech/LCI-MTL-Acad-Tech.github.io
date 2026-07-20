@@ -5,11 +5,14 @@ let currentLang = "fr";
 
 const TRANSLATIONS = {
   fr: {
-    docTitle:"Tableau de bord des plans de perfectionnement",
+    docTitle:"Tableau de bord de perfectionnement professionnel",
     appSubtitle:"Vue de la personne responsable de programmes académiques",
     themeDark:"Mode sombre", themeLight:"Mode clair",
     btnLoadPlans:"Charger des plans (JSON)", btnClearPlans:"Vider les plans",
-    btnLoadNotes:"Charger mes notes", btnExportNotes:"Exporter mes notes", btnLoadAxes:"Charger les axes (JSON)",
+    btnLoadNotes:"Charger mes notes", btnExportNotes:"Exporter mes notes",
+    btnOpenDrawer:"Import / Export", drawerTitle:"Import / Export",
+    drawerHint:"Rien n'est envoyé en ligne — tout reste dans cette session de navigateur, sauf ce que vous exportez vous-même.",
+    drawerSectionPlans:"Plans des personnes enseignantes", drawerSectionNotes:"Mes notes de revue", drawerSectionAxes:"Axes de qualité (configuration)",
     tabList:"Liste des plans", tabRadar:"Radar qualité", tabStats:"Statistiques",
     h2PlansLoaded:"Plans chargés",
     listHint:"Chargez les fichiers JSON exportés par les personnes enseignantes. Rien n'est envoyé en ligne — tout reste dans cette session de navigateur, sauf ce que vous exportez vous-même.",
@@ -48,8 +51,7 @@ const TRANSLATIONS = {
     privateNotesTitle:"Notes privées générales (non partagées avec la personne enseignante)",
     privateNotesHint:"Ces notes restent uniquement dans votre session, à moins que vous ne les exportiez via « Exporter mes notes ».",
     legendMin:"Minimum", legendQ1:"Q1", legendMedian:"Médiane", legendQ3:"Q3", legendMax:"Maximum", legendCurrent:"Position actuelle", legendGoal:"Objectif",
-    axesAutoNote:"Axes chargés automatiquement depuis axes.json.", axesDefaultNote:"Axes par défaut utilisés (fichier de configuration non disponible).", axesManualNote:"Axes chargés manuellement.",
-    errAxesConfig:"Impossible de lire ce fichier comme une configuration d'axes valide.",
+    axesAutoNote:"Axes chargés automatiquement depuis axes.json.", axesDefaultNote:"Axes par défaut utilisés (fichier de configuration non disponible).",
     errPlanRead:"", notesLoadedAlert:"Notes chargées.", errNotesRead:"Impossible de lire ce fichier comme des notes valides.",
     guardMessage:"Pas assez de plans avec auto-position pour préserver l'anonymat (minimum {N}; {C} disponible{CS} selon le filtre courant).",
     aiAttribTitle:"Comment cet outil a été créé",
@@ -59,11 +61,14 @@ const TRANSLATIONS = {
     aiAttribP3Rest:"L'IA générative est un outil de travail, non un substitut au jugement professionnel. Ce projet illustre une approche où l'humain reste l'auteur·rice : l'IA amplifie la capacité de production, mais la responsabilité éditoriale, pédagogique et éthique reste entièrement humaine. Dernière mise à jour : juillet 2026.",
   },
   en: {
-    docTitle:"Professional Development Plans Dashboard",
+    docTitle:"Professional Development Dashboard",
     appSubtitle:"Program coordinator view",
     themeDark:"Dark mode", themeLight:"Light mode",
     btnLoadPlans:"Load plans (JSON)", btnClearPlans:"Clear plans",
-    btnLoadNotes:"Load my notes", btnExportNotes:"Export my notes", btnLoadAxes:"Load axes (JSON)",
+    btnLoadNotes:"Load my notes", btnExportNotes:"Export my notes",
+    btnOpenDrawer:"Import / Export", drawerTitle:"Import / Export",
+    drawerHint:"Nothing is sent online — everything stays in this browser session, except what you export yourself.",
+    drawerSectionPlans:"Teacher plans", drawerSectionNotes:"My review notes", drawerSectionAxes:"Quality axes (configuration)",
     tabList:"Plan list", tabRadar:"Quality radar", tabStats:"Statistics",
     h2PlansLoaded:"Plans loaded",
     listHint:"Load the JSON files exported by teachers. Nothing is sent online — everything stays in this browser session, except what you export yourself.",
@@ -102,8 +107,7 @@ const TRANSLATIONS = {
     privateNotesTitle:"General private notes (not shared with the teacher)",
     privateNotesHint:"These notes remain only in your session unless you export them via \"Export my notes\".",
     legendMin:"Minimum", legendQ1:"Q1", legendMedian:"Median", legendQ3:"Q3", legendMax:"Maximum", legendCurrent:"Current position", legendGoal:"Goal",
-    axesAutoNote:"Axes loaded automatically from axes.json.", axesDefaultNote:"Default axes in use (configuration file unavailable).", axesManualNote:"Axes loaded manually.",
-    errAxesConfig:"Could not read this file as a valid axes configuration.",
+    axesAutoNote:"Axes loaded automatically from axes.json.", axesDefaultNote:"Default axes in use (configuration file unavailable).",
     errPlanRead:"", notesLoadedAlert:"Notes loaded.", errNotesRead:"Could not read this file as valid notes.",
     guardMessage:"Not enough plans with self-positioning data to preserve anonymity (minimum {N}; {C} available under the current filter).",
     aiAttribTitle:"How this tool was made",
@@ -250,6 +254,18 @@ document.getElementById("btnClear").addEventListener("click", ()=>{
   if(confirm(t("confirmClearPlans"))){ plans=[]; renderAll(); }
 });
 
+function openIoDrawer(){
+  document.getElementById("drawerOverlay").classList.add("show");
+  document.getElementById("ioDrawer").classList.add("open");
+}
+function closeIoDrawer(){
+  document.getElementById("drawerOverlay").classList.remove("show");
+  document.getElementById("ioDrawer").classList.remove("open");
+}
+document.getElementById("btnOpenDrawer").addEventListener("click", openIoDrawer);
+document.getElementById("btnCloseDrawer").addEventListener("click", closeIoDrawer);
+document.getElementById("drawerOverlay").addEventListener("click", closeIoDrawer);
+
 const dz = document.getElementById("dropzone");
 ["dragenter","dragover"].forEach(ev=>dz.addEventListener(ev, e=>{ e.preventDefault(); dz.classList.add("drag"); }));
 ["dragleave","drop"].forEach(ev=>dz.addEventListener(ev, e=>{ e.preventDefault(); dz.classList.remove("drag"); }));
@@ -320,25 +336,9 @@ async function tryAutoLoadAxes(){
 function updateAxesSourceNote(){
   const el = document.getElementById("axesSourceNote");
   if(!el) return;
-  const labels = { auto:t("axesAutoNote"), defaut:t("axesDefaultNote"), manuel:t("axesManualNote") };
+  const labels = { auto:t("axesAutoNote"), defaut:t("axesDefaultNote") };
   el.textContent = labels[axesSource] || "";
 }
-document.getElementById("btnAxesLoadTrigger").addEventListener("click", ()=>document.getElementById("axesFileImport").click());
-document.getElementById("axesFileImport").addEventListener("change", e=>{
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    try{
-      const data = JSON.parse(reader.result);
-      if(!Array.isArray(data.axes) || data.axes.length===0) throw new Error("format invalide");
-      AXES_CONFIG = data; axesSource = "manuel";
-      updateAxesSourceNote(); renderRadarTab();
-    }catch(err){ alert(t("errAxesConfig") + "\n" + err.message); }
-  };
-  reader.readAsText(file);
-  e.target.value = "";
-});
 
 /* ---------------------------------------------------------------------
    Tabs

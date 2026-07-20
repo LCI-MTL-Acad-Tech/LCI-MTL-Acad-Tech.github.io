@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title data-i18n="docTitle">Tableau de bord — Plans de perfectionnement</title>
+<title data-i18n="docTitle">Tableau de bord de perfectionnement professionnel</title>
 <link rel="stylesheet" href="tableau.css">
 </head>
 <body>
 
 <header class="app-header">
   <div>
-    <h1 data-i18n="docTitle">Tableau de bord des plans de perfectionnement</h1>
+    <h1 data-i18n="docTitle">Tableau de bord de perfectionnement professionnel</h1>
     <div class="sub" data-i18n="appSubtitle">Vue de la personne responsable de programmes académiques</div>
   </div>
   <div class="header-actions">
@@ -20,21 +20,35 @@
     </div>
     <button class="ghost" id="btnThemeToggle">Mode sombre</button>
     <div class="divider"></div>
+    <button class="ghost" id="btnOpenDrawer" data-i18n="btnOpenDrawer">Import / Export</button>
+  </div>
+</header>
+
+<div class="overlay" id="drawerOverlay"></div>
+<aside class="io-drawer" id="ioDrawer">
+  <button class="small close" id="btnCloseDrawer" data-i18n="btnClose">Fermer ✕</button>
+  <h3 data-i18n="drawerTitle">Import / Export</h3>
+  <p class="drawer-hint" data-i18n="drawerHint">Rien n'est envoyé en ligne — tout reste dans cette session de navigateur, sauf ce que vous exportez vous-même.</p>
+
+  <div class="detail-section">
+    <h4 data-i18n="drawerSectionPlans">Plans des personnes enseignantes</h4>
     <button class="ghost" id="btnLoadTrigger" data-i18n="btnLoadPlans">Charger des plans (JSON)</button>
     <input type="file" id="fileImport" accept="application/json" multiple>
     <button class="ghost" id="btnClear" data-i18n="btnClearPlans">Vider les plans</button>
-    <div class="divider"></div>
+  </div>
+
+  <div class="detail-section">
+    <h4 data-i18n="drawerSectionNotes">Mes notes de revue</h4>
     <button class="ghost" id="btnNotesImportTrigger" data-i18n="btnLoadNotes">Charger mes notes</button>
     <input type="file" id="notesImport" accept="application/json">
     <button class="ghost" id="btnNotesExport" data-i18n="btnExportNotes">Exporter mes notes</button>
-    <div class="divider"></div>
-    <button class="ghost" id="btnAxesLoadTrigger" data-i18n="btnLoadAxes">Charger les axes (JSON)</button>
-    <input type="file" id="axesFileImport" accept="application/json">
   </div>
-</header>
-<div style="max-width:1240px; margin:6px auto 0; padding:0 28px;">
-  <span id="axesSourceNote" style="font-size:11.5px; color:var(--muted);"></span>
-</div>
+
+  <div class="detail-section">
+    <h4 data-i18n="drawerSectionAxes">Axes de qualité (configuration)</h4>
+    <span id="axesSourceNote" style="font-size:11.5px; color:var(--muted);"></span>
+  </div>
+</aside>
 
 <nav class="tabs">
   <button class="tab-btn active" data-tab="list" data-i18n="tabList">Liste des plans</button>
@@ -47,7 +61,7 @@
     <h2 data-i18n="h2PlansLoaded">Plans chargés</h2>
     <p class="hint" data-i18n="listHint">Chargez les fichiers JSON exportés par les personnes enseignantes. Rien n'est envoyé en ligne — tout reste dans cette session de navigateur, sauf ce que vous exportez vous-même.</p>
 
-    <div id="dropzone" class="dropzone" data-i18n="dropzoneText">Glissez-déposez des fichiers .json ici, ou utilisez « Charger des plans » ci-dessus.</div>
+    <div id="dropzone" class="dropzone" data-i18n="dropzoneText">Glissez-déposez des fichiers .json ici, ou utilisez « Import / Export » dans l'en-tête.</div>
 
     <div class="summary-strip" id="summaryStrip"></div>
 
