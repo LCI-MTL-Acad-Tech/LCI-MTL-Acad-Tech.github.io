@@ -26,7 +26,6 @@ const TRANSLATIONS = {
     h2Radar:"Radar qualité d'enseignement",
     radarHint:"Les bandes montrent la répartition (minimum, quartiles, maximum) des positions actuelles auto-évaluées, pour les plans correspondant au filtre courant. Un enseignant peut être superposé en ligne, par-dessus les bandes.",
     overlayLabel:"Superposer un enseignant", overlayNone:"Aucun",
-    minGroupLabel:"Taille minimale du groupe pour afficher",
     h2Stats:"Analyse des besoins de formation et perfectionnement",
     statsHint:"Agrégation de tous les plans actuellement chargés dans cette session.",
     h3ChartCategory:"Catégorie d'activité", h3ChartFormat:"Format d'activité", h3ChartRD:"Catégorie R&D proposée",
@@ -53,7 +52,7 @@ const TRANSLATIONS = {
     legendMin:"Minimum", legendQ1:"Q1", legendMedian:"Médiane", legendQ3:"Q3", legendMax:"Maximum", legendCurrent:"Position actuelle", legendGoal:"Objectif",
     axesAutoNote:"Axes chargés automatiquement depuis axes.json.", axesDefaultNote:"Axes par défaut utilisés (fichier de configuration non disponible).",
     errPlanRead:"", notesLoadedAlert:"Notes chargées.", errNotesRead:"Impossible de lire ce fichier comme des notes valides.",
-    guardMessage:"Pas assez de plans avec auto-position pour préserver l'anonymat (minimum {N}; {C} disponible{CS} selon le filtre courant).",
+    guardMessage:"Aucun plan avec auto-positionnement disponible selon le filtre courant.",
     aiAttribTitle:"Comment cet outil a été créé",
     aiAttribP1:"Cet outil a été construit par une collaboration itérative entre Elisa Schaeffer, Doyenne de la Technologie et du Design au Collège LaSalle Montréal, et Claude (Anthropic), un assistant IA. Le contenu pédagogique, la structure, les fonctionnalités, les priorités et les choix éditoriaux ont été définis, questionnés et affinés par Elisa à chaque étape. Claude a généré le code, proposé des formulations et signalé les incohérences — mais chaque décision substantielle a été prise par un être humain.",
     aiAttribP2:"Ce n'est pas du contenu IA généré en une seule fois. C'est le résultat d'un dialogue de révision prolongé : chaque session a été lue, critiquée et corrigée. L'outil évolue.",
@@ -82,7 +81,6 @@ const TRANSLATIONS = {
     h2Radar:"Quality of instruction radar",
     radarHint:"The bands show the spread (minimum, quartiles, maximum) of self-assessed current positions, for plans matching the current filter. One teacher can be overlaid as a line on top of the bands.",
     overlayLabel:"Overlay a teacher", overlayNone:"None",
-    minGroupLabel:"Minimum group size to display",
     h2Stats:"Analysis of training and development needs",
     statsHint:"Aggregation of all plans currently loaded in this session.",
     h3ChartCategory:"Activity category", h3ChartFormat:"Activity format", h3ChartRD:"Proposed R&D category",
@@ -109,7 +107,7 @@ const TRANSLATIONS = {
     legendMin:"Minimum", legendQ1:"Q1", legendMedian:"Median", legendQ3:"Q3", legendMax:"Maximum", legendCurrent:"Current position", legendGoal:"Goal",
     axesAutoNote:"Axes loaded automatically from axes.json.", axesDefaultNote:"Default axes in use (configuration file unavailable).",
     errPlanRead:"", notesLoadedAlert:"Notes loaded.", errNotesRead:"Could not read this file as valid notes.",
-    guardMessage:"Not enough plans with self-positioning data to preserve anonymity (minimum {N}; {C} available under the current filter).",
+    guardMessage:"No plan with self-positioning data available under the current filter.",
     aiAttribTitle:"How this tool was made",
     aiAttribP1:"This tool was built through an iterative collaboration between Elisa Schaeffer, Dean of Technology and Design at Collège LaSalle Montréal, and Claude (Anthropic), an AI assistant. The pedagogical content, structure, features, priorities, and editorial choices were defined, questioned, and refined by Elisa at every step. Claude generated the code, proposed wording, and flagged inconsistencies — but every substantive decision was made by a human.",
     aiAttribP2:"This is not one-shot AI-generated content. It is the result of an extended review dialogue: each session was read, critiqued, and corrected. The tool continues to evolve.",
@@ -755,7 +753,6 @@ function buildRadarSVG(axesList, scaleMin, scaleMax, bands, lines, opts){
   return `<g>${els.join("")}</g>`;
 }
 
-document.getElementById("radarMinN").addEventListener("input", renderRadarTab);
 document.getElementById("radarTeacherSelect").addEventListener("change", renderRadarTab);
 
 function renderRadarTab(){
@@ -771,10 +768,9 @@ function renderRadarTab(){
   select.innerHTML = `<option value="">${t("overlayNone")}</option>` + withRadar.map(p=>`<option value="${escapeHtml(p.meta.teacherName||"")}">${escapeHtml(p.meta.teacherName||"—")}</option>`).join("");
   if(withRadar.some(p=>p.meta.teacherName===prevSelection)) select.value = prevSelection;
 
-  const minN = Number(document.getElementById("radarMinN").value) || 1;
-  if(withRadar.length < minN){
+  if(withRadar.length === 0){
     guard.style.display = "block";
-    guard.textContent = t("guardMessage").replace("{N}", minN).replace("{C}", withRadar.length).replace("{CS}", withRadar.length===1?"":"s");
+    guard.textContent = t("guardMessage");
     svg.innerHTML = "";
     document.getElementById("radarLegend").innerHTML = "";
     document.getElementById("radarTeacherNotes").innerHTML = "";
