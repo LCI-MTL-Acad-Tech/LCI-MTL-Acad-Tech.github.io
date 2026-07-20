@@ -6,7 +6,7 @@ let currentLang = "fr";
 const TRANSLATIONS = {
   fr: {
     docTitle:"Tableau de bord de perfectionnement professionnel",
-    appSubtitle:"Vue de la personne responsable de programmes académiques",
+    appSubtitle:"Vue de la personne gestionnaire",
     themeDark:"Mode sombre", themeLight:"Mode clair",
     btnLoadPlans:"Charger des plans (JSON)", btnClearPlans:"Vider les plans",
     btnLoadNotes:"Charger mes notes", btnExportNotes:"Exporter mes notes",
@@ -30,7 +30,7 @@ const TRANSLATIONS = {
     h2Stats:"Analyse des besoins de formation et perfectionnement",
     statsHint:"Agrégation de tous les plans actuellement chargés dans cette session.",
     h3ChartCategory:"Catégorie d'activité", h3ChartFormat:"Format d'activité", h3ChartRD:"Catégorie R&D proposée",
-    h3Skills:"Compétences disciplinaires signalées", h3Sabbaticals:"Sabbatiques envisagées",
+    h3Skills:"Compétences signalées", h3Sabbaticals:"Sabbatiques envisagées",
     btnExportCsv:"Exporter les statistiques (CSV)", btnClose:"Fermer ✕",
     emptyNoRows:"Aucun plan chargé, ou aucun résultat pour ces filtres.",
     chipExpired:"Plans expirés", chipSoon:"Bientôt à réviser", chipUnreviewed:"Non revus (nouveaux ou mis à jour)", chipAll:"Total des plans chargés",
@@ -38,13 +38,13 @@ const TRANSLATIONS = {
     confirmClearNotes:"Retirer tous les plans chargés de cette session ?",
     noDataEmpty:"Aucune donnée.",
     noneNoted:"Aucun congé envisagé signalé.", noSkillsNoted:"Aucune compétence disciplinaire signalée.",
-    colPerson:"Personne", colDescription:"Description", colSkill:"Compétence", colType:"Type", colWhen:"Quand", colNewCourses:"Nouveaux cours",
+    colPerson:"Personne", colDescription:"Description", colSkill:"Compétence", colCategory:"Catégorie", colType:"Type", colWhen:"Quand", colNewCourses:"Nouveaux cours",
     plansLoadedCard:"Plans chargés", activitiesPlannedCard:"Activités planifiées", rdActivitiesCard:"Activités proposées en R&D",
     rdApprovedSuffix:"approuvées", sabbaticalsCard:"Congés sans solde envisagés",
     detailNoAppr:"", noActivities:"Aucune activité.",
     kvEmail:"Courriel institutionnel", kvEmployee:"N° employé", kvCreated:"Créé le", kvEndDate:"Fin visée", kvLastMod:"Dernière modif.",
     sectionApprHistory:"Appréciation étudiante — historique", sectionActivities:"Activités", sectionSabbatical:"Congé sans solde envisagé",
-    sectionBudgetNotes:"Notes de planification budgétaire", sectionSkills:"Compétences disciplinaires",
+    sectionBudgetNotes:"Notes de planification budgétaire", sectionSkills:"Compétences",
     btnGoToRadarLabel:"Voir le radar qualité de cette personne",
     reviewHistoryTitle:"Historique des revues avec cette personne", reviewNoneYet:"Aucune revue enregistrée.",
     reviewDateLabel:"Date de la revue", reviewNoteLabel:"Note sur cette revue (optionnel)", btnAddReview:"+ Enregistrer cette revue",
@@ -62,7 +62,7 @@ const TRANSLATIONS = {
   },
   en: {
     docTitle:"Professional Development Dashboard",
-    appSubtitle:"Program coordinator view",
+    appSubtitle:"Manager view",
     themeDark:"Dark mode", themeLight:"Light mode",
     btnLoadPlans:"Load plans (JSON)", btnClearPlans:"Clear plans",
     btnLoadNotes:"Load my notes", btnExportNotes:"Export my notes",
@@ -86,7 +86,7 @@ const TRANSLATIONS = {
     h2Stats:"Analysis of training and development needs",
     statsHint:"Aggregation of all plans currently loaded in this session.",
     h3ChartCategory:"Activity category", h3ChartFormat:"Activity format", h3ChartRD:"Proposed R&D category",
-    h3Skills:"Reported subject-matter skills", h3Sabbaticals:"Sabbaticals under consideration",
+    h3Skills:"Reported skills", h3Sabbaticals:"Sabbaticals under consideration",
     btnExportCsv:"Export statistics (CSV)", btnClose:"Close ✕",
     emptyNoRows:"No plans loaded, or no results for these filters.",
     chipExpired:"Expired plans", chipSoon:"Due soon", chipUnreviewed:"Not reviewed (new or updated)", chipAll:"Total plans loaded",
@@ -94,13 +94,13 @@ const TRANSLATIONS = {
     confirmClearNotes:"Remove all plans loaded in this session?",
     noDataEmpty:"No data.",
     noneNoted:"No leave under consideration reported.", noSkillsNoted:"No subject-matter skill reported.",
-    colPerson:"Person", colDescription:"Description", colSkill:"Skill", colType:"Type", colWhen:"When", colNewCourses:"New courses",
+    colPerson:"Person", colDescription:"Description", colSkill:"Skill", colCategory:"Category", colType:"Type", colWhen:"When", colNewCourses:"New courses",
     plansLoadedCard:"Plans loaded", activitiesPlannedCard:"Activities planned", rdActivitiesCard:"Activities proposed as R&D",
     rdApprovedSuffix:"approved", sabbaticalsCard:"Unpaid leaves under consideration",
     detailNoAppr:"", noActivities:"No activities.",
     kvEmail:"Institutional email", kvEmployee:"Employee #", kvCreated:"Created on", kvEndDate:"Target end", kvLastMod:"Last modified",
     sectionApprHistory:"Student feedback — history", sectionActivities:"Activities", sectionSabbatical:"Unpaid leave under consideration",
-    sectionBudgetNotes:"Budget planning notes", sectionSkills:"Subject-matter skills",
+    sectionBudgetNotes:"Budget planning notes", sectionSkills:"Skills",
     btnGoToRadarLabel:"View this person's quality radar",
     reviewHistoryTitle:"Review history with this person", reviewNoneYet:"No review recorded yet.",
     reviewDateLabel:"Review date", reviewNoteLabel:"Note on this review (optional)", btnAddReview:"+ Save this review",
@@ -554,10 +554,13 @@ function openDetail(p){
 
   if((p.domainSkills||[]).length){
     const SKILL_KIND_LABELS = currentLang==="en" ? { nouvelle:"New skill", maintien:"Maintain / update" } : { nouvelle:"Nouvelle compétence", maintien:"Maintien / actualisation" };
+    const SKILL_CAT_LABELS = currentLang==="en"
+      ? { subject_matter:"Subject-matter", teaching:"Teaching (pedagogical)", soft_skill:"Soft skill" }
+      : { subject_matter:"Disciplinaire", teaching:"Pédagogique (enseignement)", soft_skill:"Transversale (savoir-être)" };
     html += `<div class="detail-section"><h4>${t("sectionSkills")} (${p.domainSkills.length})</h4>`;
     p.domainSkills.forEach(sk=>{
       html += `<div style="margin-bottom:10px;padding-bottom:8px;border-bottom:1px dashed var(--border);">
-        <b>${escapeHtml(sk.name||"—")}</b> <span class="tag">${SKILL_KIND_LABELS[sk.kind]||sk.kind}</span>
+        <b>${escapeHtml(sk.name||"—")}</b> <span class="tag">${SKILL_CAT_LABELS[sk.category]||SKILL_CAT_LABELS.subject_matter}</span> <span class="tag">${SKILL_KIND_LABELS[sk.kind]||sk.kind}</span>
         ${sk.newCourses ? `<span class="tag badge">${t("colNewCourses")}${sk.newCoursesDetails ? " — "+escapeHtml(sk.newCoursesDetails) : ""}</span>` : ""}
         ${sk.when ? `<div style="font-size:12.5px;color:var(--muted);margin-top:2px;">${t("colWhen")} : ${escapeHtml(sk.when)}</div>` : ""}
         ${sk.plan ? `<div style="font-size:12.5px;color:var(--muted);margin-top:2px;">${currentLang==="en"?"How":"Comment"} : ${escapeHtml(sk.plan)}</div>` : ""}
@@ -885,9 +888,13 @@ function renderStats(){
     (p.domainSkills||[]).forEach(sk=>{
       if(!sk.name) return;
       const kindLabels = currentLang==="en" ? { maintien:"Maintain / update", nouvelle:"New skill" } : { maintien:"Maintien / actualisation", nouvelle:"Nouvelle compétence" };
+      const catLabels = currentLang==="en"
+        ? { subject_matter:"Subject-matter", teaching:"Teaching (pedagogical)", soft_skill:"Soft skill" }
+        : { subject_matter:"Disciplinaire", teaching:"Pédagogique (enseignement)", soft_skill:"Transversale (savoir-être)" };
       skillEntries.push({
         name:p.meta.teacherName||"—",
         skill:sk.name,
+        category: catLabels[sk.category] || catLabels.subject_matter,
         kind: kindLabels[sk.kind] || kindLabels.nouvelle,
         when: sk.when||"—",
         newCourses: sk.newCourses ? (currentLang==="en"?"Yes":"Oui") : "—"
@@ -910,8 +917,8 @@ function renderStats(){
   if(skillList){
     if(skillEntries.length===0){ skillList.innerHTML = `<div class="empty-note">${t("noSkillsNoted")}</div>`; }
     else{
-      skillList.innerHTML = `<table class='data'><thead><tr><th>${t("colPerson")}</th><th>${t("colSkill")}</th><th>${t("colType")}</th><th>${t("colWhen")}</th><th>${t("colNewCourses")}</th></tr></thead><tbody>` +
-        skillEntries.map(e=>`<tr><td>${escapeHtml(e.name)}</td><td>${escapeHtml(e.skill)}</td><td>${escapeHtml(e.kind)}</td><td>${escapeHtml(e.when)}</td><td>${escapeHtml(e.newCourses)}</td></tr>`).join("") +
+      skillList.innerHTML = `<table class='data'><thead><tr><th>${t("colPerson")}</th><th>${t("colSkill")}</th><th>${t("colCategory")}</th><th>${t("colType")}</th><th>${t("colWhen")}</th><th>${t("colNewCourses")}</th></tr></thead><tbody>` +
+        skillEntries.map(e=>`<tr><td>${escapeHtml(e.name)}</td><td>${escapeHtml(e.skill)}</td><td>${escapeHtml(e.category)}</td><td>${escapeHtml(e.kind)}</td><td>${escapeHtml(e.when)}</td><td>${escapeHtml(e.newCourses)}</td></tr>`).join("") +
         "</tbody></table>";
     }
   }
