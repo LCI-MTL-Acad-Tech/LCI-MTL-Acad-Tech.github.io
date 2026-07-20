@@ -179,7 +179,7 @@
     <div class="modal-panel radar-zoom-modal" id="radarZoomModal">
       <button class="small close" id="btnCloseRadarZoom" data-i18n="btnClose">Fermer ✕</button>
       <h3 data-i18n="radarZoomTitle" style="margin-top:0;">Votre radar — vue agrandie</h3>
-      <p class="hint" data-i18n="radarZoomHint">Faites glisser un point pour ajuster votre position actuelle ou votre objectif directement sur le graphique — les curseurs se mettent à jour en même temps.</p>
+      <p class="hint" id="radarZoomHintText">Faites glisser un point pour ajuster votre position actuelle ou votre objectif directement sur le graphique — les curseurs se mettent à jour en même temps.</p>
       <div style="max-width:640px; margin:0 auto;">
         <svg id="radarZoomSvg" viewBox="0 0 640 640" xmlns="http://www.w3.org/2000/svg"></svg>
       </div>
@@ -229,7 +229,7 @@
 
     <section class="card" id="sec-budget">
       <h2 data-i18n="h2Budget">6. Planification du budget de perfectionnement</h2>
-      <p class="hint" data-i18n="budgetHint">Planification seulement — le traitement financier réel (approbation, remboursement) est géré séparément, selon la convention collective ou les politiques internes en vigueur (selon le cas). Ce tableau reprend le coût estimé des activités ci-dessus, regroupé par année académique puisqu'il est appelé à s'accumuler d'année en année.</p>
+      <p class="hint" data-i18n="budgetHint">Planification seulement — le traitement financier réel (approbation, remboursement) est géré séparément, selon la convention collective ou les politiques internes en vigueur (selon le cas). Ce tableau n'a pas son propre formulaire d'ajout : il reprend automatiquement le coût estimé des activités saisies dans la section « Activités de perfectionnement » juste au-dessus, regroupé par année académique puisqu'il est appelé à s'accumuler d'année en année. Pour ajouter, modifier ou retirer une dépense, retournez à cette section.</p>
       <table id="budgetTable">
         <thead><tr><th data-i18n="thYear">Année académique</th><th data-i18n="thActivity">Activité</th><th data-i18n="thCategory">Catégorie</th><th style="text-align:right;" data-i18n="thCost">Coût estimé (CAD)</th></tr></thead>
         <tbody id="budgetRows"></tbody>

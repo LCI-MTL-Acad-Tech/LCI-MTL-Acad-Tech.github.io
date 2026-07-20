@@ -43,6 +43,7 @@ const TRANSLATIONS = {
     legendCurrent:"Position actuelle", legendGoal:"Objectif",
     btnZoomRadar:"Agrandir le radar", radarZoomTitle:"Votre radar — vue agrandie",
     radarZoomHint:"Faites glisser un point pour ajuster votre position actuelle ou votre objectif directement sur le graphique — les curseurs se mettent à jour en même temps.",
+    radarZoomHintEmpty:"Aucune donnée pour le moment. Utilisez les curseurs de la section « Auto-positionnement » pour situer un premier axe — le graphique s'activera ici dès qu'un axe sera rempli.",
     radarSidebarHint:"Votre radar se met à jour en direct dans la barre latérale, à gauche.",
     h3Appr:"Appréciation étudiante",
     apprHint:"Un champ libre, optionnel, pour y déposer et résumer une appréciation étudiante formelle lorsque vous la recevez. Chaque entrée est conservée — rien n'est remplacé, l'historique s'accumule au fil des cycles.",
@@ -72,7 +73,7 @@ const TRANSLATIONS = {
     rdWarnText:"Ce plan n'accorde aucune approbation. Une activité cochée « proposée en R&D » n'est reconnue comme telle qu'après approbation écrite préalable de la Direction des études — une fois obtenue, indiquez qui l'a approuvée et à quelle date. Si elle est refusée, révisez le plan en conséquence.",
     btnAddActivity:"+ Ajouter une activité",
     h2Budget:"6. Planification du budget de perfectionnement",
-    budgetHint:"Planification seulement — le traitement financier réel (approbation, remboursement) est géré séparément, selon la convention collective ou les politiques internes en vigueur (selon le cas). Ce tableau reprend le coût estimé des activités ci-dessus, regroupé par année académique puisqu'il est appelé à s'accumuler d'année en année.",
+    budgetHint:"Planification seulement — le traitement financier réel (approbation, remboursement) est géré séparément, selon la convention collective ou les politiques internes en vigueur (selon le cas). Ce tableau n'a pas son propre formulaire d'ajout : il reprend automatiquement le coût estimé des activités saisies dans la section « Activités de perfectionnement » juste au-dessus, regroupé par année académique puisqu'il est appelé à s'accumuler d'année en année. Pour ajouter, modifier ou retirer une dépense, retournez à cette section.",
     thYear:"Année académique", thActivity:"Activité", thCategory:"Catégorie", thCost:"Coût estimé (CAD)",
     totalLabel:"Total estimé (toutes années)",
     budgetReminder:"Rappel : consultez la convention collective ou les politiques internes en vigueur (selon le cas) pour le montant exact et les modalités du budget individuel de perfectionnement (généralement non cumulatif et non transférable d'une année à l'autre).",
@@ -111,6 +112,7 @@ const TRANSLATIONS = {
     labelAcademicYear:"Année académique", phAcademicYear:"Ex. 2026-2027",
     labelSession:"Session / période visée", phSession:"Ex. Session Automne 2026",
     labelCost:"Coût estimé (CAD)", labelProposedRD:"Proposée en R&D",
+    costFieldHint:"Uniquement les dépenses que vous prévoyez porter à votre budget individuel de perfectionnement — pas le coût total de l'activité si une partie seulement (ou aucune) sera couverte par ce budget.",
     labelDomains:"Domaine(s) visé(s)",
     labelRdCategory:"Catégorie R&D", labelRdStatus:"État de l'approbation", labelRdDate:"Date de la décision",
     labelRdBy:"Décidée par (nom et fonction, Direction des études)", phRdBy:"Ex. Jordan Léveillé, directeur des études",
@@ -193,6 +195,7 @@ const TRANSLATIONS = {
     legendCurrent:"Current position", legendGoal:"Goal",
     btnZoomRadar:"Enlarge the radar", radarZoomTitle:"Your radar — enlarged view",
     radarZoomHint:"Drag a point to adjust your current position or your goal directly on the chart — the sliders update at the same time.",
+    radarZoomHintEmpty:"No data yet. Use the sliders in the \"Self-positioning\" section to set a first axis — the chart will become active here once an axis is filled in.",
     radarSidebarHint:"Your radar updates live in the sidebar, on the left.",
     h3Appr:"Student feedback",
     apprHint:"A free, optional field to log and summarize formal student feedback whenever you receive it. Each entry is kept — nothing is replaced, the history accumulates across cycles.",
@@ -222,7 +225,7 @@ const TRANSLATIONS = {
     rdWarnText:"This plan grants no approval. An activity checked \"proposed as R&D\" is only recognized as such after prior written approval from the Direction of Studies — once obtained, indicate who approved it and on what date. If refused, revise the plan accordingly.",
     btnAddActivity:"+ Add an activity",
     h2Budget:"6. Professional development budget planning",
-    budgetHint:"Planning only — the actual financial process (approval, reimbursement) is handled separately, per the collective agreement or internal policies in effect (as applicable). This table simply reflects the estimated cost of the activities above, grouped by academic year since it's meant to accumulate year over year.",
+    budgetHint:"Planning only — the actual financial process (approval, reimbursement) is handled separately, per the collective agreement or internal policies in effect (as applicable). This table has no add form of its own: it automatically reflects the estimated cost of the activities entered in the \"Professional development activities\" section just above, grouped by academic year since it's meant to accumulate year over year. To add, edit, or remove an expense, go back to that section.",
     thYear:"Academic year", thActivity:"Activity", thCategory:"Category", thCost:"Estimated cost (CAD)",
     totalLabel:"Estimated total (all years)",
     budgetReminder:"Reminder: check the collective agreement or internal policies in effect (as applicable) for the exact amount and terms of the individual professional development budget (generally non-cumulative and non-transferable from year to year).",
@@ -260,6 +263,7 @@ const TRANSLATIONS = {
     labelAcademicYear:"Academic year", phAcademicYear:"E.g. 2026-2027",
     labelSession:"Session / target period", phSession:"E.g. Fall 2026 session",
     labelCost:"Estimated cost (CAD)", labelProposedRD:"Proposed as R&D",
+    costFieldHint:"Only the expenses you plan to charge to your individual professional development budget — not the activity's total cost if only part of it (or none) will be covered by that budget.",
     labelDomains:"Target domain(s)",
     labelRdCategory:"R&D category", labelRdStatus:"Approval status", labelRdDate:"Decision date",
     labelRdBy:"Decided by (name and role, Direction of Studies)", phRdBy:"E.g. Jordan Léveillé, director of studies",
@@ -937,7 +941,7 @@ function buildRadarSVG(axesList, scaleMin, scaleMax, bands, lines, opts){
       if(opts.interactive && line.role){
         pts.forEach((p,i)=>{
           els.push(`<circle class="drag-handle" data-axis-idx="${i}" data-role="${line.role}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="15" fill="transparent" stroke="none"/>`);
-          els.push(`<circle class="drag-handle" data-axis-idx="${i}" data-role="${line.role}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="7" fill="${line.pointFill||line.stroke}" stroke="${themeC('#fff','#15171A')}" stroke-width="2"/>`);
+          els.push(`<circle class="drag-handle" data-axis-idx="${i}" data-role="${line.role}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="7" fill="${line.pointFill||line.stroke}" stroke="${line.stroke}" stroke-width="2"/>`);
         });
       } else {
         pts.forEach(p=>{ els.push(`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="${line.pointFill||line.stroke}" stroke="${line.stroke}" stroke-width="1.5"/>`); });
@@ -1090,12 +1094,12 @@ function setAxisValueFromInteraction(axisIndex, role, rawValue){
   if(card){
     const curSlider = card.querySelector(".rv-current");
     const goalSlider = card.querySelector(".rv-goal");
-    if(curSlider && Number(curSlider.value) !== entry.current){
+    if(curSlider){
       curSlider.value = entry.current;
       card.querySelector(".rv-cur-out").textContent = scaleLabelFor(entry.current);
       applySliderColor(curSlider, entry.current, smin, smax);
     }
-    if(goalSlider && Number(goalSlider.value) !== entry.goal){
+    if(goalSlider){
       goalSlider.value = entry.goal;
       card.querySelector(".rv-goal-out").textContent = scaleLabelFor(entry.goal);
       applySliderColor(goalSlider, entry.goal, smin, smax);
@@ -1115,6 +1119,17 @@ function renderRadarZoom(){
   if(!svg || !modal || !modal.classList.contains("open")) return;
   const axes = AXES_CONFIG.axes;
   const smin = AXES_CONFIG.scaleMin, smax = AXES_CONFIG.scaleMax;
+  const hintEl = document.getElementById("radarZoomHintText");
+
+  if(!hasAnyRadarData()){
+    if(hintEl) hintEl.textContent = t("radarZoomHintEmpty");
+    const midVals = axes.map(()=> (smin+smax)/2 );
+    const lines = [{ values:midVals, stroke:themeC("rgba(27,36,48,0.28)","rgba(236,236,231,0.3)"), width:2, dash:"4,4", points:false }];
+    svg.innerHTML = buildRadarSVG(axes, smin, smax, [], lines, {size:640, showLabels:false});
+    return;
+  }
+
+  if(hintEl) hintEl.textContent = t("radarZoomHint");
   const currentVals = axes.map(ax=>{ const en = state.qualityRadar.entries.find(e=>e.axisId===ax.id); return en && en.current!==null && en.current!==undefined ? Number(en.current) : null; });
   const goalVals = axes.map(ax=>{ const en = state.qualityRadar.entries.find(e=>e.axisId===ax.id); return en && en.goal!==null && en.goal!==undefined ? Number(en.goal) : null; });
   const lines = [
@@ -1260,6 +1275,7 @@ function renderQualityRadar(){
     card.querySelector(".rv-note-goal").addEventListener("input", e=>{ entry.noteGoal = e.target.value; touch(); });
   });
   renderSidebarRadar();
+  renderRadarZoom();
   renderPortrait();
 }
 document.getElementById("radar-target-date").addEventListener("input", e=>{ state.qualityRadar.targetDate = e.target.value; touch(); renderPortrait(); });
@@ -1518,6 +1534,7 @@ function renderActivities(){
           <input type="number" min="0" step="1" class="a-cost" data-idx="${idx}" value="${a.estimatedCost ?? ""}">
         </div>
       </div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:-4px;margin-bottom:2px;">${t("costFieldHint")}</div>
       <div class="grid3" style="margin-top:12px;">
         <div class="field tight">
           <label class="chip" style="width:fit-content;">
