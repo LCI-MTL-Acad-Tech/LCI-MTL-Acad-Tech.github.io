@@ -1094,12 +1094,12 @@ function setAxisValueFromInteraction(axisIndex, role, rawValue){
   if(card){
     const curSlider = card.querySelector(".rv-current");
     const goalSlider = card.querySelector(".rv-goal");
-    if(curSlider){
+    if(curSlider && entry.current !== null && entry.current !== undefined){
       curSlider.value = entry.current;
       card.querySelector(".rv-cur-out").textContent = scaleLabelFor(entry.current);
       applySliderColor(curSlider, entry.current, smin, smax);
     }
-    if(goalSlider){
+    if(goalSlider && entry.goal !== null && entry.goal !== undefined){
       goalSlider.value = entry.goal;
       card.querySelector(".rv-goal-out").textContent = scaleLabelFor(entry.goal);
       applySliderColor(goalSlider, entry.goal, smin, smax);
