@@ -25,145 +25,107 @@ const SESSION = {
   ide:{
     demoSteps:[
       {
-        label:{ fr:'Classe de base abstraite avec méthode virtuelle pure', en:'Abstract base class with pure virtual method' },
-        fr:`Crée deux fichiers : movable.h et player.h/player.cpp. Dans movable.h : class Movable { public: virtual void move(float dx, float dy) = 0; virtual ~Movable() {} float x=0, y=0; };. Le = 0 rend move() purement virtuelle — Movable ne peut pas être instancié directement. C'est l'équivalent d'une interface en C#.`,
-        en:`Create two files: movable.h and player.h/player.cpp. In movable.h: class Movable { public: virtual void move(float dx, float dy) = 0; virtual ~Movable() {} float x=0, y=0; };. The = 0 makes move() purely virtual — Movable cannot be instantiated directly. It's the equivalent of an interface in C#.`
+        label:{ fr:'Vecteur 2D — position et déplacement', en:'2D vector — position and displacement' },
+        fr:`Crée vec2.h. Définit struct Vec2 { float x, y; Vec2(float x=0, float y=0): x(x), y(y){} Vec2 operator+(const Vec2& o) const { return {x+o.x, y+o.y}; } Vec2 operator*(float s) const { return {x*s, y*s}; } float length() const { return std::sqrt(x*x+y*y); } };. Dans main.cpp : Vec2 pos(0,0); Vec2 vel(3,-1); pos = pos + vel; std::cout << pos.x << " " << pos.y;. Résultat : 3 -1. C'est exactement ce que AddMovementInput fait sous le capot — additionner un vecteur direction à une position.`,
+        en:`Create vec2.h. Define struct Vec2 { float x, y; Vec2(float x=0, float y=0): x(x), y(y){} Vec2 operator+(const Vec2& o) const { return {x+o.x, y+o.y}; } Vec2 operator*(float s) const { return {x*s, y*s}; } float length() const { return std::sqrt(x*x+y*y); } };. In main.cpp: Vec2 pos(0,0); Vec2 vel(3,-1); pos = pos + vel; std::cout << pos.x << " " << pos.y;. Result: 3 -1. This is exactly what AddMovementInput does under the hood — adding a direction vector to a position.`
       },
       {
-        label:{ fr:'Classe dérivée Player implémente move()', en:'Derived Player class implements move()' },
-        fr:`Dans player.h : class Player : public Movable { public: void move(float dx, float dy) override; void printPos() const; };. Dans player.cpp : void Player::move(float dx, float dy) { x += dx; y += dy; } void Player::printPos() const { cout << "(" << x << "," << y << ")"; }. Compile et teste : Player p; p.move(3,4); p.printPos();`,
-        en:`In player.h: class Player : public Movable { public: void move(float dx, float dy) override; void printPos() const; };. In player.cpp: void Player::move(float dx, float dy) { x += dx; y += dy; } void Player::printPos() const { cout << "(" << x << "," << y << ")"; }. Compile and test: Player p; p.move(3,4); p.printPos();`
+        label:{ fr:'Delta time — mouvement indépendant du framerate', en:'Delta time — frame-rate independent movement' },
+        fr:`Simule une boucle de jeu. float dt = 0.016f; // ~60fps. Vec2 pos(0,0); Vec2 vel(100, 0); // 100 unités/seconde. for(int i=0; i<5; i++) { pos = pos + vel * dt; std::cout << pos.x << "\n"; }. Résultat : 1.6, 3.2, 4.8, 6.4, 8.0. Change dt à 0.033f (30fps) — même distance couverte par frame : 3.3, 6.6... mais la distance par seconde reste 100. Sans dt : pos = pos + vel donne 500 en 5 frames peu importe le framerate — le jeu est deux fois plus rapide à 120fps.`,
+        en:`Simulate a game loop. float dt = 0.016f; // ~60fps. Vec2 pos(0,0); Vec2 vel(100, 0); // 100 units/second. for(int i=0; i<5; i++) { pos = pos + vel * dt; std::cout << pos.x << "\n"; }. Result: 1.6, 3.2, 4.8, 6.4, 8.0. Change dt to 0.033f (30fps) — same distance per second: 3.3, 6.6... but distance per second stays 100. Without dt: pos = pos + vel gives 500 in 5 frames regardless of framerate — the game runs twice as fast at 120fps.`
       },
       {
-        label:{ fr:'Polymorphisme avec Movable*', en:'Polymorphism with Movable*' },
-        fr:`Dans main.cpp : Movable* entity = new Player(); entity->move(5, -2); Montre que move() de Player est appelée via le pointeur Movable. Ajoute une deuxième classe Enemy : public Movable avec son propre move() qui applique une vélocité différente. Stocke les deux dans vector<Movable*> et appelle move() sur tous.`,
-        en:`In main.cpp: Movable* entity = new Player(); entity->move(5, -2); Show that Player's move() is called through the Movable pointer. Add a second Enemy : public Movable class with its own move() applying different velocity. Store both in a vector<Movable*> and call move() on all.`
+        label:{ fr:'Normalisation — direction sans magnitude', en:'Normalisation — direction without magnitude' },
+        fr:`Vec2 input(1, 1); // diagonale. float len = input.length(); // 1.414... if(len > 0) input = input * (1.0f / len); // normalize. std::cout << input.length(); // ~1.0. Sans normalisation, se déplacer en diagonale est 41% plus rapide qu'en ligne droite — bug classique. Teste avec (3, 4) → length 5 → normalisé (0.6, 0.8) → length 1. En Unreal, GetActorForwardVector() retourne déjà un vecteur normalisé — c'est pourquoi tu peux le passer directement à AddMovementInput.`,
+        en:`Vec2 input(1, 1); // diagonal. float len = input.length(); // 1.414... if(len > 0) input = input * (1.0f / len); // normalize. std::cout << input.length(); // ~1.0. Without normalisation, moving diagonally is 41% faster than in a straight line — classic bug. Test with (3, 4) → length 5 → normalised (0.6, 0.8) → length 1. In Unreal, GetActorForwardVector() already returns a normalised vector — that's why you can pass it directly to AddMovementInput.`
+      },
+      {
+        label:{ fr:'FMath::Clamp — borner la vitesse et la position', en:'FMath::Clamp — bounding speed and position' },
+        fr:`float speed = 250.0f; float maxSpeed = 200.0f; float clamped = std::max(-maxSpeed, std::min(maxSpeed, speed)); // 200.0. En Unreal : FMath::Clamp(speed, -MaxSpeed, MaxSpeed). Applique sur la position : float posX = -50.0f; posX = std::max(0.0f, std::min(800.0f, posX)); // 0 — resté dans les bords. C'est la base de tout système de contrainte de mouvement : zones interdites, vitesse plafonnée, inertie limitée.`,
+        en:`float speed = 250.0f; float maxSpeed = 200.0f; float clamped = std::max(-maxSpeed, std::min(maxSpeed, speed)); // 200.0. In Unreal: FMath::Clamp(speed, -MaxSpeed, MaxSpeed). Apply to position: float posX = -50.0f; posX = std::max(0.0f, std::min(800.0f, posX)); // 0 — stays within bounds. This is the basis of every movement constraint system: forbidden zones, capped speed, limited inertia.`
       },
     ],
     discussion:[
-      { fr:`Une méthode purement virtuelle (= 0) force toutes les classes dérivées à l'implémenter. Quelle est la différence avec une méthode virtuelle ordinaire qui a une implémentation par défaut ?`, en:`A purely virtual method (= 0) forces all derived classes to implement it. What's the difference from an ordinary virtual method that has a default implementation?` },
+      { fr:`Si tu multiples une direction par delta time mais que tu oublies de normaliser la direction d'abord, qu'est-ce qui se passe concrètement dans le jeu quand le joueur appuie simultanément sur deux touches ?`, en:`If you multiply a direction by delta time but forget to normalise the direction first, what concretely happens in the game when the player presses two keys simultaneously?` },
     ],
     compare:{
-      std:`<span class="cm">// C++ — interface via classe abstraite</span>
-<span class="kw2">class</span> <span class="ty">Movable</span> {
-<span class="kw2">public</span>:
-    <span class="kw2">virtual void</span> <span class="fn2">move</span>(<span class="kw2">float</span> dx, <span class="kw2">float</span> dy) = <span class="num">0</span>;
-    <span class="kw2">virtual</span> ~<span class="ty">Movable</span>() {}
-    <span class="kw2">float</span> x=<span class="num">0</span>, y=<span class="num">0</span>;
-};
-<span class="kw2">class</span> <span class="ty">Player</span> : <span class="kw2">public</span> <span class="ty">Movable</span> {
-<span class="kw2">public</span>:
-    <span class="kw2">void</span> <span class="fn2">move</span>(<span class="kw2">float</span> dx, <span class="kw2">float</span> dy) <span class="kw2">override</span> {
-        x += dx; y += dy;
-    }
-};`,
-      unreal:`<span class="cm">// Unreal — interface via UInterface + I*</span>
-<span class="mac">UINTERFACE</span>()
-<span class="kw2">class</span> <span class="ty">UMovable</span> : <span class="kw2">public</span> <span class="ty">UInterface</span>
-    { <span class="mac">GENERATED_BODY</span>() };
-
-<span class="kw2">class</span> <span class="ty">IMovable</span> {
-    <span class="mac">GENERATED_BODY</span>()
-<span class="kw2">public</span>:
-    <span class="kw2">virtual void</span> <span class="fn2">Move</span>(
-        <span class="ty">FVector</span> Dir) = <span class="num">0</span>;
-};`
+      std:`<span class="cm">// C++ — mouvement manuel avec dt</span>
+<span class="kw2">struct</span> <span class="ty">Vec2</span> { <span class="kw2">float</span> x, y; };
+<span class="ty">Vec2</span> pos{<span class="num">0</span>,<span class="num">0</span>}, vel{<span class="num">100</span>,<span class="num">0</span>};
+<span class="kw2">float</span> dt = <span class="num">0.016f</span>;
+pos.x += vel.x * dt;   <span class="cm">// 1.6 par frame</span>
+pos.y += vel.y * dt;
+<span class="cm">// normaliser la direction :</span>
+<span class="kw2">float</span> len = std::sqrt(
+    vel.x*vel.x + vel.y*vel.y);
+<span class="kw2">if</span>(len > <span class="num">0</span>) {
+    vel.x /= len; vel.y /= len;
+}`,
+      unreal:`<span class="cm">// Unreal — même logique, APIs intégrées</span>
+<span class="kw2">void</span> <span class="fn2">Move</span>(
+    <span class="kw2">const</span> <span class="ty">FInputActionValue</span>&amp; Val)
+{
+    <span class="ty">FVector2D</span> In =
+        Val.<span class="fn2">Get</span>&lt;<span class="ty">FVector2D</span>&gt;();
+    <span class="cm">// GetActorForwardVector() est déjà</span>
+    <span class="cm">// normalisé — pas besoin de diviser</span>
+    <span class="fn2">AddMovementInput</span>(
+        <span class="fn2">GetActorForwardVector</span>(), In.Y);
+    <span class="fn2">AddMovementInput</span>(
+        <span class="fn2">GetActorRightVector</span>(), In.X);
+    <span class="cm">// DeltaTime géré par CharacterMovement</span>
+}`
     },
     activities:[
       {
         id:'i11_1', type:'predict', xp:15,
-        code:`#include &lt;iostream&gt;
-class Shape {
-public:
-    virtual float area() const = 0;
-    virtual ~Shape() {}
+        code:`<span class="kw2">struct</span> <span class="ty">Vec2</span> {
+    <span class="kw2">float</span> x, y;
+    <span class="ty">Vec2</span> <span class="kw2">operator</span>*(<span class="kw2">float</span> s) <span class="kw2">const</span> { <span class="kw2">return</span> {x*s, y*s}; }
 };
-class Rect : public Shape {
-    float w, h;
-public:
-    Rect(float w, float h) : w(w), h(h) {}
-    float area() const override { return w * h; }
-};
-class Circle : public Shape {
-    float r;
-public:
-    Circle(float r) : r(r) {}
-    float area() const override { return 3.14f * r * r; }
-};
-int main() {
-    Shape* shapes[2] = { new Rect(4,3), new Circle(2) };
-    for(auto* s : shapes)
-        std::cout &lt;&lt; s-&gt;area() &lt;&lt; " ";
-    for(auto* s : shapes) delete s;
-}`,
-        question:{ fr:`Quelle est la sortie ? Pourquoi Shape* peut-il appeler la bonne méthode area() pour chaque type ?`, en:`What is the output? Why can Shape* call the correct area() method for each type?` },
-        output:`12 12.56 `,
-        explanation:{ fr:`12 (4×3) et 12.56 (3.14×4). area() est purement virtuelle — le dispatch dynamique appelle la version réelle de l'objet (Rect ou Circle), pas celle de Shape (qui n'en a pas). C'est le polymorphisme via pointeur de classe de base.`, en:`12 (4×3) and 12.56 (3.14×4). area() is purely virtual — dynamic dispatch calls the actual object's version (Rect or Circle), not Shape's (which has none). That's polymorphism via base class pointer.` }
+<span class="ty">Vec2</span> dir{<span class="num">1</span>, <span class="num">1</span>};
+<span class="kw2">float</span> speed = <span class="num">100.0f</span>, dt = <span class="num">0.016f</span>;
+<span class="ty">Vec2</span> vel = dir * speed * dt;
+std::cout &lt;&lt; vel.x &lt;&lt; <span class="str">" "</span> &lt;&lt; vel.y;`,
+        question:{ fr:`Quelle est la sortie ? Y a-t-il un problème avec ce code de mouvement ?`, en:`What is the output? Is there a problem with this movement code?` },
+        explanation:{ fr:`Sortie : 1.6 1.6. Oui — dir (1,1) n'est pas normalisé. Sa longueur est sqrt(2) ≈ 1.414, donc le personnage se déplace à 141 unités/s en diagonale au lieu de 100. Il faut normaliser dir avant de multiplier. Normalisé : (0.707, 0.707) → vel = (1.131, 1.131) → vitesse réelle = 100.`, en:`Output: 1.6 1.6. Yes — dir (1,1) is not normalised. Its length is sqrt(2) ≈ 1.414, so the character moves at 141 units/s diagonally instead of 100. dir must be normalised before multiplying. Normalised: (0.707, 0.707) → vel = (1.131, 1.131) → actual speed = 100.` }
       },
       {
         id:'i11_2', type:'cpp', xp:35,
-        instr:{ fr:`Crée une classe abstraite Animal avec virtual std::string sound() const = 0 et virtual void describe() const qui affiche "Animal: " + sound(). Crée Dog et Cat qui héritent d'Animal et implémentent sound(). Dans main(), appelle describe() sur chacun via Animal*.`, en:`Create an abstract class Animal with virtual std::string sound() const = 0 and virtual void describe() const that prints "Animal: " + sound(). Create Dog and Cat inheriting from Animal and implementing sound(). In main(), call describe() on each via Animal*.` },
-        stub:`#include &lt;iostream&gt;
-#include &lt;string&gt;
-class Animal {
-public:
-    virtual std::string sound() const = 0;
-    virtual void describe() const {
-        std::cout &lt;&lt; "Animal: " &lt;&lt; sound() &lt;&lt; std::endl;
-    }
-    virtual ~Animal() {}
-};
-// Dog et Cat ici
-
-int main() {
-    Animal* animals[] = { new Dog(), new Cat() };
-    for(auto* a : animals) { a-&gt;describe(); delete a; }
-    return 0;
+        instr:{ fr:`Complète cette fonction move() qui déplace une position par une vélocité × deltaTime, en clampant le résultat entre -500 et 500 sur chaque axe. Teste avec pos=(490,0), vel=(100,0), dt=0.016f.`, en:`Complete this move() function that moves a position by velocity × deltaTime, clamping the result between -500 and 500 on each axis. Test with pos=(490,0), vel=(100,0), dt=0.016f.` },
+        stub:`<span class="kw2">#include</span> <span class="str">&lt;algorithm&gt;</span>
+<span class="kw2">struct</span> <span class="ty">Vec2</span> { <span class="kw2">float</span> x, y; };
+<span class="ty">Vec2</span> <span class="fn2">move</span>(<span class="ty">Vec2</span> pos, <span class="ty">Vec2</span> vel, <span class="kw2">float</span> dt) {
+    <span class="cm">// 1. applique la vélocité × dt</span>
+    <span class="cm">// 2. clamp x et y entre -500 et 500</span>
+    <span class="cm">// 3. retourne la position mise à jour</span>
 }`,
-        hint:{ fr:`describe() dans la classe de base appelle sound() — qui sera résolue dynamiquement vers Dog::sound() ou Cat::sound() selon l'objet réel.`, en:`describe() in the base class calls sound() — which will be dynamically resolved to Dog::sound() or Cat::sound() based on the actual object.` },
-        solution:{
-          fr:`<pre style="font-family:var(--mono);font-size:1.3rem;line-height:1.8;color:#e0e8ef">class Dog : public Animal {
-public:
-    std::string sound() const override { return "Woof"; }
-};
-class Cat : public Animal {
-public:
-    std::string sound() const override { return "Meow"; }
-};</pre><p style="margin-top:.8rem;font-size:1.4rem;color:var(--ch2)">Sortie : <code>Animal: Woof</code> puis <code>Animal: Meow</code><br>Note : describe() appelle sound() via dispatch dynamique — la version concrète est choisie à l'exécution.</p>`,
-          en:`<pre style="font-family:var(--mono);font-size:1.3rem;line-height:1.8;color:#e0e8ef">class Dog : public Animal {
-public:
-    std::string sound() const override { return "Woof"; }
-};
-class Cat : public Animal {
-public:
-    std::string sound() const override { return "Meow"; }
-};</pre><p style="margin-top:.8rem;font-size:1.4rem;color:var(--ch2)">Output: <code>Animal: Woof</code> then <code>Animal: Meow</code><br>Note: describe() calls sound() via dynamic dispatch — the concrete version is chosen at runtime.</p>`
-        }
+        hint:{ fr:`std::max(-500.0f, std::min(500.0f, val)) pour clamper. Avec pos.x=490, vel.x=100, dt=0.016 → 490 + 1.6 = 491.6 → pas encore clampé. Essaie dt=0.5f pour voir le clamp.`, en:`std::max(-500.0f, std::min(500.0f, val)) to clamp. With pos.x=490, vel.x=100, dt=0.016 → 490 + 1.6 = 491.6 → not clamped yet. Try dt=0.5f to see the clamp.` }
       },
       {
         id:'i11_3', type:'bug', xp:20,
-        instr:{ fr:`Ce code compile mais ne peut jamais être exécuté tel quel. Pourquoi ?`, en:`This code compiles but can never be executed as-is. Why?` },
-        bugCode:`<span class="kw2">class</span> <span class="ty">Weapon</span> {
-<span class="kw2">public</span>:
-    <span class="kw2">virtual void</span> <span class="fn2">fire</span>() = <span class="num">0</span>;
-    <span class="kw2">virtual</span> ~<span class="ty">Weapon</span>() {}
+        instr:{ fr:`Ce code de mouvement produit un bug classique. Identifie-le.`, en:`This movement code produces a classic bug. Identify it.` },
+        bugCode:`<span class="kw2">struct</span> <span class="ty">Vec2</span> {
+    <span class="kw2">float</span> x, y;
+    <span class="kw2">float</span> <span class="fn2">length</span>() <span class="kw2">const</span> {
+        <span class="kw2">return</span> std::sqrt(x*x + y*y);
+    }
 };
-<span class="kw2">int</span> main() {
-    <span class="bug-line"><span class="ty">Weapon</span> w;</span>  <span class="cm">// tentative d'instanciation</span>
-    w.<span class="fn2">fire</span>();
-}`,
-        explanation:{ fr:`Weapon est une classe abstraite car fire() est purement virtuelle (= 0). Instancier directement une classe abstraite est une erreur de compilation. Pour utiliser Weapon, il faut créer une classe dérivée concrète (ex. Pistol : public Weapon) qui implémente fire(), puis instancier cette classe.`, en:`Weapon is an abstract class because fire() is purely virtual (= 0). Directly instantiating an abstract class is a compilation error. To use Weapon, you need to create a concrete derived class (e.g. Pistol : public Weapon) that implements fire(), then instantiate that class.` }
+<span class="ty">Vec2</span> input = getPlayerInput(); <span class="cm">// ex : {1,1}</span>
+<span class="kw2">float</span> speed = <span class="num">200.0f</span>;
+<span class="cm">// Applique la vitesse</span>
+<span class="ty">Vec2</span> vel = { <span class="bug-line">input.x * speed, input.y * speed</span> };`,
+        explanation:{ fr:`input n'est pas normalisé avant d'être multiplié par speed. Si le joueur appuie sur W et D simultanément, input = (1,1), length ≈ 1.414 → vitesse diagonale ≈ 283 au lieu de 200. Correction : normaliser input d'abord. float len = input.length(); if(len > 0.001f) { input.x /= len; input.y /= len; } puis multiplier par speed.`, en:`input is not normalised before multiplying by speed. If the player presses W and D simultaneously, input = (1,1), length ≈ 1.414 → diagonal speed ≈ 283 instead of 200. Fix: normalise input first. float len = input.length(); if(len > 0.001f) { input.x /= len; input.y /= len; } then multiply by speed.` }
       },
       {
         id:'i11_4', type:'fill', xp:15,
-        instr:{ fr:`Pour déclarer une méthode virtuelle pure qui oblige toutes les classes dérivées à l'implémenter :`, en:`To declare a purely virtual method that forces all derived classes to implement it:` },
-        template:{ fr:'virtual void attack() ______;', en:'virtual void attack() ______;' },
-        answer:'= 0',
-        hint:{ fr:`La syntaxe après la signature qui rend la méthode "purement virtuelle"`, en:`The syntax after the signature that makes the method "purely virtual"` }
+        instr:{ fr:`Complète la formule de mouvement indépendant du framerate :`, en:`Complete the frame-rate independent movement formula:` },
+        template:{ fr:'position = position + velocity * ______;', en:'position = position + velocity * ______;' },
+        answer:'deltaTime',
+        hint:{ fr:`La variable qui représente le temps écoulé depuis la dernière frame, en secondes.`, en:`The variable representing time elapsed since the last frame, in seconds.` }
       },
     ],
   },
-
   engine:{
     demoSteps:[
       {
