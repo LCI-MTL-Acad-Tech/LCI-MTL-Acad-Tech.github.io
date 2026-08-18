@@ -399,6 +399,8 @@
             data-view="calendar" onclick="setHubView('calendar')">📅 Calendrier cohorte</button>
           <button class="btn btn--ghost btn--sm hub-view-btn"
             data-view="monthgrid" onclick="setHubView('monthgrid')">📆 Vue mensuelle</button>
+          <button class="btn btn--ghost btn--sm hub-view-btn"
+            data-view="advice" onclick="setHubView('advice');renderAdviceView()">💬 Conseils aux futurs</button>
         </div>
 
         <!-- Student table view -->
@@ -423,6 +425,7 @@
         <div id="hub-comp-section" style="display:none"></div>
         <div id="hub-cal-section"       style="display:none"></div>
         <div id="hub-monthgrid-section" style="display:none"></div>
+        <div id="hub-advice-section"    style="display:none"></div>
 
       </div><!-- /hub-dashboard -->
 

@@ -1220,11 +1220,13 @@ function renderCurrentView() {
   const calWrap    = document.getElementById("hub-cal-section");
 
   const mgWrap    = document.getElementById("hub-monthgrid-section");
+  const advWrap   = document.getElementById("hub-advice-section");
   if (tableWrap)  tableWrap.style.display  = hubView === "students"   ? "" : "none";
   if (compWrap)   compWrap.style.display   = hubView === "competency" ? "" : "none";
   if (courseWrap) courseWrap.style.display = hubView === "course"     ? "" : "none";
   if (calWrap)    calWrap.style.display    = hubView === "calendar"   ? "" : "none";
   if (mgWrap)     mgWrap.style.display     = hubView === "monthgrid"  ? "" : "none";
+  if (advWrap)    advWrap.style.display    = hubView === "advice"     ? "" : "none";
 
   if (hubView === "students")   renderTable();
   if (hubView === "competency") renderCompetencyView();
@@ -2490,6 +2492,69 @@ function toggleDetail(i) {
   row.style.display = row.style.display === "none" ? "" : "none";
 }
 
+function renderAdviceView() {
+  const el = document.getElementById("hub-advice-section");
+  if (!el) return;
+  const isFr = getCurrentLang() === "fr-CA";
+
+  // Collect all programs for filter
+  const programs = [...new Set(students.map(s => s.program).filter(Boolean))].sort();
+  const activeFilter = el.dataset.programFilter || "";
+
+  // Students with advice text
+  const withAdvice = students.filter(s => {
+    const adv = s.raw.reflection?.advice_to_next_student;
+    if (!adv?.trim()) return false;
+    if (activeFilter && s.program !== activeFilter) return false;
+    return true;
+  });
+
+  // Build all text for copy-all
+  const allText = withAdvice.map(s =>
+    `[${s.name} — ${s.program}]\n${s.raw.reflection.advice_to_next_student.trim()}`
+  ).join("\n\n─────────────────────────────\n\n");
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:var(--sp-4);flex-wrap:wrap;margin-bottom:var(--sp-5)">
+      <h3 style="margin:0;font-size:1.8rem">
+        💬 ${isFr ? "Conseils aux futurs stagiaires" : "Advice to future interns"}
+        <span style="font-size:1.3rem;font-weight:400;color:var(--text-muted);margin-left:var(--sp-2)">
+          (${withAdvice.length} / ${students.length})
+        </span>
+      </h3>
+      <select onchange="document.getElementById('hub-advice-section').dataset.programFilter=this.value;renderAdviceView()"
+        style="font-size:1.3rem;padding:var(--sp-1) var(--sp-3);border-radius:var(--r-pill);
+               border:1px solid var(--border);background:var(--bg-card);color:var(--text);
+               font-family:inherit;cursor:pointer">
+        <option value="">${isFr ? "Tous les programmes" : "All programs"}</option>
+        ${programs.map(p => `<option value="${escHtml(p)}" ${p === activeFilter ? "selected" : ""}>${escHtml(p)}</option>`).join("")}
+      </select>
+      ${withAdvice.length > 0 ? `
+        <button onclick="(function(btn){navigator.clipboard?.writeText(${JSON.stringify(allText)}).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='${isFr ? "📄 Tout copier" : "📄 Copy all"}',1500);})})(this)"
+          class="btn btn--ghost btn--sm">
+          📄 ${isFr ? "Tout copier" : "Copy all"}
+        </button>` : ""}
+    </div>
+    ${withAdvice.length === 0
+      ? `<p style="color:var(--text-muted);font-size:1.4rem">${isFr ? "Aucune réflexion finale soumise pour l'instant." : "No final reflections submitted yet."}</p>`
+      : withAdvice.map(s => `
+        <div style="margin-bottom:var(--sp-6);padding:var(--sp-4) var(--sp-5);
+                    background:var(--bg-card);border-radius:var(--r-lg);
+                    border:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-3);flex-wrap:wrap">
+            <strong style="font-size:1.4rem">${escHtml(s.name)}</strong>
+            <span style="font-size:1.2rem;color:var(--text-muted);background:var(--bg-subtle);
+                         padding:2px 8px;border-radius:var(--r-pill)">${escHtml(s.program)}</span>
+            <button onclick="(function(btn){navigator.clipboard?.writeText(${JSON.stringify(s.raw.reflection.advice_to_next_student.trim())}).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='📄',1500);})})(this)"
+              style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:var(--r-pill);
+                     cursor:pointer;font-size:1.1rem;padding:2px 8px;color:var(--text-muted);font-family:inherit"
+              title="${isFr ? "Copier" : "Copy"}">📄</button>
+          </div>
+          <div style="font-size:1.4rem;line-height:1.7;white-space:pre-wrap">${escHtml(s.raw.reflection.advice_to_next_student.trim())}</div>
+        </div>`
+      ).join("")}`;
+}
+
 function buildTextDump(s) {
   const isFr = getCurrentLang() === "fr-CA";
   const lines = [];
@@ -2685,7 +2750,7 @@ function buildDetailHTML(s) {
           >${lang === "fr-CA" ? "📋 Tout voir" : "📋 View all"}</button>
         <button class="btn btn--ghost btn--sm no-print" style="align-self:center;font-size:1.2rem;color:var(--text-muted)"
           title="${lang === "fr-CA" ? "Copier toutes les réponses écrites pour analyse" : "Copy all written answers for analysis"}"
-          onclick="(function(btn){const txt=buildTextDump(filtered.find(s=>s.uuid==='${escHtml(s.uuid)}'));navigator.clipboard?.writeText(txt).then(()=>{btn.textContent='✓ Copié';setTimeout(()=>btn.textContent='${lang === "fr-CA" ? "📄 Copier texte" : "📄 Copy text"}',1500);})})(this)"
+          onclick="(function(btn){const uuid=resolveUUID('${escHtml(s.uuid)}');const st=students.find(x=>x.uuid===uuid)||students.find(x=>x.uuid==='${escHtml(s.uuid)}');if(!st){btn.textContent='✗ not found';return;}const txt=buildTextDump(st);if(!txt||txt.trim().length<50){btn.textContent='✗ vide';return;}navigator.clipboard?.writeText(txt).then(()=>{btn.textContent='✓ Copié';setTimeout(()=>btn.textContent='${lang === "fr-CA" ? "📄 Copier texte" : "📄 Copy text"}',1500);})})(this)"
           >${lang === "fr-CA" ? "📄 Copier texte" : "📄 Copy text"}</button>
         ${manualBtn}
       </div>
@@ -2978,20 +3043,29 @@ function openFileListModal(uuid, filter = "all") {
   // Reflection-only view
   if (filter === "reflection") {
     const refl = s.raw.reflection;
-    document.getElementById("hub-file-modal-title").textContent =
-      `${s.name} — ${isFr ? "Rapport final" : "Final report"}`;
+    document.getElementById("hub-file-modal-title").innerHTML =
+      `${escHtml(s.name)} — ${isFr ? "Réflexion finale" : "Final reflection"}
+       ${refl && Object.keys(refl).length ? `
+         <button onclick="(function(btn){
+           const txt = document.getElementById('hub-refl-text-dump').innerText;
+           navigator.clipboard?.writeText(txt).then(()=>{
+             btn.textContent='✓'; setTimeout(()=>btn.textContent='📄',1500);
+           });
+         })(this)" style="margin-left:var(--sp-3);background:none;border:1px solid var(--border);
+           border-radius:var(--r-pill);cursor:pointer;font-size:1.2rem;padding:2px 10px;
+           color:var(--text-muted);font-family:inherit" title="${isFr ? "Copier pour analyse" : "Copy for analysis"}">📄</button>` : ""}`;
     document.getElementById("hub-file-modal-body").innerHTML = refl && Object.keys(refl).length
-      ? `<div style="font-size:1.4rem;line-height:1.7">
+      ? `<div id="hub-refl-text-dump" style="font-size:1.4rem;line-height:1.7">
           ${Object.entries(refl).map(([k, v]) =>
-            `<div style="margin-bottom:var(--sp-4)">
+            v && String(v).trim() ? `<div style="margin-bottom:var(--sp-4)">
               <div style="font-weight:700;color:var(--text-subtle);font-size:1.2rem;
-                          text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--sp-1)">${escHtml(k)}</div>
-              <div>${escHtml(String(v || "—"))}</div>
-            </div>`
+                          text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--sp-1)">${escHtml(k.replace(/_/g," "))}</div>
+              <div>${escHtml(String(v))}</div>
+            </div>` : ""
           ).join("")}
          </div>`
       : `<p style="color:var(--danger);font-size:1.4rem">
-           ${isFr ? "Aucun rapport final soumis." : "No final report submitted."}
+           ${isFr ? "Aucune réflexion finale soumise." : "No final reflection submitted."}
          </p>`;
     document.getElementById("hub-file-modal").classList.remove("hidden");
     return;
