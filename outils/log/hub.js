@@ -2497,29 +2497,49 @@ function renderAdviceView() {
   if (!el) return;
   const isFr = getCurrentLang() === "fr-CA";
 
-  // Collect all programs for filter
   const programs = [...new Set(students.map(s => s.program).filter(Boolean))].sort();
   const activeFilter = el.dataset.programFilter || "";
 
-  // Students with advice text
-  const withAdvice = students.filter(s => {
-    const adv = s.raw.reflection?.advice_to_next_student;
-    if (!adv?.trim()) return false;
+  const FIELDS = [
+    { key: "advice_to_next_student",
+      label: isFr ? "Conseils au prochain étudiant" : "Advice to next student" },
+    { key: "would_do_differently",
+      label: isFr ? "Ferait différemment" : "Would do differently" },
+    { key: "suggestions_for_school",
+      label: isFr ? "Recommandations à l'école" : "Recommendations to school" },
+  ];
+
+  const rows = students.filter(s => {
     if (activeFilter && s.program !== activeFilter) return false;
-    return true;
+    return FIELDS.some(f => s.raw.reflection?.[f.key]?.trim());
   });
 
-  // Build all text for copy-all
-  const allText = withAdvice.map(s =>
-    `[${s.name} — ${s.program}]\n${s.raw.reflection.advice_to_next_student.trim()}`
-  ).join("\n\n─────────────────────────────\n\n");
+  // Build copy-all text per column
+  function colText(fieldKey) {
+    return rows
+      .filter(s => s.raw.reflection?.[fieldKey]?.trim())
+      .map(s => `[${s.name} — ${s.program}]\n${s.raw.reflection[fieldKey].trim()}`)
+      .join("\n\n─────────────────────────────\n\n");
+  }
+
+  function copyBtn(text, label) {
+    const safe = JSON.stringify(text);
+    return `<button onclick="(function(btn){navigator.clipboard?.writeText(${safe}).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='📄 ${label}',1500);})})(this)"
+      class="btn btn--ghost btn--sm" style="font-size:1.1rem;white-space:nowrap">📄 ${label}</button>`;
+  }
+
+  const copyLabel = isFr ? "Copier colonne" : "Copy column";
+  const copyAllLabel = isFr ? "Tout copier" : "Copy all";
+  const allText = FIELDS.map(f =>
+    `=== ${f.label.toUpperCase()} ===\n\n${colText(f.key)}`
+  ).join("\n\n\n");
 
   el.innerHTML = `
     <div style="display:flex;align-items:center;gap:var(--sp-4);flex-wrap:wrap;margin-bottom:var(--sp-5)">
       <h3 style="margin:0;font-size:1.8rem">
-        💬 ${isFr ? "Conseils aux futurs stagiaires" : "Advice to future interns"}
+        💬 ${isFr ? "Réflexions collectives" : "Collective reflections"}
         <span style="font-size:1.3rem;font-weight:400;color:var(--text-muted);margin-left:var(--sp-2)">
-          (${withAdvice.length} / ${students.length})
+          (${rows.length} / ${students.length})
         </span>
       </h3>
       <select onchange="document.getElementById('hub-advice-section').dataset.programFilter=this.value;renderAdviceView()"
@@ -2529,30 +2549,50 @@ function renderAdviceView() {
         <option value="">${isFr ? "Tous les programmes" : "All programs"}</option>
         ${programs.map(p => `<option value="${escHtml(p)}" ${p === activeFilter ? "selected" : ""}>${escHtml(p)}</option>`).join("")}
       </select>
-      ${withAdvice.length > 0 ? `
-        <button onclick="(function(btn){navigator.clipboard?.writeText(${JSON.stringify(allText)}).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='${isFr ? "📄 Tout copier" : "📄 Copy all"}',1500);})})(this)"
-          class="btn btn--ghost btn--sm">
-          📄 ${isFr ? "Tout copier" : "Copy all"}
-        </button>` : ""}
+      ${copyBtn(allText, copyAllLabel)}
     </div>
-    ${withAdvice.length === 0
+
+    ${rows.length === 0
       ? `<p style="color:var(--text-muted);font-size:1.4rem">${isFr ? "Aucune réflexion finale soumise pour l'instant." : "No final reflections submitted yet."}</p>`
-      : withAdvice.map(s => `
-        <div style="margin-bottom:var(--sp-6);padding:var(--sp-4) var(--sp-5);
-                    background:var(--bg-card);border-radius:var(--r-lg);
-                    border:1px solid var(--border)">
-          <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-3);flex-wrap:wrap">
-            <strong style="font-size:1.4rem">${escHtml(s.name)}</strong>
-            <span style="font-size:1.2rem;color:var(--text-muted);background:var(--bg-subtle);
-                         padding:2px 8px;border-radius:var(--r-pill)">${escHtml(s.program)}</span>
-            <button onclick="(function(btn){navigator.clipboard?.writeText(${JSON.stringify(s.raw.reflection.advice_to_next_student.trim())}).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='📄',1500);})})(this)"
-              style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:var(--r-pill);
-                     cursor:pointer;font-size:1.1rem;padding:2px 8px;color:var(--text-muted);font-family:inherit"
-              title="${isFr ? "Copier" : "Copy"}">📄</button>
-          </div>
-          <div style="font-size:1.4rem;line-height:1.7;white-space:pre-wrap">${escHtml(s.raw.reflection.advice_to_next_student.trim())}</div>
-        </div>`
-      ).join("")}`;
+      : `<div style="overflow-x:auto">
+           <table style="width:100%;border-collapse:collapse;font-size:1.3rem;table-layout:fixed">
+             <colgroup>
+               <col style="width:14rem">
+               ${FIELDS.map(() => `<col>`).join("")}
+             </colgroup>
+             <thead>
+               <tr style="background:var(--bg-subtle)">
+                 <th style="padding:var(--sp-2) var(--sp-3);text-align:left;font-weight:700;
+                             border-bottom:2px solid var(--border);white-space:nowrap">
+                   ${isFr ? "Étudiant·e" : "Student"}
+                 </th>
+                 ${FIELDS.map(f => `
+                   <th style="padding:var(--sp-2) var(--sp-3);text-align:left;font-weight:700;
+                               border-bottom:2px solid var(--border);vertical-align:bottom">
+                     <div>${escHtml(f.label)}</div>
+                     <div style="margin-top:var(--sp-1)">${copyBtn(colText(f.key), copyLabel)}</div>
+                   </th>`).join("")}
+               </tr>
+             </thead>
+             <tbody>
+               ${rows.map((s, i) => `
+                 <tr style="border-bottom:1px solid var(--border);
+                            background:${i % 2 === 0 ? "transparent" : "var(--bg-subtle)"}">
+                   <td style="padding:var(--sp-3);vertical-align:top">
+                     <div style="font-weight:600">${escHtml(s.name)}</div>
+                     <div style="font-size:1.1rem;color:var(--text-muted)">${escHtml(s.program)}</div>
+                   </td>
+                   ${FIELDS.map(f => {
+                     const val = s.raw.reflection?.[f.key]?.trim() || "";
+                     return `<td style="padding:var(--sp-3);vertical-align:top;line-height:1.6;
+                               color:${val ? "var(--text)" : "var(--text-subtle)"}">
+                       ${val ? escHtml(val) : "—"}
+                     </td>`;
+                   }).join("")}
+                 </tr>`).join("")}
+             </tbody>
+           </table>
+         </div>`}`;
 }
 
 function buildTextDump(s) {
