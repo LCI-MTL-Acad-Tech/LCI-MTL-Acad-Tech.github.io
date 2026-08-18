@@ -2596,6 +2596,7 @@ function renderAdviceView() {
 }
 
 function buildTextDump(s) {
+  if (!s) return "";
   const isFr = getCurrentLang() === "fr-CA";
   const lines = [];
   const hr = "─".repeat(60);
@@ -2653,19 +2654,27 @@ function buildTextDump(s) {
   if (r && Object.keys(r).length) {
     lines.push(`\n${"═".repeat(40)}`);
     lines.push(isFr ? "🎓 RÉFLEXION FINALE" : "🎓 FINAL REFLECTION");
-    add(isFr ? "Réalité vs attentes"        : "Reality vs expectations",      r.internship_reality_vs_expectation);
-    add(isFr ? "Travail significatif"        : "Significant work",             Array.isArray(r.significant_work) ? r.significant_work.join("\n") : r.significant_work);
-    add(isFr ? "Moment de fierté"            : "Proud moment",                 r.proud_moment);
-    add(isFr ? "Échec"                       : "Failure",                      r.failure_moment);
-    add(isFr ? "Leçon de l'échec"            : "Failure lesson",               r.failure_lesson);
-    add(isFr ? "Environnement professionnel" : "Professional environment",     r.professional_environment_lesson);
-    add(isFr ? "Relation superviseur"        : "Supervisor relationship",      r.supervisor_relationship);
-    add(isFr ? "Conseil au prochain étudiant": "Advice to next student",       r.advice_to_next_student);
-    add(isFr ? "Ferais différemment"         : "Would do differently",         r.would_do_differently);
-    add(isFr ? "Direction future"            : "Future direction",             r.future_plans?.career_direction_impact);
-    add(isFr ? "Prochaines étapes"           : "Next steps",                   r.future_plans?.next_steps);
-    add(isFr ? "Commentaires"               : "Additional comments",           r.additional_comments);
-    add(isFr ? "Suggestions à l'école"       : "Suggestions for school",       r.suggestions_for_school);
+
+    function reflVal(v) {
+      if (!v) return null;
+      if (typeof v === "string") return v.trim() || null;
+      if (Array.isArray(v)) {
+        return v.map(item =>
+          typeof item === "object" && item !== null
+            ? Object.entries(item).filter(([,iv]) => iv).map(([ik,iv]) => `${ik.replace(/_/g," ")}: ${iv}`).join(" | ")
+            : String(item)
+        ).filter(Boolean).join("\n");
+      }
+      if (typeof v === "object") {
+        return Object.entries(v).filter(([,iv]) => iv).map(([ik,iv]) => `${ik.replace(/_/g," ")}: ${iv}`).join("\n") || null;
+      }
+      return String(v).trim() || null;
+    }
+
+    Object.entries(r).forEach(([k, v]) => {
+      const text = reflVal(v);
+      if (text) add(k.replace(/_/g, " "), text);
+    });
   }
 
   lines.push(`\n${hr}`);
@@ -3096,13 +3105,36 @@ function openFileListModal(uuid, filter = "all") {
            color:var(--text-muted);font-family:inherit" title="${isFr ? "Copier pour analyse" : "Copy for analysis"}">📄</button>` : ""}`;
     document.getElementById("hub-file-modal-body").innerHTML = refl && Object.keys(refl).length
       ? `<div id="hub-refl-text-dump" style="font-size:1.4rem;line-height:1.7">
-          ${Object.entries(refl).map(([k, v]) =>
-            v && String(v).trim() ? `<div style="margin-bottom:var(--sp-4)">
+          ${Object.entries(refl).map(([k, v]) => {
+            if (!v || (Array.isArray(v) && v.length === 0)) return "";
+            // Render value as readable text
+            let display;
+            if (typeof v === "string" && v.trim()) {
+              display = escHtml(v.trim());
+            } else if (Array.isArray(v)) {
+              display = v.map(item =>
+                typeof item === "object" && item !== null
+                  ? Object.entries(item).map(([ik, iv]) =>
+                      iv ? `<div><strong>${escHtml(ik.replace(/_/g," "))}:</strong> ${escHtml(String(iv))}</div>` : ""
+                    ).join("")
+                  : escHtml(String(item))
+              ).join("<hr style='border:none;border-top:1px solid var(--border);margin:var(--sp-2) 0'>");
+            } else if (typeof v === "object" && v !== null) {
+              display = Object.entries(v).map(([ik, iv]) =>
+                iv ? `<div><strong>${escHtml(ik.replace(/_/g," "))}:</strong> ${escHtml(String(iv))}</div>` : ""
+              ).join("");
+            } else {
+              return "";
+            }
+            if (!display?.trim()) return "";
+            return `<div style="margin-bottom:var(--sp-4)">
               <div style="font-weight:700;color:var(--text-subtle);font-size:1.2rem;
-                          text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--sp-1)">${escHtml(k.replace(/_/g," "))}</div>
-              <div>${escHtml(String(v))}</div>
-            </div>` : ""
-          ).join("")}
+                          text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--sp-1)">
+                ${escHtml(k.replace(/_/g," "))}
+              </div>
+              <div style="white-space:pre-wrap">${display}</div>
+            </div>`;
+          }).join("")}
          </div>`
       : `<p style="color:var(--danger);font-size:1.4rem">
            ${isFr ? "Aucune réflexion finale soumise." : "No final reflection submitted."}
