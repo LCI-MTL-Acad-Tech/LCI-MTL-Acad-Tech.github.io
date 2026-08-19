@@ -2655,24 +2655,56 @@ function buildTextDump(s) {
     lines.push(`\n${"═".repeat(40)}`);
     lines.push(isFr ? "🎓 RÉFLEXION FINALE" : "🎓 FINAL REFLECTION");
 
-    function reflVal(v) {
+    function reflVal(v, key, raw) {
       if (!v) return null;
+
+      // tools_reflection: look up tool name from raw.tools
+      if (key === "tools_reflection" && Array.isArray(v)) {
+        return v.map(item => {
+          if (typeof item !== "object") return String(item);
+          const tool = raw?.tools?.find(t => t.id === item.tool_id || t.tool_id === item.tool_id);
+          const name = tool?.name || tool?.label || item.tool_id || "Tool";
+          const parts = [`🔧 ${name}`];
+          if (item.proficiency_start || item.proficiency_end)
+            parts.push(`${item.proficiency_start || "?"} → ${item.proficiency_end || "?"}`);
+          if (item.notes?.trim()) parts.push(item.notes.trim());
+          return parts.join("\n");
+        }).filter(Boolean).join("\n\n") || null;
+      }
+
+      // competency object with nested arrays
+      if (key === "competencies" && typeof v === "object" && !Array.isArray(v)) {
+        const parts = [];
+        if (Array.isArray(v.helpful) && v.helpful.length)
+          parts.push(`Helpful: ${v.helpful.map(c => typeof c === "object" ? (c.label || c.code || JSON.stringify(c)) : c).join(", ")}`);
+        if (Array.isArray(v.gaps) && v.gaps.length)
+          parts.push(`Gaps: ${v.gaps.map(c => typeof c === "object" ? (c.label || c.code || JSON.stringify(c)) : c).join(", ")}`);
+        if (v.improvements?.trim()) parts.push(`Improvements: ${v.improvements.trim()}`);
+        return parts.join("\n") || null;
+      }
+
       if (typeof v === "string") return v.trim() || null;
       if (Array.isArray(v)) {
         return v.map(item =>
           typeof item === "object" && item !== null
-            ? Object.entries(item).filter(([,iv]) => iv).map(([ik,iv]) => `${ik.replace(/_/g," ")}: ${iv}`).join(" | ")
+            ? Object.entries(item).filter(([,iv]) => iv && String(iv).trim())
+                .map(([ik,iv]) => `${ik.replace(/_/g," ")}: ${iv}`).join("\n")
             : String(item)
-        ).filter(Boolean).join("\n");
+        ).filter(Boolean).join("\n\n") || null;
       }
       if (typeof v === "object") {
-        return Object.entries(v).filter(([,iv]) => iv).map(([ik,iv]) => `${ik.replace(/_/g," ")}: ${iv}`).join("\n") || null;
+        return Object.entries(v).filter(([,iv]) => iv && String(iv).trim())
+          .map(([ik,iv]) => `${ik.replace(/_/g," ")}: ${iv}`).join("\n") || null;
       }
       return String(v).trim() || null;
     }
 
+    // Fields to skip — internal metadata, not student-written content
+    const SKIP_FIELDS = new Set(["actual_end_date","total_weeks","schema_version","exported_at","saved_at"]);
+
     Object.entries(r).forEach(([k, v]) => {
-      const text = reflVal(v);
+      if (SKIP_FIELDS.has(k)) return;
+      const text = reflVal(v, k, s.raw);
       if (text) add(k.replace(/_/g, " "), text);
     });
   }
@@ -3106,26 +3138,42 @@ function openFileListModal(uuid, filter = "all") {
     document.getElementById("hub-file-modal-body").innerHTML = refl && Object.keys(refl).length
       ? `<div id="hub-refl-text-dump" style="font-size:1.4rem;line-height:1.7">
           ${Object.entries(refl).map(([k, v]) => {
-            if (!v || (Array.isArray(v) && v.length === 0)) return "";
-            // Render value as readable text
+            const SKIP = new Set(["actual_end_date","total_weeks","schema_version","exported_at","saved_at"]);
+            if (SKIP.has(k)) return "";
             let display;
-            if (typeof v === "string" && v.trim()) {
+            if (!v || (Array.isArray(v) && v.length === 0)) return "";
+            if (k === "tools_reflection" && Array.isArray(v)) {
+              display = v.map(item => {
+                if (typeof item !== "object") return escHtml(String(item));
+                const tool = s.raw?.tools?.find(t => t.id === item.tool_id);
+                const name = tool?.name || tool?.label || item.tool_id || "Tool";
+                const parts = [`<strong>${escHtml(name)}</strong>`];
+                if (item.proficiency_start || item.proficiency_end)
+                  parts.push(`${escHtml(item.proficiency_start||"?")} → ${escHtml(item.proficiency_end||"?")}`);
+                if (item.notes?.trim()) parts.push(escHtml(item.notes.trim()));
+                return parts.join("<br>");
+              }).join("<hr style='border:none;border-top:1px solid var(--border);margin:var(--sp-2) 0'>");
+            } else if (k === "competencies" && typeof v === "object" && !Array.isArray(v)) {
+              const parts = [];
+              if (Array.isArray(v.helpful) && v.helpful.length)
+                parts.push(`<strong>Helpful:</strong> ${v.helpful.map(c=>escHtml(typeof c==="object"?(c.label||c.code||""):String(c))).join(", ")}`);
+              if (Array.isArray(v.gaps) && v.gaps.length)
+                parts.push(`<strong>Gaps:</strong> ${v.gaps.map(c=>escHtml(typeof c==="object"?(c.label||c.code||""):String(c))).join(", ")}`);
+              if (v.improvements?.trim()) parts.push(`<strong>Improvements:</strong> ${escHtml(v.improvements.trim())}`);
+              display = parts.join("<br>") || null;
+            } else if (typeof v === "string" && v.trim()) {
               display = escHtml(v.trim());
             } else if (Array.isArray(v)) {
               display = v.map(item =>
                 typeof item === "object" && item !== null
-                  ? Object.entries(item).map(([ik, iv]) =>
-                      iv ? `<div><strong>${escHtml(ik.replace(/_/g," "))}:</strong> ${escHtml(String(iv))}</div>` : ""
-                    ).join("")
+                  ? Object.entries(item).filter(([,iv]) => iv && String(iv).trim())
+                      .map(([ik,iv]) => `<div><strong>${escHtml(ik.replace(/_/g," "))}:</strong> ${escHtml(String(iv))}</div>`).join("")
                   : escHtml(String(item))
               ).join("<hr style='border:none;border-top:1px solid var(--border);margin:var(--sp-2) 0'>");
-            } else if (typeof v === "object" && v !== null) {
-              display = Object.entries(v).map(([ik, iv]) =>
-                iv ? `<div><strong>${escHtml(ik.replace(/_/g," "))}:</strong> ${escHtml(String(iv))}</div>` : ""
-              ).join("");
-            } else {
-              return "";
-            }
+            } else if (typeof v === "object") {
+              display = Object.entries(v).filter(([,iv]) => iv && String(iv).trim())
+                .map(([ik,iv]) => `<div><strong>${escHtml(ik.replace(/_/g," "))}:</strong> ${escHtml(String(iv))}</div>`).join("");
+            } else { return ""; }
             if (!display?.trim()) return "";
             return `<div style="margin-bottom:var(--sp-4)">
               <div style="font-weight:700;color:var(--text-subtle);font-size:1.2rem;

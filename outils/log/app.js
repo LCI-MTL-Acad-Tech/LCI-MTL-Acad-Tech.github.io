@@ -825,11 +825,22 @@ function mergeInternshipFiles(files) {
   mainFiles.sort((a, b) => new Date(b.meta.last_modified) - new Date(a.meta.last_modified));
   const base = JSON.parse(JSON.stringify(mainFiles[0]));
 
-  // Absorb most recent reflection file (if any) — skip asking again
-  if (reflectionFiles.length) {
-    reflectionFiles.sort((a, b) => new Date(b.meta.saved_at) - new Date(a.meta.saved_at));
-    base.reflection = reflectionFiles[0].reflection;
-    result.warnings.push({ type: "reflection_preloaded", date: reflectionFiles[0].meta.saved_at });
+  // Absorb reflection — prefer dedicated reflection files, then fall back to
+  // any main/weekly file that contains reflection data (full journal with reflection filled in).
+  // Keep the most recently saved one across all sources.
+  const allReflSources = [
+    ...reflectionFiles.map(f => ({ refl: f.reflection, date: f.meta?.saved_at || f.meta?.last_modified || "" })),
+    ...[...mainFiles, ...weeklyFiles]
+      .filter(f => f.reflection && Object.keys(f.reflection).length > 0)
+      .map(f => ({ refl: f.reflection, date: f.meta?.last_modified || f.meta?.saved_at || "" })),
+  ].filter(x => x.refl && Object.keys(x.refl).length > 0);
+
+  if (allReflSources.length) {
+    allReflSources.sort((a, b) => b.date.localeCompare(a.date));
+    base.reflection = allReflSources[0].refl;
+    if (reflectionFiles.length) {
+      result.warnings.push({ type: "reflection_preloaded", date: allReflSources[0].date });
+    }
   }
 
   // Merge logs from all files — main journals, weekly/full exports, and reflections
