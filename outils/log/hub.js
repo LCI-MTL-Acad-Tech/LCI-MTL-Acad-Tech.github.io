@@ -2595,6 +2595,30 @@ function renderAdviceView() {
          </div>`}`;
 }
 
+function copyStudentTextDump(uuid, btn) {
+  const isFr = getCurrentLang() === "fr-CA";
+  const resolved = resolveUUID(uuid);
+  const s = students.find(x => x.uuid === resolved) || students.find(x => x.uuid === uuid);
+  if (!s) { btn.textContent = "✗"; return; }
+  const txt = buildTextDump(s);
+  if (!txt || txt.trim().length < 50) { btn.textContent = isFr ? "✗ vide" : "✗ empty"; return; }
+  navigator.clipboard?.writeText(txt).then(() => {
+    btn.textContent = "✓ Copié";
+    setTimeout(() => btn.textContent = isFr ? "📄 Copier texte" : "📄 Copy text", 1500);
+  }).catch(() => {
+    // Fallback for browsers that block clipboard API
+    const ta = document.createElement("textarea");
+    ta.value = txt;
+    ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    btn.textContent = "✓";
+    setTimeout(() => btn.textContent = isFr ? "📄 Copier texte" : "📄 Copy text", 1500);
+  });
+}
+
 function buildTextDump(s) {
   if (!s) return "";
   const isFr = getCurrentLang() === "fr-CA";
@@ -2831,7 +2855,7 @@ function buildDetailHTML(s) {
           >${lang === "fr-CA" ? "📋 Tout voir" : "📋 View all"}</button>
         <button class="btn btn--ghost btn--sm no-print" style="align-self:center;font-size:1.2rem;color:var(--text-muted)"
           title="${lang === "fr-CA" ? "Copier toutes les réponses écrites pour analyse" : "Copy all written answers for analysis"}"
-          onclick="(function(btn){const uuid=resolveUUID('${escHtml(s.uuid)}');const st=students.find(x=>x.uuid===uuid)||students.find(x=>x.uuid==='${escHtml(s.uuid)}');if(!st){btn.textContent='✗ not found';return;}const txt=buildTextDump(st);if(!txt||txt.trim().length<50){btn.textContent='✗ vide';return;}navigator.clipboard?.writeText(txt).then(()=>{btn.textContent='✓ Copié';setTimeout(()=>btn.textContent='${lang === "fr-CA" ? "📄 Copier texte" : "📄 Copy text"}',1500);})})(this)"
+          onclick="copyStudentTextDump('${escHtml(s.uuid)}', this)"
           >${lang === "fr-CA" ? "📄 Copier texte" : "📄 Copy text"}</button>
         ${manualBtn}
       </div>
