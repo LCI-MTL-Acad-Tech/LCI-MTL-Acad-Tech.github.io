@@ -695,7 +695,7 @@ const LANG = {
     "final.option_direct_hint": "You\'ve already submitted everything to OneDrive and just need to fill the questionnaire. Your answers are saved automatically — you can export at the end.",
     "final.start_directly":     "✏ Start questionnaire",
     "final.submit_reminder_title": "⬇ Last step: download and upload to OneDrive",
-    "final.submit_reminder_body":  "Download either file below and upload it to the same OneDrive folder as your daily logs. This is the file your teacher will use to evaluate your reflection.",
+    "final.submit_reminder_body":  "Download either file below and upload it to the same OneDrive folder as your daily logs. ⚠ Filling in the form is not enough — the downloaded file is what your teacher uses to evaluate your reflection.",
     "nav.title.hub":      "Hub — Dashboard",
     "nav.title.teacher":  "Teacher dashboard",
     "nav.title.intro":    "Introduction",
