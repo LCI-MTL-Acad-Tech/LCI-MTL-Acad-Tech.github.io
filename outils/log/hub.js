@@ -2656,15 +2656,16 @@ function buildTextDump(s) {
   if (!s) return "";
   const isFr = getCurrentLang() === "fr-CA";
   const lines = [];
-  const hr = "─".repeat(60);
+  const hr  = "=".repeat(60);
+  const hr2 = "-".repeat(40);
   const add = (label, text) => {
     if (!text?.trim()) return;
     lines.push(`\n[${label}]\n${text.trim()}`);
   };
 
-  lines.push(`${hr}`);
-  lines.push(`${s.name} — ${s.student_id} — ${s.program}`);
-  lines.push(`${s.actual_hours}h logged · ${s.days_logged} days`);
+  lines.push(hr);
+  lines.push(`${s.name} -- ${s.student_id} -- ${s.program}`);
+  lines.push(`${s.actual_hours}h logged / ${s.days_logged} days`);
   lines.push(hr);
 
   // ── Daily logs ─────────────────────────────────────────
@@ -2672,8 +2673,8 @@ function buildTextDump(s) {
     .sort((a, b) => a.date.localeCompare(b.date));
 
   dailyLogs.forEach(log => {
-    lines.push(`\n${"═".repeat(40)}`);
-    lines.push(`📅 ${log.date}`);
+    lines.push(`\n${hr2}`);
+    lines.push(`[${log.date}]`);
 
     // Task descriptions
     (log.tasks || []).forEach(t => {
@@ -2692,7 +2693,7 @@ function buildTextDump(s) {
     // Weekly wrap (if this log carries one)
     const w = log.weekly_wrap;
     if (w && Object.keys(w).length) {
-      lines.push(`\n  [${isFr ? "BILAN HEBDOMADAIRE" : "WEEKLY WRAP"}]`);
+      lines.push(`\n  --- ${isFr ? "BILAN HEBDOMADAIRE" : "WEEKLY WRAP"} ---`);
       add(isFr ? "  Point fort"            : "  Highlight",     w.highlight);
       add(isFr ? "  Apprentissage"         : "  Learning",      w.learning);
       add(isFr ? "  À faire différemment"  : "  Do differently",w.change);
@@ -2710,7 +2711,7 @@ function buildTextDump(s) {
   const r = s.raw.reflection;
   if (r && Object.keys(r).length) {
     lines.push(`\n${"═".repeat(40)}`);
-    lines.push(isFr ? "🎓 RÉFLEXION FINALE" : "🎓 FINAL REFLECTION");
+    lines.push(isFr ? "=== REFLEXION FINALE ===" : "=== FINAL REFLECTION ===");
 
     function reflVal(v, key, raw) {
       if (!v) return null;
