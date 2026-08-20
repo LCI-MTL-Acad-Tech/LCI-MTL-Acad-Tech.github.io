@@ -57,14 +57,37 @@ const uuidMap       = {}; // { oldUUID → canonicalUUID } — redirects superse
 const manuallyFinished = new Set(
   JSON.parse(sessionStorage.getItem("hub_manually_finished") || "[]")
 );
+const manuallyFailed = new Set(
+  JSON.parse(sessionStorage.getItem("hub_manually_failed") || "[]")
+);
 
 function isFinished(s) {
   return s.has_reflection || manuallyFinished.has(s.uuid);
 }
 
+function isFailed(s) {
+  return manuallyFailed.has(s.uuid);
+}
+
+function toggleManualFailed(uuid) {
+  if (manuallyFailed.has(uuid)) manuallyFailed.delete(uuid);
+  else {
+    manuallyFailed.add(uuid);
+    // Remove from finished if marked failed
+    manuallyFinished.delete(uuid);
+    sessionStorage.setItem("hub_manually_finished", JSON.stringify([...manuallyFinished]));
+  }
+  sessionStorage.setItem("hub_manually_failed", JSON.stringify([...manuallyFailed]));
+  applyFilters();
+}
+
 function toggleManualFinished(uuid) {
   if (manuallyFinished.has(uuid)) manuallyFinished.delete(uuid);
-  else manuallyFinished.add(uuid);
+  else {
+    manuallyFinished.add(uuid);
+    manuallyFailed.delete(uuid); // can't be both
+    sessionStorage.setItem("hub_manually_failed", JSON.stringify([...manuallyFailed]));
+  }
   sessionStorage.setItem("hub_manually_finished", JSON.stringify([...manuallyFinished]));
   applyFilters();
   // Re-open the detail row if it was open
@@ -1556,8 +1579,9 @@ function mergeStudents(uuidA, uuidB) {
 function renderStats() {
   const f = filtered;
   const total       = f.length;
+  const failed      = f.filter(s => isFailed(s)).length;
   const finished    = f.filter(s => isFinished(s)).length;
-  const inProgFiltered = f.filter(s => !isFinished(s));
+  const inProgFiltered = f.filter(s => !isFinished(s) && !isFailed(s));
   const inProgress  = inProgFiltered.length;
   const onTrack     = inProgFiltered.filter(s => s.track_band === "green").length;
   const behind      = inProgFiltered.filter(s => s.track_band === "red").length;
@@ -1570,6 +1594,7 @@ function renderStats() {
   document.getElementById("hub-stats").innerHTML = [
     { val: inProgress + " / " + total,  label: isFr ? "En cours / Total"   : "In progress / Total", color: "var(--accent)" },
     { val: finished,                     label: isFr ? "Terminé·e·s ✅"     : "Finished ✅",          color: "#1a6fa8" },
+    { val: failed > 0 ? failed : "—",   label: isFr ? "Échoué·e·s / Disparu·e·s ⛔" : "Failed / Dropped ⛔", color: failed > 0 ? "var(--danger)" : "var(--text-subtle)" },
     { val: onTrack + " / " + inProgress, label: isFr ? "Dans les temps (en cours)" : "On track (in progress)", color: "#3a6e00" },
     { val: behind  + " / " + inProgress, label: isFr ? "En retard (en cours)"      : "Behind (in progress)",   color: "#a00" },
     { val: avgH + " h",                  label: isFr ? "Moy. heures (en cours)"    : "Avg. hours (in progress)", color: "var(--accent)" },
@@ -1734,6 +1759,7 @@ function getAWOLStudents() {
   return filtered.filter(s =>
     s.working_days_absent !== null && s.working_days_absent >= MIA_WORK_DAYS
     && !isFinished(s)
+    && !isFailed(s)
     && !inPendingPair.has(s.uuid)
   ).sort((a, b) => b.working_days_absent - a.working_days_absent);
 }
@@ -1784,7 +1810,7 @@ function renderAWOL() {
     },
     {
       key: "no_config",
-      students: filtered.filter(s => !isFinished(s)
+      students: filtered.filter(s => !isFinished(s) && !isFailed(s)
         && (s.file_type_counts?.config || 0) === 0
         && (s.file_type_counts?.daily  || 0) > 0),
       badge: "⚙",
@@ -1956,7 +1982,7 @@ function renderHoursChart() {
     const expectH  = Math.max(s.expected_hours, 0.1);
     const actualPx = Math.max(Math.round((actualH / maxH) * chartH), 4);
     const expectPx = Math.max(Math.round((expectH / maxH) * chartH), 4);
-    const color    = isFinished(s) ? cols.finished : (cols[s.track_band] || cols.none);
+    const color    = isFailed(s) ? "#c00" : isFinished(s) ? cols.finished : (cols[s.track_band] || cols.none);
     const initials = s.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
     const tip      = `${escHtml(s.name)}: ${s.actual_hours}h / ${s.expected_hours}h attendues`;
 
@@ -2839,6 +2865,17 @@ function buildDetailHTML(s) {
         ${isManuallyDone
           ? (lang === "fr-CA" ? "✅ Terminé (manuel) — annuler" : "✅ Finished (manual) — undo")
           : (lang === "fr-CA" ? "☑ Marquer comme terminé" : "☑ Mark as finished")}
+      </button>
+      <button class="btn btn--sm no-print"
+        onclick="toggleManualFailed('${escHtml(s.uuid)}')"
+        style="align-self:center;font-size:1.2rem;
+               border:1.5px solid ${isFailed(s) ? "var(--danger)" : "var(--border)"};
+               background:${isFailed(s) ? "rgba(255,80,80,.1)" : "var(--bg-card)"};
+               color:${isFailed(s) ? "var(--danger)" : "var(--text-muted)"};
+               border-radius:var(--r-pill);padding:var(--sp-1) var(--sp-3)">
+        ${isFailed(s)
+          ? (lang === "fr-CA" ? "⛔ Échoué / Disparu — annuler" : "⛔ Failed / Dropped — undo")
+          : (lang === "fr-CA" ? "⛔ Marquer comme échoué / disparu" : "⛔ Mark as failed / dropped")}
       </button>` : "";
     return `
       <div style="display:flex;gap:var(--sp-3);flex-wrap:wrap;margin-bottom:var(--sp-4)">
@@ -3434,6 +3471,7 @@ function exportHubState() {
       student_count: students.length,
     },
     manually_finished: [...manuallyFinished],
+    manually_failed:   [...manuallyFailed],
     merged_pairs:      sessionMerges,
   };
 
@@ -3452,6 +3490,10 @@ function loadHubState(data) {
   if (Array.isArray(data.manually_finished)) {
     data.manually_finished.forEach(uuid => manuallyFinished.add(uuid));
     sessionStorage.setItem("hub_manually_finished", JSON.stringify([...manuallyFinished]));
+  }
+  if (Array.isArray(data.manually_failed)) {
+    data.manually_failed.forEach(uuid => manuallyFailed.add(uuid));
+    sessionStorage.setItem("hub_manually_failed", JSON.stringify([...manuallyFailed]));
   }
 
   // Re-apply merged_pairs — deduplicated union across all loaded states
