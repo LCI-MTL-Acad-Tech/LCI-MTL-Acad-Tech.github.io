@@ -1350,7 +1350,11 @@ function dismissDupPair(uuidA, uuidB) {
   renderDupStudentBanner();
 }
 
+let _renderDupBannerRunning = false;
 function renderDupStudentBanner() {
+  if (_renderDupBannerRunning) return;
+  _renderDupBannerRunning = true;
+  try {
   const banner = document.getElementById("hub-dup-student-banner");
   if (!banner) return;
   const isFr = getCurrentLang() === "fr-CA";
@@ -1460,6 +1464,9 @@ function renderDupStudentBanner() {
       </p>
       ${rows}
     </div>`;
+  } finally {
+    _renderDupBannerRunning = false;
+  }
 }
 
 function mergeStudents(uuidA, uuidB) {
@@ -2703,7 +2710,7 @@ function buildTextDump(s) {
           parts.push(`Helpful: ${v.helpful.map(c => typeof c === "object" ? (c.label || c.code || JSON.stringify(c)) : c).join(", ")}`);
         if (Array.isArray(v.gaps) && v.gaps.length)
           parts.push(`Gaps: ${v.gaps.map(c => typeof c === "object" ? (c.label || c.code || JSON.stringify(c)) : c).join(", ")}`);
-        if (v.improvements?.trim()) parts.push(`Improvements: ${v.improvements.trim()}`);
+        const imp = Array.isArray(v.improvements) ? v.improvements.map(x=>typeof x==='object'?(x.label||x.code||JSON.stringify(x)):x).join(', ') : (v.improvements ? String(v.improvements).trim() : ''); if (imp) parts.push(`Improvements: ${imp}`);
         return parts.join("\n") || null;
       }
 
@@ -3138,8 +3145,9 @@ function moodSparklineLarge(points) {
 let _fileModalUUID = null;
 
 function openFileListModal(uuid, filter = "all") {
-  const s    = students.find(r => r.uuid === uuid);
-  if (!s) return;
+  uuid = resolveUUID(uuid);
+  const s = students.find(r => r.uuid === uuid) || students.find(r => r.uuid === resolveUUID(uuid));
+  if (!s) { console.warn("[LCI Hub] openFileListModal: student not found for UUID", uuid); return; }
   _fileModalUUID = uuid;
 
   const lang = getCurrentLang();
@@ -3183,7 +3191,7 @@ function openFileListModal(uuid, filter = "all") {
                 parts.push(`<strong>Helpful:</strong> ${v.helpful.map(c=>escHtml(typeof c==="object"?(c.label||c.code||""):String(c))).join(", ")}`);
               if (Array.isArray(v.gaps) && v.gaps.length)
                 parts.push(`<strong>Gaps:</strong> ${v.gaps.map(c=>escHtml(typeof c==="object"?(c.label||c.code||""):String(c))).join(", ")}`);
-              if (v.improvements?.trim()) parts.push(`<strong>Improvements:</strong> ${escHtml(v.improvements.trim())}`);
+              const imp2 = Array.isArray(v.improvements) ? v.improvements.map(x=>typeof x==='object'?(x.label||x.code||JSON.stringify(x)):x).join(', ') : (v.improvements ? String(v.improvements).trim() : ''); if (imp2) parts.push(`<strong>Improvements:</strong> ${escHtml(imp2)}`);
               display = parts.join("<br>") || null;
             } else if (typeof v === "string" && v.trim()) {
               display = escHtml(v.trim());
