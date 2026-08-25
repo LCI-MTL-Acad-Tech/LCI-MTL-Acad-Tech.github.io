@@ -617,9 +617,7 @@ function processAllParsed(parsed) {
       for (let i = startIdx; i < end; i++) {
         const [uid, grp] = uuidEntries[i];
         let base;
-        if (grp.length === 1) {
-          base = grp[0];
-        } else {
+        {
           let merged;
           try {
             merged = mergeInternshipFiles(grp);
