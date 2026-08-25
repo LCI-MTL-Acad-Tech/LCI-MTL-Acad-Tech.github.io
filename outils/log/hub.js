@@ -60,6 +60,9 @@ const manuallyFinished = new Set(
 const manuallyFailed = new Set(
   JSON.parse(sessionStorage.getItem("hub_manually_failed") || "[]")
 );
+const manuallyTransferred = new Set(
+  JSON.parse(sessionStorage.getItem("hub_manually_transferred") || "[]")
+);
 
 function isFinished(s) {
   return s.has_reflection || manuallyFinished.has(s.uuid);
@@ -67,6 +70,23 @@ function isFinished(s) {
 
 function isFailed(s) {
   return manuallyFailed.has(s.uuid);
+}
+
+function isTransferred(s) {
+  return manuallyTransferred.has(s.uuid);
+}
+
+function toggleManualTransferred(uuid) {
+  if (manuallyTransferred.has(uuid)) manuallyTransferred.delete(uuid);
+  else {
+    manuallyTransferred.add(uuid);
+    manuallyFailed.delete(uuid);
+    manuallyFinished.delete(uuid);
+    sessionStorage.setItem("hub_manually_failed", JSON.stringify([...manuallyFailed]));
+    sessionStorage.setItem("hub_manually_finished", JSON.stringify([...manuallyFinished]));
+  }
+  sessionStorage.setItem("hub_manually_transferred", JSON.stringify([...manuallyTransferred]));
+  applyFilters();
 }
 
 function toggleManualFailed(uuid) {
@@ -85,8 +105,10 @@ function toggleManualFinished(uuid) {
   if (manuallyFinished.has(uuid)) manuallyFinished.delete(uuid);
   else {
     manuallyFinished.add(uuid);
-    manuallyFailed.delete(uuid); // can't be both
+    manuallyFailed.delete(uuid);
+    manuallyTransferred.delete(uuid); // can't be both
     sessionStorage.setItem("hub_manually_failed", JSON.stringify([...manuallyFailed]));
+    sessionStorage.setItem("hub_manually_transferred", JSON.stringify([...manuallyTransferred]));
   }
   sessionStorage.setItem("hub_manually_finished", JSON.stringify([...manuallyFinished]));
   applyFilters();
@@ -1581,7 +1603,8 @@ function renderStats() {
   const total       = f.length;
   const failed      = f.filter(s => isFailed(s)).length;
   const finished    = f.filter(s => isFinished(s)).length;
-  const inProgFiltered = f.filter(s => !isFinished(s) && !isFailed(s));
+  const transferred = f.filter(s => isTransferred(s)).length;
+  const inProgFiltered = f.filter(s => !isFinished(s) && !isFailed(s) && !isTransferred(s));
   const inProgress  = inProgFiltered.length;
   const onTrack     = inProgFiltered.filter(s => s.track_band === "green").length;
   const behind      = inProgFiltered.filter(s => s.track_band === "red").length;
@@ -1760,6 +1783,7 @@ function getAWOLStudents() {
     s.working_days_absent !== null && s.working_days_absent >= MIA_WORK_DAYS
     && !isFinished(s)
     && !isFailed(s)
+    && !isTransferred(s)
     && !inPendingPair.has(s.uuid)
   ).sort((a, b) => b.working_days_absent - a.working_days_absent);
 }
@@ -1810,7 +1834,7 @@ function renderAWOL() {
     },
     {
       key: "no_config",
-      students: filtered.filter(s => !isFinished(s) && !isFailed(s)
+      students: filtered.filter(s => !isFinished(s) && !isFailed(s) && !isTransferred(s)
         && (s.file_type_counts?.config || 0) === 0
         && (s.file_type_counts?.daily  || 0) > 0),
       badge: "⚙",
@@ -1982,7 +2006,7 @@ function renderHoursChart() {
     const expectH  = Math.max(s.expected_hours, 0.1);
     const actualPx = Math.max(Math.round((actualH / maxH) * chartH), 4);
     const expectPx = Math.max(Math.round((expectH / maxH) * chartH), 4);
-    const color    = isFailed(s) ? "#c00" : isFinished(s) ? cols.finished : (cols[s.track_band] || cols.none);
+    const color    = isFailed(s) ? "#c00" : isTransferred(s) ? "#8855cc" : isFinished(s) ? cols.finished : (cols[s.track_band] || cols.none);
     const initials = s.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
     const tip      = `${escHtml(s.name)}: ${s.actual_hours}h / ${s.expected_hours}h attendues`;
 
@@ -2877,6 +2901,17 @@ function buildDetailHTML(s) {
         ${isFailed(s)
           ? (lang === "fr-CA" ? "⛔ Échoué / Disparu — annuler" : "⛔ Failed / Dropped — undo")
           : (lang === "fr-CA" ? "⛔ Marquer comme échoué / disparu" : "⛔ Mark as failed / dropped")}
+      </button>
+      <button class="btn btn--sm no-print"
+        onclick="toggleManualTransferred('${escHtml(s.uuid)}')"
+        style="align-self:center;font-size:1.2rem;
+               border:1.5px solid ${isTransferred(s) ? "#8855cc" : "var(--border)"};
+               background:${isTransferred(s) ? "rgba(136,85,204,.1)" : "var(--bg-card)"};
+               color:${isTransferred(s) ? "#8855cc" : "var(--text-muted)"};
+               border-radius:var(--r-pill);padding:var(--sp-1) var(--sp-3)">
+        ${isTransferred(s)
+          ? (lang === "fr-CA" ? "🔄 Transféré ailleurs — annuler" : "🔄 Transferred elsewhere — undo")
+          : (lang === "fr-CA" ? "🔄 Stage complété ailleurs" : "🔄 Completed internship elsewhere")}
       </button>` : "";
     return `
       <div style="display:flex;gap:var(--sp-3);flex-wrap:wrap;margin-bottom:var(--sp-4)">
@@ -3472,7 +3507,8 @@ function exportHubState() {
       student_count: students.length,
     },
     manually_finished: [...manuallyFinished],
-    manually_failed:   [...manuallyFailed],
+    manually_failed:      [...manuallyFailed],
+    manually_transferred: [...manuallyTransferred],
     merged_pairs:      sessionMerges,
   };
 
@@ -3495,6 +3531,10 @@ function loadHubState(data) {
   if (Array.isArray(data.manually_failed)) {
     data.manually_failed.forEach(uuid => manuallyFailed.add(uuid));
     sessionStorage.setItem("hub_manually_failed", JSON.stringify([...manuallyFailed]));
+  }
+  if (Array.isArray(data.manually_transferred)) {
+    data.manually_transferred.forEach(uuid => manuallyTransferred.add(uuid));
+    sessionStorage.setItem("hub_manually_transferred", JSON.stringify([...manuallyTransferred]));
   }
 
   // Re-apply merged_pairs — deduplicated union across all loaded states
