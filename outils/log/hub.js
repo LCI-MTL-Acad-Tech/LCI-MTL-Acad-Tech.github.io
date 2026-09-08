@@ -2591,7 +2591,7 @@ function renderAnalyticsView() {
   function fieldText(key) {
     return cohort
       .filter(s => s.raw.reflection?.[key]?.trim?.())
-      .map(s => `[${s.name} -- ${s.program}]\n${s.raw.reflection[key].trim()}`)
+      .map(s => `[${s.program}]\n${s.raw.reflection[key].trim()}`)
       .join("\n\n---\n\n");
   }
 
@@ -2605,7 +2605,7 @@ function renderAnalyticsView() {
     .filter(s => s.raw.reflection && Object.keys(s.raw.reflection).length)
     .map(s => {
       const r = s.raw.reflection;
-      const lines = [`=== ${s.name} -- ${s.program} ===`];
+      const lines = [`=== ${s.program} ===`];
       TEXT_FIELDS.forEach(f => { if (r[f.key]?.trim?.()) lines.push(`[${f.label}]\n${r[f.key].trim()}`); });
       return lines.join("\n\n");
     }).join("\n\n" + "=".repeat(50) + "\n\n");
@@ -2697,12 +2697,12 @@ function renderAdviceView() {
     return FIELDS.some(f => s.raw.reflection?.[f.key]?.trim());
   });
 
-  // Build copy-all text per column
+  // Build copy text per column — program only, no student names
   function colText(fieldKey) {
     return rows
       .filter(s => s.raw.reflection?.[fieldKey]?.trim())
-      .map(s => `[${s.name} — ${s.program}]\n${s.raw.reflection[fieldKey].trim()}`)
-      .join("\n\n─────────────────────────────\n\n");
+      .map(s => `[${s.program}]\n${s.raw.reflection[fieldKey].trim()}`)
+      .join("\n\n---\n\n");
   }
 
   function copyBtn(text, label) {
@@ -2711,7 +2711,7 @@ function renderAdviceView() {
       class="btn btn--ghost btn--sm" style="font-size:1.1rem;white-space:nowrap">📄 ${label}</button>`;
   }
 
-  const copyLabel = isFr ? "Copier colonne" : "Copy column";
+  const copyLabel   = isFr ? "Copier colonne" : "Copy column";
   const copyAllLabel = isFr ? "Tout copier" : "Copy all";
   const allText = FIELDS.map(f =>
     `=== ${f.label.toUpperCase()} ===\n\n${colText(f.key)}`
@@ -2760,7 +2760,7 @@ function renderAdviceView() {
              <tbody>
                ${rows.map((s, i) => `
                  <tr style="border-bottom:1px solid var(--border);
-                            background:${i % 2 === 0 ? "transparent" : "var(--bg-subtle)"}">
+                            background:${i % 2 === 0 ? "var(--bg-card)" : "var(--bg-subtle)"}">
                    <td style="padding:var(--sp-3);vertical-align:top">
                      <div style="font-weight:600">${escHtml(s.name)}</div>
                      <div style="font-size:1.1rem;color:var(--text-muted)">${escHtml(s.program)}</div>
