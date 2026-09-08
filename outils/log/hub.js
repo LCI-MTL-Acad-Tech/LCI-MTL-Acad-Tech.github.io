@@ -1270,6 +1270,8 @@ function renderCurrentView() {
   if (calWrap)    calWrap.style.display    = hubView === "calendar"   ? "" : "none";
   if (mgWrap)     mgWrap.style.display     = hubView === "monthgrid"  ? "" : "none";
   if (advWrap)    advWrap.style.display    = hubView === "advice"     ? "" : "none";
+  const anlWrap   = document.getElementById("hub-analytics-section");
+  if (anlWrap)    anlWrap.style.display    = hubView === "analytics"  ? "" : "none";
 
   if (hubView === "students")   renderTable();
   if (hubView === "competency") renderCompetencyView();
@@ -2545,6 +2547,132 @@ function toggleDetail(i) {
   const row = document.getElementById(`detail-${i}`);
   if (!row) return;
   row.style.display = row.style.display === "none" ? "" : "none";
+}
+
+function renderAnalyticsView() {
+  const el = document.getElementById("hub-analytics-section");
+  if (!el) return;
+  const isFr = getCurrentLang() === "fr-CA";
+  const cohort = filtered; // respects current filters
+  const n = cohort.length;
+  if (!n) { el.innerHTML = `<p style="color:var(--text-muted)">${isFr ? "Aucun étudiant dans la sélection actuelle." : "No students in current selection."}</p>`; return; }
+
+  // ── Quantitative stats ────────────────────────────────
+  const withHours  = cohort.filter(s => s.actual_hours > 0);
+  const avgHours   = withHours.length ? (withHours.reduce((a,s) => a + s.actual_hours, 0) / withHours.length).toFixed(1) : "—";
+  const avgDays    = withHours.length ? (withHours.reduce((a,s) => a + s.days_logged, 0) / withHours.length).toFixed(1) : "—";
+  const avgHPD     = (withHours.length && avgDays !== "—") ? (avgHours / avgDays).toFixed(2) : "—";
+
+  // Mood/energy from logs
+  const allMoods = [], allEnergy = [];
+  cohort.forEach(s => (s.raw.logs || []).forEach(l => {
+    if (l.day_rating)     allMoods.push(l.day_rating);
+    if (l.morning_energy) allEnergy.push(l.morning_energy);
+  }));
+  const avg = arr => arr.length ? (arr.reduce((a,b) => a+b,0)/arr.length).toFixed(2) : "—";
+
+  // Finished / in-progress / failed
+  const nFinished    = cohort.filter(s => isFinished(s)).length;
+  const nFailed      = cohort.filter(s => isFailed(s)).length;
+  const nTransferred = cohort.filter(s => isTransferred(s)).length;
+  const nInProg      = n - nFinished - nFailed - nTransferred;
+
+  // ── Text fields for copy ──────────────────────────────
+  const TEXT_FIELDS = [
+    { key: "internship_reality_vs_expectation", label: isFr ? "Réalité vs attentes" : "Reality vs expectations" },
+    { key: "proud_moment",                      label: isFr ? "Moment de fierté"    : "Proud moment" },
+    { key: "failure_moment",                    label: isFr ? "Échec"               : "Failure" },
+    { key: "failure_lesson",                    label: isFr ? "Leçon de l'échec"    : "Failure lesson" },
+    { key: "would_do_differently",              label: isFr ? "Ferait différemment"  : "Would do differently" },
+    { key: "advice_to_next_student",            label: isFr ? "Conseils au suivant"  : "Advice to next student" },
+    { key: "suggestions_for_school",            label: isFr ? "Suggestions à l'école" : "Suggestions to school" },
+  ];
+
+  function fieldText(key) {
+    return cohort
+      .filter(s => s.raw.reflection?.[key]?.trim?.())
+      .map(s => `[${s.name} -- ${s.program}]\n${s.raw.reflection[key].trim()}`)
+      .join("\n\n---\n\n");
+  }
+
+  function copyBtn(text, label) {
+    const safe = JSON.stringify(text || "");
+    return `<button class="btn btn--ghost btn--sm" style="font-size:1.1rem;white-space:nowrap"
+      onclick="(function(btn){navigator.clipboard?.writeText(${safe}).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='📄',1500);})})(this)">📄 ${label}</button>`;
+  }
+
+  const copyAll = cohort
+    .filter(s => s.raw.reflection && Object.keys(s.raw.reflection).length)
+    .map(s => {
+      const r = s.raw.reflection;
+      const lines = [`=== ${s.name} -- ${s.program} ===`];
+      TEXT_FIELDS.forEach(f => { if (r[f.key]?.trim?.()) lines.push(`[${f.label}]\n${r[f.key].trim()}`); });
+      return lines.join("\n\n");
+    }).join("\n\n" + "=".repeat(50) + "\n\n");
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:var(--sp-4);flex-wrap:wrap;margin-bottom:var(--sp-5)">
+      <h3 style="margin:0;font-size:1.8rem">
+        📊 ${isFr ? "Analytique cohorte" : "Cohort analytics"}
+        <span style="font-size:1.3rem;font-weight:400;color:var(--text-muted);margin-left:var(--sp-2)">(${n} ${isFr ? "étudiant·e·s" : "students"})</span>
+      </h3>
+      ${copyBtn(copyAll, isFr ? "Tout copier (réflexions)" : "Copy all (reflections)")}
+    </div>
+
+    <!-- Stats grid -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:var(--sp-3);margin-bottom:var(--sp-6)">
+      ${[
+        { v: avgHours + " h",  l: isFr ? "Moy. heures totales"    : "Avg. total hours" },
+        { v: avgDays,          l: isFr ? "Moy. jours journalisés"  : "Avg. days logged" },
+        { v: avgHPD + " h/j",  l: isFr ? "Moy. heures / jour"     : "Avg. hours / day" },
+        { v: avg(allMoods) + " / 5",   l: isFr ? "Humeur moy. (fin de journée)" : "Avg. end-of-day mood" },
+        { v: avg(allEnergy) + " / 5",  l: isFr ? "Énergie moy. (matin)"         : "Avg. morning energy" },
+        { v: nFinished,        l: isFr ? "Terminé·e·s"             : "Finished",    c: "#1a6fa8" },
+        { v: nInProg,          l: isFr ? "En cours"                : "In progress", c: "var(--accent)" },
+        { v: nFailed || "—",   l: isFr ? "Échoué·e·s / Disparu·e·s" : "Failed / Dropped", c: nFailed ? "var(--danger)" : "var(--text-subtle)" },
+        { v: nTransferred || "—", l: isFr ? "Transféré·e·s"        : "Transferred", c: nTransferred ? "#8855cc" : "var(--text-subtle)" },
+      ].map(s => `
+        <div style="padding:var(--sp-3) var(--sp-4);background:var(--bg-card);border-radius:var(--r-lg);border:1px solid var(--border)">
+          <div style="font-size:2.2rem;font-weight:700;color:${s.c || "var(--accent)"};letter-spacing:-.04em">${s.v}</div>
+          <div style="font-size:1.2rem;color:var(--text-muted);margin-top:var(--sp-1)">${s.l}</div>
+        </div>`).join("")}
+    </div>
+
+    <!-- Text fields table -->
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:1.3rem">
+        <thead>
+          <tr style="background:var(--bg-subtle)">
+            <th style="padding:var(--sp-2) var(--sp-3);text-align:left;border-bottom:2px solid var(--border);width:13rem">
+              ${isFr ? "Étudiant·e" : "Student"}
+            </th>
+            ${TEXT_FIELDS.map(f => `
+              <th style="padding:var(--sp-2) var(--sp-3);text-align:left;border-bottom:2px solid var(--border);vertical-align:bottom">
+                <div style="font-size:1.2rem">${f.label}</div>
+                <div style="margin-top:var(--sp-1)">${copyBtn(fieldText(f.key), isFr ? "Copier" : "Copy")}</div>
+              </th>`).join("")}
+          </tr>
+        </thead>
+        <tbody>
+          ${cohort.map((s, i) => `
+            <tr style="border-bottom:1px solid var(--border);background:${i%2===0?"transparent":"var(--bg-subtle)"}">
+              <td style="padding:var(--sp-3);vertical-align:top">
+                <div style="font-weight:600;font-size:1.3rem">${escHtml(s.name)}</div>
+                <div style="font-size:1.1rem;color:var(--text-muted)">${escHtml(s.program)}</div>
+                <div style="font-size:1.1rem;color:var(--text-subtle);margin-top:var(--sp-1)">${s.actual_hours}h / ${s.days_logged}j</div>
+              </td>
+              ${TEXT_FIELDS.map(f => {
+                const val = s.raw.reflection?.[f.key];
+                const txt = typeof val === "string" ? val.trim() : "";
+                return `<td style="padding:var(--sp-3);vertical-align:top;line-height:1.6;font-size:1.3rem;
+                           color:${txt ? "var(--text)" : "var(--text-subtle)"}">
+                  ${txt ? escHtml(txt) : "—"}
+                </td>`;
+              }).join("")}
+            </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>`;
 }
 
 function renderAdviceView() {
