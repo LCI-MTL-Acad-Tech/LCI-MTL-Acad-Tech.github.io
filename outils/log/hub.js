@@ -2595,10 +2595,16 @@ function renderAnalyticsView() {
       .join("\n\n---\n\n");
   }
 
+  window._analyticsViewTexts = {};
+  const _analyticsTexts = window._analyticsViewTexts;
+  let _analyticsBtnIdx = 0;
+
   function copyBtn(text, label) {
-    const safe = JSON.stringify(text || "");
-    return `<button class="btn btn--ghost btn--sm" style="font-size:1.1rem;white-space:nowrap"
-      onclick="(function(btn){navigator.clipboard?.writeText(${safe}).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='📄',1500);})})(this)">📄 ${label}</button>`;
+    const key = "anl_" + (_analyticsBtnIdx++);
+    _analyticsTexts[key] = text || "";
+    return "<button data-copy-key=\"" + key + "\" data-copy-label=\"" + escHtml(label) + "\" " +
+           "class=\"btn btn--ghost btn--sm\" style=\"font-size:1.1rem;white-space:nowrap\"" +
+           " onclick=\"_handleAnalyticsCopy(this)\">📄 " + label + "</button>";
   }
 
   const copyAll = cohort
@@ -2675,6 +2681,26 @@ function renderAnalyticsView() {
     </div>`;
 }
 
+function _handleAdviceCopy(btn) {
+  const key = btn.dataset.copyKey;
+  const label = btn.dataset.copyLabel || "📄";
+  const text = (window._adviceViewTexts || {})[key] || "";
+  navigator.clipboard?.writeText(text).then(() => {
+    btn.textContent = "✓";
+    setTimeout(() => btn.textContent = "📄 " + label, 1500);
+  });
+}
+
+function _handleAnalyticsCopy(btn) {
+  const key = btn.dataset.copyKey;
+  const label = btn.dataset.copyLabel || "📄";
+  const text = (window._analyticsViewTexts || {})[key] || "";
+  navigator.clipboard?.writeText(text).then(() => {
+    btn.textContent = "✓";
+    setTimeout(() => btn.textContent = "📄 " + label, 1500);
+  });
+}
+
 function renderAdviceView() {
   const el = document.getElementById("hub-advice-section");
   if (!el) return;
@@ -2705,10 +2731,16 @@ function renderAdviceView() {
       .join("\n\n---\n\n");
   }
 
+  window._adviceViewTexts = {};
+  const _adviceTexts = window._adviceViewTexts;
+  let _adviceBtnIdx = 0;
+
   function copyBtn(text, label) {
-    const safe = JSON.stringify(text);
-    return `<button onclick="(function(btn){navigator.clipboard?.writeText(${safe}).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='📄 ${label}',1500);})})(this)"
-      class="btn btn--ghost btn--sm" style="font-size:1.1rem;white-space:nowrap">📄 ${label}</button>`;
+    const key = "adv_" + (_adviceBtnIdx++);
+    _adviceTexts[key] = text;
+    return "<button data-copy-key=\"" + key + "\" data-copy-label=\"" + escHtml(label) + "\" " +
+           "class=\"btn btn--ghost btn--sm\" style=\"font-size:1.1rem;white-space:nowrap\"" +
+           " onclick=\"_handleAdviceCopy(this)\">📄 " + label + "</button>";
   }
 
   const copyLabel   = isFr ? "Copier colonne" : "Copy column";
