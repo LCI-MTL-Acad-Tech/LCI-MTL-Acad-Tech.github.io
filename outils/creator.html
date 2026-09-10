@@ -50,6 +50,8 @@
   --rl:          10px;
   --auto-bg:     rgba(255,200,0,.18); /* highlight for auto-copied unedited text */
   --chrome:      #07181e; /* fixed dark chrome for headers/bars — same in both themes */
+  --on-chrome:       #ffffff; /* text on --chrome — always literal white, never re-themed */
+  --on-chrome-muted: #b6bec0; /* secondary/label text on --chrome — always light, never re-themed */
 }
 
 [data-theme="dark"] {
@@ -120,8 +122,8 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
 #prog-meta{display:none;background:var(--chrome);border-radius:var(--rl);padding:12px 20px;margin-bottom:20px;gap:24px;flex-wrap:wrap;align-items:center}
 #prog-meta.visible{display:flex}
 .meta-item{display:flex;flex-direction:column;gap:1px}
-.meta-label{font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ch300)}
-.meta-value{font-size:.82rem;color:var(--white)}
+.meta-label{font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--on-chrome-muted)}
+.meta-value{font-size:.82rem;color:var(--on-chrome)}
 .meta-value a{color:var(--blue-mid);text-decoration:none;font-size:.72rem}
 .meta-pill{padding:2px 9px;border-radius:100px;font-size:.72rem}
 .meta-pill.obl{background:rgba(26,138,74,.25);color:var(--green-dark)}
@@ -233,7 +235,7 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
 
 /* Criteria config cards */
 .crit-config-section{margin-bottom:16px}
-.crit-section-hdr{background:var(--chrome);color:var(--white);padding:8px 14px;border-radius:var(--r) var(--r) 0 0;font-size:.78rem;display:flex;align-items:center;gap:8px}
+.crit-section-hdr{background:var(--chrome);color:var(--on-chrome);padding:8px 14px;border-radius:var(--r) var(--r) 0 0;font-size:.78rem;display:flex;align-items:center;gap:8px}
 .crit-section-hdr .crit-hdr-code{font-size:.65rem;background:rgba(255,255,255,.15);padding:1px 6px;border-radius:3px}
 .crit-section-hdr .crit-hdr-title{flex:1;opacity:.85}
 /* Element sub-header */
@@ -259,7 +261,7 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
 
 /* Grille de correction — per section */
 .grille-section{background:var(--white);border:1px solid var(--cream-darker);border-radius:var(--rl);margin-bottom:20px;overflow:hidden}
-.grille-section-hdr{background:var(--chrome);color:var(--white);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.grille-section-hdr{background:var(--chrome);color:var(--on-chrome);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .grille-section-hdr .gsh-title{font-size:.86rem;font-weight:500}
 .grille-section-hdr .gsh-budget{font-size:.74rem;opacity:.85}
 .grille-section-hdr .gsh-budget.mismatch{color:#ffb3b8}
@@ -272,6 +274,11 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
 .crit-pick-item.disabled:hover{background:none}
 .crit-pick-item input[type=checkbox]{margin-top:2px;accent-color:var(--blue);cursor:pointer}
 .crit-pick-item .cpi-used-elsewhere{font-size:.68rem;color:var(--ch300);font-style:italic;margin-left:4px}
+.crit-pick-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.crit-pick-row .crit-pick-item{flex:1;min-width:200px}
+.btn-reuse-anyway{background:none;border:1px solid var(--blue-mid);color:var(--blue);border-radius:100px;font-size:.68rem;padding:2px 10px;cursor:pointer;white-space:nowrap;font-family:inherit}
+.btn-reuse-anyway:hover{background:var(--blue-light)}
+.cpi-shared-badge{font-size:.68rem;color:var(--blue);background:var(--blue-light);border-radius:100px;padding:2px 9px;white-space:nowrap;cursor:default}
 .grille-crit-config{padding:10px 16px}
 .grille-empty-hint{padding:16px;font-size:.8rem;color:var(--ch400);font-style:italic}
 .pts-input{width:58px;background:var(--cream);border:1px solid var(--cream-darker);border-radius:var(--r);padding:5px 8px;font-size:.82rem;text-align:center;color:var(--charcoal)}
@@ -304,7 +311,7 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
 /* ── SCALE DRAWER ── */
 #scale-drawer{position:fixed;top:0;right:-440px;width:430px;height:100vh;background:var(--white);border-left:1px solid var(--cream-darker);box-shadow:-8px 0 32px rgba(7,24,30,.12);z-index:500;transition:right .3s var(--ease);display:flex;flex-direction:column}
 #scale-drawer.open{right:0}
-.drawer-header{background:var(--chrome);color:var(--white);padding:16px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.drawer-header{background:var(--chrome);color:var(--on-chrome);padding:16px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0}
 .drawer-header h3{font-size:.95rem;flex:1}
 .btn-close-drawer{background:transparent;border:none;color:var(--ch300);font-size:1.4rem;cursor:pointer;line-height:1;padding:2px 6px;border-radius:3px;transition:color var(--dur)}
 .btn-close-drawer:hover{color:var(--white)}
@@ -403,7 +410,7 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
 
 .langue-table-ro{width:100%;min-width:900px;border-collapse:collapse;background:var(--white);border:1px solid var(--cream-darker);border-radius:var(--rl);overflow:hidden;font-size:.72rem}
 .langue-table-ro th,.langue-table-ro td{padding:8px 10px;border:1px solid var(--cream-dark);text-align:left;vertical-align:top}
-.langue-table-ro thead th{background:var(--chrome);color:var(--white);font-weight:500;font-size:.66rem}
+.langue-table-ro thead th{background:var(--chrome);color:var(--on-chrome);font-weight:500;font-size:.66rem}
 .langue-table-ro td.lg-crit{width:120px;background:var(--cream)}
 .langue-table-ro td.lg-max{width:50px;text-align:center;white-space:nowrap}
 .lg-total{margin-top:10px;font-size:.82rem;font-weight:600;color:var(--charcoal);text-align:right}
@@ -430,7 +437,7 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
 
 .verif-summary{width:100%;border-collapse:collapse;background:var(--white);border:1px solid var(--cream-darker);border-radius:var(--rl);overflow:hidden;font-size:.8rem;margin-bottom:16px}
 .verif-summary th,.verif-summary td{padding:8px 12px;border-bottom:1px solid var(--cream-dark);text-align:left;vertical-align:top}
-.verif-summary thead th{background:var(--chrome);color:var(--white);font-weight:500;font-size:.72rem}
+.verif-summary thead th{background:var(--chrome);color:var(--on-chrome);font-weight:500;font-size:.72rem}
 .verif-badge{display:inline-block;padding:2px 10px;border-radius:100px;font-size:.7rem;font-weight:500;white-space:nowrap}
 .verif-badge.conforme{background:var(--green-light);color:var(--green-dark)}
 .verif-badge.corriger{background:#fff4d6;color:#8a6100}
@@ -2813,6 +2820,10 @@ const T = {
     grilleHint:"Pour chaque section, sélectionnez les critères de performance évalués et répartissez les points.",
     pickCriteriaHint:"Cochez les critères de performance évalués dans cette section.",
     usedInAnotherSection:"déjà utilisé dans une autre section",
+    reuseAnyway:"↺ Réutiliser quand même",
+    reuseAnywayTip:"Permettre à ce critère d'être évalué dans plus d'une section",
+    sharedBadge:"Partagé",
+    sharedWithLabel:"Aussi utilisé dans",
     untitledSection:"Section sans titre",
     noCriteriaPickedYet:"Aucun critère sélectionné pour cette section.",
     noSectionsYet:"Ajoutez au moins une section pour commencer.",
@@ -3009,6 +3020,10 @@ const T = {
     grilleHint:"For each section, select the performance criteria evaluated and distribute the points.",
     pickCriteriaHint:"Check the performance criteria evaluated in this section.",
     usedInAnotherSection:"already used in another section",
+    reuseAnyway:"↺ Reuse anyway",
+    reuseAnywayTip:"Allow this criterion to be evaluated in more than one section",
+    sharedBadge:"Shared",
+    sharedWithLabel:"Also used in",
     untitledSection:"Untitled section",
     noCriteriaPickedYet:"No criteria selected for this section.",
     noSectionsYet:"Add at least one section to get started.",
@@ -3388,12 +3403,6 @@ function gatherAvailableCritRows(){
   return rows;
 }
 
-function usedCritKeysExcluding(excludeSectionId){
-  const s=new Set();
-  evalSections.forEach(sec=>{ if(sec.id!==excludeSectionId) sec.critKeys.forEach(k=>s.add(k)); });
-  return s;
-}
-
 function renderGrilleSections(){
   const wrap=document.getElementById('grille-sections');
   if(evalSections.length===0){ wrap.innerHTML=`<div class="grille-empty-hint">${t('noSectionsYet')}</div>`; return; }
@@ -3403,7 +3412,6 @@ function renderGrilleSections(){
 
 function renderGrilleSectionBlock(sec){
   const el=document.getElementById(`grille-sec-${sec.id}`); if(!el) return;
-  const usedElsewhere=usedCritKeysExcluding(sec.id);
   const rows=gatherAvailableCritRows();
 
   let pickerHtml=`<div class="grille-crit-picker"><div class="gcp-hint">${t('pickCriteriaHint')}</div>`;
@@ -3414,14 +3422,21 @@ function renderGrilleSectionBlock(sec){
   rows.forEach(r=>{
     const k=critKey(r.compCode,r.elN,r.critIdx);
     const checked=sec.critKeys.has(k);
-    const disabled=usedElsewhere.has(k);
+    const otherSections=evalSections.filter(s=>s.id!==sec.id && s.critKeys.has(k));
+    const blockedElsewhere = otherSections.length>0 && !checked; // taken by another section, not (yet) reused here
+    const sharedHere = otherSections.length>0 && checked;        // deliberately reused: checked here AND elsewhere
     if(r.compCode!==lastComp){ pickerHtml+=`<div class="comp-mini-hdr">${r.compCode} — ${compLabel(r.comp)}</div>`; lastComp=r.compCode; lastEl=null; }
     if(r.elN!==lastEl){ pickerHtml+=`<div style="font-size:.72rem;color:var(--ch400);margin:4px 0 2px 8px">${r.elN}. ${elLabel(r.el)}</div>`; lastEl=r.elN; }
     const critText=lang==='en'?(r.critTextEn||r.critText):r.critText;
-    pickerHtml+=`<label class="crit-pick-item${disabled?' disabled':''}" style="margin-left:16px">
-      <input type="checkbox" data-pick-sid="${sec.id}" data-pick-key="${k}" ${checked?'checked':''} ${disabled?'disabled':''}>
-      <span>${r.critIdx}. ${critText}${disabled?`<span class="cpi-used-elsewhere">(${t('usedInAnotherSection')})</span>`:''}</span>
-    </label>`;
+    const otherLabels=otherSections.map(s=>s.label||t('untitledSection')).join(', ');
+    pickerHtml+=`<div class="crit-pick-row" style="margin-left:16px">
+      <label class="crit-pick-item${blockedElsewhere?' disabled':''}">
+        <input type="checkbox" data-pick-sid="${sec.id}" data-pick-key="${k}" ${checked?'checked':''} ${blockedElsewhere?'disabled':''}>
+        <span>${r.critIdx}. ${critText}${blockedElsewhere?`<span class="cpi-used-elsewhere">(${t('usedInAnotherSection')})</span>`:''}</span>
+      </label>
+      ${blockedElsewhere?`<button type="button" class="btn-reuse-anyway" data-reuse-sid="${sec.id}" data-reuse-key="${k}" title="${t('reuseAnywayTip')}">${t('reuseAnyway')}</button>`:''}
+      ${sharedHere?`<span class="cpi-shared-badge" title="${t('sharedWithLabel')} : ${otherLabels}">🔗 ${t('sharedBadge')}</span>`:''}
+    </div>`;
   });
   pickerHtml+=`</div>`;
 
@@ -3437,23 +3452,54 @@ function renderGrilleSectionBlock(sec){
     cb.addEventListener('change', e=>{
       const k=e.target.dataset.pickKey;
       if(e.target.checked) sec.critKeys.add(k);
-      else { sec.critKeys.delete(k); critConfig.delete(k); }
-      // Picking criteria is a structural step that happens before fine-tuning
-      // individual point values — redistribute the section's total evenly
-      // across whatever is now checked, rather than only filling in the
-      // newest pick (which would compound incorrectly across clicks).
-      const rows=gatherAvailableCritRows().filter(r=>sec.critKeys.has(critKey(r.compCode,r.elN,r.critIdx)));
-      const parts=distributeEvenly(sec.points, rows.length);
-      rows.forEach((r,ri)=>{
-        critConfig.set(critKey(r.compCode,r.elN,r.critIdx), {points:parts[ri], subcriteria:null, scaleKey:'default'});
-      });
+      else {
+        sec.critKeys.delete(k);
+        // Only drop the point config if no OTHER section still relies on it.
+        if(!evalSections.some(s=>s.critKeys.has(k))) critConfig.delete(k);
+      }
+      redistributeSectionCriteria(sec);
       recomputeSelectedCriteriaFromSections();
-      renderGrilleSections(); // full rebuild so every section's "used elsewhere" state stays in sync
+      renderGrilleSections(); // full rebuild so every section's "used elsewhere"/"shared" state stays in sync
+    });
+  });
+
+  el.querySelectorAll('.btn-reuse-anyway').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const sid=e.currentTarget.dataset.reuseSid, k=e.currentTarget.dataset.reuseKey;
+      const s=evalSections.find(x=>x.id===sid); if(!s) return;
+      s.critKeys.add(k);
+      redistributeSectionCriteria(s);
+      recomputeSelectedCriteriaFromSections();
+      renderGrilleSections();
     });
   });
 
   renderSectionCritConfig(sec);
   updateSectionBudget(sec);
+}
+
+// Recompute point values for a section's criteria after its picked-set changes.
+// A criterion already configured AND still used by another section is left
+// untouched (editing it here would silently corrupt that other section's
+// budget) — only this section's own exclusive criteria share the remaining
+// budget evenly.
+function redistributeSectionCriteria(sec){
+  const rows=gatherAvailableCritRows().filter(r=>sec.critKeys.has(critKey(r.compCode,r.elN,r.critIdx)));
+  const sharedKeys=new Set();
+  rows.forEach(r=>{
+    const k=critKey(r.compCode,r.elN,r.critIdx);
+    const usedElsewhere=evalSections.some(s=>s.id!==sec.id && s.critKeys.has(k));
+    if(usedElsewhere && critConfig.has(k)) sharedKeys.add(k);
+  });
+  const sharedTotal=[...sharedKeys].reduce((a,k)=>{
+    const c=critConfig.get(k); return a+(c.subcriteria?c.subcriteria.reduce((x,s)=>x+s.points,0):c.points);
+  },0);
+  const exclusiveRows=rows.filter(r=>!sharedKeys.has(critKey(r.compCode,r.elN,r.critIdx)));
+  const remaining=Math.max(0, roundPt(sec.points-sharedTotal));
+  const parts=distributeEvenly(remaining, exclusiveRows.length);
+  exclusiveRows.forEach((r,ri)=>{
+    critConfig.set(critKey(r.compCode,r.elN,r.critIdx), {points:parts[ri], subcriteria:null, scaleKey:'default'});
+  });
 }
 
 function renderSectionCritConfig(sec){
@@ -3462,11 +3508,10 @@ function renderSectionCritConfig(sec){
   const rows=gatherAvailableCritRows().filter(r=>sec.critKeys.has(critKey(r.compCode,r.elN,r.critIdx)));
   if(!rows.length){ container.innerHTML=`<div class="grille-empty-hint">${t('noCriteriaPickedYet')}</div>`; return; }
 
-  const evenParts=distributeEvenly(sec.points, rows.length);
-  rows.forEach((r,ri)=>{
-    const k=critKey(r.compCode,r.elN,r.critIdx);
-    if(!critConfig.has(k)) critConfig.set(k,{points:evenParts[ri],subcriteria:null,scaleKey:'default'});
-  });
+  // Safety net: ensure every picked criterion has a config (covers edge cases
+  // like a freshly-imported section). Normal add/remove already goes through
+  // redistributeSectionCriteria(), so this is usually a no-op.
+  if(rows.some(r=>!critConfig.has(critKey(r.compCode,r.elN,r.critIdx)))) redistributeSectionCriteria(sec);
 
   let lastComp=null,lastEl=null,elGroup=null;
   rows.forEach(r=>{
