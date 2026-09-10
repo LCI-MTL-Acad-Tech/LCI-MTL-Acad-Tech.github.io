@@ -243,11 +243,37 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
 .crit-row{padding:10px 14px;border-bottom:1px solid var(--cream-dark);background:var(--white)}
 .crit-row:last-child{border-bottom:none;border-radius:0 0 var(--r) var(--r)}
 .crit-row-top{display:flex;align-items:flex-start;gap:10px}
-.crit-row-label-wrap{margin-top:6px}
-.crit-row-label-wrap .crit-label-input{width:100%;background:var(--cream);border:1px solid var(--cream-darker);border-radius:var(--r);padding:5px 9px;font-family:inherit;font-size:.76rem;color:var(--charcoal)}
-.crit-row-label-wrap .crit-label-input::placeholder{color:var(--ch300);font-style:italic}
 .crit-row-text{flex:1;font-size:.78rem;color:var(--ch600);line-height:1.45;padding-top:2px}
 .crit-row-controls{display:flex;align-items:center;gap:8px;flex-shrink:0}
+
+/* Sections (Répartition des points) */
+.section-card{background:var(--white);border:1px solid var(--cream-darker);border-radius:var(--rl);padding:14px 16px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start}
+.section-card .sc-num{width:26px;height:26px;border-radius:50%;background:var(--blue-light);color:var(--blue);font-size:.76rem;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.section-card .sc-fields{flex:1;display:flex;gap:10px;flex-wrap:wrap}
+.section-card .sc-label-input{flex:3;min-width:220px;background:var(--cream);color:var(--charcoal);border:1px solid var(--cream-darker);border-radius:var(--r);padding:7px 11px;font-family:inherit;font-size:.86rem}
+.section-card .sc-points-wrap{display:flex;align-items:center;gap:6px}
+.section-card .sc-points-input{width:70px;background:var(--cream);color:var(--charcoal);border:1px solid var(--cream-darker);border-radius:var(--r);padding:7px 9px;font-family:inherit;font-size:.86rem;text-align:center}
+.section-card .btn-remove-section{background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;padding:4px;flex-shrink:0;margin-top:2px}
+#sections-total-display.ok{color:var(--green-dark)}
+#sections-total-display.mismatch{color:var(--red)}
+
+/* Grille de correction — per section */
+.grille-section{background:var(--white);border:1px solid var(--cream-darker);border-radius:var(--rl);margin-bottom:20px;overflow:hidden}
+.grille-section-hdr{background:var(--chrome);color:var(--white);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.grille-section-hdr .gsh-title{font-size:.86rem;font-weight:500}
+.grille-section-hdr .gsh-budget{font-size:.74rem;opacity:.85}
+.grille-section-hdr .gsh-budget.mismatch{color:#ffb3b8}
+.grille-crit-picker{padding:10px 16px;border-bottom:1px solid var(--cream-dark)}
+.grille-crit-picker .gcp-hint{font-size:.7rem;color:var(--ch400);margin-bottom:8px}
+.grille-crit-picker .comp-mini-hdr{font-size:.7rem;color:var(--ch500);font-weight:600;margin:8px 0 4px}
+.crit-pick-item{display:flex;align-items:flex-start;gap:8px;padding:5px 6px;border-radius:var(--r);cursor:pointer;font-size:.78rem;color:var(--ch600)}
+.crit-pick-item:hover{background:var(--cream)}
+.crit-pick-item.disabled{opacity:.4;cursor:not-allowed}
+.crit-pick-item.disabled:hover{background:none}
+.crit-pick-item input[type=checkbox]{margin-top:2px;accent-color:var(--blue);cursor:pointer}
+.crit-pick-item .cpi-used-elsewhere{font-size:.68rem;color:var(--ch300);font-style:italic;margin-left:4px}
+.grille-crit-config{padding:10px 16px}
+.grille-empty-hint{padding:16px;font-size:.8rem;color:var(--ch400);font-style:italic}
 .pts-input{width:58px;background:var(--cream);border:1px solid var(--cream-darker);border-radius:var(--r);padding:5px 8px;font-size:.82rem;text-align:center;color:var(--charcoal)}
 .pts-input:focus{outline:2px solid var(--blue-mid);border-color:var(--blue)}
 .pts-inpu
@@ -611,90 +637,63 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
       </div>
       <div class="action-btns">
         <button class="btn-secondary" id="btn-clear-elements" data-t="clearElements">Effacer éléments</button>
-        <button class="btn-primary" id="btn-show-criteria" disabled data-t="showCriteria" data-t-title="showCriteriaTip" title="Afficher les critères des éléments sélectionnés">Afficher les critères</button>
+        <button class="btn-primary" id="btn-show-sections" disabled data-t="showSections" data-t-title="showSectionsTip" title="Passer à la répartition des points">Configurer l'évaluation</button>
       </div>
     </div>
   </div>
+  </div><!-- /step-section (compétences) -->
 
-  <!-- Step 4: Criteria selection per element -->
-  <div id="criteria-area"></div>
-
-  <!-- Step 4b: Criteria action row -->
-  <div id="crit-action-row-wrap" style="display:none">
-    <div class="action-row">
-      <div class="sel-summary">
-        <span id="crit-count-summary" data-t="criteriaSelected">0 critère(s) sélectionné(s)</span>
-      </div>
-      <div class="action-btns">
-        <button class="btn-secondary" id="btn-clear-criteria" data-t="clearCriteria">Effacer critères</button>
-        <button class="btn-primary" id="btn-show-config" disabled data-t="showConfig" data-t-title="showConfigTip" title="Configurer la grille d'évaluation">Configurer la grille</button>
-      </div>
+  <!-- Step 4: Répartition des points — sections libres définies par l'enseignant -->
+  <div class="step-section" id="sections-step" style="display:none">
+    <div class="step-hdr"><span class="step-num">4</span><h2 data-t="stepSections">Répartition des points</h2></div>
+    <div class="step-hint" data-t="sectionsHint">Indiquez comment l'évaluation est divisée (questions, tâches, mises en situation, etc.) et le nombre de points pour chacune. Ex. : « Deux questions à développement — 10 points », « Cinq analyses de cas — 50 points ».</div>
+    <div id="sections-list"></div>
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center">
+      <button class="btn-secondary" id="btn-add-section" data-t="addSection">+ Ajouter une section</button>
+      <div style="margin-left:auto;font-size:.82rem;font-weight:500" id="sections-total-display"></div>
     </div>
   </div>
 
-  <!-- Step 5: Rubric configuration -->
-  <div id="rubric-config">
-    <div class="config-header">
-      <h2 data-t="rubricConfigTitle">Configuration de la grille d'évaluation</h2>
-    </div>
-    <div class="step-hint" data-t="totalOn100">Cette évaluation est sur 100 points.</div>
+  <!-- Step 5: Grille de correction — critères et points, par section -->
+  <div class="step-section" id="grille-step" style="display:none">
+    <div class="step-hdr"><span class="step-num">5</span><h2 data-t="stepGrille">Grille de correction</h2></div>
+    <div class="step-hint" data-t="grilleHint">Pour chaque section, sélectionnez les critères de performance évalués et répartissez les points.</div>
 
-    <!-- Total points + scale -->
-    <div class="config-top-row">
-      <div class="config-box total-box">
-        <h3 data-t="totalPointsLabel">Points total</h3>
-        <div class="total-input-wrap">
-          <input type="number" id="total-points" value="100" min="0" max="100">
-          <span data-t="pointsUnit">pts</span>
-        </div>
-        <div style="margin-top:8px;font-size:.72rem;display:flex;align-items:center;gap:5px">
-          <span data-t="pointsAssignedLabel" style="color:var(--ch400)">Assignés :</span>
-          <span id="points-assigned" style="font-weight:500">0</span>
-          <span style="color:var(--ch400)">/ <span id="points-total-echo">100</span> pts</span>
-        </div>
-      </div>
-      <div class="config-box scale-box" style="flex:1">
-        <h3 data-t="scaleLabel">Échelle d'évaluation</h3>
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <div class="scale-pills" id="scale-preview"></div>
-          <button class="btn-edit-scale" id="btn-open-scale-drawer" data-t="editScale">✎ Modifier</button>
-        </div>
+    <div class="config-box scale-box" style="margin-bottom:18px">
+      <h3 data-t="scaleLabel">Échelle d'évaluation</h3>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div class="scale-pills" id="scale-preview"></div>
+        <button class="btn-edit-scale" id="btn-open-scale-drawer" data-t="editScale">✎ Modifier</button>
       </div>
     </div>
 
-    <!-- Criteria config cards (generated) -->
-    <div id="crit-config-cards"></div>
-
-    <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-      <span id="rubric-budget-msg" style="font-size:.72rem;color:var(--red);display:none" data-t="budgetWarning">⚠ Le total des critères ne correspond pas au total de l'évaluation</span>
-    </div>
+    <div id="grille-sections"></div>
   </div>
-  </div><!-- /step-section (compétences+grille) -->
 
   <!-- Step: Consignes -->
   <div class="step-section">
-    <div class="step-hdr"><span class="step-num">4</span><h2 data-t="stepConsignes">Consignes</h2></div>
+    <div class="step-hdr"><span class="step-num">6</span><h2 data-t="stepConsignes">Consignes</h2></div>
     <div class="step-hint" data-t="consignesHint">Cochez les consignes à inclure et ajustez le texte en jaune selon votre situation.</div>
     <div class="consigne-block" id="consignes-block"></div>
   </div>
 
   <!-- Step: Échelle IA -->
   <div class="step-section">
-    <div class="step-hdr"><span class="step-num">5</span><h2 data-t="stepIA">Échelle d'évaluation de l'usage de l'intelligence artificielle</h2></div>
+    <div class="step-hdr"><span class="step-num">7</span><h2 data-t="stepIA">Échelle d'évaluation de l'usage de l'intelligence artificielle</h2></div>
     <div class="step-hint" data-t="iaHint">Sélectionnez le seul niveau applicable à cette évaluation.</div>
     <div class="ia-cards" id="ia-cards"></div>
   </div>
 
   <!-- Step: Grille de langue -->
   <div class="step-section">
-    <div class="step-hdr"><span class="step-num">6</span><h2 data-t="stepLangueGrid">Grille de correction de la langue</h2></div>
+    <div class="step-hdr"><span class="step-num">8</span><h2 data-t="stepLangueGrid">Grille de correction de la langue</h2></div>
     <div class="step-hint" data-t="langueGridHint">Obligatoire pour tous les cours. Format officiel fixe, reproduit tel quel dans le document.</div>
     <div style="overflow-x:auto" id="langue-table"></div>
   </div>
 
   <!-- Step: Export -->
   <div class="step-section">
-    <div class="step-hdr"><span class="step-num">7</span><h2 data-t="stepExport">Télécharger</h2></div>
+    <div class="step-hdr"><span class="step-num">9</span><h2 data-t="stepExport">Télécharger</h2></div>
     <div class="export-row">
       <div class="export-card">
         <div class="ec-hint" data-t="exportHintTemplate">À réimporter ici pour reprendre l'édition de ce gabarit.</div>
@@ -714,7 +713,7 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
 
   <!-- Step: Vérification du gabarit rempli -->
   <div class="step-section">
-    <div class="step-hdr"><span class="step-num">8</span><h2 data-t="stepVerif">Vérifier un gabarit rempli</h2></div>
+    <div class="step-hdr"><span class="step-num">10</span><h2 data-t="stepVerif">Vérifier un gabarit rempli</h2></div>
     <div class="step-hint" data-t="verifHint">Une fois votre évaluation complétée dans Word, réimportez-la ici pour un contrôle technique de premier niveau avant l'envoi en vérification par les pairs.</div>
     <div class="export-row">
       <div class="export-card" style="flex:1">
@@ -2804,8 +2803,21 @@ const T = {
     manualRemoveCrit:"✕",
     manualAddCrit:"+ Ajouter un critère",
     manualValidationError:"Veuillez saisir au moins une compétence avec un élément et un critère avant de continuer.",
-    categoryLabel:"Titre affiché (Répartition des points / Contenu de l'évaluation)",
-    categoryLabelHint:"Modifiable — ce titre apparaîtra tel quel dans les deux sections du document Word.",
+    stepSections:"Répartition des points",
+    sectionsHint:"Indiquez comment l'évaluation est divisée (questions, tâches, mises en situation, etc.) et le nombre de points pour chacune. Ex. : « Deux questions à développement — 10 points », « Cinq analyses de cas — 50 points ».",
+    sectionLabelPlaceholder:"ex. : Deux questions à développement",
+    addSection:"+ Ajouter une section",
+    removeSection:"Retirer cette section",
+    sectionsTotalLabel:"Total des sections",
+    stepGrille:"Grille de correction",
+    grilleHint:"Pour chaque section, sélectionnez les critères de performance évalués et répartissez les points.",
+    pickCriteriaHint:"Cochez les critères de performance évalués dans cette section.",
+    usedInAnotherSection:"déjà utilisé dans une autre section",
+    untitledSection:"Section sans titre",
+    noCriteriaPickedYet:"Aucun critère sélectionné pour cette section.",
+    noSectionsYet:"Ajoutez au moins une section pour commencer.",
+    noCompetencySelectedYet:"Aucun critère disponible — sélectionnez d'abord des éléments de compétence.",
+    showSectionsTip:"Passer à la répartition des points",
     stepVerif:"Vérifier un gabarit rempli",
     verifHint:"Une fois votre évaluation complétée dans Word, réimportez-la ici pour un contrôle technique de premier niveau avant l'envoi en vérification par les pairs.",
     verifUploadHint:"Le fichier n'est jamais envoyé sur un serveur : l'analyse se fait entièrement dans votre navigateur.",
@@ -2987,8 +2999,21 @@ const T = {
     manualRemoveCrit:"✕",
     manualAddCrit:"+ Add a criterion",
     manualValidationError:"Please enter at least one competency with one element and one criterion before continuing.",
-    categoryLabel:"Displayed title (Point Breakdown / Evaluation Content)",
-    categoryLabelHint:"Editable — this title will appear as-is in both sections of the Word document.",
+    stepSections:"Point Breakdown",
+    sectionsHint:"Indicate how the evaluation is divided (questions, tasks, scenarios, etc.) and the number of points for each. E.g.: \"Two essay questions — 10 points\", \"Five case analyses — 50 points\".",
+    sectionLabelPlaceholder:"e.g.: Two essay questions",
+    addSection:"+ Add a section",
+    removeSection:"Remove this section",
+    sectionsTotalLabel:"Sections total",
+    stepGrille:"Correction Rubric",
+    grilleHint:"For each section, select the performance criteria evaluated and distribute the points.",
+    pickCriteriaHint:"Check the performance criteria evaluated in this section.",
+    usedInAnotherSection:"already used in another section",
+    untitledSection:"Untitled section",
+    noCriteriaPickedYet:"No criteria selected for this section.",
+    noSectionsYet:"Add at least one section to get started.",
+    noCompetencySelectedYet:"No criteria available — select competency elements first.",
+    showSectionsTip:"Move on to the point breakdown",
     stepVerif:"Check a completed template",
     verifHint:"Once your evaluation is completed in Word, re-import it here for a first-level technical check before sending it for peer review.",
     verifUploadHint:"The file is never sent to a server: the analysis happens entirely in your browser.",
@@ -3018,6 +3043,8 @@ let savedScales  = []; // array of {name, scale}
 
 // Criteria point config: "compCode__elN__critIdx" -> { points:N, subcriteria:[ {label_fr, label_en, points, editedFr, editedEn} ] | null }
 const critConfig = new Map();
+let evalSections = []; // [{id, label, points, critKeys:Set<critKey>}] — teacher-defined evaluation structure
+let sectionIdCounter = 0;
 
 const checkSVG = `<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
@@ -3041,7 +3068,7 @@ function setLang(l) {
   });
   document.title = t('appTitle');
   // Re-render dynamic areas that depend on language
-  if (currentProg) { renderLists(); renderElementsArea(); renderCriteriaArea(); renderRubricConfig(); }
+  if (currentProg) { renderLists(); renderElementsArea(); if(evalSections.length){ renderSections(); renderGrilleSections(); } }
   renderScalePreview();
   renderScaleEditor();
   renderTypeCards();
@@ -3113,12 +3140,13 @@ progSelect.addEventListener('change', () => {
 });
 
 function hideAll() {
-  ['action-row-wrap','el-action-row-wrap','crit-action-row-wrap'].forEach(id => {
+  ['action-row-wrap','el-action-row-wrap'].forEach(id => {
     document.getElementById(id).style.display='none';
   });
   document.getElementById('elements-area').innerHTML=''; document.getElementById('elements-area').style.display='none';
-  document.getElementById('criteria-area').innerHTML=''; document.getElementById('criteria-area').style.display='none';
-  document.getElementById('rubric-config').classList.remove('visible');
+  document.getElementById('sections-step').style.display='none';
+  document.getElementById('grille-step').style.display='none';
+  evalSections.length=0;
 }
 
 // ── META BAR ──────────────────────────────────────────────────────────────────
@@ -3201,12 +3229,11 @@ document.getElementById('btn-clear-comps').addEventListener('click', () => {
 });
 
 function clearDownstreamFromComps() {
-  selectedEls.clear(); selectedCriteria.clear(); critConfig.clear();
+  selectedEls.clear(); selectedCriteria.clear(); critConfig.clear(); evalSections.length=0;
   document.getElementById('elements-area').innerHTML=''; document.getElementById('elements-area').style.display='none';
-  document.getElementById('criteria-area').innerHTML=''; document.getElementById('criteria-area').style.display='none';
   document.getElementById('el-action-row-wrap').style.display='none';
-  document.getElementById('crit-action-row-wrap').style.display='none';
-  document.getElementById('rubric-config').classList.remove('visible');
+  document.getElementById('sections-step').style.display='none';
+  document.getElementById('grille-step').style.display='none';
 }
 
 // ── SHOW ELEMENTS ────────────────────────────────────────────────────────────
@@ -3263,101 +3290,230 @@ function updateElCounts() {
   let total=0;
   selectedEls.forEach(s=>total+=s.size);
   document.getElementById('el-count-summary').textContent=`${total} ${t('elementsSelected')}`;
-  document.getElementById('btn-show-criteria').disabled=total===0;
+  document.getElementById('btn-show-sections').disabled=total===0;
 }
 
 document.getElementById('btn-clear-elements').addEventListener('click',()=>{
   selectedEls.forEach(s=>s.clear());
   document.querySelectorAll('.el-item.selected').forEach(el=>el.classList.remove('selected'));
   updateElCounts();
-  selectedCriteria.clear(); critConfig.clear();
-  document.getElementById('criteria-area').innerHTML=''; document.getElementById('criteria-area').style.display='none';
-  document.getElementById('crit-action-row-wrap').style.display='none';
-  document.getElementById('rubric-config').classList.remove('visible');
+  selectedCriteria.clear(); critConfig.clear(); evalSections.length=0;
+  document.getElementById('sections-step').style.display='none';
+  document.getElementById('grille-step').style.display='none';
 });
 
-// ── SHOW CRITERIA ─────────────────────────────────────────────────────────────
-document.getElementById('btn-show-criteria').addEventListener('click', renderCriteriaArea);
+// ── SHOW SECTIONS (Répartition des points) ──────────────────────────────────
+document.getElementById('btn-show-sections').addEventListener('click', showSectionsStep);
 
-function renderCriteriaArea() {
-  const area=document.getElementById('criteria-area');
-  area.innerHTML=''; area.style.display='block';
+function showSectionsStep(){
+  document.getElementById('sections-step').style.display='';
+  document.getElementById('grille-step').style.display='';
+  if(evalSections.length===0) addSection();
+  else { renderSections(); renderGrilleSections(); }
+  document.getElementById('sections-step').scrollIntoView({behavior:'smooth',block:'start'});
+}
 
-  const hdr=document.createElement('div'); hdr.className='elements-header';
-  hdr.innerHTML=`<h2>${t('criteriaAreaHeader')}</h2>`;
-  area.appendChild(hdr);
+function addSection(){
+  evalSections.push({ id:'s'+(sectionIdCounter++), label:'', points:0, critKeys:new Set() });
+  renderSections();
+  renderGrilleSections();
+}
+document.getElementById('btn-add-section').addEventListener('click', addSection);
 
-  const ordered = currentProg.competences.filter(c=>selectedComps.has(c.code));
-  let hasSomething=false;
-  ordered.forEach(comp=>{
-    const elSel=selectedEls.get(comp.code);
-    if(!elSel||!elSel.size) return;
-    const kind=comp.type==='choix'?'opt':'obl';
-
-    const selEls=(comp.elements||[]).filter(el=>elSel.has(el.n));
-    selEls.forEach((el,eli)=>{
-      hasSomething=true;
-      const elKey=`${comp.code}__${el.n}`;
-      if(!selectedCriteria.has(elKey)) selectedCriteria.set(elKey,new Set());
-      const critSel=selectedCriteria.get(elKey);
-
-      const sec=document.createElement('div'); sec.className='comp-section';
-      sec.innerHTML=`
-        <div class="comp-section-header ${kind}" style="gap:6px">
-          <span class="cs-code">${comp.code}</span>
-          <span class="cs-title" style="font-size:.82rem">${compLabel(comp)} — <em style="font-weight:400;color:var(--ch400)">${el.n}. ${elLabel(el)}</em></span>
+function renderSections(){
+  const wrap=document.getElementById('sections-list');
+  wrap.innerHTML = evalSections.map((sec,i)=>`
+    <div class="section-card" data-sid="${sec.id}">
+      <div class="sc-num">${i+1}</div>
+      <div class="sc-fields">
+        <input type="text" class="sc-label-input" data-sec-field="label" data-sid="${sec.id}" placeholder="${t('sectionLabelPlaceholder')}" value="${(sec.label||'').replace(/"/g,'&quot;')}">
+        <div class="sc-points-wrap">
+          <input type="number" class="sc-points-input" data-sec-field="points" data-sid="${sec.id}" min="0" max="100" step="0.5" value="${sec.points}">
+          <span style="font-size:.76rem;color:var(--ch400)">${t('pts')}</span>
         </div>
-        <div class="el-listbox-wrap">
-          <div class="el-hint">${t('clickToSelectCrit')}</div>
-          <div class="el-listbox" id="crit-lb-${comp.code}-${el.n}"></div>
-        </div>`;
-      area.appendChild(sec);
+      </div>
+      <button type="button" class="btn-remove-section" data-remove-section="${sec.id}" title="${t('removeSection')}">✕</button>
+    </div>`).join('');
 
-      const box=sec.querySelector(`#crit-lb-${comp.code}-${el.n}`);
-      (el.crit||[]).forEach((c,ci)=>{
-        const idx=ci+1;
-        const item=document.createElement('div'); item.className=`el-item ${kind}`;
-        item.innerHTML=`<div class="li-check">${checkSVG}</div><span class="el-num">${idx}.</span><span class="el-desc">${critLabelFromEl(el,ci)}</span>`;
-        if(critSel.has(idx)) item.classList.add('selected');
-        item.addEventListener('click',()=>{
-          if(critSel.has(idx)){critSel.delete(idx);item.classList.remove('selected');}
-          else{critSel.add(idx);item.classList.add('selected');}
-          updateCritCounts();
-        });
-        box.appendChild(item);
-      });
+  wrap.querySelectorAll('[data-sec-field]').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      const sec=evalSections.find(s=>s.id===e.target.dataset.sid); if(!sec) return;
+      if(e.target.dataset.secField==='label') sec.label=e.target.value;
+      else sec.points=roundPt(parseFloat(e.target.value)||0);
+      updateSectionsTotalDisplay();
+      updateTotalPointsFromSections();
+      refreshGrilleSectionHeader(sec.id);
+    });
+  });
+  wrap.querySelectorAll('[data-remove-section]').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      evalSections=evalSections.filter(s=>s.id!==e.target.dataset.removeSection);
+      renderSections();
+      updateSectionsTotalDisplay();
+      updateTotalPointsFromSections();
+      recomputeSelectedCriteriaFromSections();
+      renderGrilleSections();
     });
   });
 
-  if(!hasSomething) area.innerHTML+=`<div class="empty-state"><span>${t('selectCriteriaPrompt')}</span></div>`;
-  document.getElementById('crit-action-row-wrap').style.display='block';
-  updateCritCounts();
+  updateSectionsTotalDisplay();
+  updateTotalPointsFromSections();
 }
 
-function updateCritCounts(){
-  let total=0;
-  selectedCriteria.forEach(s=>total+=s.size);
-  document.getElementById('crit-count-summary').textContent=`${total} ${t('criteriaSelected')}`;
-  document.getElementById('btn-show-config').disabled=total===0;
+function updateSectionsTotalDisplay(){
+  const sum=roundPt(evalSections.reduce((a,s)=>a+(s.points||0),0));
+  const el=document.getElementById('sections-total-display'); if(!el) return;
+  el.textContent=`${t('sectionsTotalLabel')} : ${sum} / 100 pts`;
+  el.classList.toggle('ok', Math.abs(sum-100)<0.01);
+  el.classList.toggle('mismatch', Math.abs(sum-100)>=0.01);
 }
 
-document.getElementById('btn-clear-criteria').addEventListener('click',()=>{
+function updateTotalPointsFromSections(){
+  totalPoints = roundPt(evalSections.reduce((a,s)=>a+(s.points||0),0)) || 100;
+}
+
+// ── GRILLE DE CORRECTION — per section: pick critères + assign points ──────
+function gatherAvailableCritRows(){
+  const rows=[];
+  if(!currentProg) return rows;
+  const orderedComps=currentProg.competences.filter(c=>selectedComps.has(c.code));
+  orderedComps.forEach(comp=>{
+    const elSel=selectedEls.get(comp.code); if(!elSel) return;
+    (comp.elements||[]).filter(el=>elSel.has(el.n)).forEach(el=>{
+      (el.crit||[]).forEach((c,ci)=>{
+        rows.push({compCode:comp.code, elN:el.n, critIdx:ci+1, critText:c, critTextEn:(el.crit_en&&el.crit_en[ci])||c, comp, el});
+      });
+    });
+  });
+  return rows;
+}
+
+function usedCritKeysExcluding(excludeSectionId){
+  const s=new Set();
+  evalSections.forEach(sec=>{ if(sec.id!==excludeSectionId) sec.critKeys.forEach(k=>s.add(k)); });
+  return s;
+}
+
+function renderGrilleSections(){
+  const wrap=document.getElementById('grille-sections');
+  if(evalSections.length===0){ wrap.innerHTML=`<div class="grille-empty-hint">${t('noSectionsYet')}</div>`; return; }
+  wrap.innerHTML=evalSections.map(sec=>`<div class="grille-section" id="grille-sec-${sec.id}"></div>`).join('');
+  evalSections.forEach(sec=>renderGrilleSectionBlock(sec));
+}
+
+function renderGrilleSectionBlock(sec){
+  const el=document.getElementById(`grille-sec-${sec.id}`); if(!el) return;
+  const usedElsewhere=usedCritKeysExcluding(sec.id);
+  const rows=gatherAvailableCritRows();
+
+  let pickerHtml=`<div class="grille-crit-picker"><div class="gcp-hint">${t('pickCriteriaHint')}</div>`;
+  if(!rows.length){
+    pickerHtml+=`<div class="grille-empty-hint">${t('noCompetencySelectedYet')}</div>`;
+  }
+  let lastComp=null,lastEl=null;
+  rows.forEach(r=>{
+    const k=critKey(r.compCode,r.elN,r.critIdx);
+    const checked=sec.critKeys.has(k);
+    const disabled=usedElsewhere.has(k);
+    if(r.compCode!==lastComp){ pickerHtml+=`<div class="comp-mini-hdr">${r.compCode} — ${compLabel(r.comp)}</div>`; lastComp=r.compCode; lastEl=null; }
+    if(r.elN!==lastEl){ pickerHtml+=`<div style="font-size:.72rem;color:var(--ch400);margin:4px 0 2px 8px">${r.elN}. ${elLabel(r.el)}</div>`; lastEl=r.elN; }
+    const critText=lang==='en'?(r.critTextEn||r.critText):r.critText;
+    pickerHtml+=`<label class="crit-pick-item${disabled?' disabled':''}" style="margin-left:16px">
+      <input type="checkbox" data-pick-sid="${sec.id}" data-pick-key="${k}" ${checked?'checked':''} ${disabled?'disabled':''}>
+      <span>${r.critIdx}. ${critText}${disabled?`<span class="cpi-used-elsewhere">(${t('usedInAnotherSection')})</span>`:''}</span>
+    </label>`;
+  });
+  pickerHtml+=`</div>`;
+
+  el.innerHTML=`
+    <div class="grille-section-hdr">
+      <span class="gsh-title">${sec.label||t('untitledSection')} — ${sec.points} ${t('pts')}</span>
+      <span class="gsh-budget" id="gsh-budget-${sec.id}"></span>
+    </div>
+    ${pickerHtml}
+    <div class="grille-crit-config" id="grille-crit-config-${sec.id}"></div>`;
+
+  el.querySelectorAll('[data-pick-key]').forEach(cb=>{
+    cb.addEventListener('change', e=>{
+      const k=e.target.dataset.pickKey;
+      if(e.target.checked) sec.critKeys.add(k);
+      else { sec.critKeys.delete(k); critConfig.delete(k); }
+      // Picking criteria is a structural step that happens before fine-tuning
+      // individual point values — redistribute the section's total evenly
+      // across whatever is now checked, rather than only filling in the
+      // newest pick (which would compound incorrectly across clicks).
+      const rows=gatherAvailableCritRows().filter(r=>sec.critKeys.has(critKey(r.compCode,r.elN,r.critIdx)));
+      const parts=distributeEvenly(sec.points, rows.length);
+      rows.forEach((r,ri)=>{
+        critConfig.set(critKey(r.compCode,r.elN,r.critIdx), {points:parts[ri], subcriteria:null, scaleKey:'default'});
+      });
+      recomputeSelectedCriteriaFromSections();
+      renderGrilleSections(); // full rebuild so every section's "used elsewhere" state stays in sync
+    });
+  });
+
+  renderSectionCritConfig(sec);
+  updateSectionBudget(sec);
+}
+
+function renderSectionCritConfig(sec){
+  const container=document.getElementById(`grille-crit-config-${sec.id}`); if(!container) return;
+  container.innerHTML='';
+  const rows=gatherAvailableCritRows().filter(r=>sec.critKeys.has(critKey(r.compCode,r.elN,r.critIdx)));
+  if(!rows.length){ container.innerHTML=`<div class="grille-empty-hint">${t('noCriteriaPickedYet')}</div>`; return; }
+
+  const evenParts=distributeEvenly(sec.points, rows.length);
+  rows.forEach((r,ri)=>{
+    const k=critKey(r.compCode,r.elN,r.critIdx);
+    if(!critConfig.has(k)) critConfig.set(k,{points:evenParts[ri],subcriteria:null,scaleKey:'default'});
+  });
+
+  let lastComp=null,lastEl=null,elGroup=null;
+  rows.forEach(r=>{
+    if(r.elN!==lastEl||r.compCode!==lastComp){
+      elGroup=document.createElement('div');
+      elGroup.innerHTML=`<div class="el-subhdr"><span class="el-subhdr-num">${r.compCode}.${r.elN}</span><span>${elLabel(r.el)}</span></div>`;
+      container.appendChild(elGroup); lastEl=r.elN; lastComp=r.compCode;
+    }
+    elGroup.appendChild(buildCritRow(r, sec.points));
+  });
+}
+
+function updateSectionBudget(sec){
+  const badge=document.getElementById(`gsh-budget-${sec.id}`); if(!badge) return;
+  let used=0;
+  sec.critKeys.forEach(k=>{ const c=critConfig.get(k); if(c) used+= c.subcriteria ? c.subcriteria.reduce((a,s)=>a+s.points,0) : c.points; });
+  used=roundPt(used);
+  const mismatch=Math.abs(used-sec.points)>0.05;
+  badge.textContent=`${used} / ${sec.points} pts`;
+  badge.classList.toggle('mismatch', mismatch);
+}
+
+function refreshGrilleSectionHeader(sid){
+  const sec=evalSections.find(s=>s.id===sid); if(!sec) return;
+  const hdr=document.querySelector(`#grille-sec-${sid} .gsh-title`);
+  if(hdr) hdr.textContent=`${sec.label||t('untitledSection')} — ${sec.points} ${t('pts')}`;
+  updateSectionBudget(sec);
+}
+
+function recomputeSelectedCriteriaFromSections(){
   selectedCriteria.forEach(s=>s.clear());
-  document.querySelectorAll('#criteria-area .el-item.selected').forEach(el=>el.classList.remove('selected'));
-  updateCritCounts();
-  document.getElementById('rubric-config').classList.remove('visible');
-});
+  evalSections.forEach(sec=>{
+    sec.critKeys.forEach(k=>{
+      const m=k.match(/^(.+)__(\d+)__(\d+)$/); if(!m) return;
+      const elKey=`${m[1]}__${m[2]}`;
+      if(!selectedCriteria.has(elKey)) selectedCriteria.set(elKey,new Set());
+      selectedCriteria.get(elKey).add(parseInt(m[3]));
+    });
+  });
+}
 
-// ── SHOW RUBRIC CONFIG ────────────────────────────────────────────────────────
-document.getElementById('btn-show-config').addEventListener('click', renderRubricConfig);
-
-function renderRubricConfig() {
-  const cfg=document.getElementById('rubric-config');
-  cfg.classList.add('visible');
-  renderScalePreview();
-  buildCritConfigCards();
-  cfg.scrollIntoView({behavior:'smooth',block:'start'});
-  checkBudget();
+function synthesizeSingleSectionFromCritConfig(){
+  evalSections.length=0; sectionIdCounter=0;
+  const keys=[...critConfig.keys()];
+  if(!keys.length) return;
+  const pts=roundPt(keys.reduce((a,k)=>{ const c=critConfig.get(k); return a+(c.subcriteria?c.subcriteria.reduce((x,s)=>x+s.points,0):c.points); },0));
+  evalSections.push({ id:'s'+(sectionIdCounter++), label:(lang==='en'?'Evaluation':'Évaluation'), points: totalPoints||pts, critKeys:new Set(keys) });
 }
 
 // ── SCALE PREVIEW ─────────────────────────────────────────────────────────────
@@ -3368,57 +3524,6 @@ function renderScalePreview() {
       <span class="pill-label">${lang==='en'?s.label_en:s.label_fr}</span>
       <span class="pill-weight">${s.weight}%</span>
     </div>`).join('');
-}
-
-// ── BUILD CRITERIA CONFIG CARDS ───────────────────────────────────────────────
-function buildCritConfigCards() {
-  const container=document.getElementById('crit-config-cards'); container.innerHTML='';
-  const total=roundPt(parseFloat(document.getElementById('total-points').value)||30);
-
-  // Collect all selected criteria in order
-  const rows=[]; // {compCode, elN, critIdx, critText, comp, el}
-  const orderedComps=currentProg.competences.filter(c=>selectedComps.has(c.code));
-  orderedComps.forEach(comp=>{
-    const elSel=selectedEls.get(comp.code);
-    if(!elSel) return;
-    (comp.elements||[]).filter(el=>elSel.has(el.n)).forEach(el=>{
-      const elKey=`${comp.code}__${el.n}`;
-      const critSel=selectedCriteria.get(elKey);
-      if(!critSel) return;
-      (el.crit||[]).forEach((c,ci)=>{
-        if(critSel.has(ci+1)) rows.push({compCode:comp.code,elN:el.n,critIdx:ci+1,critText:c,critTextEn:(el.crit_en&&el.crit_en[ci])||c,comp,el});
-      });
-    });
-  });
-
-  if(!rows.length) return;
-  const evenParts=distributeEvenly(total, rows.length);
-
-  // Auto-distribute on first render (if key not yet set)
-  rows.forEach((r,ri)=>{
-    const k=critKey(r.compCode,r.elN,r.critIdx);
-    if(!critConfig.has(k)) critConfig.set(k,{points:evenParts[ri],subcriteria:null,scaleKey:'default'});
-  });
-
-  // Group by comp then by element
-  let lastComp=null, lastEl=null, section=null, elGroup=null;
-  rows.forEach((r,ri)=>{
-    if(r.compCode!==lastComp){
-      const kind=getCompKind(r.compCode);
-      section=document.createElement('div'); section.className='crit-config-section'; section.style.animationDelay=`${ri*20}ms`;
-      section.innerHTML=`<div class="crit-section-hdr"><span class="crit-hdr-code">${r.compCode}</span><span class="crit-hdr-title">${compLabel(r.comp)}</span></div>`;
-      container.appendChild(section); lastComp=r.compCode; lastEl=null;
-    }
-    if(r.elN!==lastEl){
-      elGroup=document.createElement('div');
-      elGroup.innerHTML=`<div class="el-subhdr"><span class="el-subhdr-num">${r.elN}.</span><span>${elLabel(r.el)}</span></div>`;
-      section.appendChild(elGroup); lastEl=r.elN;
-    }
-    elGroup.appendChild(buildCritRow(r, total));
-  });
-
-  // Budget bar at the bottom
-  updateBudgetDisplay();
 }
 
 function buildCritRow(r, total) {
@@ -3444,14 +3549,7 @@ function buildCritRow(r, total) {
         <button class="toggle-sub${hasSub?' active':''}" data-key="${k}">${hasSub?t('removeSubdivision'):t('subdivide')}</button>
       </div>
     </div>
-    <div class="crit-row-label-wrap">
-      <input type="text" class="crit-label-input" data-key="${k}" placeholder="${t('categoryLabel')}" value="${(cfg.customLabel||'').replace(/"/g,'&quot;')}" title="${t('categoryLabelHint')}">
-    </div>
     <div class="sub-builder${hasSub?' open':''}" id="sub-${k}"></div>`;
-
-  row.querySelector('.crit-label-input').addEventListener('input', e=>{
-    cfg.customLabel = e.target.value;
-  });
 
   row.querySelector('.pts-input').addEventListener('input', e=>{
     cfg.points=roundPt(parseFloat(e.target.value)||0);
@@ -3613,58 +3711,23 @@ function updateSubSum(k) {
   el.className=`sub-sum-display ${isOk?'ok':'over'}`;
 }
 
-function calcAssigned() {
-  let used=0;
-  critConfig.forEach(cfg=>{
-    if(cfg.subcriteria) used+=cfg.subcriteria.reduce((a,s)=>a+roundPt(s.points),0);
-    else used+=roundPt(cfg.points);
-  });
-  return roundPt(used);
-}
-
 function updateBudgetDisplay() {
-  const total=roundPt(parseFloat(document.getElementById('total-points').value)||30);
-  const used=calcAssigned();
-  const mismatch=Math.abs(used-total)>0.05;
-
-  // Update assigned counter
-  const assignedEl=document.getElementById('points-assigned');
-  const totalEchoEl=document.getElementById('points-total-echo');
-  if(assignedEl){ assignedEl.textContent=used; assignedEl.style.color=mismatch?'var(--red)':'var(--ch600)'; assignedEl.style.fontWeight=mismatch?'700':'500'; }
-  if(totalEchoEl) totalEchoEl.textContent=total;
-
-  // Warning message
-  const msgEl=document.getElementById('rubric-budget-msg');
-  if(msgEl) msgEl.style.display=mismatch?'inline':'none';
-
-  // Disable export buttons when mismatch
+  // Refresh every section's own budget badge (sum of its critères vs its declared points),
+  // plus the overall "sections total vs 100" indicator.
+  evalSections.forEach(sec=>updateSectionBudget(sec));
+  updateSectionsTotalDisplay();
+  const anyMismatch = evalSections.some(sec=>{
+    let used=0;
+    sec.critKeys.forEach(k=>{ const c=critConfig.get(k); if(c) used+= c.subcriteria ? c.subcriteria.reduce((a,s)=>a+s.points,0) : c.points; });
+    return Math.abs(roundPt(used)-sec.points)>0.05;
+  }) || Math.abs(roundPt(evalSections.reduce((a,s)=>a+(s.points||0),0))-100)>=0.01;
   ['btn-download-docx','btn-export-grading-json'].forEach(id=>{
     const b=document.getElementById(id);
-    if(b){ b.disabled=mismatch; b.title=mismatch?'Total assigné ('+used+') ≠ total évaluation ('+total+')':'';}
+    if(b){ b.disabled=anyMismatch; b.title=anyMismatch?t('budgetWarning'):''; }
   });
 }
 
 function checkBudget() { updateBudgetDisplay(); }
-
-// Total points input
-document.getElementById('total-points').addEventListener('input',e=>{
-  totalPoints=roundPt(parseFloat(e.target.value)||30);
-  redistributePoints();
-  buildCritConfigCards();
-  updateBudgetDisplay();
-});
-
-function redistributePoints() {
-  const total=roundPt(parseFloat(document.getElementById('total-points').value)||30);
-  const keys=[...critConfig.keys()];
-  const n=keys.length; if(!n) return;
-  const parts=distributeEvenly(total, n);
-  keys.forEach((k,i)=>{
-    const cfg=critConfig.get(k);
-    cfg.points=parts[i];
-    if(cfg.subcriteria) distributeSubPoints(k);
-  });
-}
 
 // ── SCALE DRAWER ──────────────────────────────────────────────────────────────
 document.getElementById('btn-open-scale-drawer').addEventListener('click',()=>{
@@ -3760,7 +3823,7 @@ document.getElementById('btn-add-level').addEventListener('click',()=>{
 
 document.getElementById('btn-apply-scale').addEventListener('click',()=>{
   currentScale=drawerScale.map(s=>({...s}));
-  renderScalePreview(); closeDrawer(); buildCritConfigCards();
+  renderScalePreview(); closeDrawer(); renderGrilleSections();
 });
 
 document.getElementById('btn-reset-scale').addEventListener('click',()=>{
@@ -3888,11 +3951,11 @@ function buildGradingParams(){
   return params;
 }
 
-function applyGradingParams(p){
+function applyGradingParams(p, skipSectionSetup){
   if(p.lang) setLang(p.lang);
   if(p.scale) currentScale=p.scale;
   if(p.savedScales) savedScales=p.savedScales;
-  if(p.totalPoints){ totalPoints=p.totalPoints; document.getElementById('total-points').value=totalPoints; }
+  if(p.totalPoints) totalPoints=p.totalPoints;
 
   selectedComps.clear(); selectedEls.clear(); selectedCriteria.clear(); critConfig.clear();
 
@@ -3917,14 +3980,17 @@ function applyGradingParams(p){
   Object.entries(p.selectedCriteria||{}).forEach(([k,v])=>selectedCriteria.set(k,new Set(v)));
   Object.entries(p.critConfig||{}).forEach(([k,v])=>critConfig.set(k,v));
 
-  if(selectedComps.size>0){
-    renderElementsArea();
-    if([...selectedEls.values()].some(s=>s.size>0)){
-      renderCriteriaArea();
-      if([...selectedCriteria.values()].some(s=>s.size>0)){
-        renderRubricConfig();
-      }
+  if(selectedComps.size>0) renderElementsArea();
 
+  if(!skipSectionSetup){
+    // Bare grading-JSON import (no section structure available): wrap
+    // whatever critères/points came in into a single fallback section.
+    synthesizeSingleSectionFromCritConfig();
+    if(evalSections.length){
+      document.getElementById('sections-step').style.display='';
+      document.getElementById('grille-step').style.display='';
+      renderSections();
+      renderGrilleSections();
     }
   }
   renderScalePreview();
@@ -4222,28 +4288,23 @@ document.getElementById('btn-manual-validate').addEventListener('click', ()=>{
     competences: cleanComps.map(c=>({ code:c.code, type:'obligatoire', enonce:c.enonce, enonce_en:c.enonce, elements:c.elements.map(el=>({ n:el.n, desc:el.desc, desc_en:el.desc, crit:el.crit, crit_en:el.crit })) }))
   };
 
-  // Auto-select everything the teacher entered — in manual mode, whatever
-  // was typed IS what's evaluated, there is no larger list to narrow down from.
+  // Auto-select the competencies/elements the teacher entered — in manual mode,
+  // whatever was typed IS what's evaluated, there is no larger list to narrow
+  // down from. Criteria themselves get assigned to sections in the next step.
   selectedComps.clear();
   currentProg.competences.forEach(c=>selectedComps.add(c.code));
   selectedEls.clear();
   currentProg.competences.forEach(c=>selectedEls.set(c.code, new Set(c.elements.map(el=>el.n))));
   selectedCriteria.clear();
-  currentProg.competences.forEach(c=>{
-    c.elements.forEach(el=>{
-      selectedCriteria.set(`${c.code}__${el.n}`, new Set(el.crit.map((_,i)=>i+1)));
-    });
-  });
   critConfig.clear();
+  evalSections.length = 0;
 
   const idProgField=document.getElementById('id-program');
   if(idProgField && !idProgField.value.trim()) idProgField.value = `${progTitre} — ${progCode}`;
 
   document.getElementById('action-row-wrap').style.display='none';
   renderElementsArea();
-  renderCriteriaArea();
-  renderRubricConfig();
-  document.getElementById('rubric-config').scrollIntoView({behavior:'smooth', block:'start'});
+  showSectionsStep();
 });
 
 
@@ -4471,6 +4532,7 @@ function exportTemplateJSON(){
     identification: idFieldsToObject(),
     consignes: JSON.parse(JSON.stringify(consignesState)),
     iaLevel,
+    evalSections: evalSections.map(s=>({ id:s.id, label:s.label, points:s.points, critKeys:[...s.critKeys] })),
     grading: buildGradingParams(),
   };
   const blob=new Blob([JSON.stringify(tpl,null,2)],{type:'application/json'});
@@ -4496,7 +4558,23 @@ function importGabaritTemplate(p){
     });
   }
   if(p.iaLevel) iaLevel=p.iaLevel;
-  if(p.grading) applyGradingParams(p.grading);
+  if(p.grading) applyGradingParams(p.grading, true); // true = we restore sections ourselves below
+
+  if(p.evalSections && p.evalSections.length){
+    evalSections.length=0;
+    p.evalSections.forEach(s=>evalSections.push({ id:s.id, label:s.label, points:s.points, critKeys:new Set(s.critKeys||[]) }));
+    sectionIdCounter = evalSections.length;
+  } else {
+    // Older export (pre-sections) — wrap existing critères into one section
+    synthesizeSingleSectionFromCritConfig();
+  }
+  if(evalSections.length){
+    document.getElementById('sections-step').style.display='';
+    document.getElementById('grille-step').style.display='';
+    renderSections();
+    renderGrilleSections();
+  }
+
   renderTypeCards();   // also re-renders consignes
   renderIACards();
   renderLangueTable();
@@ -4587,28 +4665,6 @@ const CONS_TEXT = {
       en:"Students may use generative AI only with the teacher's authorization. In all cases, students are required to disclose or cite any instances where they have used a generative AI tool. They must carefully verify and appropriately adjust any work produced with the help of generative AI. A student who chooses to use generative AI to contribute to the production of a resource or document will always be held accountable for the content of their work. (IPEL – Article 5.16.5)"},
   lisible:{fr:"Veuillez écrire de façon lisible.", en:"Please write clearly."},
 };
-
-function gatherRubricRows(){
-  const rows=[];
-  if(!currentProg) return rows;
-  const orderedComps=currentProg.competences.filter(c=>selectedComps.has(c.code));
-  orderedComps.forEach(comp=>{
-    const elSel=selectedEls.get(comp.code); if(!elSel) return;
-    (comp.elements||[]).filter(el=>elSel.has(el.n)).forEach(el=>{
-      const elKey=`${comp.code}__${el.n}`;
-      const critSel=selectedCriteria.get(elKey); if(!critSel) return;
-      const crits=[];
-      (el.crit||[]).forEach((c,ci)=>{
-        if(!critSel.has(ci+1)) return;
-        const k=critKey(comp.code,el.n,ci+1);
-        const cfg=critConfig.get(k)||{points:0,subcriteria:null,scaleKey:'default'};
-        crits.push({critIdx:ci+1, text:critLabelFromEl(el,ci), cfg});
-      });
-      if(crits.length) rows.push({comp, el, crits});
-    });
-  });
-  return rows;
-}
 
 function buildAndDownloadDocx(){
   const D = window.docx;
@@ -4744,33 +4800,22 @@ function buildAndDownloadDocx(){
     else children.push(p(line));
   });
 
-  // Répartition des points
+  // Répartition des points — directly from the teacher-defined sections
   children.push(bar(dt('repartitionTitle')));
   children.push(p(dt('repartitionIntro')));
-  const rubricRows = gatherRubricRows();
-  const repRows=[];
-  const contenuCategories=[]; // kept in exact sync with répartition rows: same label, same points
-  let grandTotal=0;
-  rubricRows.forEach(({comp,el,crits})=>{
-    crits.forEach(({critIdx,text,cfg})=>{
-      const pts = cfg.subcriteria ? cfg.subcriteria.reduce((a,s)=>a+s.points,0) : cfg.points;
-      grandTotal+=pts;
-      const label = (cfg.customLabel && cfg.customLabel.trim()) ? cfg.customLabel.trim() : `${comp.code}.${el.n}.${critIdx} — ${text}`;
-      repRows.push([label, pts+' pts']);
-      contenuCategories.push({label, pts});
-    });
-  });
+  const repRows = evalSections.map(sec=>[sec.label || dt('totalPts'), roundPt(sec.points)+' pts']);
+  const grandTotal = roundPt(evalSections.reduce((a,s)=>a+(s.points||0),0));
   if(repRows.length){
     children.push(twoColTable(repRows, [7440,2200]));
   }
-  children.push(p(`${dt('totalLbl')}: ${roundPt(grandTotal)} ${dt('totalPts')}`, {bold:true}));
+  children.push(p(`${dt('totalLbl')}: ${grandTotal} ${dt('totalPts')}`, {bold:true}));
 
-  // Contenu de l'évaluation — auto-structured to mirror Répartition des points
-  // exactly (same titles, same point values), per each named category above.
+  // Contenu de l'évaluation — one heading per section, mirroring Répartition
+  // des points exactly (same titles, same point values) by construction.
   children.push(bar(dt('contenuTitle')));
-  if(contenuCategories.length){
-    contenuCategories.forEach(cat=>{
-      children.push(p(`${cat.label} (${cat.pts} ${dt('totalPts').toLowerCase()})`, {bold:true}));
+  if(evalSections.length){
+    evalSections.forEach(sec=>{
+      children.push(p(`${sec.label || dt('totalPts')} (${roundPt(sec.points)} ${dt('totalPts').toLowerCase()})`, {bold:true}));
       children.push(p(dt('contenuPlaceholder'), {italics:true}));
     });
   } else {
@@ -4778,24 +4823,34 @@ function buildAndDownloadDocx(){
   }
   children.push(p(dt('guideLink'), {italics:true}));
 
-  // Grilles de correction
+  // Grilles de correction — grouped by section, then by élément within it
   children.push(bar(dt('grillesTitle')));
-  rubricRows.forEach(({comp,el,crits})=>{
-    children.push(p(`${dt('competencyCodeWord')} ${comp.code}.${el.n} ${elLabel(el)}`, {bold:true}));
-    crits.forEach(({critIdx,text,cfg})=>{
+  const allRows = gatherAvailableCritRows();
+  evalSections.forEach(sec=>{
+    children.push(p(`${sec.label || dt('totalPts')} (${roundPt(sec.points)} ${dt('totalPts').toLowerCase()})`, {bold:true, run:{color:"00587C"}}));
+    const rows = allRows.filter(r=>sec.critKeys.has(critKey(r.compCode,r.elN,r.critIdx)));
+    let lastComp=null, lastEl=null;
+    rows.forEach(r=>{
+      const k = critKey(r.compCode,r.elN,r.critIdx);
+      const cfg = critConfig.get(k); if(!cfg) return;
+      if(r.compCode!==lastComp || r.elN!==lastEl){
+        children.push(p(`${dt('competencyCodeWord')} ${r.compCode}.${r.elN} ${elLabel(r.el)}`, {bold:true}));
+        lastComp=r.compCode; lastEl=r.elN;
+      }
+      const critText = lang==='en' ? (r.critTextEn||r.critText) : r.critText;
       if(cfg.subcriteria){
         const scale = getScaleForKey(cfg.subcriteria[0].scaleKey||'default');
         const header = [dt('criteresPerf'), ...scale.map(s=>`${lang==='en'?s.label_en:s.label_fr} (${s.weight}%)`), dt('totalLbl')];
-        const rows=[header, ...cfg.subcriteria.map((sub,si)=>{
+        const trows=[header, ...cfg.subcriteria.map((sub,si)=>{
           const lbl = lang==='en' ? (sub.label_en||sub.label_fr) : sub.label_fr;
-          return [`${critIdx}.${si+1} ${lbl}`, ...scale.map(s=>roundPt(sub.points*s.weight/100)), sub.points];
+          return [`${r.critIdx}.${si+1} ${lbl}`, ...scale.map(s=>roundPt(sub.points*s.weight/100)), sub.points];
         })];
-        children.push(simpleGridTable(D, rows));
+        children.push(simpleGridTable(D, trows));
       } else {
         const scale = getScaleForKey(cfg.scaleKey||'default');
         const header = [dt('criteresPerf'), ...scale.map(s=>`${lang==='en'?s.label_en:s.label_fr} (${s.weight}%)`), dt('totalLbl')];
-        const rows=[header, [`${critIdx}. ${text}`, ...scale.map(s=>roundPt(cfg.points*s.weight/100)), cfg.points]];
-        children.push(simpleGridTable(D, rows));
+        const trows=[header, [`${r.critIdx}. ${critText}`, ...scale.map(s=>roundPt(cfg.points*s.weight/100)), cfg.points]];
+        children.push(simpleGridTable(D, trows));
       }
       children.push(new Paragraph({text:"", spacing:{after:80}}));
     });
