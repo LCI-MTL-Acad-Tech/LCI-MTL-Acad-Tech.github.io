@@ -265,7 +265,7 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
 .sub-label-input{flex:1;background:var(--white);border:1px solid var(--cream-darker);border-radius:var(--r);padding:5px 8px;font-size:.76rem;color:var(--charcoal)}
 .sub-label-input.auto-copy{background:var(--auto-bg);border-color:#cc9a00}
 .sub-label-input:focus{outline:2px solid var(--blue-mid);border-color:var(--blue);background:var(--white)}
-.sub-pts-input{width:52px;background:var(--white);border:1px solid var(--cream-darker);border-radius:var(--r);padding:5px 7px;font-size:.76rem;text-align:center}
+.sub-pts-input{width:52px;background:var(--white);color:var(--charcoal);border:1px solid var(--cream-darker);border-radius:var(--r);padding:5px 7px;font-size:.76rem;text-align:center}
 .sub-pts-input:focus{outline:2px solid var(--blue-mid);border-color:var(--blue)}
 .sub-pts-input
 .btn-rm-sub{background:transparent;border:none;color:var(--ch300);font-size:1rem;cursor:pointer;line-height:1;padding:2px 5px;border-radius:3px;transition:color var(--dur)}
@@ -287,10 +287,10 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
 .drawer-section-lbl:first-child{margin-top:0}
 /* Scale list in drawer */
 .scale-editor-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:7px 10px;background:var(--cream);border:1px solid var(--cream-dark);border-radius:var(--r)}
-.scale-editor-row input.scale-lbl{flex:1;background:var(--white);border:1px solid var(--cream-darker);border-radius:var(--r);padding:4px 8px;font-size:.82rem}
+.scale-editor-row input.scale-lbl{flex:1;background:var(--white);color:var(--charcoal);border:1px solid var(--cream-darker);border-radius:var(--r);padding:4px 8px;font-size:.82rem}
 .scale-editor-row input.scale-lbl.auto-copy{background:var(--auto-bg);border-color:#cc9a00}
 .scale-editor-row input.scale-lbl:focus{outline:2px solid var(--blue-mid);border-color:var(--blue);background:var(--white)}
-.scale-editor-row input.scale-wt{width:52px;background:var(--white);border:1px solid var(--cream-darker);border-radius:var(--r);padding:4px 8px;font-size:.82rem;text-align:center}
+.scale-editor-row input.scale-wt{width:52px;background:var(--white);color:var(--charcoal);border:1px solid var(--cream-darker);border-radius:var(--r);padding:4px 8px;font-size:.82rem;text-align:center}
 .scale-editor-row input.scale-wt:focus{outline:2px solid var(--blue-mid);border-color:var(--blue)}
 .scale-editor-row input.scale-wt:disabled{background:var(--cream);color:var(--ch300)}
 .scale-editor-row input.scale-w
@@ -356,8 +356,14 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
 .consigne-row .cr-body{flex:1;display:flex;flex-direction:column;gap:5px}
 .consigne-row .cr-label{font-size:.8rem;color:var(--charcoal);line-height:1.4}
 .consigne-row .cr-extra{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.consigne-row .cr-extra input[type=text]{background:var(--cream);border:1px solid var(--cream-darker);border-radius:var(--r);padding:5px 9px;font-family:inherit;font-size:.78rem;flex:1;min-width:160px}
-.consigne-row .cr-extra input[type=number]{width:60px;background:var(--cream);border:1px solid var(--cream-darker);border-radius:var(--r);padding:5px 7px;font-family:inherit;font-size:.78rem;text-align:center}
+.consigne-row .cr-extra input[type=text]{background:var(--cream);color:var(--charcoal);border:1px solid var(--cream-darker);border-radius:var(--r);padding:5px 9px;font-family:inherit;font-size:.78rem;flex:1;min-width:160px}
+.chip-field{display:flex;flex-direction:column;gap:6px}
+.chip-row{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--cream);color:var(--ch400);border:1px solid var(--cream-darker);border-radius:100px;padding:4px 12px;font-size:.72rem;font-family:inherit;cursor:pointer;transition:all var(--dur) var(--ease)}
+.chip:hover{border-color:var(--blue-mid)}
+.chip.active{background:var(--blue);border-color:var(--blue);color:var(--white)}
+.chip-other-input{background:var(--cream);color:var(--charcoal);border:1px solid var(--cream-darker);border-radius:var(--r);padding:5px 9px;font-family:inherit;font-size:.78rem;width:100%}
+.consigne-row .cr-extra input[type=number]{width:60px;background:var(--cream);color:var(--charcoal);border:1px solid var(--cream-darker);border-radius:var(--r);padding:5px 7px;font-family:inherit;font-size:.78rem;text-align:center}
 .consigne-block{background:var(--white);border:1px solid var(--cream-darker);border-radius:var(--rl);overflow:hidden}
 .consigne-subhdr{background:var(--cream);color:var(--ch500);font-size:.68rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase;padding:7px 10px}
 
@@ -392,7 +398,7 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
 .manual-el-block{background:var(--cream);border:1px solid var(--cream-dark);border-radius:var(--r);padding:10px 12px;margin:8px 0}
 .manual-el-block .meb-hdr{font-size:.7rem;color:var(--ch400);margin-bottom:6px}
 .manual-crit-row{display:flex;gap:6px;align-items:center;margin-bottom:6px}
-.manual-crit-row input{flex:1}
+.manual-crit-row input{flex:1;background:var(--cream);color:var(--charcoal);border:1px solid var(--cream-darker);border-radius:var(--r);padding:5px 9px;font-family:inherit;font-size:.82rem}
 .btn-link-remove{background:none;border:none;color:var(--red);font-size:.72rem;cursor:pointer;padding:2px 6px;white-space:nowrap}
 .btn-link-add{background:none;border:none;color:var(--blue);font-size:.74rem;cursor:pointer;padding:2px 0;text-align:left}
 
@@ -443,7 +449,7 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
   <div class="drawer-footer">
     <div style="display:flex;flex-direction:column;gap:6px;width:100%">
       <div style="display:flex;gap:6px;align-items:center">
-        <input type="text" id="scale-name-input" placeholder="" data-t-placeholder="scaleNameLabel" style="flex:1;background:var(--cream);border:1px solid var(--cream-darker);border-radius:var(--r);padding:6px 10px;font-family:inherit;font-size:.8rem">
+        <input type="text" id="scale-name-input" placeholder="" data-t-placeholder="scaleNameLabel" style="flex:1;background:var(--cream);color:var(--charcoal);border:1px solid var(--cream-darker);border-radius:var(--r);padding:6px 10px;font-family:inherit;font-size:.8rem">
         <button class="btn-secondary" id="btn-save-named-scale" data-t="saveScale" style="white-space:nowrap">Enregistrer</button>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -670,8 +676,6 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
     <div class="step-hdr"><span class="step-num">4</span><h2 data-t="stepConsignes">Consignes</h2></div>
     <div class="step-hint" data-t="consignesHint">Cochez les consignes à inclure et ajustez le texte en jaune selon votre situation.</div>
     <div class="consigne-block" id="consignes-block"></div>
-    <datalist id="materiel-datalist"></datalist>
-    <datalist id="notescours-datalist"></datalist>
   </div>
 
   <!-- Step: Échelle IA -->
@@ -2743,6 +2747,8 @@ const T = {
     consignesHint:"Cochez les consignes à inclure et ajustez le texte en jaune selon votre situation.",
     consMateriel:"Matériel permis",
     consMaterielPlaceholder:"ex. : calculatrice, ordinateur portable…",
+    consMaterielOtherPlaceholder:"Autre matériel (précisez)…",
+    consNotesCoursOtherPlaceholder:"Autre document (précisez)…",
     consNotesCours:"Notes de cours et documents de soutien permis",
     consNotesCoursText:"Précisez lesquels",
     consSurveillance:"Consignes de surveillance — aucune pause, sortie interdite avant la moitié du temps, retour interdit",
@@ -2924,6 +2930,8 @@ const T = {
     consignesHint:"Check the instructions to include and adjust the highlighted text to your situation.",
     consMateriel:"Permitted equipment",
     consMaterielPlaceholder:"e.g.: calculator, laptop…",
+    consMaterielOtherPlaceholder:"Other equipment (specify)…",
+    consNotesCoursOtherPlaceholder:"Other document (specify)…",
     consNotesCours:"Class notes and support documents allowed",
     consNotesCoursText:"Specify which ones",
     consSurveillance:"Proctoring instructions — no break, no leaving before half the time has elapsed, no re-entry",
@@ -3039,7 +3047,6 @@ function setLang(l) {
   renderTypeCards();
   renderIACards();
   renderLangueTable();
-  renderDatalists();
 }
 
 document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
@@ -3944,8 +3951,8 @@ const ARTICLE_REF = new Proxy({}, { get:(_,code)=>articleRefText(code) });
 let iaLevel = 1; // 1..5
 
 const consignesState = {
-  materiel:      { checked:true,  text:'' },
-  notesCours:    { checked:false, text:'' },
+  materiel:      { checked:true,  chips:[], other:'' },
+  notesCours:    { checked:false, chips:[], other:'' },
   surveillance:  { checked:true  }, // examen / examen_ligne only
   noQuestions:   { checked:true  }, // examen / examen_ligne only
   noCommunication:{ checked:true }, // examen / examen_ligne only
@@ -3954,10 +3961,17 @@ const consignesState = {
   ia:            { checked:true  },
   lisible:       { checked:true  }, // examen / examen_ligne only
   onlineGenerales:{ checked:true }, // examen_ligne only, fixed text
-  onlineMateriel: { text:'' },      // examen_ligne only
+  onlineMateriel: { chips:[], other:'' }, // examen_ligne only
   onlineFormat:   { text:'' },      // examen_ligne only
   autresProgramme:{ checked:false, text:'' },
 };
+
+// Combine a chip-multi-select + free "other" text into one display string
+function chipsDisplayText(state){
+  const parts = [...(state.chips||[])];
+  if(state.other && state.other.trim()) parts.push(state.other.trim());
+  return parts.join(', ');
+}
 
 // Official language-correction rubric, reproduced verbatim from the gabarit
 // v.2.0 templates. Fixed by design — not teacher-editable — so it stays
@@ -4099,12 +4113,6 @@ const NOTESCOURS_OPTIONS = {
     "Course reference textbook",
   ]
 };
-function renderDatalists(){
-  const md = document.getElementById('materiel-datalist');
-  const nd = document.getElementById('notescours-datalist');
-  if(md) md.innerHTML = (MATERIEL_OPTIONS[lang]||MATERIEL_OPTIONS.fr).map(o=>`<option value="${o.replace(/"/g,'&quot;')}">`).join('');
-  if(nd) nd.innerHTML = (NOTESCOURS_OPTIONS[lang]||NOTESCOURS_OPTIONS.fr).map(o=>`<option value="${o.replace(/"/g,'&quot;')}">`).join('');
-}
 
 function typeLabel(type,l){
   const m={examen:{fr:'Examen',en:'Exam'},examen_ligne:{fr:'Examen en ligne',en:'Online exam'},projet:{fr:'Projet',en:'Project'}};
@@ -4266,6 +4274,20 @@ document.querySelectorAll('.type-card').forEach(card=>{
 // ── STEP: Consignes ─────────────────────────────────────────────────────
 function crow(html, tip){ return `<div class="consigne-row"${tip?` title="${tip.replace(/"/g,'&quot;')}"`:''}>${html}</div>`; }
 
+// Multi-select chips (common items) + one free-text field for anything else —
+// so a teacher can pick several standard items *and* still write their own.
+function chipField(stateKey, options, otherPlaceholder){
+  const state = consignesState[stateKey];
+  const chipsHtml = options.map(opt=>{
+    const active = state.chips.includes(opt);
+    return `<button type="button" class="chip${active?' active':''}" data-chip-field="${stateKey}" data-chip-value="${opt.replace(/"/g,'&quot;')}">${opt}</button>`;
+  }).join('');
+  return `<div class="chip-field">
+    <div class="chip-row">${chipsHtml}</div>
+    <input type="text" class="chip-other-input" data-chip-other="${stateKey}" placeholder="${otherPlaceholder.replace(/"/g,'&quot;')}" value="${(state.other||'').replace(/"/g,'&quot;')}">
+  </div>`;
+}
+
 function renderConsignes(){
   const wrap=document.getElementById('consignes-block');
   const cs=consignesState;
@@ -4276,14 +4298,14 @@ function renderConsignes(){
     <input type="checkbox" data-cons="materiel" ${cs.materiel.checked?'checked':''}>
     <div class="cr-body">
       <div class="cr-label">${t('consMateriel')}</div>
-      <div class="cr-extra"><input type="text" data-cons-text="materiel" list="materiel-datalist" placeholder="${t('consMaterielPlaceholder')}" value="${cs.materiel.text.replace(/"/g,'&quot;')}"></div>
+      ${chipField('materiel', MATERIEL_OPTIONS[lang]||MATERIEL_OPTIONS.fr, t('consMaterielOtherPlaceholder'))}
     </div>`);
 
   html+=crow(`
     <input type="checkbox" data-cons="notesCours" ${cs.notesCours.checked?'checked':''}>
     <div class="cr-body">
       <div class="cr-label">${t('consNotesCours')}</div>
-      <div class="cr-extra"><input type="text" data-cons-text="notesCours" list="notescours-datalist" placeholder="${t('consNotesCoursText')}" value="${cs.notesCours.text.replace(/"/g,'&quot;')}"></div>
+      ${chipField('notesCours', NOTESCOURS_OPTIONS[lang]||NOTESCOURS_OPTIONS.fr, t('consNotesCoursOtherPlaceholder'))}
     </div>`);
 
   if(isExam){
@@ -4327,8 +4349,9 @@ function renderConsignes(){
     html+=`<div class="consigne-subhdr">${t('consOnlineSpecifiques')}</div>`;
     html+=crow(`
       <div class="cr-body">
-        <div class="cr-extra"><label style="font-size:.72rem;color:var(--ch400);min-width:110px">${t('consMateriel')}</label><input type="text" data-cons-text="onlineMateriel" list="materiel-datalist" value="${cs.onlineMateriel.text.replace(/"/g,'&quot;')}"></div>
-        <div class="cr-extra"><label style="font-size:.72rem;color:var(--ch400);min-width:110px">${t('consFormatDoc')}</label><input type="text" data-cons-text="onlineFormat" value="${cs.onlineFormat.text.replace(/"/g,'&quot;')}"></div>
+        <div class="cr-label" style="margin-bottom:6px">${t('consMateriel')}</div>
+        ${chipField('onlineMateriel', MATERIEL_OPTIONS[lang]||MATERIEL_OPTIONS.fr, t('consMaterielOtherPlaceholder'))}
+        <div class="cr-extra" style="margin-top:8px"><label style="font-size:.72rem;color:var(--ch400);min-width:110px">${t('consFormatDoc')}</label><input type="text" data-cons-text="onlineFormat" value="${cs.onlineFormat.text.replace(/"/g,'&quot;')}"></div>
       </div>`);
   }
 
@@ -4349,6 +4372,18 @@ function renderConsignes(){
   });
   wrap.querySelectorAll('[data-cons-num]').forEach(el=>{
     el.addEventListener('input',e=>{ consignesState.langue.maxPct=parseFloat(e.target.value)||0; });
+  });
+  wrap.querySelectorAll('[data-chip-field]').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const key = e.target.dataset.chipField, val = e.target.dataset.chipValue;
+      const chips = consignesState[key].chips;
+      const idx = chips.indexOf(val);
+      if(idx===-1) chips.push(val); else chips.splice(idx,1);
+      e.target.classList.toggle('active');
+    });
+  });
+  wrap.querySelectorAll('[data-chip-other]').forEach(inp=>{
+    inp.addEventListener('input', e=>{ consignesState[e.target.dataset.chipOther].other = e.target.value; });
   });
 }
 
@@ -4449,7 +4484,16 @@ function importGabaritTemplate(p){
   if(p.gabaritType) gabaritType=p.gabaritType;
   applyIdFields(p.identification);
   if(p.consignes){
-    Object.entries(p.consignes).forEach(([k,v])=>{ if(consignesState[k]) Object.assign(consignesState[k],v); });
+    Object.entries(p.consignes).forEach(([k,v])=>{
+      if(!consignesState[k]) return;
+      Object.assign(consignesState[k],v);
+      // Migrate older exports that stored a single free-text "text" field
+      // (before the chip multi-select + "other" field existed).
+      if(v && typeof v.text==='string' && !('chips' in v)){
+        consignesState[k].chips = [];
+        consignesState[k].other = v.text;
+      }
+    });
   }
   if(p.iaLevel) iaLevel=p.iaLevel;
   if(p.grading) applyGradingParams(p.grading);
@@ -4670,8 +4714,8 @@ function buildAndDownloadDocx(){
   children.push(bar(dt('consignesTitle')));
   const cs = consignesState;
   const isExam = (gabaritType==='examen' || gabaritType==='examen_ligne');
-  if(cs.materiel.checked) children.push(bullet(CONS_TEXT.materiel[lang](cs.materiel.text||'')));
-  if(cs.notesCours.checked && cs.notesCours.text) children.push(bullet(CONS_TEXT.notesCours[lang](cs.notesCours.text)));
+  if(cs.materiel.checked) children.push(bullet(CONS_TEXT.materiel[lang](chipsDisplayText(cs.materiel)||'')));
+  if(cs.notesCours.checked && chipsDisplayText(cs.notesCours)) children.push(bullet(CONS_TEXT.notesCours[lang](chipsDisplayText(cs.notesCours))));
   if(isExam && cs.surveillance.checked) children.push(bullet(CONS_TEXT.surveillance[lang]));
   if(isExam && cs.noQuestions.checked) children.push(bullet(CONS_TEXT.noQuestions[lang]));
   if(isExam && cs.noCommunication.checked) children.push(bullet(CONS_TEXT.noCommunication[lang]));
@@ -4685,7 +4729,7 @@ function buildAndDownloadDocx(){
       children.push(p(t('consOnlineGenerales'), {bold:true}));
       (CONS_ONLINE_GENERALES[lang]||CONS_ONLINE_GENERALES.fr).forEach(line=>children.push(bullet(line)));
     }
-    if(cs.onlineMateriel.text) children.push(bullet((lang==='en'?'Permitted equipment: ':'Matériel permis : ')+cs.onlineMateriel.text));
+    if(chipsDisplayText(cs.onlineMateriel)) children.push(bullet((lang==='en'?'Permitted equipment: ':'Matériel permis : ')+chipsDisplayText(cs.onlineMateriel)));
     if(cs.onlineFormat.text) children.push(bullet((lang==='en'?'Document format: ':'Format du document : ')+cs.onlineFormat.text));
   }
 
@@ -5102,7 +5146,6 @@ renderScalePreview();
 renderTypeCards();
 renderIACards();
 renderLangueTable();
-renderDatalists();
 </script>
 </body>
 </html>
