@@ -49,6 +49,37 @@
   --r:           6px;
   --rl:          10px;
   --auto-bg:     rgba(255,200,0,.18); /* highlight for auto-copied unedited text */
+  --chrome:      #07181e; /* fixed dark chrome for headers/bars — same in both themes */
+}
+
+[data-theme="dark"] {
+  --blue:        #5fb3e0;
+  --blue-dark:   #8dcdec;
+  --blue-light:  #16323e;
+  --blue-mid:    #2c5568;
+  --red:         #ff7078;
+  --red-light:   #3a1f22;
+  --red-mid:     #a44950;
+  --cream:       #14191b;
+  --cream-dark:  #1f2628;
+  --cream-darker:#3a4547;
+  --charcoal:    #eef1f2;
+  --ch700:       #d7dcdd;
+  --ch600:       #c3cacb;
+  --ch500:       #aab3b5;
+  --ch400:       #8f999b;
+  --ch300:       #7a8386;
+  --ch200:       #62696b;
+  --ch100:       #4c5254;
+  --ch50:        #363b3c;
+  --white:       #1e2426;
+  --green:       #4bd88c;
+  --green-dark:  #7ee8ab;
+  --green-light: #123322;
+  --green-mid:   #1f6b45;
+  --obl-sel:     #123322;
+  --opt-sel:     #16323e;
+  --auto-bg:     rgba(255,200,0,.22);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:14px}
@@ -57,11 +88,17 @@ h1,h2,h3,h4,h5,h6{font-weight:400;letter-spacing:-.03em;line-height:1}
 input,select,textarea,button{font-family:inherit}
 
 /* ── HEADER ── */
-header{background:var(--charcoal);height:52px;display:flex;align-items:center;gap:16px;padding:0 28px;position:sticky;top:0;z-index:200}
+header{background:var(--chrome);height:52px;display:flex;align-items:center;gap:16px;padding:0 28px;position:sticky;top:0;z-index:200}
 header h1{font-size:.95rem;color:var(--white)}
 .hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px}
 
 /* Language toggle */
+.theme-toggle{position:relative;width:44px;height:24px;border-radius:100px;background:var(--ch700);border:none;cursor:pointer;flex-shrink:0}
+.theme-toggle .theme-icon{position:absolute;top:50%;transform:translateY(-50%);font-size:.72rem;line-height:1;transition:opacity var(--dur) var(--ease)}
+.theme-toggle .theme-icon-light{left:6px;opacity:1}
+.theme-toggle .theme-icon-dark{right:6px;opacity:.35}
+[data-theme="dark"] .theme-toggle .theme-icon-light{opacity:.35}
+[data-theme="dark"] .theme-toggle .theme-icon-dark{opacity:1}
 .lang-toggle{display:flex;background:var(--ch700);border-radius:100px;padding:2px;gap:2px}
 .lang-btn{background:transparent;border:none;color:var(--ch300);font-size:.72rem;font-weight:500;padding:4px 10px;border-radius:100px;cursor:pointer;transition:all var(--dur) var(--ease);letter-spacing:.04em}
 .lang-btn.active{background:var(--blue);color:var(--white)}
@@ -80,7 +117,7 @@ select#prog-select{flex:1;max-width:520px;background:var(--white);color:var(--ch
 select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;border-color:var(--blue)}
 
 /* ── META BAR ── */
-#prog-meta{display:none;background:var(--charcoal);border-radius:var(--rl);padding:12px 20px;margin-bottom:20px;gap:24px;flex-wrap:wrap;align-items:center}
+#prog-meta{display:none;background:var(--chrome);border-radius:var(--rl);padding:12px 20px;margin-bottom:20px;gap:24px;flex-wrap:wrap;align-items:center}
 #prog-meta.visible{display:flex}
 .meta-item{display:flex;flex-direction:column;gap:1px}
 .meta-label{font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ch300)}
@@ -196,7 +233,7 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
 
 /* Criteria config cards */
 .crit-config-section{margin-bottom:16px}
-.crit-section-hdr{background:var(--charcoal);color:var(--white);padding:8px 14px;border-radius:var(--r) var(--r) 0 0;font-size:.78rem;display:flex;align-items:center;gap:8px}
+.crit-section-hdr{background:var(--chrome);color:var(--white);padding:8px 14px;border-radius:var(--r) var(--r) 0 0;font-size:.78rem;display:flex;align-items:center;gap:8px}
 .crit-section-hdr .crit-hdr-code{font-size:.65rem;background:rgba(255,255,255,.15);padding:1px 6px;border-radius:3px}
 .crit-section-hdr .crit-hdr-title{flex:1;opacity:.85}
 /* Element sub-header */
@@ -241,7 +278,7 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
 /* ── SCALE DRAWER ── */
 #scale-drawer{position:fixed;top:0;right:-440px;width:430px;height:100vh;background:var(--white);border-left:1px solid var(--cream-darker);box-shadow:-8px 0 32px rgba(7,24,30,.12);z-index:500;transition:right .3s var(--ease);display:flex;flex-direction:column}
 #scale-drawer.open{right:0}
-.drawer-header{background:var(--charcoal);color:var(--white);padding:16px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.drawer-header{background:var(--chrome);color:var(--white);padding:16px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0}
 .drawer-header h3{font-size:.95rem;flex:1}
 .btn-close-drawer{background:transparent;border:none;color:var(--ch300);font-size:1.4rem;cursor:pointer;line-height:1;padding:2px 6px;border-radius:3px;transition:color var(--dur)}
 .btn-close-drawer:hover{color:var(--white)}
@@ -334,7 +371,7 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
 
 .langue-table-ro{width:100%;min-width:900px;border-collapse:collapse;background:var(--white);border:1px solid var(--cream-darker);border-radius:var(--rl);overflow:hidden;font-size:.72rem}
 .langue-table-ro th,.langue-table-ro td{padding:8px 10px;border:1px solid var(--cream-dark);text-align:left;vertical-align:top}
-.langue-table-ro thead th{background:var(--charcoal);color:var(--white);font-weight:500;font-size:.66rem}
+.langue-table-ro thead th{background:var(--chrome);color:var(--white);font-weight:500;font-size:.66rem}
 .langue-table-ro td.lg-crit{width:120px;background:var(--cream)}
 .langue-table-ro td.lg-max{width:50px;text-align:center;white-space:nowrap}
 .lg-total{margin-top:10px;font-size:.82rem;font-weight:600;color:var(--charcoal);text-align:right}
@@ -361,7 +398,7 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
 
 .verif-summary{width:100%;border-collapse:collapse;background:var(--white);border:1px solid var(--cream-darker);border-radius:var(--rl);overflow:hidden;font-size:.8rem;margin-bottom:16px}
 .verif-summary th,.verif-summary td{padding:8px 12px;border-bottom:1px solid var(--cream-dark);text-align:left;vertical-align:top}
-.verif-summary thead th{background:var(--charcoal);color:var(--white);font-weight:500;font-size:.72rem}
+.verif-summary thead th{background:var(--chrome);color:var(--white);font-weight:500;font-size:.72rem}
 .verif-badge{display:inline-block;padding:2px 10px;border-radius:100px;font-size:.7rem;font-weight:500;white-space:nowrap}
 .verif-badge.conforme{background:var(--green-light);color:var(--green-dark)}
 .verif-badge.corriger{background:#fff4d6;color:#8a6100}
@@ -420,6 +457,10 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
 <header>
   <h1 data-t="appTitle" style="font-size:.9rem;color:#fff;flex:1;font-weight:400">Gabarit d'évaluation finale</h1>
   <div class="hdr-right">
+    <button class="theme-toggle" id="btn-theme-toggle" type="button" aria-label="Basculer le mode sombre / clair" title="Mode sombre / clair">
+      <span class="theme-icon theme-icon-light">☀</span>
+      <span class="theme-icon theme-icon-dark">☾</span>
+    </button>
     <div class="lang-toggle">
       <button class="lang-btn active" data-lang="fr">FR</button>
       <button class="lang-btn" data-lang="en">EN</button>
@@ -629,6 +670,8 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
     <div class="step-hdr"><span class="step-num">4</span><h2 data-t="stepConsignes">Consignes</h2></div>
     <div class="step-hint" data-t="consignesHint">Cochez les consignes à inclure et ajustez le texte en jaune selon votre situation.</div>
     <div class="consigne-block" id="consignes-block"></div>
+    <datalist id="materiel-datalist"></datalist>
+    <datalist id="notescours-datalist"></datalist>
   </div>
 
   <!-- Step: Échelle IA -->
@@ -2699,7 +2742,7 @@ const T = {
     stepConsignes:"Consignes",
     consignesHint:"Cochez les consignes à inclure et ajustez le texte en jaune selon votre situation.",
     consMateriel:"Matériel permis",
-    consMaterielPlaceholder:"ex. : calculatrice",
+    consMaterielPlaceholder:"ex. : calculatrice, ordinateur portable…",
     consNotesCours:"Notes de cours et documents de soutien permis",
     consNotesCoursText:"Précisez lesquels",
     consSurveillance:"Consignes de surveillance — aucune pause, sortie interdite avant la moitié du temps, retour interdit",
@@ -2880,7 +2923,7 @@ const T = {
     stepConsignes:"Instructions",
     consignesHint:"Check the instructions to include and adjust the highlighted text to your situation.",
     consMateriel:"Permitted equipment",
-    consMaterielPlaceholder:"e.g.: calculator",
+    consMaterielPlaceholder:"e.g.: calculator, laptop…",
     consNotesCours:"Class notes and support documents allowed",
     consNotesCoursText:"Specify which ones",
     consSurveillance:"Proctoring instructions — no break, no leaving before half the time has elapsed, no re-entry",
@@ -2996,9 +3039,21 @@ function setLang(l) {
   renderTypeCards();
   renderIACards();
   renderLangueTable();
+  renderDatalists();
 }
 
 document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+
+// ── Light/dark theme toggle (session-only, no localStorage) ────────────────
+function setTheme(mode){
+  document.documentElement.setAttribute('data-theme', mode);
+}
+document.getElementById('btn-theme-toggle').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  setTheme(current === 'dark' ? 'light' : 'dark');
+});
+// Respect the system's live preference as the initial state only — never persisted.
+setTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 
 // ── HELPERS ──────────────────────────────────────────────────────────────────
 function compLabel(comp) { return lang==='en' && comp.enonce_en ? comp.enonce_en : comp.enonce; }
@@ -3889,7 +3944,7 @@ const ARTICLE_REF = new Proxy({}, { get:(_,code)=>articleRefText(code) });
 let iaLevel = 1; // 1..5
 
 const consignesState = {
-  materiel:      { checked:true,  text:'calculatrice' },
+  materiel:      { checked:true,  text:'' },
   notesCours:    { checked:false, text:'' },
   surveillance:  { checked:true  }, // examen / examen_ligne only
   noQuestions:   { checked:true  }, // examen / examen_ligne only
@@ -3998,6 +4053,58 @@ const CONS_ONLINE_GENERALES = {
     "Make sure you have submitted your exam before the deadline.",
   ]
 };
+
+// Common equipment / support-document suggestions, offered as autocomplete
+// (via <datalist>) rather than a pre-filled default — the teacher still
+// types or picks freely, and can note network access explicitly.
+const MATERIEL_OPTIONS = {
+  fr:[
+    "Calculatrice non programmable",
+    "Calculatrice programmable",
+    "Ordinateur portable — sans connexion réseau",
+    "Ordinateur portable — avec connexion réseau",
+    "Tablette — sans connexion réseau",
+    "Tablette — avec connexion réseau",
+    "Téléphone intelligent — sans connexion réseau",
+    "Règle et équerre",
+    "Formulaire fourni par l'enseignant(e)",
+  ],
+  en:[
+    "Non-programmable calculator",
+    "Programmable calculator",
+    "Laptop — no network connection",
+    "Laptop — with network connection",
+    "Tablet — no network connection",
+    "Tablet — with network connection",
+    "Smartphone — no network connection",
+    "Ruler and set square",
+    "Formula sheet provided by the teacher",
+  ]
+};
+const NOTESCOURS_OPTIONS = {
+  fr:[
+    "Dictionnaire unilingue",
+    "Dictionnaire bilingue",
+    "Grammaire ou ouvrage de référence linguistique",
+    "Notes de cours manuscrites",
+    "Notes de cours imprimées (diapositives, résumés)",
+    "Livre de référence du cours",
+  ],
+  en:[
+    "Unilingual dictionary",
+    "Bilingual dictionary",
+    "Grammar or language reference book",
+    "Handwritten class notes",
+    "Printed class notes (slides, summaries)",
+    "Course reference textbook",
+  ]
+};
+function renderDatalists(){
+  const md = document.getElementById('materiel-datalist');
+  const nd = document.getElementById('notescours-datalist');
+  if(md) md.innerHTML = (MATERIEL_OPTIONS[lang]||MATERIEL_OPTIONS.fr).map(o=>`<option value="${o.replace(/"/g,'&quot;')}">`).join('');
+  if(nd) nd.innerHTML = (NOTESCOURS_OPTIONS[lang]||NOTESCOURS_OPTIONS.fr).map(o=>`<option value="${o.replace(/"/g,'&quot;')}">`).join('');
+}
 
 function typeLabel(type,l){
   const m={examen:{fr:'Examen',en:'Exam'},examen_ligne:{fr:'Examen en ligne',en:'Online exam'},projet:{fr:'Projet',en:'Project'}};
@@ -4169,14 +4276,14 @@ function renderConsignes(){
     <input type="checkbox" data-cons="materiel" ${cs.materiel.checked?'checked':''}>
     <div class="cr-body">
       <div class="cr-label">${t('consMateriel')}</div>
-      <div class="cr-extra"><input type="text" data-cons-text="materiel" placeholder="${t('consMaterielPlaceholder')}" value="${cs.materiel.text.replace(/"/g,'&quot;')}"></div>
+      <div class="cr-extra"><input type="text" data-cons-text="materiel" list="materiel-datalist" placeholder="${t('consMaterielPlaceholder')}" value="${cs.materiel.text.replace(/"/g,'&quot;')}"></div>
     </div>`);
 
   html+=crow(`
     <input type="checkbox" data-cons="notesCours" ${cs.notesCours.checked?'checked':''}>
     <div class="cr-body">
       <div class="cr-label">${t('consNotesCours')}</div>
-      <div class="cr-extra"><input type="text" data-cons-text="notesCours" placeholder="${t('consNotesCoursText')}" value="${cs.notesCours.text.replace(/"/g,'&quot;')}"></div>
+      <div class="cr-extra"><input type="text" data-cons-text="notesCours" list="notescours-datalist" placeholder="${t('consNotesCoursText')}" value="${cs.notesCours.text.replace(/"/g,'&quot;')}"></div>
     </div>`);
 
   if(isExam){
@@ -4220,7 +4327,7 @@ function renderConsignes(){
     html+=`<div class="consigne-subhdr">${t('consOnlineSpecifiques')}</div>`;
     html+=crow(`
       <div class="cr-body">
-        <div class="cr-extra"><label style="font-size:.72rem;color:var(--ch400);min-width:110px">${t('consMateriel')}</label><input type="text" data-cons-text="onlineMateriel" value="${cs.onlineMateriel.text.replace(/"/g,'&quot;')}"></div>
+        <div class="cr-extra"><label style="font-size:.72rem;color:var(--ch400);min-width:110px">${t('consMateriel')}</label><input type="text" data-cons-text="onlineMateriel" list="materiel-datalist" value="${cs.onlineMateriel.text.replace(/"/g,'&quot;')}"></div>
         <div class="cr-extra"><label style="font-size:.72rem;color:var(--ch400);min-width:110px">${t('consFormatDoc')}</label><input type="text" data-cons-text="onlineFormat" value="${cs.onlineFormat.text.replace(/"/g,'&quot;')}"></div>
       </div>`);
   }
@@ -4995,6 +5102,7 @@ renderScalePreview();
 renderTypeCards();
 renderIACards();
 renderLangueTable();
+renderDatalists();
 </script>
 </body>
 </html>
