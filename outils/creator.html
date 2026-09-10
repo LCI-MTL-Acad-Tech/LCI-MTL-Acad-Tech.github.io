@@ -114,6 +114,8 @@ header h1{font-size:.95rem;color:var(--white)}
 
 /* ── PROGRAM SELECTOR ── */
 .selector-row{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.info-tip{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--cream-darker);color:var(--ch500);font-size:.72rem;cursor:help;flex-shrink:0}
+.info-tip:hover{background:var(--blue-mid);color:var(--blue-dark)}
 .selector-row label{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ch300);white-space:nowrap}
 select#prog-select{flex:1;max-width:520px;background:var(--white);color:var(--charcoal);border:1px solid var(--cream-darker);border-radius:var(--r);padding:8px 34px 8px 12px;font-size:.93rem;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236d7478' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;transition:border-color var(--dur)}
 select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;border-color:var(--blue)}
@@ -548,7 +550,8 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
       </div>
       <div class="field" id="id-profil-wrap">
         <label data-t="fieldProfil">Profil (s'il y a lieu)</label>
-        <input type="text" id="id-profil" list="profil-datalist" placeholder="ex. : Programmation">
+        <input type="text" id="id-profil" placeholder="ex. : Programmation">
+        <span class="hint" data-t="fieldProfilHint">Toujours déterminé par l'enseignant(e) — ne provient jamais du ministère.</span>
       </div>
       <div class="field">
         <label data-t="fieldGroup">Groupe</label>
@@ -574,7 +577,6 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
       </div>
     </div>
     <datalist id="program-name-datalist"></datalist>
-    <datalist id="profil-datalist"></datalist>
   </div>
 
   <!-- Step 3: Program / competency selector -->
@@ -592,6 +594,7 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
     <select id="prog-select">
       <option value="" data-t="selectProgram">— Sélectionner un programme —</option>
     </select>
+    <span class="info-tip" data-t-title="programMissingTip" title="Votre programme n'est pas dans la liste ? Cherchez « dean » (doyen·ne) dans Teams ou sur l'intranet pour en faire la demande.">ⓘ</span>
   </div>
 
   <div id="prog-meta"></div>
@@ -707,11 +710,12 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
   <!-- Step: Export -->
   <div class="step-section">
     <div class="step-hdr"><span class="step-num">9</span><h2 data-t="stepExport">Télécharger</h2></div>
+    <div class="step-hint" data-t="exportStepHint">Le gabarit JSON est ce qui vous permet de réutiliser et de modifier une évaluation à une session future sans repartir de zéro — conservez-le précieusement.</div>
     <div class="export-row">
       <div class="export-card">
-        <div class="ec-hint" data-t="exportHintTemplate">À réimporter ici pour reprendre l'édition de ce gabarit.</div>
-        <button class="btn-secondary" id="btn-import-template" data-t="importTemplateJsonBtn" data-t-title="importTemplateJsonTip" title="Importer un gabarit (JSON)">⬆ Importer un gabarit</button>
-        <button class="btn-secondary" id="btn-export-template" data-t="exportTemplateJsonBtn" data-t-title="exportTemplateJsonTip" title="Exporter le gabarit (JSON — pour modifier plus tard)">⬇ Exporter le gabarit</button>
+        <div class="ec-hint" data-t="exportHintTemplate">À réimporter ici pour reprendre l'édition de ce gabarit — utile pour réutiliser cette évaluation (ou une version modifiée) à une session future sans tout refaire.</div>
+        <button class="btn-secondary" id="btn-import-template" data-t="importTemplateJsonBtn" data-t-title="importTemplateJsonTip" title="Importer un gabarit (JSON) — pour reprendre l'édition d'une évaluation déjà commencée">⬆ Importer un gabarit</button>
+        <button class="btn-secondary" id="btn-export-template" data-t="exportTemplateJsonBtn" data-t-title="exportTemplateJsonTip" title="Exporter le gabarit (JSON) — à conserver pour réutiliser ou modifier cette évaluation plus tard, sans repartir de zéro">⬇ Exporter le gabarit</button>
       </div>
       <div class="export-card">
         <div class="ec-hint" data-t="exportHintGrading">À charger plus tard dans l'outil de correction pour noter les copies.</div>
@@ -2659,6 +2663,7 @@ const T = {
     exportParams:"⬇ Exporter paramètres",
     programLabel:"Programme",
     selectProgram:"— Sélectionner un programme —",
+    programMissingTip:"Votre programme n'est pas dans la liste ? Cherchez « dean » (doyen·ne) dans Teams ou sur l'intranet pour en faire la demande.",
     selectProgramPrompt:"Sélectionnez un programme pour afficher les compétences",
     oblSelected:"Obligatoires :",
     optSelected:"Au choix :",
@@ -2747,6 +2752,7 @@ const T = {
     fieldCourseNum:"Numéro du cours",
     fieldGroup:"Groupe",
     fieldProfil:"Profil (s'il y a lieu)",
+    fieldProfilHint:"Toujours déterminé par l'enseignant(e) — ne provient jamais du ministère.",
     fieldTeacher:"Nom de l'enseignant(e)",
     fieldDuration:"Durée de l'évaluation",
     fieldDurationHint:"Ex. : 3 périodes (150 minutes)",
@@ -2782,16 +2788,17 @@ const T = {
     stepLangueGrid:"Grille de correction de la langue",
     langueGridHint:"Obligatoire pour tous les cours. Format officiel fixe, reproduit tel quel dans le document.",
     stepExport:"Télécharger",
+    exportStepHint:"Le gabarit JSON est ce qui vous permet de réutiliser et de modifier une évaluation à une session future sans repartir de zéro — conservez-le précieusement.",
     downloadDocx:"⬇ Télécharger le Word",
     downloadDocxTip:"Télécharger le gabarit Word (.docx)",
     exportGradingJsonBtn:"⬇ Exporter la grille",
     exportGradingJsonTip:"Exporter la grille (JSON — outil de correction)",
     exportTemplateJsonBtn:"⬇ Exporter le gabarit",
-    exportTemplateJsonTip:"Exporter le gabarit (JSON — pour modifier plus tard)",
+    exportTemplateJsonTip:"Exporter le gabarit (JSON) — à conserver pour réutiliser ou modifier cette évaluation plus tard, sans repartir de zéro",
     importTemplateJsonBtn:"⬆ Importer un gabarit",
-    importTemplateJsonTip:"Importer un gabarit (JSON)",
+    importTemplateJsonTip:"Importer un gabarit (JSON) — pour reprendre l'édition d'une évaluation déjà commencée",
     exportHintGrading:"À charger plus tard dans l'outil de correction pour noter les copies.",
-    exportHintTemplate:"À réimporter ici pour reprendre l'édition de ce gabarit.",
+    exportHintTemplate:"À réimporter ici pour reprendre l'édition de ce gabarit — utile pour réutiliser cette évaluation (ou une version modifiée) à une session future sans tout refaire.",
     weightMismatchWarning:"⚠ La pondération de la langue et la répartition des points seront à valider dans le document final.",
     totalOn100:"Cette évaluation est sur 100 points.",
     langueVocabulaire:"Vocabulaire",
@@ -2860,6 +2867,7 @@ const T = {
     exportParams:"⬇ Export parameters",
     programLabel:"Program",
     selectProgram:"— Select a program —",
+    programMissingTip:"Your program isn't in the list? Search \"dean\" in Teams or on the intranet to request it.",
     selectProgramPrompt:"Select a program to display competencies",
     oblSelected:"Mandatory:",
     optSelected:"Optional:",
@@ -2948,6 +2956,7 @@ const T = {
     fieldCourseNum:"Course number",
     fieldGroup:"Group",
     fieldProfil:"Profile (if applicable)",
+    fieldProfilHint:"Always determined by the teacher — never comes from the ministry.",
     fieldTeacher:"Teacher's name",
     fieldDuration:"Duration of the evaluation",
     fieldDurationHint:"E.g.: 3 periods (150 minutes)",
@@ -2983,16 +2992,17 @@ const T = {
     stepLangueGrid:"Language correction rubric",
     langueGridHint:"Mandatory for all courses. Fixed official format, reproduced as-is in the document.",
     stepExport:"Download",
+    exportStepHint:"The JSON template is what lets you reuse and modify an evaluation in a future semester without starting from scratch — keep it safe.",
     downloadDocx:"⬇ Download Word",
     downloadDocxTip:"Download the Word template (.docx)",
     exportGradingJsonBtn:"⬇ Export the rubric",
     exportGradingJsonTip:"Export the rubric (JSON — grading tool)",
     exportTemplateJsonBtn:"⬇ Export the template",
-    exportTemplateJsonTip:"Export the template (JSON — to edit later)",
+    exportTemplateJsonTip:"Export the template (JSON) — keep it to reuse or modify this evaluation later, without starting from scratch",
     importTemplateJsonBtn:"⬆ Import a template",
-    importTemplateJsonTip:"Import a template (JSON)",
+    importTemplateJsonTip:"Import a template (JSON) — to resume editing an evaluation you already started",
     exportHintGrading:"Load this later into the grading tool to grade submissions.",
-    exportHintTemplate:"Re-import this here to resume editing this template.",
+    exportHintTemplate:"Re-import this here to resume editing this template — useful for reusing this evaluation (or a modified version) in a future semester without starting over.",
     weightMismatchWarning:"⚠ The language weighting and point breakdown should be double-checked in the final document.",
     totalOn100:"This evaluation is out of 100 points.",
     langueVocabulaire:"Vocabulary",
@@ -3098,7 +3108,6 @@ function setLang(l) {
   renderIACards();
   renderLangueTable();
   renderProgramNameDatalist();
-  renderProfilDatalist();
 }
 
 document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
@@ -3162,7 +3171,6 @@ progSelect.addEventListener('change', () => {
   if(idProgField && !idProgField.value.trim()){
     idProgField.value = `${currentProg.titre} — ${currentProg.code}`;
   }
-  renderProfilDatalist();
 });
 
 function hideAll() {
@@ -4023,8 +4031,7 @@ function applyGradingParams(p, skipSectionSetup){
       renderMeta();
       renderLists();
       document.getElementById('action-row-wrap').style.display='block';
-      renderProfilDatalist();
-    }
+        }
   }
 
   (p.selectedComps||[]).forEach(c=>{selectedComps.add(c);});
@@ -4358,7 +4365,6 @@ document.getElementById('btn-manual-validate').addEventListener('click', ()=>{
 
   const idProgField=document.getElementById('id-program');
   if(idProgField && !idProgField.value.trim()) idProgField.value = `${progTitre} — ${progCode}`;
-  renderProfilDatalist();
 
   document.getElementById('action-row-wrap').style.display='none';
   renderElementsArea();
@@ -4566,18 +4572,6 @@ function renderProgramNameDatalist(){
   }).join('');
 }
 
-// Autocomplete for "Profil" — only populated when the selected programme has
-// known profils defined (varies by institution; empty by default until
-// filled in for a given college's own program offerings).
-function renderProfilDatalist(){
-  const dl=document.getElementById('profil-datalist'); if(!dl) return;
-  const profils = (currentProg && currentProg.profils) || [];
-  dl.innerHTML = profils.map(pr=>{
-    const label = lang==='en' ? (pr.en||pr.fr||pr) : (pr.fr||pr.en||pr);
-    return `<option value="${String(label).replace(/"/g,'&quot;')}">`;
-  }).join('');
-}
-
 function idFieldsToObject(){
   return {
     program: document.getElementById('id-program').value||'',
@@ -4605,6 +4599,10 @@ function applyIdFields(o){
 }
 
 // ── FULL GABARIT TEMPLATE (superset JSON — reload into THIS tool) ──────────
+function isListedProgram(code){
+  return PROGRAMMES.some(p=>p.code===code);
+}
+
 function exportTemplateJSON(){
   const tpl={
     gabarit:true,
@@ -4616,6 +4614,12 @@ function exportTemplateJSON(){
     iaLevel,
     evalSections: evalSections.map(s=>({ id:s.id, label:s.label, points:s.points, critKeys:[...s.critKeys] })),
     grading: buildGradingParams(),
+    // A programme built via "Programme non listé" doesn't exist in this
+    // tool's built-in PROGRAMMES data, so its full competency structure
+    // must be saved here too — otherwise re-importing later would have no
+    // way to reconstruct what the compétences/éléments/critères actually said.
+    customProg: (currentProg && !isListedProgram(currentProg.code)) ? currentProg : null,
+    manualComps: (currentProg && !isListedProgram(currentProg.code)) ? manualComps : null,
   };
   const blob=new Blob([JSON.stringify(tpl,null,2)],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
@@ -4641,6 +4645,26 @@ function importGabaritTemplate(p){
   }
   if(p.iaLevel) iaLevel=p.iaLevel;
   if(p.grading) applyGradingParams(p.grading, true); // true = we restore sections ourselves below
+
+  if(p.customProg){
+    // Restore a "Programme non listé" evaluation exactly as it was authored —
+    // this data doesn't exist in the built-in PROGRAMMES list, so it has to
+    // travel inside the template JSON itself.
+    currentProg = p.customProg;
+    progMode = 'manual';
+    document.querySelectorAll('#prog-mode-toggle .mode-btn').forEach(b=>b.classList.toggle('active', b.dataset.mode==='manual'));
+    document.getElementById('list-mode-panel').style.display='none';
+    document.getElementById('manual-mode-panel').style.display='';
+    document.getElementById('manual-prog-titre').value = currentProg.titre || '';
+    document.getElementById('manual-prog-code').value = (currentProg.code && currentProg.code!=='—') ? currentProg.code : '';
+    manualComps = (p.manualComps && p.manualComps.length) ? p.manualComps : (currentProg.competences||[]).map(c=>({
+      code: c.code, enonce: c.enonce,
+      elements: (c.elements||[]).map(el=>({ desc: el.desc, crit:[...(el.crit||[])] }))
+    }));
+    renderManualPanel();
+    document.getElementById('action-row-wrap').style.display='none';
+    renderElementsArea();
+  }
 
   if(p.evalSections && p.evalSections.length){
     evalSections.length=0;
@@ -5289,7 +5313,6 @@ renderTypeCards();
 renderIACards();
 renderLangueTable();
 renderProgramNameDatalist();
-renderProfilDatalist();
 </script>
 </body>
 </html>
