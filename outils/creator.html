@@ -535,7 +535,7 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
     <div class="field-grid">
       <div class="field" style="grid-column:1/-1">
         <label data-t="fieldProgram">Nom du (des) programme(s) — Code(s)</label>
-        <input type="text" id="id-program" placeholder="ex. : Techniques de l'informatique — 420.B0">
+        <input type="text" id="id-program" list="program-name-datalist" placeholder="ex. : Techniques de l'informatique — 420.B0">
         <span class="hint" data-t="fieldProgramHint">Transposez le nom du programme sans aucune modification.</span>
       </div>
       <div class="field">
@@ -545,6 +545,10 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
       <div class="field">
         <label data-t="fieldCourseNum">Numéro du cours</label>
         <input type="text" id="id-coursenum">
+      </div>
+      <div class="field" id="id-profil-wrap">
+        <label data-t="fieldProfil">Profil (s'il y a lieu)</label>
+        <input type="text" id="id-profil" list="profil-datalist" placeholder="ex. : Programmation">
       </div>
       <div class="field">
         <label data-t="fieldGroup">Groupe</label>
@@ -569,6 +573,8 @@ select#prog-select:focus{outline:2px solid var(--blue-mid);outline-offset:1px;bo
         <span class="hint" data-t="fieldWeightHint" data-t-title="fieldWeightTip" title="Politique institutionnelle d'évaluation des apprentissages, art. 5.5.2.2">Minimum 40 % et ≥ à chacune des évaluations intermédiaires.</span>
       </div>
     </div>
+    <datalist id="program-name-datalist"></datalist>
+    <datalist id="profil-datalist"></datalist>
   </div>
 
   <!-- Step 3: Program / competency selector -->
@@ -2740,6 +2746,7 @@ const T = {
     fieldTitle:"Titre du cours",
     fieldCourseNum:"Numéro du cours",
     fieldGroup:"Groupe",
+    fieldProfil:"Profil (s'il y a lieu)",
     fieldTeacher:"Nom de l'enseignant(e)",
     fieldDuration:"Durée de l'évaluation",
     fieldDurationHint:"Ex. : 3 périodes (150 minutes)",
@@ -2940,6 +2947,7 @@ const T = {
     fieldTitle:"Course title",
     fieldCourseNum:"Course number",
     fieldGroup:"Group",
+    fieldProfil:"Profile (if applicable)",
     fieldTeacher:"Teacher's name",
     fieldDuration:"Duration of the evaluation",
     fieldDurationHint:"E.g.: 3 periods (150 minutes)",
@@ -3089,6 +3097,8 @@ function setLang(l) {
   renderTypeCards();
   renderIACards();
   renderLangueTable();
+  renderProgramNameDatalist();
+  renderProfilDatalist();
 }
 
 document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
@@ -3152,6 +3162,7 @@ progSelect.addEventListener('change', () => {
   if(idProgField && !idProgField.value.trim()){
     idProgField.value = `${currentProg.titre} — ${currentProg.code}`;
   }
+  renderProfilDatalist();
 });
 
 function hideAll() {
@@ -4012,6 +4023,7 @@ function applyGradingParams(p, skipSectionSetup){
       renderMeta();
       renderLists();
       document.getElementById('action-row-wrap').style.display='block';
+      renderProfilDatalist();
     }
   }
 
@@ -4346,6 +4358,7 @@ document.getElementById('btn-manual-validate').addEventListener('click', ()=>{
 
   const idProgField=document.getElementById('id-program');
   if(idProgField && !idProgField.value.trim()) idProgField.value = `${progTitre} — ${progCode}`;
+  renderProfilDatalist();
 
   document.getElementById('action-row-wrap').style.display='none';
   renderElementsArea();
@@ -4543,11 +4556,34 @@ function renderLangueTable(){
 }
 
 // ── Identification field helpers ────────────────────────────────────────
+// Autocomplete for the free-text "Nom du programme" field, drawn from the
+// programmes already known to this tool (bilingual).
+function renderProgramNameDatalist(){
+  const dl=document.getElementById('program-name-datalist'); if(!dl) return;
+  dl.innerHTML = PROGRAMMES.map(p=>{
+    const titre = lang==='en' ? (p.titre_en||p.titre) : p.titre;
+    return `<option value="${(titre+' — '+p.code).replace(/"/g,'&quot;')}">`;
+  }).join('');
+}
+
+// Autocomplete for "Profil" — only populated when the selected programme has
+// known profils defined (varies by institution; empty by default until
+// filled in for a given college's own program offerings).
+function renderProfilDatalist(){
+  const dl=document.getElementById('profil-datalist'); if(!dl) return;
+  const profils = (currentProg && currentProg.profils) || [];
+  dl.innerHTML = profils.map(pr=>{
+    const label = lang==='en' ? (pr.en||pr.fr||pr) : (pr.fr||pr.en||pr);
+    return `<option value="${String(label).replace(/"/g,'&quot;')}">`;
+  }).join('');
+}
+
 function idFieldsToObject(){
   return {
     program: document.getElementById('id-program').value||'',
     title: document.getElementById('id-title').value||'',
     coursenum: document.getElementById('id-coursenum').value||'',
+    profil: document.getElementById('id-profil').value||'',
     group: document.getElementById('id-group').value||'',
     teacher: document.getElementById('id-teacher').value||'',
     duration: document.getElementById('id-duration').value||'',
@@ -4560,6 +4596,7 @@ function applyIdFields(o){
   if(o.program!=null) document.getElementById('id-program').value=o.program;
   if(o.title!=null) document.getElementById('id-title').value=o.title;
   if(o.coursenum!=null) document.getElementById('id-coursenum').value=o.coursenum;
+  if(o.profil!=null) document.getElementById('id-profil').value=o.profil;
   if(o.group!=null) document.getElementById('id-group').value=o.group;
   if(o.teacher!=null) document.getElementById('id-teacher').value=o.teacher;
   if(o.duration!=null) document.getElementById('id-duration').value=o.duration;
@@ -4681,6 +4718,7 @@ const DOCX_TXT = {
   titleLbl:{fr:"Titre du cours :",en:"Course title:"},
   numLbl:{fr:"Numéro du cours :",en:"Course number:"},
   groupLbl:{fr:"Groupe :",en:"Group:"},
+  profilLbl:{fr:"Profil :",en:"Profile:"},
   teacherLbl:{fr:"Nom de l'enseignant(e) :",en:"Teacher's name:"},
   durationLbl:{fr:"Durée de l'évaluation :",en:"Duration of the evaluation:"},
   dueDateLbl:{fr:"Date et heure de remise :",en:"Date and time due:"},
@@ -4776,15 +4814,19 @@ function buildAndDownloadDocx(){
   const durRow = gabaritType==='projet'
     ? [dt('dueDateLbl'), idf.duration]
     : [dt('durationLbl'), idf.duration];
-  children.push(twoColTable([
+  const idRows = [
     [dt('progLbl'), idf.program],
     [dt('titleLbl'), idf.title],
     [dt('numLbl'), idf.coursenum],
+  ];
+  if(idf.profil && idf.profil.trim()) idRows.push([dt('profilLbl'), idf.profil]);
+  idRows.push(
     [dt('groupLbl'), idf.group],
     [dt('teacherLbl'), idf.teacher],
     durRow,
     [dt('sessionLbl'), idf.session],
-  ]));
+  );
+  children.push(twoColTable(idRows));
   children.push(new Paragraph({text:"", spacing:{after:120}}));
 
   // Identification de l'étudiant
@@ -5246,6 +5288,8 @@ renderScalePreview();
 renderTypeCards();
 renderIACards();
 renderLangueTable();
+renderProgramNameDatalist();
+renderProfilDatalist();
 </script>
 </body>
 </html>
