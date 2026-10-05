@@ -170,6 +170,7 @@ button { font-family: inherit; }
 .seg-btn:last-child { border-right: none; }
 .seg-btn:hover { background: var(--bg-alt); }
 .seg-btn[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.budget__note { font-size: 1.3rem; color: var(--text-2); background: var(--bg-alt); border-left: 3px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0; padding: 1rem 1.4rem; margin-bottom: 1.4rem; line-height: 1.5; }
 .budget__caption { font-size: 1.25rem; color: var(--text-4); margin-bottom: 1.2rem; min-height: 1.8em; }
 .bar { display: flex; height: 4.4rem; border-radius: 4px; overflow: hidden; gap: 2px; margin-bottom: 1.6rem; }
 .bar__seg { display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 700; min-width: 0; transition: flex-grow .35s var(--ease); }
@@ -298,6 +299,7 @@ footer.appfoot { background: var(--bg-alt); color: var(--text-3); font-size: 1.2
         </div>
         <div class="seg-group" role="group" id="durGroup" aria-label="Durée / Duration"></div>
       </div>
+      <p class="budget__note" data-i18n="budgetNote">x</p>
       <div class="budget__caption" id="durCaption"></div>
       <div class="bar" id="budgetBar" aria-hidden="true"></div>
       <ol class="legend" id="budgetLegend"></ol>
@@ -392,6 +394,7 @@ const TRANSLATIONS = {
     videoDesc: "Personne ne peut vous poser de questions : la vidéo doit se suffire à elle-même, avec ou sans le son.",
     budgetTitle: "Répartition du temps",
     budgetDesc: "Plus de la moitié du temps va à voir le jeu, pas à en parler.",
+    budgetNote: "Ces durées sont des maximums : plus court vaut souvent mieux. Les proportions sont un point de départ, pas une règle. Si votre jugement vous donne une bonne raison de vous en écarter (un jeu qui se comprend en dix secondes, une démo qui mérite plus de place), faites-le.",
     formulaTitle: "La phrase qui ouvre tout",
     formulaTpl: "[Nom] est un [genre] où vous [action principale] pour [but].",
     formulaEx: "Exemple (fictif) : « Marée Haute est un jeu de gestion où vous livrez le courrier en barque avant que la marée monte. »",
@@ -420,6 +423,7 @@ const TRANSLATIONS = {
     videoDesc: "Nobody can ask you questions: the video must stand on its own, with or without sound.",
     budgetTitle: "Time budget",
     budgetDesc: "More than half of the time goes to showing the game, not talking about it.",
+    budgetNote: "These lengths are upper limits: shorter is often better. The proportions are a starting point, not a rule. If your judgment gives you a good reason to deviate (a game that is clear in ten seconds, a demo that deserves more room), go ahead.",
     formulaTitle: "The sentence that opens everything",
     formulaTpl: "[Name] is a [genre] where you [main action] to [goal].",
     formulaEx: "Example (fictional): “High Tide is a management game where you deliver mail by rowboat before the tide rises.”",
@@ -522,8 +526,8 @@ const SECTIONS = {
   video: [
     { fr: "Contenu", en: "Content", items: [
       { id: "v1", tag: "must",
-        fr: ["60 à 90 secondes maximum", "Même limite que pour un showreel de portfolio. Mieux vaut court et net que complet."],
-        en: ["60–90 seconds maximum", "Same limit as a portfolio showreel. Short and sharp beats complete."] },
+        fr: ["60 à 90 secondes maximum", "Même limite que pour un showreel de portfolio. Mieux vaut court et net que complet. Vous pouvez dépasser si vous avez une bonne raison, mais chaque seconde de plus augmente le risque que votre public cible ne regarde pas la vidéo jusqu'à la fin."],
+        en: ["60–90 seconds maximum", "Same limit as a portfolio showreel. Short and sharp beats complete. You can go over if you have a good reason, but every extra second increases the risk that your target audience will not watch the whole video."] },
       { id: "v2", tag: "must",
         fr: ["La vidéo commence par du gameplay", "Ni logo animé, ni écran-titre, ni « Bonjour, voici notre jeu » en ouverture. La première image doit déjà montrer le jeu."],
         en: ["The video opens with gameplay", "No animated logo, no title screen, no “Hi, this is our game” opener. The very first frame should already show the game."] },
