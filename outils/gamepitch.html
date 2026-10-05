@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Checklist pour présenter un jeu vidéo en personne ou en vidéo. Checklist for pitching a video game in person or on video.">
+<title>Présenter son jeu · Pitching your game</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2300587c'/%3E%3Cpolyline points='7,17 13,23 25,10' fill='none' stroke='%23ffffff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+/* === LCI BRAND FONTS (même chargement que checklist.html; repli système si hors ligne) === */
+@font-face {
+  font-family: 'Modern Gothic';
+  src: local('Modern Gothic'), local('Modern Gothic Regular'),
+       url('https://dam.lcieducation.com/1fipm6Snk5jh2rLnFu4uq2hg8_sNzVmOTU5OWM0YzA4MDQ5/ModernGothic-Regular.woff2') format('woff2');
+  font-weight: 400; font-display: swap;
+}
+@font-face {
+  font-family: 'Modern Gothic';
+  src: local('Modern Gothic Medium'),
+       url('https://dam.lcieducation.com/1fidCrXy5z5kbAmnhACmEhth5_sYWE3Njc1ZTY2OGYwM2E1/ModernGothic-Medium.woff2') format('woff2');
+  font-weight: 500; font-display: swap;
+}
+@font-face {
+  font-family: 'Modern Gothic';
+  src: local('Modern Gothic Bold'),
+       url('https://dam.lcieducation.com/1fihEASn3qmjdpL2S77vCoz7w_sOWYzOTAxMGM2OTk3OTI5/ModernGothic-Bold.woff2') format('woff2');
+  font-weight: 700; font-display: swap;
+}
+
+/* === TOKENS === */
+:root {
+  --blue: #00587c; --blue-dark: #00435e; --blue-dim: #c8dde6;
+  --red: #eb2d37; --cobalt: #685ef7; --taupe: #cdc19e;
+  --radius: 6px; --duration: .25s; --ease: cubic-bezier(.4,.14,.3,1);
+
+  --bg: #ffffff; --bg-alt: #f8f5e9; --bg-alt2: #ede9d8; --surface: #ffffff;
+  --border: #e1e3e4;
+  --text: #07181e; --text-2: #424f54; --text-3: #576266; --text-4: #6d7478; --text-5: #9ca3a5; --text-6: #babfc0;
+
+  --accent: #00587c; --accent-dark: #00435e;
+  --hero-bg: #00587c; --hero-fg: #ffffff;
+  --header-bg: #07181e; --header-text: #ffffff; --header-muted: #babfc0;
+  --on-accent: #ffffff;
+
+  --tag-must: #c71f29;  --tag-must-bg: rgba(235,45,55,.10);
+  --tag-tip: #4a7000;   --tag-tip-bg: rgba(91,128,0,.12);
+  --warn: #7a5a00;      --warn-bg: #fbf0da; --warn-border: #e4c077;
+  --ok-bg: #eef5e0;     --ok-border: #b9d58a; --ok-text: #3b5a00;
+
+  --s1: #00587c; --s1-fg: #ffffff;
+  --s2: #685ef7; --s2-fg: #ffffff;
+  --s3: #4a7000; --s3-fg: #ffffff;
+  --s4: #cdc19e; --s4-fg: #07181e;
+  --s5: #c71f29; --s5-fg: #ffffff;
+}
+html[data-theme="dark"] {
+  --bg: #0e1a1f; --bg-alt: #152028; --bg-alt2: #1c2d36; --surface: #1a2c35;
+  --border: #2a3d47;
+  --text: #dce8ec; --text-2: #b0c4cc; --text-3: #8fa8b2; --text-4: #6e8c96; --text-5: #4e6870; --text-6: #3a5058;
+
+  --accent: #3a9bc4; --accent-dark: #79c4e4;
+  --hero-bg: #0d3a4c; --hero-fg: #ffffff;
+  --header-bg: #050d11; --header-text: #dce8ec; --header-muted: #8fa8b2;
+  --on-accent: #07181e;
+  --blue-dim: #1a3a4a;
+
+  --tag-must: #ff8a91;  --tag-must-bg: rgba(235,45,55,.18);
+  --tag-tip: #8fd13a;   --tag-tip-bg: rgba(122,184,48,.16);
+  --warn: #e8b54d;      --warn-bg: #3a2f14; --warn-border: #6b5423;
+  --ok-bg: #1d2e14;     --ok-border: #3f5f20; --ok-text: #a9dd6a;
+
+  --s1: #5bb3d6; --s1-fg: #07181e;
+  --s2: #9a93ff; --s2-fg: #07181e;
+  --s3: #9ccf4f; --s3-fg: #07181e;
+  --s4: #cdc19e; --s4-fg: #07181e;
+  --s5: #ff8a91; --s5-fg: #07181e;
+}
+
+/* === BASE === */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 62.5%; scroll-behavior: smooth; }
+body {
+  font-family: 'Modern Gothic', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 1.6rem; line-height: 1.5; color: var(--text); background: var(--bg-alt); min-height: 100vh;
+}
+a { color: var(--accent); }
+button { font-family: inherit; }
+
+/* === HEADER === */
+.site-header {
+  background: var(--header-bg); padding: 1.6rem 2.4rem; position: sticky; top: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between; gap: 1.6rem; flex-wrap: wrap;
+}
+.site-header__wordmark {
+  flex: 1; font-size: 1.3rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--header-muted);
+}
+.site-header__wordmark strong { color: var(--header-text); font-weight: 700; }
+.site-header__controls { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.lang-toggle { display: flex; background: rgba(255,255,255,.10); border-radius: 4px; overflow: hidden; }
+.lang-btn {
+  padding: .5rem 1.2rem; font-size: 1.3rem; font-weight: 500; letter-spacing: .05em;
+  background: none; border: none; color: var(--header-muted); cursor: pointer;
+  transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
+}
+.lang-btn.active { background: var(--accent); color: var(--on-accent); }
+.lang-btn:hover:not(.active) { background: rgba(255,255,255,.15); color: var(--header-text); }
+.theme-toggle {
+  display: flex; align-items: center; gap: .6rem; background: none; border: 1.5px solid rgba(255,255,255,.3);
+  border-radius: 20px; padding: .35rem 1.1rem; cursor: pointer; font-size: 1.3rem; color: var(--header-text);
+  transition: border-color var(--duration) var(--ease);
+}
+.theme-toggle:hover { border-color: rgba(255,255,255,.7); }
+.btn-home {
+  display: inline-flex; gap: .5rem; align-items: center; font-size: 1.3rem; font-weight: 500;
+  color: var(--header-text); text-decoration: none; padding: .35rem 1rem; border-radius: 4px;
+}
+.btn-home:hover { background: rgba(255,255,255,.12); }
+
+/* === HERO === */
+.hero { background: var(--hero-bg); color: var(--hero-fg); padding: 4rem 2.4rem 3.2rem; }
+.hero__inner { max-width: 1000px; margin: 0 auto; }
+.hero__eyebrow { font-size: 1.2rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.65); margin-bottom: .8rem; }
+.hero__title { font-size: clamp(2.8rem, 5vw, 4.4rem); font-weight: 400; letter-spacing: -.03em; line-height: 1; margin-bottom: 1.2rem; }
+.hero__title em { font-style: normal; color: rgba(255,255,255,.6); }
+.hero__sub { font-size: 1.5rem; color: rgba(255,255,255,.8); max-width: 56ch; line-height: 1.5; }
+
+/* === LAYOUT === */
+.wrap { max-width: 1000px; margin: 0 auto; background: var(--bg); min-height: 60vh; }
+.tab-bar {
+  display: flex; border-bottom: 1.5px solid var(--border); background: var(--bg);
+  position: sticky; top: 56px; z-index: 100; overflow-x: auto;
+}
+.tab-btn {
+  flex: 1 0 auto; min-width: 12rem; padding: 1.2rem 1.6rem; font-size: 1.4rem; font-weight: 500; text-align: left;
+  background: none; border: none; border-bottom: 3px solid transparent; color: var(--text-3); cursor: pointer;
+  display: flex; flex-direction: column; gap: .2rem; transition: all var(--duration) var(--ease);
+}
+.tab-btn:hover { background: var(--bg-alt); color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-count { font-size: 1.15rem; font-weight: 500; color: var(--text-4); letter-spacing: .03em; }
+.tab-btn.complete .tab-count { color: var(--tag-tip); }
+
+.tab-panel { display: none; padding: 3.2rem 2.4rem 4rem; animation: fadeIn .2s ease; }
+.tab-panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+.panel-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1.6rem; margin-bottom: 2.4rem; flex-wrap: wrap; }
+.panel-title { font-size: 2rem; font-weight: 400; letter-spacing: -.02em; }
+.panel-desc { font-size: 1.4rem; color: var(--text-3); margin-top: .4rem; max-width: 58ch; line-height: 1.5; }
+.panel-actions { display: flex; gap: .8rem; }
+.btn-ghost {
+  padding: .8rem 1.6rem; font-size: 1.3rem; font-weight: 500; background: none; border: 1.5px solid var(--text-6);
+  border-radius: 4px; color: var(--text-3); cursor: pointer; white-space: nowrap; transition: all var(--duration) var(--ease);
+}
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn-ghost.danger:hover { border-color: var(--red); color: var(--tag-must); background: var(--tag-must-bg); }
+
+/* === PROGRESS === */
+.progress-label { font-size: 1.2rem; font-weight: 500; color: var(--text-4); letter-spacing: .04em; margin-bottom: .8rem; display: flex; justify-content: space-between; }
+.progress-bar-wrap { background: var(--border); border-radius: 3px; height: 4px; margin-bottom: 2.8rem; overflow: hidden; }
+.progress-bar { height: 100%; background: var(--accent); border-radius: 3px; transition: width .4s var(--ease); }
+
+/* === TIME BUDGET (visuel principal) === */
+.budget { border: 1.5px solid var(--border); border-radius: var(--radius); padding: 2rem; margin-bottom: 2.8rem; background: var(--surface); }
+.budget__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.6rem; flex-wrap: wrap; margin-bottom: 1.6rem; }
+.budget__title { font-size: 1.5rem; font-weight: 700; }
+.budget__desc { font-size: 1.3rem; color: var(--text-3); margin-top: .3rem; max-width: 52ch; }
+.seg-group { display: inline-flex; border: 1.5px solid var(--border); border-radius: 4px; overflow: hidden; }
+.seg-btn { padding: .6rem 1.2rem; font-size: 1.3rem; font-weight: 500; background: var(--bg); color: var(--text-3); border: none; border-right: 1px solid var(--border); cursor: pointer; }
+.seg-btn:last-child { border-right: none; }
+.seg-btn:hover { background: var(--bg-alt); }
+.seg-btn[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.budget__caption { font-size: 1.25rem; color: var(--text-4); margin-bottom: 1.2rem; min-height: 1.8em; }
+.bar { display: flex; height: 4.4rem; border-radius: 4px; overflow: hidden; gap: 2px; margin-bottom: 1.6rem; }
+.bar__seg { display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 700; min-width: 0; transition: flex-grow .35s var(--ease); }
+.legend { list-style: none; display: grid; gap: 1rem; }
+.legend li { display: grid; grid-template-columns: 1.4rem 1fr auto; gap: 1.2rem; align-items: start; }
+.legend__sw { width: 1.4rem; height: 1.4rem; border-radius: 3px; margin-top: .35rem; }
+.legend__title { font-size: 1.45rem; font-weight: 500; }
+.legend__desc { font-size: 1.25rem; color: var(--text-3); line-height: 1.4; }
+.legend__time { font-size: 1.25rem; font-weight: 700; color: var(--text-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* === CALLOUT === */
+.callout { border-left: 3px solid var(--accent); background: var(--bg-alt); border-radius: 0 var(--radius) var(--radius) 0; padding: 1.6rem 2rem; margin-bottom: 2.8rem; }
+.callout__title { font-size: 1.1rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); margin-bottom: .8rem; }
+.callout p { font-size: 1.4rem; line-height: 1.5; margin-bottom: .8rem; }
+.callout p:last-child { margin-bottom: 0; }
+.callout code { font-family: inherit; font-weight: 500; background: var(--bg-alt2); padding: .1rem .5rem; border-radius: 3px; }
+.callout .muted { color: var(--text-3); font-size: 1.3rem; }
+
+/* === CHECKLIST === */
+.checklist-section { margin-bottom: 2.8rem; }
+.section-label { font-size: 1.1rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-4); margin-bottom: 1.2rem; padding-bottom: .8rem; border-bottom: 1px solid var(--border); }
+.checklist-item {
+  display: flex; gap: 1.2rem; align-items: flex-start; padding: 1.2rem .8rem; margin: 0 -.8rem;
+  border-bottom: 1px solid var(--border); cursor: pointer; border-radius: 4px; position: relative;
+  transition: background var(--duration) var(--ease);
+}
+.checklist-item:last-child { border-bottom: none; }
+.checklist-item:hover { background: var(--bg-alt); }
+.checklist-item input { position: absolute; opacity: 0; pointer-events: none; }
+.check-box {
+  width: 2rem; height: 2rem; border: 2px solid var(--text-6); border-radius: 4px; flex-shrink: 0; margin-top: .1rem;
+  display: flex; align-items: center; justify-content: center; background: var(--bg); transition: all var(--duration) var(--ease);
+}
+.check-box::after { content: ''; width: .5rem; height: .9rem; border-right: 2.5px solid var(--on-accent); border-bottom: 2.5px solid var(--on-accent); transform: rotate(45deg) translateY(-1px); opacity: 0; transition: opacity .15s ease; }
+.checklist-item.checked .check-box { background: var(--accent); border-color: var(--accent); }
+.checklist-item.checked .check-box::after { opacity: 1; }
+.checklist-item input:focus-visible + .check-box { outline: 2px solid var(--accent); outline-offset: 2px; }
+.item-text { flex: 1; }
+.item-label { font-size: 1.5rem; transition: color var(--duration) var(--ease); }
+.checklist-item.checked .item-label { color: var(--text-4); text-decoration: line-through; text-decoration-color: var(--text-6); }
+.item-hint { font-size: 1.25rem; color: var(--text-3); margin-top: .3rem; line-height: 1.4; }
+.tag { display: inline-block; font-size: 1rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: .2rem .7rem; border-radius: 3px; margin-left: .8rem; vertical-align: middle; line-height: 1.6; }
+.tag-must { background: var(--tag-must-bg); color: var(--tag-must); }
+.tag-tip { background: var(--tag-tip-bg); color: var(--tag-tip); }
+
+/* === Q&A === */
+.qa details { border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: .8rem; background: var(--surface); }
+.qa summary { cursor: pointer; padding: 1.2rem 1.6rem; font-size: 1.45rem; font-weight: 500; list-style: none; display: flex; justify-content: space-between; gap: 1rem; }
+.qa summary::-webkit-details-marker { display: none; }
+.qa summary::after { content: '›'; color: var(--text-4); transition: transform var(--duration) var(--ease); }
+.qa details[open] summary::after { transform: rotate(90deg); }
+.qa .qa-body { padding: 0 1.6rem 1.4rem; font-size: 1.35rem; color: var(--text-2); line-height: 1.5; }
+.qa .qa-body strong { font-weight: 500; color: var(--text); }
+
+/* === DONE BANNER === */
+.done-banner { display: none; border: 1.5px solid var(--ok-border); background: var(--ok-bg); color: var(--ok-text); border-radius: var(--radius); padding: 1.4rem 2rem; margin-bottom: 2.4rem; }
+.done-banner.visible { display: block; }
+.done-banner strong { display: block; font-size: 1.5rem; font-weight: 700; }
+.done-banner span { font-size: 1.3rem; }
+
+/* === FOOTER === */
+footer.appfoot { background: var(--bg-alt); color: var(--text-3); font-size: 1.2rem; padding: 3rem 2.4rem 6rem; text-align: center; }
+.ai-attribution { max-width: 640px; margin: 0 auto; text-align: left; border-top: 1px solid var(--border); padding-top: 1.2rem; }
+.ai-attribution summary { cursor: pointer; font-weight: 600; color: var(--text-3); text-align: center; }
+.ai-attribution p { margin: .8rem 0 0; line-height: 1.5; font-size: 1.15rem; }
+.updated { margin-top: 1.2rem; }
+
+@media (max-width: 640px) {
+  .site-header { padding: 1.2rem 1.6rem; }
+  .tab-bar { top: 0; position: static; }
+  .tab-panel { padding: 2.4rem 1.6rem 3.2rem; }
+  .legend li { grid-template-columns: 1.4rem 1fr; }
+  .legend__time { grid-column: 2; }
+  .budget { padding: 1.4rem; }
+}
+@media print {
+  .site-header, .tab-bar, .panel-actions, .seg-group, .done-banner { display: none !important; }
+  .tab-panel { display: block !important; padding: 1.6rem 0; break-after: page; }
+  body, .wrap { background: #fff; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__wordmark"><strong>Outils carrière</strong> &nbsp;·&nbsp; Career Tools</div>
+  <div class="site-header__controls">
+    <div class="lang-toggle" role="group" aria-label="Langue / Language">
+      <button class="lang-btn active" id="btnLangFr" data-lang="fr" aria-pressed="true">FR</button>
+      <button class="lang-btn" id="btnLangEn" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <button class="theme-toggle" id="btnThemeToggle" type="button"><span aria-hidden="true" id="themeIcon">🌙</span><span id="themeLabel">Mode sombre</span></button>
+    <a class="btn-home" href="checklist.html"><span aria-hidden="true">←</span><span data-i18n="backLink">Outils carrière</span></a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero__inner">
+    <p class="hero__eyebrow" data-i18n="heroEyebrow">Développement professionnel · Jeu vidéo et design interactif</p>
+    <h1 class="hero__title"><span data-i18n="heroTitleA">Présentez votre</span> <em data-i18n="heroTitleB">jeu vidéo</em></h1>
+    <p class="hero__sub" data-i18n="heroSub">En personne ou en vidéo : une structure courte, une checklist et les pièges à éviter.</p>
+  </div>
+</section>
+
+<main class="wrap">
+  <nav class="tab-bar" role="tablist" id="tabBar"></nav>
+
+  <!-- PITCH -->
+  <section class="tab-panel active" id="panel-pitch" role="tabpanel">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title" data-i18n="pitchTitle">Le pitch : quoi dire, et combien de temps</h2>
+        <p class="panel-desc" data-i18n="pitchDesc">Valable en personne comme en vidéo. Choisissez la durée, puis préparez chaque partie.</p>
+      </div>
+      <div class="panel-actions">
+        <button class="btn-ghost" type="button" data-print data-i18n="print">Imprimer</button>
+        <button class="btn-ghost danger" type="button" data-reset="pitch" data-i18n="reset">Réinitialiser</button>
+      </div>
+    </div>
+
+    <div class="budget">
+      <div class="budget__head">
+        <div>
+          <div class="budget__title" data-i18n="budgetTitle">Répartition du temps</div>
+          <div class="budget__desc" data-i18n="budgetDesc">Plus de la moitié du temps va à voir le jeu, pas à en parler.</div>
+        </div>
+        <div class="seg-group" role="group" id="durGroup" aria-label="Durée / Duration"></div>
+      </div>
+      <div class="budget__caption" id="durCaption"></div>
+      <div class="bar" id="budgetBar" aria-hidden="true"></div>
+      <ol class="legend" id="budgetLegend"></ol>
+    </div>
+
+    <div class="callout">
+      <div class="callout__title" data-i18n="formulaTitle">La phrase qui ouvre tout</div>
+      <p><code data-i18n="formulaTpl">[Nom] est un [genre] où vous [action principale] pour [but].</code></p>
+      <p data-i18n="formulaEx">Exemple (fictif) : « Marée Haute est un jeu de gestion où vous livrez le courrier en barque avant que la marée monte. »</p>
+      <p class="muted" data-i18n="formulaTest">Test : une personne qui l'entend doit pouvoir la répéter à quelqu'un d'autre. Sinon, simplifiez.</p>
+    </div>
+
+    <div class="progress-label"><span id="plabel-pitch"></span></div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="pbar-pitch" style="width:0%"></div></div>
+    <div class="done-banner" id="done-pitch"><strong data-i18n="doneTitle">Prêt·e ✓</strong><span data-i18n="doneText">Toutes les cases sont cochées.</span></div>
+    <div id="list-pitch"></div>
+  </section>
+
+  <!-- EN PERSONNE -->
+  <section class="tab-panel" id="panel-person" role="tabpanel">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title" data-i18n="personTitle">En personne</h2>
+        <p class="panel-desc" data-i18n="personDesc">Salon, journée carrière, entrevue, jury : la démo doit fonctionner même quand tout le reste va mal.</p>
+      </div>
+      <div class="panel-actions">
+        <button class="btn-ghost" type="button" data-print data-i18n="print">Imprimer</button>
+        <button class="btn-ghost danger" type="button" data-reset="person" data-i18n="reset">Réinitialiser</button>
+      </div>
+    </div>
+    <div class="progress-label"><span id="plabel-person"></span></div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="pbar-person" style="width:0%"></div></div>
+    <div class="done-banner" id="done-person"><strong data-i18n="doneTitle">Prêt·e ✓</strong><span data-i18n="doneText">Toutes les cases sont cochées.</span></div>
+    <div id="list-person"></div>
+    <div class="checklist-section qa">
+      <div class="section-label" data-i18n="qaTitle">Questions à prévoir</div>
+      <div id="qa-list"></div>
+    </div>
+  </section>
+
+  <!-- VIDÉO -->
+  <section class="tab-panel" id="panel-video" role="tabpanel">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title" data-i18n="videoTitle">En vidéo</h2>
+        <p class="panel-desc" data-i18n="videoDesc">Personne ne peut vous poser de questions : la vidéo doit se suffire à elle-même, avec ou sans le son.</p>
+      </div>
+      <div class="panel-actions">
+        <button class="btn-ghost" type="button" data-print data-i18n="print">Imprimer</button>
+        <button class="btn-ghost danger" type="button" data-reset="video" data-i18n="reset">Réinitialiser</button>
+      </div>
+    </div>
+    <div class="progress-label"><span id="plabel-video"></span></div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="pbar-video" style="width:0%"></div></div>
+    <div class="done-banner" id="done-video"><strong data-i18n="doneTitle">Prêt·e ✓</strong><span data-i18n="doneText">Toutes les cases sont cochées.</span></div>
+    <div id="list-video"></div>
+  </section>
+</main>
+
+<footer class="appfoot">
+  <p class="updated" data-i18n="updated">Dernière mise à jour : octobre 2026</p>
+  <details class="ai-attribution">
+    <summary data-i18n="aiAttribTitle">Comment cet outil a été créé</summary>
+    <p data-i18n="aiAttribP1">x</p>
+    <p data-i18n="aiAttribP2">x</p>
+    <p><strong data-i18n="aiAttribP3Strong">x</strong> — <span data-i18n="aiAttribP3Rest">x</span></p>
+  </details>
+</footer>
+
+<script>
+"use strict";
+/* ---------- Stockage sécuritaire ---------- */
+const KEY = "pitch-jeu";
+function lsGet(k){ try { return localStorage.getItem(KEY + "-" + k); } catch(e){ return null; } }
+function lsSet(k, v){ try { localStorage.setItem(KEY + "-" + k, v); } catch(e){} }
+
+/* ---------- Traductions statiques ---------- */
+let currentLang = "fr";
+const TRANSLATIONS = {
+  fr: {
+    backLink: "Outils carrière",
+    themeDark: "Mode sombre", themeLight: "Mode clair",
+    heroEyebrow: "Développement professionnel · Jeu vidéo et design interactif",
+    heroTitleA: "Présentez votre", heroTitleB: "jeu vidéo",
+    heroSub: "En personne ou en vidéo : une structure courte, une checklist et les pièges à éviter.",
+    print: "Imprimer", reset: "Réinitialiser",
+    pitchTitle: "Le pitch : quoi dire, et combien de temps",
+    pitchDesc: "Valable en personne comme en vidéo. Choisissez la durée, puis préparez chaque partie.",
+    personTitle: "En personne",
+    personDesc: "Salon, journée carrière, entrevue, jury : la démo doit fonctionner même quand tout le reste va mal.",
+    videoTitle: "En vidéo",
+    videoDesc: "Personne ne peut vous poser de questions : la vidéo doit se suffire à elle-même, avec ou sans le son.",
+    budgetTitle: "Répartition du temps",
+    budgetDesc: "Plus de la moitié du temps va à voir le jeu, pas à en parler.",
+    formulaTitle: "La phrase qui ouvre tout",
+    formulaTpl: "[Nom] est un [genre] où vous [action principale] pour [but].",
+    formulaEx: "Exemple (fictif) : « Marée Haute est un jeu de gestion où vous livrez le courrier en barque avant que la marée monte. »",
+    formulaTest: "Test : une personne qui l'entend doit pouvoir la répéter à quelqu'un d'autre. Sinon, simplifiez.",
+    qaTitle: "Questions à prévoir",
+    doneTitle: "Prêt·e ✓", doneText: "Toutes les cases sont cochées.",
+    updated: "Dernière mise à jour : octobre 2026",
+    aiAttribTitle: "Comment cet outil a été créé",
+    aiAttribP1: "Cet outil a été construit par une collaboration itérative entre Elisa Schaeffer, Doyenne de la Technologie et du Design au Collège LaSalle Montréal, et Claude (Anthropic), un assistant IA. Le contenu pédagogique, la structure, les fonctionnalités, les priorités et les choix éditoriaux ont été définis, questionnés et affinés par Elisa à chaque étape. Claude a généré le code, proposé des formulations et signalé les incohérences — mais chaque décision substantielle a été prise par un être humain.",
+    aiAttribP2: "Ce n'est pas du contenu IA généré en une seule fois. C'est le résultat d'un dialogue de révision prolongé : chaque session a été lue, critiquée et corrigée. L'outil évolue.",
+    aiAttribP3Strong: "Utilisation réfléchie de l'IA",
+    aiAttribP3Rest: "L'IA générative est un outil de travail, non un substitut au jugement professionnel. Ce projet illustre une approche où l'humain reste l'auteur·rice : l'IA amplifie la capacité de production, mais la responsabilité éditoriale, pédagogique et éthique reste entièrement humaine. Dernière mise à jour : octobre 2026."
+  },
+  en: {
+    backLink: "Career tools",
+    themeDark: "Dark mode", themeLight: "Light mode",
+    heroEyebrow: "Professional development · Video games and interactive design",
+    heroTitleA: "Pitch your", heroTitleB: "video game",
+    heroSub: "In person or on video: a short structure, a checklist and the traps to avoid.",
+    print: "Print", reset: "Reset",
+    pitchTitle: "The pitch: what to say, and for how long",
+    pitchDesc: "Works in person and on video. Pick a length, then prepare each part.",
+    personTitle: "In person",
+    personDesc: "Expo, career day, interview, jury: the demo has to work even when everything else goes wrong.",
+    videoTitle: "On video",
+    videoDesc: "Nobody can ask you questions: the video must stand on its own, with or without sound.",
+    budgetTitle: "Time budget",
+    budgetDesc: "More than half of the time goes to showing the game, not talking about it.",
+    formulaTitle: "The sentence that opens everything",
+    formulaTpl: "[Name] is a [genre] where you [main action] to [goal].",
+    formulaEx: "Example (fictional): “High Tide is a management game where you deliver mail by rowboat before the tide rises.”",
+    formulaTest: "Test: someone who hears it should be able to repeat it to somebody else. If not, simplify.",
+    qaTitle: "Questions to expect",
+    doneTitle: "Ready ✓", doneText: "Every box is checked.",
+    updated: "Last updated: October 2026",
+    aiAttribTitle: "How this tool was made",
+    aiAttribP1: "This tool was built through an iterative collaboration between Elisa Schaeffer, Dean of Technology and Design at Collège LaSalle Montréal, and Claude (Anthropic), an AI assistant. The pedagogical content, structure, features, priorities, and editorial choices were defined, questioned, and refined by Elisa at every step. Claude generated the code, proposed wording, and flagged inconsistencies — but every substantive decision was made by a human.",
+    aiAttribP2: "This is not one-shot AI-generated content. It is the result of an extended review dialogue: each session was read, critiqued, and corrected. The tool continues to evolve.",
+    aiAttribP3Strong: "Thoughtful use of AI",
+    aiAttribP3Rest: "Generative AI is a working tool, not a substitute for professional judgment. This project illustrates an approach where the human remains the author: AI amplifies production capacity, but editorial, pedagogical, and ethical responsibility remains entirely human. Last updated: October 2026."
+  }
+};
+function t(key){
+  const d = TRANSLATIONS[currentLang] || TRANSLATIONS.fr;
+  return (key in d) ? d[key] : ((key in TRANSLATIONS.fr) ? TRANSLATIONS.fr[key] : key);
+}
+function L(o){ return (o && o[currentLang]) || (o && o.fr) || ""; }
+
+/* ---------- Contenu dynamique ---------- */
+const TABS = [
+  { id: "pitch",  fr: "Le pitch",    en: "The pitch" },
+  { id: "person", fr: "En personne", en: "In person" },
+  { id: "video",  fr: "En vidéo",    en: "On video" }
+];
+
+const SECTIONS = {
+  pitch: [
+    { fr: "Avant de parler", en: "Before you speak", items: [
+      { id: "p1", tag: "must",
+        fr: ["Une phrase décrit le jeu : nom + genre + ce que le joueur fait", "Utilisez la formule ci-dessus. Pas de jargon : votre grand-parent devrait comprendre le but."],
+        en: ["One sentence describes the game: name + genre + what the player does", "Use the formula above. No jargon: a grandparent should understand the goal."] },
+      { id: "p2", tag: "must",
+        fr: ["Vous pouvez nommer la boucle de jeu centrale (core loop)", "Ce que le joueur fait toutes les 30 secondes environ. C'est cela que vous montrez en priorité."],
+        en: ["You can name the core loop", "What the player does roughly every 30 seconds. That is what you show first."] },
+      { id: "p3", tag: "must",
+        fr: ["Un seul élément distinctif est retenu", "Le reste va dans une page de présentation, pas dans le pitch. Trois fonctionnalités à moitié expliquées valent moins qu'une seule bien montrée."],
+        en: ["One distinctive element is chosen", "The rest goes on a project page, not in the pitch. Three half-explained features are worth less than one shown well."] },
+      { id: "p4", tag: "tip",
+        fr: ["Public visé et deux jeux comparables nommés", "« Pour les fans de X et de Y ». Deux comparables au maximum."],
+        en: ["Target audience and two comparable games named", "“For fans of X and Y.” Two comparisons at most."] }
+    ]},
+    { fr: "Honnêteté", en: "Honesty", items: [
+      { id: "p5", tag: "must",
+        fr: ["Vous ne montrez que ce qui fonctionne dans la version actuelle, et vous nommez son état", "Prototype, tranche verticale (vertical slice) ou jeu complet. Une fonction qui n'existe pas encore se dit à voix haute : « prévu, pas implanté »."],
+        en: ["You only show what works in the current version, and you name its state", "Prototype, vertical slice or finished game. A feature that does not exist yet is said out loud: “planned, not implemented.”"] },
+      { id: "p6", tag: "must",
+        fr: ["Votre rôle précis, la taille de l'équipe, la durée et le moteur sont prêts", "Code, art, design, son, production… Les jeux sont presque toujours des projets d'équipe : on veut savoir ce que vous avez fait."],
+        en: ["Your exact role, team size, duration and engine are ready", "Code, art, design, sound, production… Games are almost always team projects: people want to know what you did."] },
+      { id: "p7", tag: "must",
+        fr: ["Les ressources externes sont déclarées : assets, musique, polices, IA générative", "Une liste claire vaut mieux qu'une mauvaise surprise. Respectez aussi les règles d'intégrité académique de votre cours."],
+        en: ["External resources are declared: assets, music, fonts, generative AI", "A clear list beats a bad surprise. Also follow your course's academic integrity rules."] }
+    ]},
+    { fr: "Pour terminer", en: "To finish", items: [
+      { id: "p8", tag: "must",
+        fr: ["Un lien jouable (page itch.io, version web) et un code QR sont prêts", "Un code QR évite les fautes de frappe. Testez-le avec un autre téléphone que le vôtre."],
+        en: ["A playable link (itch.io page, web build) and a QR code are ready", "A QR code avoids typos. Test it with a phone other than your own."] },
+      { id: "p9", tag: "tip",
+        fr: ["Pitch chronométré à voix haute au moins trois fois", "Lire dans sa tête n'est pas pareil. Enregistrez-vous ou présentez à un·e camarade."],
+        en: ["Pitch timed out loud at least three times", "Reading silently is not the same. Record yourself or present to a classmate."] }
+    ]}
+  ],
+  person: [
+    { fr: "Matériel et démo", en: "Equipment and demo", items: [
+      { id: "e1", tag: "must",
+        fr: ["Le jeu est installé localement et démarre sans connexion Internet", "Le Wi-Fi d'un événement est souvent saturé. Ne comptez pas dessus."],
+        en: ["The game is installed locally and starts without an Internet connection", "Event Wi-Fi is often overloaded. Do not rely on it."] },
+      { id: "e2", tag: "must",
+        fr: ["Une démo guidée de 60 à 90 secondes se lance en un clic", "Point de sauvegarde, niveau de démo ou mode démo : on ne passe pas par les menus devant quelqu'un."],
+        en: ["A guided 60–90 second demo launches in one click", "Checkpoint, demo level or demo mode: you do not click through menus in front of someone."] },
+      { id: "e3", tag: "must",
+        fr: ["Plan B : une capture vidéo du jeu est prête à lancer sur votre téléphone", "Si l'ordinateur plante, vous continuez le pitch sans vous excuser."],
+        en: ["Plan B: a gameplay capture is ready to play on your phone", "If the computer crashes, you carry on with the pitch without apologizing."] },
+      { id: "e4", tag: "tip",
+        fr: ["Appareil chargé, chargeur, souris ou manette de rechange", "Vérifiez aussi que l'écran est lisible de deux mètres : taille de l'interface, luminosité."],
+        en: ["Device charged, charger, spare mouse or controller", "Also check that the screen is readable from two metres: interface size, brightness."] },
+      { id: "e5", tag: "tip",
+        fr: ["Le pitch ne dépend pas du son", "Salle bruyante : le son sera inaudible. Prévoyez un casque pour la personne qui joue."],
+        en: ["The pitch does not depend on sound", "A noisy room makes audio unusable. Bring a headset for whoever plays."] }
+    ]},
+    { fr: "Pendant la présentation", en: "During the pitch", items: [
+      { id: "e6", tag: "must",
+        fr: ["Une version de 30 secondes et une de 2 minutes sont mémorisées", "Vous ne savez pas combien de temps la personne vous accordera. Commencez par la version courte."],
+        en: ["A 30-second version and a 2-minute version are memorized", "You do not know how much time the person will give you. Start with the short one."] },
+      { id: "e7", tag: "tip",
+        fr: ["Vous regardez la personne, pas l'écran", "Tournez l'écran de côté pour qu'elle le voie sans que vous lui tourniez le dos."],
+        en: ["You look at the person, not the screen", "Angle the screen sideways so they can see it without you turning your back."] },
+      { id: "e8", tag: "tip",
+        fr: ["Vous laissez la personne jouer 30 secondes, si le contexte le permet", "Observez où elle hésite : c'est de la rétroaction gratuite. Ne l'interrompez pas pour expliquer."],
+        en: ["You let the person play for 30 seconds, if the setting allows", "Watch where they hesitate: free feedback. Do not interrupt to explain."] },
+      { id: "e9", tag: "tip",
+        fr: ["Vous adaptez la langue à votre interlocuteur·trice (FR ou EN)", "Au Québec, le français est la langue de départ; passez à l'anglais si on vous y invite."],
+        en: ["You adapt the language to the person (FR or EN)", "In Québec, French is the default; switch to English if invited."] },
+      { id: "e10", tag: "tip",
+        fr: ["Vous notez les commentaires et les prénoms, puis faites un suivi dans les 24 à 48 h", "Un courriel court avec le lien du jeu et un rappel de votre conversation."],
+        en: ["You note feedback and names, then follow up within 24–48 h", "A short email with the game link and a reminder of your conversation."] }
+    ]}
+  ],
+  video: [
+    { fr: "Contenu", en: "Content", items: [
+      { id: "v1", tag: "must",
+        fr: ["60 à 90 secondes maximum", "Même limite que pour un showreel de portfolio. Mieux vaut court et net que complet."],
+        en: ["60–90 seconds maximum", "Same limit as a portfolio showreel. Short and sharp beats complete."] },
+      { id: "v2", tag: "must",
+        fr: ["La vidéo commence par du gameplay", "Ni logo animé, ni écran-titre, ni « Bonjour, voici notre jeu » en ouverture. La première image doit déjà montrer le jeu."],
+        en: ["The video opens with gameplay", "No animated logo, no title screen, no “Hi, this is our game” opener. The very first frame should already show the game."] },
+      { id: "v3", tag: "must",
+        fr: ["Ce qu'on voit est une vraie capture du jeu, pas une maquette ni un rendu non représentatif", "Si une séquence est un montage ou un concept, indiquez-le à l'écran."],
+        en: ["What we see is real gameplay capture, not a mockup or an unrepresentative render", "If a sequence is an edit or a concept, label it on screen."] },
+      { id: "v4", tag: "must",
+        fr: ["La vidéo se comprend sans le son : sous-titres ou texte à l'écran", "Sous-titres dans la langue du public visé; FR et EN si les deux s'appliquent. Trois courts textes à l'écran suffisent."],
+        en: ["The video makes sense without sound: captions or on-screen text", "Captions in your audience's language; FR and EN if both apply. Three short on-screen texts are enough."] },
+      { id: "v5", tag: "tip",
+        fr: ["Voix claire : micro correct, pièce calme, texte relu à voix haute", "Un micro de casque dans une pièce calme vaut mieux que le micro d'un ordinateur portable dans un corridor."],
+        en: ["Clear voice: decent microphone, quiet room, script read aloud", "A headset mic in a quiet room beats a laptop mic in a hallway."] },
+      { id: "v6", tag: "must",
+        fr: ["Le rôle, l'équipe et l'état du jeu apparaissent à la fin (ou dans la description)", "Même contenu que l'onglet Le pitch : votre contribution, le moteur, la version montrée."],
+        en: ["Role, team and game state appear at the end (or in the description)", "Same content as The pitch tab: your contribution, the engine, the version shown."] }
+    ]},
+    { fr: "Technique et mise en ligne", en: "Technical and publishing", items: [
+      { id: "v7", tag: "tip",
+        fr: ["Format 16:9, 1080p, 30 ou 60 images par seconde stables", "Vérifiez que l'interface du jeu reste lisible sur l'écran d'un téléphone."],
+        en: ["16:9 format, 1080p, steady 30 or 60 frames per second", "Check that the game's interface stays readable on a phone screen."] },
+      { id: "v8", tag: "must",
+        fr: ["Musique et sons : créés par vous, libres de droits, ou sous licence déclarée", "La musique commerciale non autorisée peut faire bloquer ou retirer votre vidéo."],
+        en: ["Music and sounds: made by you, royalty-free, or under a declared licence", "Unlicensed commercial music can get your video blocked or removed."] },
+      { id: "v9", tag: "must",
+        fr: ["Hébergée sur YouTube (non répertoriée) ou Vimeo; titre = nom du jeu + genre", "Description : rôle, moteur, équipe, lien jouable. Ne l'hébergez pas directement sur votre site."],
+        en: ["Hosted on YouTube (unlisted) or Vimeo; title = game name + genre", "Description: role, engine, team, playable link. Do not host it directly on your own site."] },
+      { id: "v10", tag: "tip",
+        fr: ["Vignette lisible, avec une vraie image du jeu", "Évitez le texte trop petit : la vignette s'affiche souvent en miniature."],
+        en: ["Readable thumbnail with a real image from the game", "Avoid tiny text: thumbnails are often shown very small."] },
+      { id: "v11", tag: "must",
+        fr: ["Testée par une autre personne, sur téléphone, avec et sans le son", "Demandez-lui de redire le jeu en une phrase. Si elle n'y arrive pas, retravaillez les 15 premières secondes."],
+        en: ["Tested by someone else, on a phone, with and without sound", "Ask them to say what the game is in one sentence. If they cannot, rework the first 15 seconds."] }
+    ]}
+  ]
+};
+
+const QA = [
+  { q: { fr: "Quel a été votre rôle exact ?", en: "What exactly was your role?" },
+    a: { fr: "<strong>Ce qu'on vérifie :</strong> l'honnêteté et la clarté. Répondez avec des faits : « J'ai programmé le système d'inventaire et les ennemis; l'art venait de deux collègues. »",
+         en: "<strong>What they check:</strong> honesty and clarity. Answer with facts: “I programmed the inventory system and the enemies; the art came from two teammates.”" } },
+  { q: { fr: "Quel a été le plus grand défi, et comment l'avez-vous réglé ?", en: "What was the biggest challenge, and how did you solve it?" },
+    a: { fr: "<strong>Ce qu'on vérifie :</strong> votre démarche de résolution de problème. Une réponse en quatre temps (situation, tâche, action, résultat) fonctionne bien. Préparez-en une, technique ou de design.",
+         en: "<strong>What they check:</strong> your problem-solving approach. A four-part answer (situation, task, action, result) works well. Prepare one, technical or design." } },
+  { q: { fr: "Que changeriez-vous avec deux semaines de plus ?", en: "What would you change with two more weeks?" },
+    a: { fr: "<strong>Ce qu'on vérifie :</strong> votre lucidité sur le jeu. Nommez une vraie faiblesse et ce que vous feriez, plutôt qu'une fausse (« je suis perfectionniste »).",
+         en: "<strong>What they check:</strong> how clearly you see your own game. Name a real weakness and what you would do about it, not a fake one (“I'm a perfectionist”)." } },
+  { q: { fr: "À qui s'adresse le jeu ? À quel jeu le comparez-vous ?", en: "Who is the game for? Which game would you compare it to?" },
+    a: { fr: "<strong>Ce qu'on vérifie :</strong> votre connaissance du marché et du public. Deux jeux comparables et une phrase sur ce qui vous en distingue.",
+         en: "<strong>What they check:</strong> your knowledge of the market and audience. Two comparable games and one sentence on what sets yours apart." } }
+];
+
+const BUDGET = [
+  { k: "s1", pct: 10, title: { fr: "Accroche", en: "Hook" },
+    desc: { fr: "Une image ou une action forte. Pas de logo, pas de « Bonjour, on va vous présenter… ».", en: "A strong image or action. No logo, no “Hello, we're going to present…”." } },
+  { k: "s2", pct: 15, title: { fr: "Le jeu en une phrase", en: "The game in one sentence" },
+    desc: { fr: "Nom + genre + ce que le joueur fait.", en: "Name + genre + what the player does." } },
+  { k: "s3", pct: 40, title: { fr: "Le jeu en action", en: "The game in action" },
+    desc: { fr: "La boucle centrale, en vrai. Montrez, ne décrivez pas.", en: "The core loop, for real. Show, don't describe." } },
+  { k: "s4", pct: 15, title: { fr: "Ce qui le distingue", en: "What sets it apart" },
+    desc: { fr: "Un seul élément. Pas la liste de toutes les fonctionnalités.", en: "One element. Not a list of every feature." } },
+  { k: "s5", pct: 20, title: { fr: "Votre rôle et où jouer", en: "Your role and where to play" },
+    desc: { fr: "Contribution, équipe, état du jeu, puis le lien ou le code QR.", en: "Contribution, team, game state, then the link or QR code." } }
+];
+const DURATIONS = [30, 60, 90, 120];
+const DUR_CAPTION = {
+  30:  { fr: "Conversation de couloir ou de réseautage.", en: "Hallway or networking chat." },
+  60:  { fr: "Démo rapide à une table.", en: "Quick demo at a table." },
+  90:  { fr: "Vidéo de portfolio (limite recommandée : 90 s).", en: "Portfolio video (recommended limit: 90 s)." },
+  120: { fr: "Présentation à une table de démo ou devant un jury.", en: "Demo-table presentation or in front of a jury." }
+};
+let duration = 60;
+
+/* ---------- État ---------- */
+let checked = new Set();
+try { checked = new Set(JSON.parse(lsGet("checked") || "[]")); } catch(e){ checked = new Set(); }
+let activeTab = "pitch";
+function saveChecked(){ lsSet("checked", JSON.stringify([...checked])); }
+function secLabel(s){ return s + " s"; }
+
+/* ---------- Rendu ---------- */
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function tabIds(tab){ return SECTIONS[tab].flatMap(s => s.items.map(i => i.id)); }
+
+function renderTabs(){
+  const bar = document.getElementById("tabBar");
+  bar.innerHTML = TABS.map(tb => {
+    const ids = tabIds(tb.id), n = ids.filter(id => checked.has(id)).length;
+    const done = n === ids.length;
+    return `<button class="tab-btn${tb.id===activeTab?" active":""}${done?" complete":""}" role="tab" aria-selected="${tb.id===activeTab}" data-tab="${tb.id}">
+      <span>${esc(L(tb))}</span><span class="tab-count">${n} / ${ids.length}${done?" ✓":""}</span></button>`;
+  }).join("");
+  bar.querySelectorAll(".tab-btn").forEach(b => b.addEventListener("click", () => { activeTab = b.dataset.tab; showTab(); }));
+}
+
+function showTab(){
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === "panel-" + activeTab));
+  renderTabs();
+}
+
+function tagHtml(tag){
+  return tag === "must"
+    ? `<span class="tag tag-must">${currentLang==="fr" ? "Essentiel" : "Essential"}</span>`
+    : `<span class="tag tag-tip">${currentLang==="fr" ? "Conseil" : "Tip"}</span>`;
+}
+
+function renderList(tab){
+  const host = document.getElementById("list-" + tab);
+  host.innerHTML = SECTIONS[tab].map(sec => `
+    <div class="checklist-section">
+      <div class="section-label">${esc(L(sec))}</div>
+      ${sec.items.map(it => {
+        const c = checked.has(it.id), txt = it[currentLang] || it.fr;
+        return `<label class="checklist-item${c?" checked":""}">
+          <input type="checkbox" data-id="${it.id}"${c?" checked":""}>
+          <span class="check-box" aria-hidden="true"></span>
+          <span class="item-text"><span class="item-label">${esc(txt[0])}${tagHtml(it.tag)}</span>
+          <div class="item-hint">${esc(txt[1])}</div></span></label>`;
+      }).join("")}
+    </div>`).join("");
+  host.querySelectorAll("input[type=checkbox]").forEach(cb => cb.addEventListener("change", () => {
+    if (cb.checked) checked.add(cb.dataset.id); else checked.delete(cb.dataset.id);
+    saveChecked(); renderProgress(); renderTabs();
+    cb.closest(".checklist-item").classList.toggle("checked", cb.checked);
+  }));
+}
+
+function renderProgress(){
+  TABS.forEach(tb => {
+    const ids = tabIds(tb.id), n = ids.filter(id => checked.has(id)).length;
+    document.getElementById("plabel-" + tb.id).textContent = n + " / " + ids.length + (currentLang==="fr" ? " complété" : " complete");
+    document.getElementById("pbar-" + tb.id).style.width = (100 * n / ids.length) + "%";
+    document.getElementById("done-" + tb.id).classList.toggle("visible", n === ids.length);
+  });
+}
+
+function renderQA(){
+  document.getElementById("qa-list").innerHTML = QA.map(x =>
+    `<details><summary>${esc(L(x.q))}</summary><div class="qa-body">${L(x.a)}</div></details>`).join("");
+}
+
+function renderBudget(){
+  // Limites cumulatives arrondies : la somme des secondes égale toujours la durée choisie.
+  let cum = 0, prev = 0;
+  const rows = BUDGET.map(b => {
+    cum += b.pct;
+    const end = Math.round(cum * duration / 100), start = prev; prev = end;
+    return { b, start, end };
+  });
+  document.getElementById("durGroup").innerHTML = DURATIONS.map(d =>
+    `<button type="button" class="seg-btn" data-dur="${d}" aria-pressed="${d===duration}">${d === 120 ? "2 min" : d + " s"}</button>`).join("");
+  document.querySelectorAll("#durGroup .seg-btn").forEach(b => b.addEventListener("click", () => { duration = +b.dataset.dur; renderBudget(); }));
+  document.getElementById("durCaption").textContent = L(DUR_CAPTION[duration]);
+  document.getElementById("budgetBar").innerHTML = rows.map(r =>
+    `<div class="bar__seg" style="flex:${r.b.pct} 1 0;background:var(--${r.b.k});color:var(--${r.b.k}-fg)">${r.end - r.start} s</div>`).join("");
+  document.getElementById("budgetLegend").innerHTML = rows.map(r =>
+    `<li><span class="legend__sw" style="background:var(--${r.b.k})"></span>
+      <div><div class="legend__title">${esc(L(r.b.title))}</div><div class="legend__desc">${esc(L(r.b.desc))}</div></div>
+      <div class="legend__time">${r.start}–${r.end} s</div></li>`).join("");
+}
+
+/* ---------- i18n ---------- */
+function applyStaticI18n(){
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.getAttribute("data-i18n")); });
+  document.documentElement.lang = currentLang === "en" ? "en-CA" : "fr-CA";
+  document.title = currentLang === "en" ? "Pitching your game · Career Tools" : "Présenter son jeu · Outils carrière";
+}
+function fullRender(){
+  renderTabs(); renderBudget(); renderQA();
+  TABS.forEach(tb => renderList(tb.id));
+  renderProgress(); updateThemeButton();
+}
+function applyLanguage(lang){
+  currentLang = lang;
+  lsSet("lang", lang);
+  applyStaticI18n();
+  document.getElementById("btnLangFr").classList.toggle("active", lang === "fr");
+  document.getElementById("btnLangEn").classList.toggle("active", lang === "en");
+  document.getElementById("btnLangFr").setAttribute("aria-pressed", lang === "fr");
+  document.getElementById("btnLangEn").setAttribute("aria-pressed", lang === "en");
+  fullRender();
+}
+document.getElementById("btnLangFr").addEventListener("click", () => applyLanguage("fr"));
+document.getElementById("btnLangEn").addEventListener("click", () => applyLanguage("en"));
+
+/* ---------- Thème ---------- */
+function isDarkTheme(){ return document.documentElement.getAttribute("data-theme") === "dark"; }
+function updateThemeButton(){
+  const dark = isDarkTheme();
+  document.getElementById("themeIcon").textContent = dark ? "☀️" : "🌙";
+  document.getElementById("themeLabel").textContent = dark ? t("themeLight") : t("themeDark");
+}
+function initTheme(){
+  const saved = lsGet("theme");
+  const theme = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  document.documentElement.setAttribute("data-theme", theme);
+  updateThemeButton();
+}
+document.getElementById("btnThemeToggle").addEventListener("click", () => {
+  const next = isDarkTheme() ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  lsSet("theme", next);
+  updateThemeButton(); // tout le reste passe par des variables CSS : aucun visuel dessiné en JS à redessiner
+});
+
+/* ---------- Actions ---------- */
+document.querySelectorAll("[data-reset]").forEach(btn => btn.addEventListener("click", () => {
+  tabIds(btn.dataset.reset).forEach(id => checked.delete(id));
+  saveChecked(); renderList(btn.dataset.reset); renderProgress(); renderTabs();
+}));
+document.querySelectorAll("[data-print]").forEach(btn => btn.addEventListener("click", () => window.print()));
+
+/* ---------- Démarrage ---------- */
+initTheme();
+const savedLang = lsGet("lang");
+applyLanguage(savedLang === "en" ? "en" : "fr");
+</script>
+</body>
+</html>
